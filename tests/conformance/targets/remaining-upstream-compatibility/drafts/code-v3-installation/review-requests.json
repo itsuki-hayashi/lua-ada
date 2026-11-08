@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "kind": "code-v3-production-installation-review-requests",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "independent_reviewer": null,
+  "decision": "pending",
+  "installed": false,
+  "source_snapshot": {
+    "revision": "c15b1eb16be8eb1509abb31ba8cf2098efd3ba90",
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294"
+  },
+  "assistance": {
+    "tool": "Claude Code",
+    "model": "claude-haiku-5-5",
+    "session": "5dc896ad-629f-41e8-ad74-11cad9cc9847",
+    "role": "Untrusted first draft only; child author corrected and audited the concrete packet."
+  },
+  "candidate_policy": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.policy.candidate.json",
+    "sha256": "5f9d5d03fa75af590e6163291e4145e745e613fb07d27af896e5d189bf2d0b6a"
+  },
+  "decomposition": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.decomposition.draft.json",
+    "sha256": "cdb54c0505c1923049ac558117cecf71c9b5e7180ce04f70ea2bb1cbd62f54ca"
+  },
+  "decomposition_approval": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.decomposition-approval.draft.json",
+    "sha256": "1710bef32e1f4a031a1b14ed5121771b84f8ae3a6f7389831d7967f314b68a53"
+  },
+  "approvals": [
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9001",
+      "approval": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9001.exclusion-approval.draft.json",
+        "sha256": "b94ca64a818ddb64a4ac605b05b7f9e7b2ea922ce2b8e8228be0f13a9aeb9b33"
+      },
+      "narrative": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9001.independent-review.draft.json",
+        "sha256": "c39a6ce0d7a5bf77189256d2e4f6ad96e035747c6eddd1c35ebf84191b5c6d73"
+      },
+      "independent_review_status": "pending"
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9002",
+      "approval": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9002.exclusion-approval.draft.json",
+        "sha256": "5763ef7e7f9bab0e729ca25c14077670a29d6146f3b3a43e62b2174bc8dc4a52"
+      },
+      "narrative": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9002.independent-review.draft.json",
+        "sha256": "cd2b57cab1dcca7ef3bc86bb6e873cfd753ea64de1f27148e2e2da942428fcda"
+      },
+      "independent_review_status": "pending"
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9003",
+      "approval": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9003.exclusion-approval.draft.json",
+        "sha256": "a870ac11f1c8531228512d6d23ba4a0ec8880b58fe63dfb96714d4ccc221f832"
+      },
+      "narrative": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9003.independent-review.draft.json",
+        "sha256": "fe5c68bb16fefda3760c8fa6fdb6e48dc2ce39fc831d5033419da2f1e4fc97ab"
+      },
+      "independent_review_status": "pending"
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9004",
+      "approval": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9004.exclusion-approval.draft.json",
+        "sha256": "fce27baa56f472a284a9d6462951b99b5ca66d2e7c4145cfa92a119ef0fe78a7"
+      },
+      "narrative": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9004.independent-review.draft.json",
+        "sha256": "1a352213d29ece2d469e947bfbd7c96bd5050519b3191df0b437f239a8281d10"
+      },
+      "independent_review_status": "pending"
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9005",
+      "approval": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9005.exclusion-approval.draft.json",
+        "sha256": "9cf7a533eb3b25e5beff3638c03cae304b835aea2647eb73c5a33458e6fe5ad6"
+      },
+      "narrative": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9005.independent-review.draft.json",
+        "sha256": "c7d9ce1a465476c4e4d52ee465331d814fcdd485d51fb7343aa7f0fe0c205720"
+      },
+      "independent_review_status": "pending"
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9006",
+      "approval": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9006.exclusion-approval.draft.json",
+        "sha256": "2ae3ea3b9e10cdf9962f5ae3ba81bfd9b86957aa3b1e922f12a18107dead4893"
+      },
+      "narrative": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9006.independent-review.draft.json",
+        "sha256": "c99805d497c6b83692eefb8cd6aa9f9d6f3e6fd5d14c0aea499252de984357a6"
+      },
+      "independent_review_status": "pending"
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9007",
+      "approval": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9007.exclusion-approval.draft.json",
+        "sha256": "c54e579a9c08491825ca57e5c408e9cbc84e77f98f2a5e431841fd5a97a9840e"
+      },
+      "narrative": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9007.independent-review.draft.json",
+        "sha256": "5bed7aa4d9507497d8337ccc238dd077c6a1baac88e6fb847ecc6bb93eb31bc2"
+      },
+      "independent_review_status": "pending"
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9008",
+      "approval": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9008.exclusion-approval.draft.json",
+        "sha256": "a2c9d6f91f9920dceeb4848e61c502eda8948fa8a1c63b64c954f454ca0da6e5"
+      },
+      "narrative": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9008.independent-review.draft.json",
+        "sha256": "b5d31b9bf1ec562653c1be1ac03989adbc08ef7649f74a86f1a65ad2f38b6531"
+      },
+      "independent_review_status": "pending"
+    },
+    {
+      "id": "code-private-optimizer-v3",
+      "approval": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.transform-approval.draft.json",
+        "sha256": "69798523b512c36b1eede9b9b1e6285480d183d8fa19924cd053d43a01d43541"
+      },
+      "narrative": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.transform-review.draft.json",
+        "sha256": "36ff418f29af292a9994c0217ca18bf100d81cb7b07ffef831d2191168bfeb4d"
+      },
+      "independent_review_status": "pending"
+    },
+    {
+      "id": "api-fixed-buffer-private-bound",
+      "approval": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/api18-successor.transform-approval.draft.json",
+        "sha256": "323d0af705cafbfa84a259cbae08f7eeeb03fbd277b19308ead6833a348f1205"
+      },
+      "narrative": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/api18-successor.transform-review.draft.json",
+        "sha256": "1bdf7b4d7354b74ddad8341087559ff3e1fea3819cebfe5cbb30d50621da7d68"
+      },
+      "independent_review_status": "pending"
+    }
+  ],
+  "api18_successor": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/api18.transform.successor.draft.json",
+    "sha256": "44ebdbdb432e95c0899c815bceb253e0dbf1a41155086e4c90b797841aebdb34"
+  },
+  "code_transform": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.transform.draft.json",
+    "sha256": "6c781957b2726c862bb620887529829b7f43a3aa9c1b5296342d76a84ecac1f2"
+  },
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": []
+}

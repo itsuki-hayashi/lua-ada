@@ -3,6 +3,7 @@ with Ada.Unchecked_Conversion;
 with Interfaces;
 with Interfaces.C;
 with Lua.Engine.File_Resources;
+with Lua.Engine.Diagnostics;
 with Lua.Engine.Machine;
 with Lua.Engine.Strings;
 with Lua.Engine.System_Results;
@@ -60,7 +61,7 @@ package body Lua.Engine.IO_Libraries is
                            Opened : Boolean := True) return Value is
    begin
       if not Files.Is_File (State, Item) then
-         Fail (State, "FILE* expected");
+         Diagnostics.Type_Error (State, 1, "FILE*", Item);
       elsif Opened and then Files.Header (Item).Closer = null then
          Fail (State, "attempt to use a closed file");
       elsif Opened and then Files.Header (Item).File = Streams.No_Stream then
@@ -187,7 +188,7 @@ package body Lua.Engine.IO_Libraries is
    function Advance
      (State : in out World; Activation : Frame_Access) return Native_Action
    is
-      Name : constant String := To_String (Activation.Native_Name);
+      Name : constant String := Native_Operation_Name (Activation);
       Result : Native_Action := New_Action (State);
       First_Text, Second_Text : Managed.Buffer;
       Item : Value;
@@ -274,7 +275,8 @@ package body Lua.Engine.IO_Libraries is
                   procedure Raise_Open (Text : String);
                   procedure Raise_Open (Text : String) is
                   begin
-                     Fail (State, "cannot open file '" & C_Option (Text) &
+                     Diagnostics.Raise_Error
+                       (State, "cannot open file '" & C_Option (Text) &
                            "' (" & To_String
                              (Error_Packet (2).Reference.Bytes) & ")");
                   end Raise_Open;
@@ -642,8 +644,18 @@ package body Lua.Engine.IO_Libraries is
       begin
          for Index in First .. Activation.Native_Arguments.Last_Index loop
             Work (State);
-            Strings.Query_Argument
-              (State, Activation.Native_Arguments (Index), Write'Access);
+            declare
+               --  The diagnostic can retire this failed builtin's packet
+               --  after transferring its actual scalar window to the C
+               --  owner. End the vector element borrow before entering it;
+               --  the real frame/window still roots this scalar value.
+               Item : constant Value := Arg (Index);
+            begin
+               if Item.Kind not in String_Kind | Integer_Kind | Real_Kind then
+                  Diagnostics.Type_Error (State, Index, "string", Item);
+               end if;
+               Strings.Query_Argument (State, Item, Write'Access);
+            end;
             if Failed then
                Result.Results := Failure (Error);
                Result.Results.Append ((Integer_Kind, Signed_Total (Total)));
@@ -744,7 +756,8 @@ package body Lua.Engine.IO_Libraries is
         Name (Name'First .. Name'First + 7) = "io.file." and then
         Activation.Native_Arguments.Is_Empty
       then
-         Fail (State, "bad argument #1 (FILE* expected, got no value)");
+         Diagnostics.Type_Error
+           (State, 1, "FILE*", Nil_Value, Present => False);
       end if;
       if Name = "io.type" then
          if Activation.Native_Arguments.Is_Empty then

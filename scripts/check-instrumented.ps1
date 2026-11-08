@@ -1,6 +1,9 @@
 param(
     [ValidateSet('static', 'static-pic', 'relocatable')]
-    [string] $LibraryType = 'static'
+    [string] $LibraryType = 'static',
+    [ValidateSet('','remaining-upstream-compatibility')][string] $TargetPolicy = '',
+    [string] $TargetWitnessPolicy = '',
+    [switch] $TargetDevelopmentObservation
 )
 
 Set-StrictMode -Version Latest
@@ -17,11 +20,23 @@ $suffix = if ($IsWindows) { '.exe' } else { '' }
 $reportDirectory = Join-Path $root "reports/instrumented/$LibraryType"
 [void][IO.Directory]::CreateDirectory($reportDirectory)
 $observations = [Collections.Generic.List[object]]::new()
+$targetWitnesses = $null; $previousTargetReports = @()
+if ($TargetPolicy -ne '') {
+    if ($TargetWitnessPolicy -eq '') { throw 'Target build mode requires its explicit successor witness policy' }
+    Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
+    $targetWitnesses = Read-TargetWitnessPolicy -Root $root -Path $TargetWitnessPolicy -RequireReview:(-not $TargetDevelopmentObservation)
+    $previousTargetReports = @(Get-ChildItem (Join-Path $root 'reports/core-image') -Filter result.json -File -Recurse -ErrorAction SilentlyContinue | ForEach-Object FullName)
+} elseif ($TargetWitnessPolicy -ne '' -or $TargetDevelopmentObservation) { throw 'Target witness/development flags require TargetPolicy' }
 
 function Invoke-CheckedAlire([string[]] $Arguments) {
     & alr @Arguments
     if ($LASTEXITCODE -ne 0) { throw "Alire failed: $Arguments" }
 }
+
+& (Join-Path $PSScriptRoot 'test-aunit-launch.ps1')
+& (Join-Path $PSScriptRoot 'test-aunit-evidence.ps1')
+& (Join-Path $PSScriptRoot 'test-foreign-contract-evidence.ps1')
+& (Join-Path $PSScriptRoot 'test-configured-fixture-selection.ps1')
 
 function Invoke-ObservedProcess {
     param([string] $Name, [string] $Executable, [string[]] $Arguments,
@@ -90,6 +105,8 @@ try {
     # Build serially with the same strict project switches as ordinary jobs.
     Invoke-CheckedAlire @('-n', '-C', 'tests', 'build', '--validation',
         '--profiles=lua_ada=validation', '--', "-XLUA_ADA_LIBRARY_TYPE=$LibraryType", '-XLUA_ADA_PREBUILT=false')
+    Invoke-CheckedAlire @('-n','-C','cli','build','--validation',
+        '--profiles=lua_ada=validation','--',"-XLUA_ADA_LIBRARY_TYPE=$LibraryType",'-XLUA_ADA_PREBUILT=false')
     # Shared executables need the selected compiler's support DLLs as well as
     # liblua. Obtain that search path from Alire instead of the ambient shell.
     $selectedPath = & alr exec -- pwsh -NoProfile -Command '$env:PATH'
@@ -117,13 +134,57 @@ try {
         -Arguments @((Join-Path $root 'tests/instrumented/t_coroutine_api.lua')) `
         -Directory $root -Witness 'T COROUTINE API OK' -Telemetry
     & "$PSScriptRoot/check-conformance-telemetry.ps1" -Interpreter $runner -Configuration upstream-test
-    & "$PSScriptRoot/check-conformance-equivalents.ps1"
-    & "$PSScriptRoot/check-conformance-scope.ps1"
-    & "$PSScriptRoot/test-conformance-scope.ps1"
-    & "$PSScriptRoot/test-conformance-matrix.ps1"
+    if ($TargetPolicy -eq '') {
+        & "$PSScriptRoot/check-conformance-equivalents.ps1"
+        & "$PSScriptRoot/check-conformance-scope.ps1"
+        & "$PSScriptRoot/test-conformance-scope.ps1"
+        & "$PSScriptRoot/test-conformance-matrix.ps1"
+    } else {
+        # The accepted scopes remain bound to their original source tree.
+        # Target builds exercise the successor validators and frozen-input
+        # reconstruction tests; those tests report stale production bindings
+        # explicitly and never grant runtime or target acceptance.
+        & "$PSScriptRoot/test-code-v3-installation.ps1"
+        if ($LASTEXITCODE -ne 0) { throw 'Installed Code source guards failed' }
+        & "$PSScriptRoot/test-t-transform-output.ps1"
+        if ($LASTEXITCODE -ne 0) { throw 'Disposable T source guards failed' }
+        & "$PSScriptRoot/test-conformance-transforms.ps1"
+        & "$PSScriptRoot/test-target-development-observer.ps1"
+        & "$PSScriptRoot/test-conformance-target-matrix.ps1"
+    }
 
     Invoke-CheckedAlire @('exec', '--', 'gprbuild', '-P',
         'experiments/conformance/oracle.gpr', '-XLUA_CONFORMANCE_CONFIGURATION=upstream-test')
+    Invoke-CheckedAlire @('exec', '--', 'gprbuild', '-P',
+        'experiments/conformance/oracle.gpr', '-XLUA_CONFORMANCE_CONFIGURATION=default')
+    $consoleDirectory=Join-Path $root ('reports/core-image/'+[guid]::NewGuid().ToString('N'))
+    & "$PSScriptRoot/check-debug-console.ps1" -Interpreter "$root/cli/bin/upstream-test/$LibraryType/lua_ada$suffix" `
+        -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
+        -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib" `
+        -RuntimeDirectory $library -Configuration upstream-test -OutputDirectory (Join-Path $consoleDirectory 'lua')
+    & "$PSScriptRoot/check-cli-readline.ps1" -Interpreter "$root/cli/bin/upstream-test/$LibraryType/lua_ada$suffix" `
+        -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
+        -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib" `
+        -RuntimeDirectory $library -Configuration upstream-test `
+        -OutputDirectory (Join-Path $root ('reports/core-image/readline-'+[guid]::NewGuid().ToString('N')))
+    $cliPairReport=Join-Path $root ('reports/core-image/cli-'+[guid]::NewGuid().ToString('N')+'/pair.json')
+    & "$PSScriptRoot/check-configured-cli.ps1" -Interpreter "$root/cli/bin/upstream-test/$LibraryType/lua_ada$suffix" `
+        -RuntimeDirectory $library `
+        -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
+        -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib" `
+        -Configuration upstream-test -LibraryType $LibraryType -Report $cliPairReport `
+        -DevelopmentObservation:$TargetDevelopmentObservation
+    & "$PSScriptRoot/test-cli-fixtures.ps1" -Report $cliPairReport
+    & "$PSScriptRoot/test-cli-fixture-transport.ps1" -Interpreter "$root/build/conformance/default/bin/lua$suffix" `
+        -RuntimeDirectory "$root/build/conformance/default/lib"
+    # These files need actual selected stack constants and a real T table.
+    # Running their source through the default glob without setup would either
+    # fail before the operation or silently miss the instrumented obligation.
+    $configuredReport=Join-Path $root ('reports/core-image/configured-'+[guid]::NewGuid().ToString('N')+'/result.json')
+    & "$PSScriptRoot/check-configured-fixtures.ps1" -Interpreter $runner `
+        -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
+        -Configuration upstream-test -RuntimeDirectory $library `
+        -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib" -LibraryType $LibraryType -Report $configuredReport
     if ($IsWindows) {
         & "$PSScriptRoot/check-windows-buffered-failure.ps1" -Interpreter $runner `
             -Configuration upstream-test -LibraryType $LibraryType `
@@ -137,9 +198,11 @@ try {
             -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua" `
             -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib"
     }
+    if ($TargetPolicy -eq '') {
     & "$PSScriptRoot/check-expanded-conformance.ps1" -Interpreter $runner `
         -Configuration upstream-test -LibraryType $LibraryType -RuntimeDirectory $library `
         -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix"
+    }
     & "$PSScriptRoot/test-conformance-launcher.ps1" -Interpreter $runner `
         -Configuration upstream-test `
         -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
@@ -149,8 +212,27 @@ try {
     # configuration only, preserves the existing SAL and owns no second build.
     # Keep Alire invocations serialized with the test and oracle builds above.
     & "$PSScriptRoot/test-prebuilt-runtime-profile.ps1" -Profile validation `
-        -LibraryType $LibraryType -Configuration upstream-test
+        -LibraryType $LibraryType -Configuration upstream-test -TargetPolicy $TargetPolicy
     if ($LASTEXITCODE -ne 0) { throw 'Instrumented C consumer checks failed' }
+    # The four console modes are separate invocations of the actual newly
+    # linked consumer. They cannot borrow its no-argument case count or its
+    # custom allocator counts: these modes use their public state constructor.
+    $consoleCompilerOutput=& alr exec -- pwsh -NoProfile -Command '(Get-Command gcc -ErrorAction Stop).Source'
+    if($LASTEXITCODE -ne 0){throw 'Cannot identify selected instrumented console C compiler'}
+    $consoleCompiler=($consoleCompilerOutput -join '').Trim()
+    & "$PSScriptRoot/test-cli-readline-portability.ps1" -Compiler $consoleCompiler
+    if($LASTEXITCODE -ne 0){throw 'Readline callback type regressions failed'}
+    & "$PSScriptRoot/check-debug-console-c.ps1" -Interpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
+        -AdaConsumer "$root/build/c-api/bin/upstream-test/validation/$LibraryType/builtin_api_contract$suffix" `
+        -Compiler $consoleCompiler -ReferenceLibrary "$root/build/conformance/upstream-test/lib" `
+        -AdaRuntimeDirectory $library -Configuration upstream-test -OutputDirectory (Join-Path $consoleDirectory 'c')
+    if ($TargetPolicy -ne '') {
+        $platform = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
+        $link = if ($LibraryType -ceq 'relocatable') { 'shared' } else { $LibraryType }
+        $null = Write-TargetBuildWitnesses -Root $root -Policy $targetWitnesses `
+            -Context "upstream-test/$platform/validation/$link" -PreviousReports $previousTargetReports -ConfiguredReport $configuredReport -CliReport $cliPairReport
+        Write-Output 'Target build phase completed; File/Aggregate/Heavy executions belong to immutable-image partition jobs; target acceptance=False'
+    }
     Write-Output "PASS: instrumented validation/$LibraryType regressions; scope acceptance remains pending"
 } finally {
     [ordered]@{ schema_version=1; configuration='upstream-test'; library=$LibraryType;

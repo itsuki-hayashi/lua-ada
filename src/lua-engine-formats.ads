@@ -2,6 +2,17 @@ with Lua_Ada_Config;
 with Lua.Storage.Buffers;
 
 package Lua.Engine.Formats is
+   procedure Finite_Number_Image
+     (Memory : not null Lua.Storage.Owner_Access; Item : Real_Value;
+      Precision : Positive; Output : in out Lua.Storage.Buffers.Buffer);
+   --  Render a finite binary64 using the shared exact general formatter.
+   --  @param Precision Significant decimal digits, normally fifteen or
+   --    seventeen for the pinned public number-to-text roundtrip policy.
+   --  @param Memory Owner of every rational, limb and output byte. A caller
+   --    with a fixed scalar bound may supply a scoped fixed scratch owner.
+   --  @param Output Receives a signed, dot-radix general spelling. The
+   --    caller applies the native decimal byte and integer-looking suffix.
+
    procedure Render_Into
      (State : in out World; Specification : String; Item : Value;
       Output : in out Lua.Storage.Buffers.Buffer;

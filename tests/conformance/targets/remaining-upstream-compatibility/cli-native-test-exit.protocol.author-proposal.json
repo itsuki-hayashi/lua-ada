@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "kind": "native-t-exit-no-close-protocol-author-proposal",
+  "author": "Codex /root/validation_delivery",
+  "independent_review_status": "pending",
+  "reviewer": null,
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "source_snapshot": {
+    "repository_revision": "0db6e82182c19bad876e1d40632f490b1e409d71",
+    "repository_dirty": true,
+    "revision": "6d52343bf33066d1634732a944916e2bda5c2413"
+  },
+  "feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/cli-native-t-exit-no-close.independent-feature-review.json",
+    "sha256": "01c86546143077d126b2c23716a7ee49a3f9dc25106ff44c45a0dd2b759615ad"
+  },
+  "source_bindings": [
+    {
+      "path": "scripts/CliFixtureCases.psm1",
+      "sha256": "257c4f929bff7200141f95f94f7f9d5743552d5a124813e2482935359e5ac68e"
+    },
+    {
+      "path": "scripts/CliFixtureEvidence.psm1",
+      "sha256": "c1d2e6f988b358fceb698f3a0ca50b203a853ee2849cb8b26f00a9d87c820527"
+    },
+    {
+      "path": "scripts/ConformanceRunner.psm1",
+      "sha256": "0f31e38c246c3fd7552674d54f5ddd4f683f04372295fa3b4b6d5875721707cf"
+    },
+    {
+      "path": "scripts/check-cli.ps1",
+      "sha256": "08f31d8cc14b31bee91a533d4d719aea6bf25a9e5be3a98cd6d6288574199930"
+    },
+    {
+      "path": "scripts/check-configured-cli.ps1",
+      "sha256": "b84bd892af7b32764b0d04a25cd163b65fd65e980f71ab02a62dca22a7327d94"
+    },
+    {
+      "path": "scripts/ConfiguredFixtureEvidence.psm1",
+      "sha256": "2e64cdb6465a8599c1304cb41c18467cb461185130f73827179fa46640df2aec"
+    },
+    {
+      "path": "scripts/compare.ps1",
+      "sha256": "aa20fc6e085f65fa48390d05b6de2d12c4eefbd1ba9ec0f0b518929ada87c304"
+    },
+    {
+      "path": "scripts/check.ps1",
+      "sha256": "ae1f448606108da789067d8d5e1f8a15bcb0b84ffd650dfb749ce370734f9ff7"
+    },
+    {
+      "path": "scripts/check-instrumented.ps1",
+      "sha256": "12f82a3b8509412462191edf016502d5365dfc11aa9e6f26df0fbb9f0b4b3833"
+    },
+    {
+      "path": "scripts/TargetWitnessPolicy.psm1",
+      "sha256": "0d48ad880351060579050a2f12bf0b00c2ce2007313ca7e3e38cf6eed3b87855"
+    },
+    {
+      "path": "scripts/TargetObservationEnvelope.psm1",
+      "sha256": "f73c8338b052d54f65428ae64cf07a4b6c3a9d3c9fa3feec02032e9250bff516"
+    },
+    {
+      "path": "scripts/TargetContext.psm1",
+      "sha256": "1ec81be03f7c5cef720487bb73cb3ad8801aa2b1ddfbb2b86859ad0c4a69300d"
+    },
+    {
+      "path": "scripts/build-target-context.ps1",
+      "sha256": "91c1460c8f0641da91daf4b6872413ab81dcb0f5e4d6295cf7da10c4e504430e"
+    },
+    {
+      "path": "tests/conformance/targets/configured-fixture-classification.json",
+      "sha256": "a384b4f7570b0e25ac5b6e332badaaf27ccc34090771e8fae0ede3a674598caa"
+    },
+    {
+      "path": "cli/shared/lua_ada_cli_readline.c",
+      "sha256": "f30a269bfe1abf8a58bfd48cb761724114ea1040d68f999daabaeae6d2072aa1"
+    },
+    {
+      "path": "cli/shared/lua_ada_cli_prompt.c",
+      "sha256": "810db61e5b4c4e6dd478050428a46fd736ae1d47c5ac315734ad523f5ca6e26e"
+    },
+    {
+      "path": "cli/shared/lua-sessions-cli.adb",
+      "sha256": "b29b337b2762511aed1a3e9a2986350f895b33f7ea989f3f7be298f5eaf69c45"
+    },
+    {
+      "path": "cli/shared/lua-sessions-cli.ads",
+      "sha256": "4430feb9456b29ac279907f1b6efcda036b397fe58bd9c8b858ceb8626a45c91"
+    },
+    {
+      "path": "cli/shared/lua_cli.adb",
+      "sha256": "9ce48c447874496af313dbb8a702d1cd89d9e41fa57fa78aa9d2c5d9d9b25eb6"
+    },
+    {
+      "path": "cli/lua_ada_cli.gpr",
+      "sha256": "372a68f9466eab9da3e84be9102e57bf5fbbaee71eb064927fe3b57608bd751f"
+    },
+    {
+      "path": "tests/lua_ada_tests.gpr",
+      "sha256": "2d919063699469859d4ea10d619290ac81214d457ec7052d83bc6c327abdb6ce"
+    },
+    {
+      "path": "scripts/check-cli-readline.ps1",
+      "sha256": "208141feec0325da377f3798770375447475e9300a338e70b09108f800ad9738"
+    },
+    {
+      "path": "scripts/test-cli-readline-portability.ps1",
+      "sha256": "15924ad90861e4d6f1d55045f57129199add4cb012c9fb3cf8cf454310120e47"
+    }
+  ],
+  "review_scope": [
+    "Read the shared112 operation definitions and exact raw capture replay, including all19 native prompt operations and29 named AUnit linkage.",
+    "Verify exact Windows-only nativeT os.exit(37,false) zero-block assertion is observed as a nonpassing teardown diagnostic, with clean AdaT false, native default false and nativeT true siblings required.",
+    "Verify source/setup/selected runtime library/native T configuration identities; independent context-image membership binds CLI/default native counterpart and all raw input/output files.",
+    "Verify early broken input never becomes delivered input/EOF, and only the closed prompt-before-input terminal cases may observe it while generic pipe outcomes still fail.",
+    "Verify final source protocol review is separate from feature direction0570 and required by actual target image reconciliation.",
+    "Review the current first-party readline backend, C prompt transport, Ada ownership/startup, CLI and test GPR roles, actual readline process script and compile-only int/void history signature portability guards. These source identities grant no platform runtime acceptance."
+  ],
+  "remaining_requirements": [
+    "This file is pending author review input, never the accepted protocol review path.",
+    "Root must independently inspect current23-source hashes and issue a distinct exact protocol decision before final T image reconciliation.",
+    "Linux/macOS no-close diagnostics require actual source-linked measurements and fresh applicability decisions; Windows handling cannot silently cover them.",
+    "All original source/global ledgers and actual whole-target matrix remain pending."
+  ]
+}

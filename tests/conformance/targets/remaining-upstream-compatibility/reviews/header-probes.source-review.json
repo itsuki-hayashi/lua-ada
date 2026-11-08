@@ -1,0 +1,69 @@
+{
+  "reviewer": "Claude Haiku CLI",
+  "decision": "accepted",
+  "scope": "header-probe-source-and-configuration",
+  "claims_sha256": "3c98f3435b4e0fa45949236b197ecd9ee034299bcdee9bcd93068adb2c0f1094",
+  "synthetic_fixture": false,
+  "global_api_classifications_accepted": false,
+  "runtime_acceptance": false,
+  "source_and_configuration_findings": "Previous accepted review reports/header-independent-review/aa67d33a2ed94ef4a4014b8da2a17a5c/claude-output.json, finding at scripts/HeaderDeclarationProbes.psm1:25 (low): the 28 applicability anchors were not count-asserted in code. The requested one-line change is now present at scripts/HeaderDeclarationProbes.psm1:30: `if($applicability.Count -ne 28){throw 'Original conditional behavioral applicability inventory changed'}`, placed immediately after the applicability collection at line 29 and before the source hashing at line 31. The guard fixes the prior finding: a count drift now fails with its own message, and the 473/228 guard at line 25 is unchanged. The comment at lines 46-49 about unconditional Windows C_ABI_Defines and the facade DLL flags at line 50 are unchanged from the previously accepted scope and match the packet's stated boundaries. The bounded scope carries forward.",
+  "behavioral_and_runtime_boundaries": "The change is a count assertion over declaration-candidate metadata only. It adds no compiler run, runtime behaviour, Lua linkage, platform execution or coverage claim. All 132 cases, the semantic category candidates (callable_function and behavioral_macro runtime-required, object_macro and type_layout eligible-compiled-candidate, conditional applicability not runtime evidence), the private-T/facade receiver boundaries and the no-static-DLL-linkage claim are carried forward as stated in the packet. All 473 global semantic classifications and all runtime, API, platform and coverage acceptance remain pending and are not approved by this review.",
+  "findings": [],
+  "inspected_files": [
+    "reports/header-independent-review/e564fd872aca4593befeba65961671b4/packet.json (read in full, 111 lines)",
+    "reports/header-independent-review/aa67d33a2ed94ef4a4014b8da2a17a5c/claude-output.json (read in full)",
+    "scripts/HeaderDeclarationProbes.psm1 (lines 1-50 read; includes the applicability guard at line 30 and the facade DLL flag comment at lines 46-50)"
+  ],
+  "unverified_limits": [
+    "No hashes were computed: Read, Grep and Glob cannot hash files and no shell was used. claims_sha256 is the value recorded in packet.json line 4 and was not recomputed. Whether it matches the current module hash abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c is unverified.",
+    "Only lines 1-50 of HeaderDeclarationProbes.psm1 were read. Lines 51-448, including the mapping, claim-binding and case-generation code, were not re-read in this session and rely on the prior accepted review for those sections.",
+    "The 28 applicability count was not recounted from suite.json or c-api.jsonl, and the 132 case count was not recounted.",
+    "No compiler, preprocessor or PowerShell test was run. The DLL import/export header behaviour and the strict C99 and -pedantic results are unverified.",
+    "The 64-bit assumptions behind the pointer8, extraspace and LUAL_BUFFERSIZE assertions were not checked against any 32-bit configuration.",
+    "Runtime implementation, Ada representation, platform execution, coverage and the 473 global semantic classifications were out of scope and were not checked."
+  ],
+  "provenance": {
+    "command": "claude --dangerously-skip-permissions --model haiku --tools Read,Glob,Grep --output-format json -p",
+    "reviews": [
+      {
+        "model": "Claude Haiku CLI",
+        "sha256": "668197ef3ea9284f2dd1f4620e6cde4278854d5f59754cc1eaf13ab960c9d2f5",
+        "claims_sha256": "ab564d0ca7312a7f25d9d39798dadce2f661f43d8bdc7b452e4a72ae52215a54",
+        "decision": "changes_required",
+        "duration_ms": 255215,
+        "cost_usd": 0.19850842000000002,
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/header-probes.claude-first.json"
+      },
+      {
+        "model": "Claude Haiku CLI",
+        "sha256": "1835084425c611ce1bdd814e803445b0db794069915c5780e0982bbc1d23b7d5",
+        "claims_sha256": "81020b02f2f08e75de397b73b1e178951906aa89084f74ed739417319f695b73",
+        "decision": "changes_required",
+        "duration_ms": 99973,
+        "cost_usd": 0.031272799999999996,
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/header-probes.claude-fixes.json"
+      },
+      {
+        "model": "Claude Haiku CLI",
+        "sha256": "69113da8c2c7dd87976d81579a412dadd8f13a4481f35e83ea90131ab10aa806",
+        "claims_sha256": "30f4fd283093d90f021bf64a08a389b704a43284980b19f13497af52a9b869ae",
+        "decision": "accepted",
+        "duration_ms": 46767,
+        "cost_usd": 0.017343340000000002,
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/header-probes.claude-linkage.json"
+      },
+      {
+        "model": "Claude Haiku CLI",
+        "sha256": "28306841dd05bfb78d1ecc2b16324a80fab8b73f358080f055488f251e97de4f",
+        "claims_sha256": "3c98f3435b4e0fa45949236b197ecd9ee034299bcdee9bcd93068adb2c0f1094",
+        "decision": "accepted",
+        "duration_ms": 16519,
+        "cost_usd": 0.009149980000000002,
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/header-probes.claude-final.json"
+      }
+    ],
+    "source_hashes": "Machine-captured and validated against repository bytes; reviewer explicitly did not independently recompute hashes.",
+    "kind": "actual-read-only-Claude-CLI-review",
+    "scope": "Source/configuration candidate boundaries only; no global semantic classification, runtime, API, platform or coverage approval."
+  }
+}

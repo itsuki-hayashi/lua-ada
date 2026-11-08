@@ -1,0 +1,593 @@
+{
+  "schema_version": 1,
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "protected_scopes": [
+    {
+      "id": "gc-io-events",
+      "path": "tests/conformance/scopes/gc-io-events.json",
+      "sha256": "79fa732f60f380c93be190f43640acf0b2ac595bdf9196d2fc8fd0a7ee62eae7"
+    },
+    {
+      "id": "expanded-t-conformance",
+      "path": "tests/conformance/scopes/expanded-t-conformance.json",
+      "sha256": "9df8642d10238abaa48c97184ed2345be7106d4c2c74668954e43bc0cb6ecdc1"
+    }
+  ],
+  "exclusions": [
+    {
+      "id": "LUA-API-REVIEWED-BLOCK-9001",
+      "source": "api.lua",
+      "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+      "byte_offset": 17053,
+      "byte_length": 18,
+      "anchor_sha256": "f89400b75cf254feed3cc991449a9e7bc1679e6cd9b5b6be1b6598dfa176bf55",
+      "status": "excluded",
+      "disposition": "reviewed-t-internal-exclusion",
+      "configurations": [
+        "upstream-test"
+      ],
+      "eligibility": "t-only-private-invariant",
+      "public_api": false,
+      "mixed_obligation": false,
+      "module_observable": true,
+      "invariant": "Only the exact 18-byte upper allocation-delta conjunct at byte17053 is private; the original mixed assertion is retained and required.",
+      "third_party_irrelevance": "The pinned lua_load contract permits avoiding internal copies but promises no400-byte allocation delta. Memory use is observable; its exact implementation allocation footprint is not a public compatibility obligation.",
+      "t_guard": {
+        "byte_length": 101,
+        "sha256": "6f5f4b60db25bfae9020333e97d5aaa7b3b807e4086af05ea36003dd45f81c90",
+        "byte_offset": 64,
+        "mode": "absent-return"
+      },
+      "evidence": [],
+      "review": {
+        "reviewer": "Codex /root",
+        "status": "accepted",
+        "artifact_sha256": "640f4265c736ec5508601a9abbb0e7167a64188f9c64bb371c268a72e6b3ca4b",
+        "author": "Codex /root/validation_delivery",
+        "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-exclusion-approval.json"
+      },
+      "eligibility_schema_version": 2,
+      "module_compatibility_obligation": false,
+      "observation_kind": "private-resource-bound",
+      "retained_parent": {
+        "id": "LUA-API-ASSERT-CALL-0125",
+        "byte_offset": 17039,
+        "byte_length": 33,
+        "anchor_sha256": "9c64cb79308eea2b302880a35a479936b515b820ed8c610d1d23f5158593b3d2"
+      }
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9001",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 800,
+      "byte_length": 143,
+      "anchor_sha256": "26aad09cfda55023d09d73d23353c892cb5e19ba423488629606efc828ddf3fd",
+      "status": "excluded",
+      "disposition": "reviewed-t-internal-exclusion",
+      "configurations": [
+        "upstream-test"
+      ],
+      "eligibility": "t-only-private-invariant",
+      "public_api": false,
+      "mixed_obligation": false,
+      "module_observable": true,
+      "invariant": "Only the exact constant-pool-layout inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "third_party_irrelevance": "The current independent feature decision distinguishes observable dump/constant/register choices from public loading, numeric kind, result cardinality, callback, assignment, constructor and lifetime behavior. No callable/public API or mixed assertion is proposed for removal.",
+      "t_guard": {
+        "mode": "absent-return",
+        "byte_offset": 83,
+        "byte_length": 104,
+        "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+      },
+      "evidence": [],
+      "review": {
+        "author": "Codex /root/validation_delivery",
+        "reviewer": "Codex /root/remaining_suite",
+        "status": "accepted",
+        "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-9001.installation-exclusion-approval.json",
+        "artifact_sha256": "a15b1cd1ae4f7a61fe42b87bec40b731c738382fa11e5e438e609408abfbc35f"
+      },
+      "eligibility_schema_version": 3,
+      "module_compatibility_obligation": false,
+      "observation_kind": "private-optimization-structure",
+      "structure_kind": "constant-pool-layout",
+      "required_semantic_contract_ids": [
+        "compile-original",
+        "numeric-values-types-arity",
+        "callback-sequence",
+        "assignment-sequence"
+      ],
+      "original_anchor_links": [
+        {
+          "id": "LUA-CODE-INTERNAL-REFERENCE-0001",
+          "kind": "internal-reference",
+          "byte_offset": 812,
+          "byte_length": 7,
+          "anchor_sha256": "0f4f8500d5e3005e1445ef305004182f31d0c376f6be5b439dee17437d6e5d90"
+        },
+        {
+          "id": "LUA-CODE-ASSERT-CALL-0002",
+          "kind": "assert-call",
+          "byte_offset": 828,
+          "byte_length": 6,
+          "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+        },
+        {
+          "id": "LUA-CODE-ASSERT-CALL-0003",
+          "kind": "assert-call",
+          "byte_offset": 871,
+          "byte_length": 6,
+          "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+        }
+      ],
+      "feature_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-ten-source-feature-review.json",
+        "sha256": "a0a24b7ee5b8b8cecbe327afced993b44942c0bd93ee85601e09a3083e724635"
+      },
+      "semantic_retention_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+        "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+      }
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9002",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 1808,
+      "byte_length": 205,
+      "anchor_sha256": "41b6d2b52bb8f3f0d16dc0cf595c5fd6a4ca1b124b16b1bef028a1dda5f27f6b",
+      "status": "excluded",
+      "disposition": "reviewed-t-internal-exclusion",
+      "configurations": [
+        "upstream-test"
+      ],
+      "eligibility": "t-only-private-invariant",
+      "public_api": false,
+      "mixed_obligation": false,
+      "module_observable": true,
+      "invariant": "Only the exact opcode-sequence inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "third_party_irrelevance": "The current independent feature decision distinguishes observable dump/constant/register choices from public loading, numeric kind, result cardinality, callback, assignment, constructor and lifetime behavior. No callable/public API or mixed assertion is proposed for removal.",
+      "t_guard": {
+        "mode": "absent-return",
+        "byte_offset": 83,
+        "byte_length": 104,
+        "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+      },
+      "evidence": [],
+      "review": {
+        "author": "Codex /root/validation_delivery",
+        "reviewer": "Codex /root/remaining_suite",
+        "status": "accepted",
+        "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-9002.installation-exclusion-approval.json",
+        "artifact_sha256": "6293a969e523ebc2869eb23ba50384a165ab8de27634e2464a2be5ea6bc5de39"
+      },
+      "eligibility_schema_version": 3,
+      "module_compatibility_obligation": false,
+      "observation_kind": "private-optimization-structure",
+      "structure_kind": "opcode-sequence",
+      "required_semantic_contract_ids": [
+        "compile-original",
+        "retained-checkR",
+        "safe-return-cardinality"
+      ],
+      "original_anchor_links": [
+        {
+          "id": "LUA-CODE-INTERNAL-REFERENCE-0002",
+          "kind": "internal-reference",
+          "byte_offset": 1840,
+          "byte_length": 10,
+          "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54"
+        },
+        {
+          "id": "LUA-CODE-ASSERT-CALL-0004",
+          "kind": "assert-call",
+          "byte_offset": 1953,
+          "byte_length": 6,
+          "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+        },
+        {
+          "id": "LUA-CODE-ASSERT-CALL-0005",
+          "kind": "assert-call",
+          "byte_offset": 1986,
+          "byte_length": 6,
+          "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+        }
+      ],
+      "feature_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-ten-source-feature-review.json",
+        "sha256": "a0a24b7ee5b8b8cecbe327afced993b44942c0bd93ee85601e09a3083e724635"
+      },
+      "semantic_retention_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+        "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+      }
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9003",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 2288,
+      "byte_length": 239,
+      "anchor_sha256": "5b3ddc7feef1ddadfa4a18c2526a31ced0495324141bde683ac399700a67e762",
+      "status": "excluded",
+      "disposition": "reviewed-t-internal-exclusion",
+      "configurations": [
+        "upstream-test"
+      ],
+      "eligibility": "t-only-private-invariant",
+      "public_api": false,
+      "mixed_obligation": false,
+      "module_observable": true,
+      "invariant": "Only the exact opcode-equality inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "third_party_irrelevance": "The current independent feature decision distinguishes observable dump/constant/register choices from public loading, numeric kind, result cardinality, callback, assignment, constructor and lifetime behavior. No callable/public API or mixed assertion is proposed for removal.",
+      "t_guard": {
+        "mode": "absent-return",
+        "byte_offset": 83,
+        "byte_length": 104,
+        "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+      },
+      "evidence": [],
+      "review": {
+        "author": "Codex /root/validation_delivery",
+        "reviewer": "Codex /root/remaining_suite",
+        "status": "accepted",
+        "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-9003.installation-exclusion-approval.json",
+        "artifact_sha256": "ee20858f3cab151d49c2d8cda93c0396d14a61ac550bdcc75eb82f218f8adfe1"
+      },
+      "eligibility_schema_version": 3,
+      "module_compatibility_obligation": false,
+      "observation_kind": "private-optimization-structure",
+      "structure_kind": "opcode-equality",
+      "required_semantic_contract_ids": [
+        "compile-original",
+        "retained-checkR"
+      ],
+      "original_anchor_links": [
+        {
+          "id": "LUA-CODE-INTERNAL-REFERENCE-0003",
+          "kind": "internal-reference",
+          "byte_offset": 2294,
+          "byte_length": 10,
+          "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54"
+        },
+        {
+          "id": "LUA-CODE-INTERNAL-REFERENCE-0004",
+          "kind": "internal-reference",
+          "byte_offset": 2314,
+          "byte_length": 10,
+          "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54"
+        },
+        {
+          "id": "LUA-CODE-ASSERT-CALL-0007",
+          "kind": "assert-call",
+          "byte_offset": 2330,
+          "byte_length": 6,
+          "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+        },
+        {
+          "id": "LUA-CODE-ASSERT-CALL-0008",
+          "kind": "assert-call",
+          "byte_offset": 2500,
+          "byte_length": 6,
+          "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+        }
+      ],
+      "feature_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-ten-source-feature-review.json",
+        "sha256": "a0a24b7ee5b8b8cecbe327afced993b44942c0bd93ee85601e09a3083e724635"
+      },
+      "semantic_retention_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+        "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+      }
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9004",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 13327,
+      "byte_length": 32,
+      "anchor_sha256": "13c9570d19cf580345c831907370413a0a9b7c0c3d39f7b6660459373cd8e8af",
+      "status": "excluded",
+      "disposition": "reviewed-t-internal-exclusion",
+      "configurations": [
+        "upstream-test"
+      ],
+      "eligibility": "t-only-private-invariant",
+      "public_api": false,
+      "mixed_obligation": false,
+      "module_observable": true,
+      "invariant": "Only the exact outer-constant-placement inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "third_party_irrelevance": "The current independent feature decision distinguishes observable dump/constant/register choices from public loading, numeric kind, result cardinality, callback, assignment, constructor and lifetime behavior. No callable/public API or mixed assertion is proposed for removal.",
+      "t_guard": {
+        "mode": "absent-return",
+        "byte_offset": 83,
+        "byte_length": 104,
+        "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+      },
+      "evidence": [],
+      "review": {
+        "author": "Codex /root/validation_delivery",
+        "reviewer": "Codex /root/remaining_suite",
+        "status": "accepted",
+        "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-9004.installation-exclusion-approval.json",
+        "artifact_sha256": "ba12a3c9cd954a1861926b98b9210bddce4a5d2b00b8891f3de9e0cb8dd7a970"
+      },
+      "eligibility_schema_version": 3,
+      "module_compatibility_obligation": false,
+      "observation_kind": "private-optimization-structure",
+      "structure_kind": "outer-constant-placement",
+      "required_semantic_contract_ids": [
+        "nested-constant-lifetimes"
+      ],
+      "original_anchor_links": [
+        {
+          "id": "LUA-CODE-ASSERT-CALL-0014",
+          "kind": "assert-call",
+          "byte_offset": 13329,
+          "byte_length": 6,
+          "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+        },
+        {
+          "id": "LUA-CODE-INTERNAL-REFERENCE-0006",
+          "kind": "internal-reference",
+          "byte_offset": 13336,
+          "byte_length": 7,
+          "anchor_sha256": "0f4f8500d5e3005e1445ef305004182f31d0c376f6be5b439dee17437d6e5d90"
+        }
+      ],
+      "feature_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-ten-source-feature-review.json",
+        "sha256": "a0a24b7ee5b8b8cecbe327afced993b44942c0bd93ee85601e09a3083e724635"
+      },
+      "semantic_retention_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+        "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+      }
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9005",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 13359,
+      "byte_length": 32,
+      "anchor_sha256": "4b1b8301af5f0f06a693bc66df7fa421860fdf06c9821e447ae6d4af791d8907",
+      "status": "excluded",
+      "disposition": "reviewed-t-internal-exclusion",
+      "configurations": [
+        "upstream-test"
+      ],
+      "eligibility": "t-only-private-invariant",
+      "public_api": false,
+      "mixed_obligation": false,
+      "module_observable": true,
+      "invariant": "Only the exact middle-constant-placement inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "third_party_irrelevance": "The current independent feature decision distinguishes observable dump/constant/register choices from public loading, numeric kind, result cardinality, callback, assignment, constructor and lifetime behavior. No callable/public API or mixed assertion is proposed for removal.",
+      "t_guard": {
+        "mode": "absent-return",
+        "byte_offset": 83,
+        "byte_length": 104,
+        "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+      },
+      "evidence": [],
+      "review": {
+        "author": "Codex /root/validation_delivery",
+        "reviewer": "Codex /root/remaining_suite",
+        "status": "accepted",
+        "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-9005.installation-exclusion-approval.json",
+        "artifact_sha256": "438b0e75c7e31e5230bf62cd2b66b287a999098f1241bf8723d9d098749399e5"
+      },
+      "eligibility_schema_version": 3,
+      "module_compatibility_obligation": false,
+      "observation_kind": "private-optimization-structure",
+      "structure_kind": "middle-constant-placement",
+      "required_semantic_contract_ids": [
+        "nested-constant-lifetimes"
+      ],
+      "original_anchor_links": [
+        {
+          "id": "LUA-CODE-ASSERT-CALL-0015",
+          "kind": "assert-call",
+          "byte_offset": 13361,
+          "byte_length": 6,
+          "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+        },
+        {
+          "id": "LUA-CODE-INTERNAL-REFERENCE-0007",
+          "kind": "internal-reference",
+          "byte_offset": 13368,
+          "byte_length": 7,
+          "anchor_sha256": "0f4f8500d5e3005e1445ef305004182f31d0c376f6be5b439dee17437d6e5d90"
+        }
+      ],
+      "feature_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-ten-source-feature-review.json",
+        "sha256": "a0a24b7ee5b8b8cecbe327afced993b44942c0bd93ee85601e09a3083e724635"
+      },
+      "semantic_retention_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+        "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+      }
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9006",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 13587,
+      "byte_length": 10,
+      "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+      "status": "excluded",
+      "disposition": "reviewed-t-internal-exclusion",
+      "configurations": [
+        "upstream-test"
+      ],
+      "eligibility": "t-only-private-invariant",
+      "public_api": false,
+      "mixed_obligation": false,
+      "module_observable": true,
+      "invariant": "Only the exact private-register-inspection-wrapper inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "third_party_irrelevance": "The current independent feature decision distinguishes observable dump/constant/register choices from public loading, numeric kind, result cardinality, callback, assignment, constructor and lifetime behavior. No callable/public API or mixed assertion is proposed for removal.",
+      "t_guard": {
+        "mode": "absent-return",
+        "byte_offset": 83,
+        "byte_length": 104,
+        "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+      },
+      "evidence": [],
+      "review": {
+        "author": "Codex /root/validation_delivery",
+        "reviewer": "Codex /root/remaining_suite",
+        "status": "accepted",
+        "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-9006.installation-exclusion-approval.json",
+        "artifact_sha256": "7e9b57f91a0ae389b86bc9ef96fc907d08f5ce775f294917c57ed2ec86bf3326"
+      },
+      "eligibility_schema_version": 3,
+      "module_compatibility_obligation": false,
+      "observation_kind": "private-optimization-structure",
+      "structure_kind": "private-register-inspection-wrapper",
+      "required_semantic_contract_ids": [
+        "register-load-boundaries"
+      ],
+      "original_anchor_links": [
+        {
+          "id": "LUA-CODE-INTERNAL-REFERENCE-0008",
+          "kind": "internal-reference",
+          "byte_offset": 13587,
+          "byte_length": 10,
+          "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54"
+        }
+      ],
+      "feature_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-ten-source-feature-review.json",
+        "sha256": "a0a24b7ee5b8b8cecbe327afced993b44942c0bd93ee85601e09a3083e724635"
+      },
+      "semantic_retention_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+        "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+      }
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9007",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 13655,
+      "byte_length": 79,
+      "anchor_sha256": "120c5699b24c0b9102eded9963b92049e2d0f8213c5c43d77a64dc7dd3ecdac9",
+      "status": "excluded",
+      "disposition": "reviewed-t-internal-exclusion",
+      "configurations": [
+        "upstream-test"
+      ],
+      "eligibility": "t-only-private-invariant",
+      "public_api": false,
+      "mixed_obligation": false,
+      "module_observable": true,
+      "invariant": "Only the exact physical-register-numbering inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "third_party_irrelevance": "The current independent feature decision distinguishes observable dump/constant/register choices from public loading, numeric kind, result cardinality, callback, assignment, constructor and lifetime behavior. No callable/public API or mixed assertion is proposed for removal.",
+      "t_guard": {
+        "mode": "absent-return",
+        "byte_offset": 83,
+        "byte_length": 104,
+        "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+      },
+      "evidence": [],
+      "review": {
+        "author": "Codex /root/validation_delivery",
+        "reviewer": "Codex /root/remaining_suite",
+        "status": "accepted",
+        "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-9007.installation-exclusion-approval.json",
+        "artifact_sha256": "84e31f159d957f0dcf765a2265512e88deeb36bf7346036a0717322549f04cc3"
+      },
+      "eligibility_schema_version": 3,
+      "module_compatibility_obligation": false,
+      "observation_kind": "private-optimization-structure",
+      "structure_kind": "physical-register-numbering",
+      "required_semantic_contract_ids": [
+        "register-load-boundaries"
+      ],
+      "original_anchor_links": [
+        {
+          "id": "LUA-CODE-ASSERT-CALL-0017",
+          "kind": "assert-call",
+          "byte_offset": 13679,
+          "byte_length": 6,
+          "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+        }
+      ],
+      "feature_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-ten-source-feature-review.json",
+        "sha256": "a0a24b7ee5b8b8cecbe327afced993b44942c0bd93ee85601e09a3083e724635"
+      },
+      "semantic_retention_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+        "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+      }
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9008",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 14141,
+      "byte_length": 175,
+      "anchor_sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6",
+      "status": "excluded",
+      "disposition": "reviewed-t-internal-exclusion",
+      "configurations": [
+        "upstream-test"
+      ],
+      "eligibility": "t-only-private-invariant",
+      "public_api": false,
+      "mixed_obligation": false,
+      "module_observable": true,
+      "invariant": "Only the exact constructor-opcode-count inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "third_party_irrelevance": "The current independent feature decision distinguishes observable dump/constant/register choices from public loading, numeric kind, result cardinality, callback, assignment, constructor and lifetime behavior. No callable/public API or mixed assertion is proposed for removal.",
+      "t_guard": {
+        "mode": "absent-return",
+        "byte_offset": 83,
+        "byte_length": 104,
+        "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+      },
+      "evidence": [],
+      "review": {
+        "author": "Codex /root/validation_delivery",
+        "reviewer": "Codex /root/remaining_suite",
+        "status": "accepted",
+        "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-9008.installation-exclusion-approval.json",
+        "artifact_sha256": "5d45e3120382e3b1ea209c432b359088d6407839f611b8ce9d4b7c7801a4d9c7"
+      },
+      "eligibility_schema_version": 3,
+      "module_compatibility_obligation": false,
+      "observation_kind": "private-optimization-structure",
+      "structure_kind": "constructor-opcode-count",
+      "required_semantic_contract_ids": [
+        "constructor-and-vararg-boundaries"
+      ],
+      "original_anchor_links": [
+        {
+          "id": "LUA-CODE-INTERNAL-REFERENCE-0009",
+          "kind": "internal-reference",
+          "byte_offset": 14169,
+          "byte_length": 10,
+          "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54"
+        },
+        {
+          "id": "LUA-CODE-ASSERT-CALL-0020",
+          "kind": "assert-call",
+          "byte_offset": 14297,
+          "byte_length": 6,
+          "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+        }
+      ],
+      "feature_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-ten-source-feature-review.json",
+        "sha256": "a0a24b7ee5b8b8cecbe327afced993b44942c0bd93ee85601e09a3083e724635"
+      },
+      "semantic_retention_review": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+        "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+      }
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "kind": "t-verifier-equivalent-review",
+  "equivalent_id": "memerr-verifier-allocation",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "decision": "accepted",
+  "review_date": "2026-11-08",
+  "semantic_sha256": "92d6573423cfe1c34c6deaf8f4dd4cd05e8d6fead741084251d7480648f5f711",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "application_refusal_preserved": true,
+  "status_message_assertion_preserved": true,
+  "original_reset_preserved": true,
+  "later_campaigns_preserved": true,
+  "no_source_exclusions": true,
+  "refresh_proposal": {
+    "sha256": "7e369c6860b02f38e02e3edee50462591352f82a2ec458d6d0990b6187933ad7",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/final-runtime-equivalent-bindings.author-proposal.json"
+  },
+  "source_bound_rationale": "Independently reread original memerr helper/application/reset spans, current Control_Count and selected provider, C adapter and the resetCI checked release. The adapter delta from the prior exact review adds an actual read-only table invariant inspector/registration and routes validated cached-frame deletion through private Engine.Free_Frame, preserving physical capacity and live metadata ownership. Control_Count and the provider reset remain unchanged: the single17-byte insertion still occurs strictly after the actual protected application and before only its original status/message verification. The original application limits, errors, later sweeps and all other source bytes remain unchanged. All seven current source identities and the exact complete semantic hash were checked. No prior fault observation, whole-file result or final matrix authority is inherited.",
+  "counterpart_sources": [
+    {
+      "path": "references/lua/ltests.c",
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3"
+    },
+    {
+      "path": "tests/src/lua-conformance_allocator.adb",
+      "sha256": "c5f0347be0e16db96e1d93d7fb7aa4a3ac316fdc7efc3355d8d19f591b548b36"
+    },
+    {
+      "path": "tests/c/conformance_adapter.c",
+      "sha256": "4141d51fbabd31aae0d7f1c529d2caab381c2a15f980fd7750bfb360f757ceb2"
+    },
+    {
+      "path": "tests/src/lua-sessions-conformance.adb",
+      "sha256": "15666c173f37041d24b59737b0051964487c28806cb3a5c26eb2ce144bcb2ae9"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/memerr-verifier.author.lua",
+      "sha256": "453c9d685bb1dce92f956975ce05e7358b2b0d8e0f54248b2b147fbf07ccb32a"
+    },
+    {
+      "path": "scripts/ConformanceVerifierEquivalents.psm1",
+      "sha256": "3a0f01431471c7793284efe338ae2c3142ce40233aa9d3e784cb95db892029c1"
+    }
+  ],
+  "output_sha256": "880d83e6ee5b5cf621c59d410fa928340375ac4f4191913c8092a5f385bbda76",
+  "source_exclusions": [],
+  "limitations": [
+    "Actual optimized-vararg zero-growth behavior remains required and currently failing.",
+    "Native Windows temporary-file applicability remains unresolved.",
+    "A new runtime image requires fresh fault/recovery and final-context observations."
+  ]
+}

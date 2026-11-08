@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "kind": "t-verifier-equivalent",
+  "id": "memerr-verifier-allocation",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": "references/lua/testes/memerr.lua",
+  "source_sha256": "02cc2a754e688bdfcbf507e009d899c4d367f27ced45094b68fdf208a6912491",
+  "implementation": "Ada",
+  "configuration": "upstream-test",
+  "operation": "reset-allocator-after-protected-call",
+  "insertion": {
+    "replacement": "  T.alloccount()\n",
+    "start_byte": 140,
+    "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "length_bytes": 0
+  },
+  "retained_spans": [
+    {
+      "byte_offset": 106,
+      "sha256": "24a6f919689ea609ba03232fe8612d54ca4045810431ba6b84a26ad61765c852",
+      "id": "protected-call",
+      "byte_length": 34
+    },
+    {
+      "byte_offset": 140,
+      "sha256": "2258cf6e841baf2afb792c687ed09a87dfa0c813db3c5999f155f1b0d224f5a5",
+      "id": "status-message-assertion",
+      "byte_length": 44
+    },
+    {
+      "byte_offset": 861,
+      "sha256": "e92064b5113699458891aea05278493425d514f81d6cc3e7c176677b2587ba8d",
+      "id": "oversized-application",
+      "byte_length": 57
+    },
+    {
+      "byte_offset": 993,
+      "sha256": "8b1b01f67f1b82177438ac34727289f0abb9478557a96a7bba40bd70ef4d9ebc",
+      "id": "limited-application-and-reset",
+      "byte_length": 79
+    },
+    {
+      "byte_offset": 1075,
+      "sha256": "b522c996d34e1643b84e3e9dfcbc013d06abb078ffc4fa8287bc70d5987a83ba",
+      "id": "later-campaigns",
+      "byte_length": 6437
+    }
+  ],
+  "counterpart_sources": [
+    {
+      "path": "references/lua/ltests.c",
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3"
+    },
+    {
+      "path": "tests/src/lua-conformance_allocator.adb",
+      "sha256": "c5f0347be0e16db96e1d93d7fb7aa4a3ac316fdc7efc3355d8d19f591b548b36"
+    },
+    {
+      "path": "tests/c/conformance_adapter.c",
+      "sha256": "4141d51fbabd31aae0d7f1c529d2caab381c2a15f980fd7750bfb360f757ceb2"
+    },
+    {
+      "path": "tests/src/lua-sessions-conformance.adb",
+      "sha256": "15666c173f37041d24b59737b0051964487c28806cb3a5c26eb2ce144bcb2ae9"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/memerr-verifier.author.lua",
+      "sha256": "453c9d685bb1dce92f956975ce05e7358b2b0d8e0f54248b2b147fbf07ccb32a"
+    },
+    {
+      "path": "scripts/ConformanceVerifierEquivalents.psm1",
+      "sha256": "3a0f01431471c7793284efe338ae2c3142ce40233aa9d3e784cb95db892029c1"
+    }
+  ],
+  "excluded_obligations": [],
+  "output_sha256": "880d83e6ee5b5cf621c59d410fa928340375ac4f4191913c8092a5f385bbda76",
+  "author_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/memerr-verifier-allocation.author-proposal.json",
+    "sha256": "14b403d732cf34a0b9e3f4d5f9e07b73a854f6f673264a1d74a1a15c2706cd23"
+  },
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "review": {
+    "reviewer": "Codex /root",
+    "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/memerr-verifier-allocation.resetci-approval.json",
+    "author": "Codex /root/validation_delivery",
+    "artifact_sha256": "19b97307896f170ea424ebd4cc60b0867550cf69e71dcf0e5e6815ffe4fe35aa",
+    "status": "accepted"
+  }
+}

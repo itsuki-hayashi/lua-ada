@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "kind": "header-declaration-probe-source-approval",
+  "scope": "header-probe-source-and-configuration",
+  "decision": "accepted",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Claude Haiku CLI",
+  "synthetic_fixture": false,
+  "claims_sha256": "3c98f3435b4e0fa45949236b197ecd9ee034299bcdee9bcd93068adb2c0f1094",
+  "global_api_classifications_accepted": false,
+  "runtime_acceptance": false,
+  "category_decisions": {
+    "conditional_behavioral_applicability": "not-runtime-evidence",
+    "type_layout": "eligible-compiled-candidate",
+    "object_macro": "eligible-compiled-candidate",
+    "callable_function": "runtime-required",
+    "behavioral_macro": "runtime-required"
+  },
+  "review_evidence": {
+    "sha256": "736dbc043c56ff3c6f396d0e1de05f61d414c0499b6f5f0db38c4361e5f79d93",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/header-probes.source-review.json"
+  }
+}

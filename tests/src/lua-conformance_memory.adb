@@ -1,3 +1,4 @@
+with Lua.Engine.Stacks;
 with Lua.Storage.Conformance;
 
 package body Lua.Conformance_Memory is
@@ -118,6 +119,21 @@ package body Lua.Conformance_Memory is
                Object (Closing.Cell);
                if Closing.Frozen then Scalar (Closing.Frozen_Value); end if;
             end loop;
+            declare
+               Level : Natural := Activation.C_Closing_Level;
+            begin
+               --  Check the real pending scalar chain independently of
+               --  debug/compiler liveness and lexical capture cells.
+               while Level /= 0 loop
+                  declare
+                     Previous : constant Natural :=
+                       Stacks.Closing_Predecessor (Activation, Level);
+                  begin
+                     Scalar (Stacks.Read (Item, Level));
+                     Level := Previous;
+                  end;
+               end loop;
+            end;
             for Index in 1 .. Activation.Active_Registers loop
                Packet (Activation.Slots.Element (Index));
             end loop;
@@ -134,6 +150,7 @@ package body Lua.Conformance_Memory is
                if Activation.Warning_Borrow_Depth /= 0 then
                   Last := Natural'Max (Last, Activation.Stack_Live_Top);
                end if;
+               Last := Natural'Max (Last, Activation.C_Closing_Level);
                Check (First >= Previous_First);
                Previous_First := First;
                Window (First, Last);

@@ -1,10 +1,12 @@
 with Lua.Prototypes;
+with Lua.Inputs;
 with Lua.Storage.Buffers;
 
 private package Lua.Chunks is
    type Status is (Succeeded, Bad_Format, Resource_Limit, Memory_Failure);
    type Error_Kind is
-     (No_Error, Truncated, Signature_Mismatch, Version_Mismatch,
+     (No_Error, Truncated, Truncated_Fixed_Buffer,
+      Signature_Mismatch, Version_Mismatch,
       Format_Mismatch, Header_Mismatch, Integer_Overflow,
       Invalid_String, Invalid_Constant, Invalid_Opcode, Invalid_Prototype,
       Invalid_Operand, Input_Limit, Nesting_Limit, Prototype_Limit,
@@ -37,10 +39,17 @@ private package Lua.Chunks is
    function Decode
      (Source : String; Memory : not null Lua.Storage.Owner_Access;
       Bounds : Limits := (others => <>)) return Decode_Result;
+   function Decode
+     (Source : in out Lua.Inputs.Source;
+      Memory : not null Lua.Storage.Owner_Access;
+      Bounds : Limits := (others => <>); Fixed_Buffer : Boolean := False)
+      return Decode_Result;
    --  Decode pinned native Lua 5.5 chunks into independently owned canonical
    --  data. Trailing bytes are left unread, as in lua_load. Header/operand
    --  failures and limits return typed results; partial graphs are destroyed.
    --  The borrowed owner must outlive the result and every prototype view.
+   --  Streaming uses that same decoder once. Fixed_Buffer preserves pinned
+   --  B-mode contiguous-block requirements while retaining owned Ada code.
 
    Invalid_Program : exception;
    function Encode

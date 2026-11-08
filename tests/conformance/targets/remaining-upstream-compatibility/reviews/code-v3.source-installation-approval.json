@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "kind": "code-v3-source-installation-approval",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root/remaining_suite",
+  "review_date": "2026-11-08",
+  "decision": "accepted-source-only-installation",
+  "author_input_policy": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.policy.candidate.json",
+    "sha256": "5f9d5d03fa75af590e6163291e4145e745e613fb07d27af896e5d189bf2d0b6a"
+  },
+  "source_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3-installation.independent-review.json",
+    "sha256": "faffcd7c683bbcf96ec235e92ec34be85f33f7cc5335df56c548a25e07502bf2"
+  },
+  "final_policy": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility.exclusions.json",
+    "sha256": "a7ae9b40b57dc48ce5742a7a3baefd2ddc79696a1c028eb8287c0efe5623a5ec"
+  },
+  "classification_approval": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3.decomposition-approval.json",
+    "sha256": "2192934d41cedea96fd44039d519146198ebbb3b0955d54f7f03489801fe2714"
+  },
+  "decomposition": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/code-private-optimizer-v3.decomposition.json",
+    "sha256": "ac5b0eeb7cccffb359b3b0cc41dd8425714f4a04836a75ec24023d86f8d54c4a"
+  },
+  "ledger": {
+    "path": "tests/conformance/coverage/code.jsonl",
+    "sha256": "68d7da0eb7f58f2320495ee71d8ba45aacf0c2529832d68ceffd97184d6e613b"
+  },
+  "code_transform": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/code-private-optimizer-v3.transform.json",
+    "sha256": "713b149e95ed5d82ddb1e0183e13d758ba53ebad2869bc1b3839744879bfbf34"
+  },
+  "api18_transform": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.transform.json",
+    "sha256": "85a69ef2e9152631d1e6ab4155a615daf73a480b4bd332a67c998225db20459d"
+  },
+  "frozen_inputs": [
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3-installation-inputs/code.original-51.jsonl",
+      "sha256": "27231932dffbd450a7fbdabfbf0de2c9edafd4ab0bbaecf3a16457af98e5fd94"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3-installation-inputs/pre-code-policy.exclusions.json",
+      "sha256": "4917d6bbd7a3048f60a262f2e744a596af5e870039085ce9f2aa6d6945307224"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3-installation-inputs/api18.pre-code-policy.transform.json",
+      "sha256": "2438260413355164328518f67572e33ee1fc27c859e024cf3aa7534b1636a2f2"
+    }
+  ],
+  "protected_scopes": [
+    {
+      "id": "gc-io-events",
+      "path": "tests/conformance/scopes/gc-io-events.json",
+      "sha256": "79fa732f60f380c93be190f43640acf0b2ac595bdf9196d2fc8fd0a7ee62eae7"
+    },
+    {
+      "id": "expanded-t-conformance",
+      "path": "tests/conformance/scopes/expanded-t-conformance.json",
+      "sha256": "9df8642d10238abaa48c97184ed2345be7106d4c2c74668954e43bc0cb6ecdc1"
+    }
+  ],
+  "private_code_source_exclusions": 8,
+  "existing_api_exclusion_unchanged": true,
+  "original_source_identities": 51,
+  "source_reference_classifications": 18,
+  "required_public_nodes_pending": 9,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "synthetic_fixture": false,
+  "acyclic_order": "Frozen author inputs -> source narratives -> exclusion/classification approvals -> final policy -> transform narratives/approvals -> manifests -> this installation record",
+  "limitations": [
+    "Exclusion counts are not passing tests. No runtime source/API/target acceptance is granted.",
+    "Older author drafts remain unchanged dated inputs; their original current-ledger path now has explicit frozen51successor bytes.",
+    "API941 and the existing composite remain stale and unrenewed; no component or whole-source execution credit is imported."
+  ]
+}

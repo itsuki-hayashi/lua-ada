@@ -2,13 +2,41 @@ with "../lua_ada";
 with "../config/lua_ada_config.gpr";
 
 project Consumer is
+   C_Import_Defines := ();
+   Private_T_Mains := ();
+   case Lua_Ada.Configuration_Subdir is
+      when "upstream-test/" =>
+         Private_T_Mains := ("buffer_private_t_contract.c");
+      when others => null;
+   end case;
+   case Lua_Ada_Config.Alire_Host_OS is
+      when "windows" =>
+         case Lua_Ada.Library_Mode is
+            when "relocatable" =>
+               C_Import_Defines := ("-DLUA_BUILD_AS_DLL");
+            when others => null;
+         end case;
+      when others => null;
+   end case;
    for Languages use ("C");
    for Source_Dirs use ("tests", "../tests/c");
    for Source_Files use
      ("c_api_consumer.c", "gc_api_contract.c", "io_api_contract.c",
       "foreign_api_contract.c", "foreign_continuation_contract.c",
       "foreign_hook_contract.c", "math_reopen_contract.c",
-      "library_opener_contract.c");
+      "library_opener_contract.c", "load_dump_api_contract.c",
+      "debug_api_contract.c", "builtin_api_contract.c",
+      "format_api_contract.c", "external_string_contract.c",
+      "value_api_contract.c", "auxiliary_api_contract.c",
+      "conversion_api_contract.c", "operator_api_contract.c",
+      "index_type_api_contract.c", "base_closing_api_contract.c",
+      "native_module_contract.c", "buffer_api_contract.c",
+      "close_yield_contract.c", "allocator_api_contract.c",
+      "substitution_api_contract.c", "thread_reset_api_contract.c",
+      "loadfile_api_contract.c", "pointer_identity_contract.c",
+      "concat_api_contract.c", "traceback_api_contract.c",
+      "macro_api_contract.c", "macro_compat_api_contract.c") &
+      Private_T_Mains;
    for Object_Dir use
      "../build/c-api/consumer/" & Lua_Ada.Configuration_Subdir &
        Lua_Ada_Config.Build_Profile & "/" & Lua_Ada.Library_Mode;
@@ -17,14 +45,34 @@ project Consumer is
        Lua_Ada_Config.Build_Profile & "/" & Lua_Ada.Library_Mode;
    for Main use
      ("c_api_consumer.c", "gc_api_contract.c", "io_api_contract.c",
-      "foreign_api_contract.c");
+      "foreign_api_contract.c", "load_dump_api_contract.c",
+      "debug_api_contract.c", "builtin_api_contract.c",
+      "format_api_contract.c", "external_string_contract.c",
+      "value_api_contract.c", "auxiliary_api_contract.c",
+      "conversion_api_contract.c", "operator_api_contract.c",
+      "index_type_api_contract.c", "base_closing_api_contract.c",
+      "native_module_contract.c", "buffer_api_contract.c",
+      "close_yield_contract.c", "allocator_api_contract.c",
+      "substitution_api_contract.c", "thread_reset_api_contract.c",
+      "loadfile_api_contract.c", "pointer_identity_contract.c",
+      "concat_api_contract.c", "traceback_api_contract.c",
+      "macro_api_contract.c", "macro_compat_api_contract.c") &
+      Private_T_Mains;
    for Create_Missing_Dirs use "True";
 
    package Compiler is
       for Default_Switches ("C") use
         ("-std=c99", "-Wall", "-Wextra", "-Werror", "-pedantic",
          "-I" & Project'Project_Dir & "include",
-         "-I" & Project'Project_Dir & "include/api");
+         "-I" & Project'Project_Dir & "include/api") &
+        Lua_Ada.C_Platform_Defines & C_Import_Defines;
+      case Lua_Ada.Configuration_Subdir is
+         when "upstream-test/" =>
+            for Switches ("buffer_private_t_contract.c") use
+              Consumer.Compiler'Default_Switches ("C") &
+              ("-I" & Project'Project_Dir & "../references/lua");
+         when others => null;
+      end case;
    end Compiler;
    package Linker is
       case Lua_Ada_Config.Alire_Host_OS is
@@ -35,9 +83,11 @@ project Consumer is
             for Default_Switches ("C") use
               ("-lm", "-Wl,-u,___gnat_tasking_runtime_initialize",
                external ("LUA_ADA_TASKING_RUNTIME_ARCHIVE", ""),
-               external ("LUA_ADA_ABI_RUNTIME_ARCHIVE", ""));
+               external ("LUA_ADA_ABI_RUNTIME_ARCHIVE", "")) &
+              Lua_Ada.Module_Link_Options;
          when others =>
-            for Default_Switches ("C") use ("-lm");
+            for Default_Switches ("C") use
+              ("-lm") & Lua_Ada.Module_Link_Options;
       end case;
    end Linker;
 end Consumer;

@@ -482,31 +482,10 @@ package body Collector is
       begin
          Shade_Value (State, Item);
       end Mark_Value;
-   begin
-      if Context = null then
-         return;
-      end if;
-      for Item of Context.Boundary_Results loop
-         Mark_Value (Item);
-      end loop;
-      Lua.Engine.Stacks.Trace
-        (Context, Mark_Value'Access, Mark'Access);
-      if State.GC.Phase = Enter_Atomic and then not State.GC.Emergency then
-         --  Mark/clear the actual live union before optional physical copies.
-         --  No vector borrow survives Trace; absolute indices and stable
-         --  cells remain authoritative after both arrays move together.
-         Shrink_Context_Storage (State, Context);
-      end if;
-      Mark_Value (Context.Hook);
-      Mark_Value (Context.Entry_Function);
-      Mark_Value (Context.Failure);
-      for Item of Context.Transfer.Results loop
-         Mark_Value (Item);
-      end loop;
-      for Item of Context.Arguments loop
-         Mark_Value (Item);
-      end loop;
-      for Activation of Context.Stack loop
+      procedure Mark_Activation (Activation : not null Frame_Access);
+      procedure Mark_Activation (Activation : not null Frame_Access) is
+         Level : Natural := Activation.C_Closing_Level;
+      begin
          Mark_Value (Activation.Callee);
          Mark_Value (Activation.Message_Handler);
          Mark_Value (Activation.Warning_Root);
@@ -518,6 +497,19 @@ package body Collector is
             if Closing.Frozen then
                Mark_Value (Closing.Frozen_Value);
             end if;
+         end loop;
+         --  Pending canonical/C closers own their actual scalar slots.
+         --  Detached lexical cells can change independently after CLOSE.
+         --  Each predecessor is checked before reading/following it; strict
+         --  descent bounds this allocation-free scan by initialized slots.
+         while Level /= 0 loop
+            declare
+               Previous : constant Natural :=
+                 Lua.Engine.Stacks.Closing_Predecessor (Activation, Level);
+            begin
+               Mark_Value (Lua.Engine.Stacks.Read (Context, Level));
+               Level := Previous;
+            end;
          end loop;
          Mark_Value (Activation.Unwind_Error);
          for Item of Activation.Unwind_Results loop
@@ -544,10 +536,50 @@ package body Collector is
          for Item of Activation.Varargs loop
             Mark_Value (Item);
          end loop;
+      end Mark_Activation;
+   begin
+      if Context = null then
+         return;
+      end if;
+      for Item of Context.Boundary_Results loop
+         Mark_Value (Item);
+      end loop;
+      Lua.Engine.Stacks.Trace
+        (Context, Mark_Value'Access, Mark'Access);
+      if State.GC.Phase = Enter_Atomic and then not State.GC.Emergency then
+         --  Mark/clear the actual live union before optional physical copies.
+         --  No vector borrow survives Trace; absolute indices and stable
+         --  cells remain authoritative after both arrays move together.
+         Shrink_Context_Storage (State, Context);
+      end if;
+      Mark_Value (Context.Hook);
+      Mark_Value (Context.Entry_Function);
+      Mark_Value (Context.Failure);
+      for Item of Context.Transfer.Results loop
+         Mark_Value (Item);
+      end loop;
+      for Item of Context.Arguments loop
+         Mark_Value (Item);
+      end loop;
+      for Activation of Context.Stack loop
+         Mark_Activation (Activation);
+         declare
+            Deferred : Frame_Access := Activation.Deferred_Error_Head;
+         begin
+            --  A boundary remains on the real context stack while its C
+            --  guard owns error transfer. Every detached scope must keep
+            --  its frozen cells/closers/prototype traced in that interval.
+            while Deferred /= null loop
+               Mark_Activation (Deferred);
+               Deferred := Deferred.Deferred_Error_Next;
+            end loop;
+         end;
       end loop;
    end Trace_Context;
 
    procedure Trace_Roots (State : in out World) is
+      String_Root : Object_Access := State.String_Root_Head;
+      Release : Object_Access;
       procedure Mark (Item : Object_Access);
       procedure Mark (Item : Object_Access) is
       begin
@@ -565,6 +597,20 @@ package body Collector is
       end loop;
       for Item of State.Operation_Roots loop
          Shade_Value (State, Item);
+      end loop;
+      while String_Root /= null loop
+         Mark (String_Root);
+         String_Root := String_Root.String_Root_Next;
+      end loop;
+      Release := State.External_Release_Head;
+      while Release /= null loop
+         if Release.Registry_Slot /= 0 then Mark (Release); end if;
+         Release := Release.Release_Next;
+      end loop;
+      Release := State.External_Release_Active;
+      while Release /= null loop
+         if Release.Registry_Slot /= 0 then Mark (Release); end if;
+         Release := Release.Release_Active_Previous;
       end loop;
       if State.Operation_Active or else State.GC.Emergency then
          for Item of State.Heap loop
@@ -708,6 +754,23 @@ package body Collector is
          Shade_Value (State, Item);
       end if;
    end Root_Barrier;
+
+   procedure Revive_String
+     (State : in out World; Item : not null Object_Access) is
+   begin
+      --  The intern chain can still contain a string whose old-white color
+      --  was declared dead at atomic, but whose sweep slot has not run. As
+      --  in luaS_internshrstr, finding its bytes makes that same header live
+      --  again. Strings have no outgoing edges, so whitening is sufficient
+      --  after the marking wave; during propagation use its ordinary queue.
+      if State.GC.Phase in Sweeping_Objects | Sweeping_Programs |
+        Finishing_Sweep | Finalizers_Ready
+      then
+         Item.Color := State.GC.Current_White;
+      else
+         Root_Barrier (State, Item);
+      end if;
+   end Revive_String;
 
    procedure Root_Barrier (State : in out World; Item : Object_Access) is
    begin

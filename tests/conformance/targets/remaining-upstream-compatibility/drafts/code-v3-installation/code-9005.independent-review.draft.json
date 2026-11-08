@@ -1,0 +1,45 @@
+{
+  "schema_version": 3,
+  "kind": "t-private-optimizer-exclusion-review",
+  "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9005",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": null,
+  "decision": "pending",
+  "t_dominance": "Author proposal: the exact pinned top-level T-absence return dominates this private span; the original guard remains unchanged.",
+  "private_invariant": "Only the exact middle-constant-placement inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+  "third_party_irrelevance": "The current independent feature decision distinguishes observable dump/constant/register choices from public loading, numeric kind, result cardinality, callback, assignment, constructor and lifetime behavior. No callable/public API or mixed assertion is proposed for removal.",
+  "feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-ten-source-feature-review.json",
+    "sha256": "a0a24b7ee5b8b8cecbe327afced993b44942c0bd93ee85601e09a3083e724635"
+  },
+  "semantic_retention_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+    "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+  },
+  "original_anchor_links": [
+    {
+      "id": "LUA-CODE-ASSERT-CALL-0015",
+      "kind": "assert-call",
+      "byte_offset": 13361,
+      "byte_length": 6,
+      "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-CODE-INTERNAL-REFERENCE-0007",
+      "kind": "internal-reference",
+      "byte_offset": 13368,
+      "byte_length": 7,
+      "anchor_sha256": "0f4f8500d5e3005e1445ef305004182f31d0c376f6be5b439dee17437d6e5d90"
+    }
+  ],
+  "required_semantic_contract_ids": [
+    "nested-constant-lifetimes"
+  ],
+  "review_instruction": "Independent reviewer must confirm exact source bytes, observable private structure relevance, all original links and each retained public contract before changing this pending decision.",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": []
+}

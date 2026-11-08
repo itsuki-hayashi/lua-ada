@@ -9,14 +9,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
+#include <stdint.h>
 
 struct adapter_result {
     int count;
     int text_length;
-    lua_Integer integers[3];
+    lua_Integer integers[5];
     char text[256];
 };
 extern void lua_ada_test_inspect(void *, int, struct adapter_result *);
+extern int lua_ada_test_set_allocation_count(void *, long long);
 extern lua_CFunction lua_ada_test_platform_callback(int);
 
 /* Per-universe counterpart of ltests.c:85-169. The registry owns this real
@@ -129,6 +131,12 @@ static int inspect(lua_State *L) {
      * publication. A Lua error therefore unwinds only the live C guard. */
     lua_ada_test_inspect(lua_touserdata(L, lua_upvalueindex(2)),
         (int)lua_tointeger(L, lua_upvalueindex(1)), &result);
+    if (lua_tointeger(L, lua_upvalueindex(1)) == 37 && result.count == 4) {
+        /* Match the driver's diagnostic address with this actual C frame;
+         * no Ada frame or private C Lua representation is impersonated. */
+        result.integers[4] = (lua_Integer)(uintptr_t)&i;
+        result.count = 5;
+    }
     if (result.count == -2) abort(); /* Internal invariant, never Lua error. */
     if (result.count < 0) {
         lua_pushlstring(L, result.text, (size_t)result.text_length);
@@ -143,12 +151,27 @@ static int inspect(lua_State *L) {
     return result.count;
 }
 
+static int allocation_control(lua_State *L) {
+    lua_Integer limit = luaL_checkinteger(L, 1);
+    void *owner;
+    lua_getfield(L, LUA_REGISTRYINDEX, LUA_ADA_T_OWNER_KEY);
+    owner = lua_touserdata(L, -1);
+    lua_pop(L, 1);
+    /* The test registry retains the original controlling world even for an
+     * independently created state. The Ada leaf receives the scalar, never
+     * guesses another world's current argument window, and cannot throw. */
+    if (lua_ada_test_set_allocation_count(owner, (long long)limit) != 0)
+        abort();
+    return 0;
+}
+
 lua_CFunction lua_ada_test_adapter_callback(int operation) {
     if (operation == 0) return userdata;
     if (operation == 11) return install_warning;
     if (operation >= 14 && operation <= 16)
         return lua_ada_test_platform_callback(operation);
-    if (operation >= 17 && operation <= 24)
+    if ((operation >= 17 && operation <= 35) || operation == 39)
         return lua_ada_test_api_callback(operation);
+    if (operation == 36) return allocation_control;
     return inspect;
 }

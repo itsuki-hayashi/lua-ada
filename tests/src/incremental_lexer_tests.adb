@@ -81,6 +81,8 @@ package body Incremental_Lexer_Tests is
    begin
       Assert (Result.Status = Syntax_Error, "lexical numeral failure");
       Assert (Result.Tokens.Is_Empty, "batch adapter discards partial input");
+      Assert (Result.Message = "malformed number near '1e+'",
+              "malformed token is retained in diagnostic context");
    end Malformed_Numeral;
 
    procedure Raw_Nul_Token is

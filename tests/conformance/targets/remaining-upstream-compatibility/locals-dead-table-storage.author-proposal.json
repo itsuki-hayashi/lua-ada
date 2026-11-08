@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "kind": "locals-dead-table-storage-author-proposal",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root",
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source": {
+    "path": "references/lua/testes/locals.lua",
+    "sha256": "56b5126c40f48bb1a701f041af28cd72a3a7d50b3db9b05da5659f2485f740c1"
+  },
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "configuration": "upstream-test",
+  "original_anchors": [
+    {
+      "id": "LUA-LOCALS-INTERNAL-REFERENCE-0001",
+      "kind": "internal-reference",
+      "byte_offset": 2367,
+      "byte_length": 10,
+      "line": 120,
+      "end_line": 120,
+      "anchor_sha256": "85a7feb78cbcd09da43e8e0bcdcc4894d236ac4f886fac9806a595ea873261d9",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": null,
+      "configurations": [],
+      "evidence": [],
+      "review": null
+    },
+    {
+      "id": "LUA-LOCALS-ASSERT-CALL-0023",
+      "kind": "assert-call",
+      "byte_offset": 2540,
+      "byte_length": 6,
+      "line": 126,
+      "end_line": 126,
+      "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": null,
+      "configurations": [],
+      "evidence": [],
+      "review": null
+    }
+  ],
+  "relevant_block": {
+    "byte_offset": 2163,
+    "byte_length": 438,
+    "sha256": "58cb6759c23bb48299fd1bbc9b451d996dc6f52f7f31d050aad1ad3e7998f1bf",
+    "original_bytes": "  -- testing clearing of dead elements from tables\n  collectgarbage(\"stop\")   -- stop GC\n  local a = {[{}] = 4, [3] = 0, alo = 1,\n             a1234567890123456789012345678901234567890 = 10}\n\n  local t = T.querytab(a)\n\n  for k,_ in pairs(a) do a[k] = undef end\n  collectgarbage()   -- restore GC and collect dead fields in 'a'\n  for i=0,t-1 do\n    local k = querytab(a, i)\n    assert(k == nil or type(k) == 'number' or k == 'alo')\n  end\n\n"
+  },
+  "candidate_spans": [
+    {
+      "byte_offset": 2355,
+      "byte_length": 26,
+      "sha256": "04035d9ee038af9e7f37506bbf2f8c5ae6917c7ecd8de5a99c5205551cd00bc6",
+      "original_bytes": "  local t = T.querytab(a)\n"
+    },
+    {
+      "byte_offset": 2490,
+      "byte_length": 110,
+      "sha256": "00b85ae4732a06e844c82cd987ba31de93c22d726a4cbd18f3914cf8fde5f628",
+      "original_bytes": "  for i=0,t-1 do\n    local k = querytab(a, i)\n    assert(k == nil or type(k) == 'number' or k == 'alo')\n  end\n"
+    }
+  ],
+  "proposed_resolution": "ada-internal-equivalent",
+  "source_exclusions": [],
+  "original_obligations_remain_required": true,
+  "feature_rationale": "The retained safety intent is to clear dead collectable table keys before sweeping and unlink their indices, preventing stale-pointer access and accidental retention. C querytab exposes private array/hash geometry and dead-node representation. Do not implement synthetic C geometry or waive public table, iteration, weak-reference or allocation-refusal behavior.",
+  "native_observation": {
+    "path": "reports/combined-reader-failure/locals-d69ae37f0cb24da590856cae20afb4e3",
+    "result": "Unchanged native completes default/T; Ada default completes, Ada T fails120 missing querytab. table_query first result is private array size. The original constructed table has zero native array rows, so the subsequent unqualified querytab loop does not establish a hash-node safety witness."
+  },
+  "proposed_source_plan": [
+    "Retain original T guard, stopped collector, original four-entry table, exact public pairs deletion and full collection.",
+    "Replace only private size/query calls with a test-only Ada checker of actual member/index/free-list storage. No synthetic querytab API or invented zero loop bound.",
+    "Observe the original anonymous table key through a public weak-value witness and require its reclamation after collection. Require four actual live entries before deletion and zero afterward, with no constraint on private row/bucket capacity.",
+    "Preserve the later original allocation-error insertion sweep byte-for-byte. No allocator verification reset or reduced limit is introduced.",
+    "Keep both original anchors required and pending until exact independent source approval, actual runtime equivalent evidence and final reconciliation."
+  ],
+  "planned_witnesses": [
+    "actual retained table keys are registered before any dereference",
+    "array/hash/free-list indices are in bounds and acyclic; nil keys are unlinked",
+    "deleted collectable keys do not retain otherwise unreachable objects",
+    "live keys survive collection; dead rows can be reused without stale access",
+    "actual insertion failure/retry and public iteration remain intact"
+  ],
+  "source_bindings": [
+    {
+      "path": "references/lua/ltests.c",
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687"
+    },
+    {
+      "path": "src/lua-engine-tables.adb",
+      "sha256": "31db4043d6b387c08b61a2ff6f6197d9a5495626200d67cf56cfad66f0821173"
+    },
+    {
+      "path": "src/lua-engine.ads",
+      "sha256": "dc25ffbb543cf19bac085bed357aa967f912b35d50e5facdcac41f1b934e5f8f"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0"
+    }
+  ],
+  "implementation_status": "planned private checker and counterparts; no adapted source or runtime acceptance supplied by this proposal",
+  "independent_review": null
+}

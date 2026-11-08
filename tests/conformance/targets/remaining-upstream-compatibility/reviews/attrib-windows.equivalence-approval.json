@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "kind": "equivalent-approval",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "decision": "accepted",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "equivalent": {
+    "id": "attrib-windows-paths",
+    "source": "references/lua/testes/attrib.lua",
+    "source_sha256": "dd2eb13be29628ac0268cddfafdc6a816edcba6552ae15e8637afc6a79742e52",
+    "configuration": "default-and-upstream-test",
+    "disposition": "native-platform-equivalent",
+    "platform": "windows",
+    "generated_sha256": "a56021013a850cf69feb421e5385ac0e5f8e6b5841d107c9c7a55ed5ea172dca"
+  },
+  "decisions": [
+    {
+      "id": "windows-path-require-b-lua",
+      "start_byte": 4388,
+      "length_bytes": 12,
+      "source_sha256": "82d58eff6dc00f7d37a2e6ce3cf4ca7acf9a8e31db579b6c03d5c994606b184a",
+      "replacement_sha256": "6fa56434429eb5448fa829af33269aa687efbabafa02ffadf12ad27cd623b5a2",
+      "decision": "accepted",
+      "author": "Codex /root/validation_delivery",
+      "reviewer": "Codex /root",
+      "rationale": "Independently inspected this exact expected-path literal and its unchanged loader/template assertions. Retain exact searchpath/require filename and loader-data equality using the original D helper; preserve all assertions and cache/reload behavior. Source generation only; actual native applicability and complete runtime observations remain mandatory.",
+      "review_evidence": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/attrib-windows.independent-source-review.json",
+        "sha256": "6fbb37fee44ff1b7ba985d1205e503167ebdf72456d7a6b1e917d8eff695c85b"
+      },
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/windows-package-paths.lua#require-b-lua",
+          "sha256": "d3700e1babb78724741101d2a2ce66a0add4525455ff40d6bc9047d5fd0337f4"
+        }
+      ]
+    },
+    {
+      "id": "windows-path-require-a-lua",
+      "start_byte": 4607,
+      "length_bytes": 12,
+      "source_sha256": "d0ba414494faa28458c8d6de8f799bbfea510d62c1b063a5d56a02b31a225e1e",
+      "replacement_sha256": "9b4cb6b1f34ce2b588575790e2ece7533df32fba62690096f92e1a22282d2a58",
+      "decision": "accepted",
+      "author": "Codex /root/validation_delivery",
+      "reviewer": "Codex /root",
+      "rationale": "Independently inspected this exact expected-path literal and its unchanged loader/template assertions. Retain exact searchpath/require filename and loader-data equality using the original D helper; preserve all assertions and cache/reload behavior. Source generation only; actual native applicability and complete runtime observations remain mandatory.",
+      "review_evidence": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/attrib-windows.independent-source-review.json",
+        "sha256": "6fbb37fee44ff1b7ba985d1205e503167ebdf72456d7a6b1e917d8eff695c85b"
+      },
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/windows-package-paths.lua#require-a-lua",
+          "sha256": "d3700e1babb78724741101d2a2ce66a0add4525455ff40d6bc9047d5fd0337f4"
+        }
+      ]
+    },
+    {
+      "id": "windows-path-require-a-lc",
+      "start_byte": 4693,
+      "length_bytes": 11,
+      "source_sha256": "d212c0d7fffc2d987148a86cd0049401615994d4190b8fca85f8a420eabd57c8",
+      "replacement_sha256": "e73e3d2019ae4824ffb7894e8b5661cbf4390ddf7859cd9663b25244b12f8312",
+      "decision": "accepted",
+      "author": "Codex /root/validation_delivery",
+      "reviewer": "Codex /root",
+      "rationale": "Independently inspected this exact expected-path literal and its unchanged loader/template assertions. Retain exact searchpath/require filename and loader-data equality using the original D helper; preserve all assertions and cache/reload behavior. Source generation only; actual native applicability and complete runtime observations remain mandatory.",
+      "review_evidence": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/attrib-windows.independent-source-review.json",
+        "sha256": "6fbb37fee44ff1b7ba985d1205e503167ebdf72456d7a6b1e917d8eff695c85b"
+      },
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/windows-package-paths.lua#require-a-lc",
+          "sha256": "d3700e1babb78724741101d2a2ce66a0add4525455ff40d6bc9047d5fd0337f4"
+        }
+      ]
+    },
+    {
+      "id": "windows-path-fallback-l-first",
+      "start_byte": 4854,
+      "length_bytes": 8,
+      "source_sha256": "fcc1121c77338e326263978da0cbe2ee273f88a73ccdbc2c07dd0d807c7329a0",
+      "replacement_sha256": "0ef3c20bb44cf495d35898a940407dde74dee703bf69256f4870c06a60ee6110",
+      "decision": "accepted",
+      "author": "Codex /root/validation_delivery",
+      "reviewer": "Codex /root",
+      "rationale": "Independently inspected this exact expected-path literal and its unchanged loader/template assertions. Retain exact searchpath/require filename and loader-data equality using the original D helper; preserve all assertions and cache/reload behavior. Source generation only; actual native applicability and complete runtime observations remain mandatory.",
+      "review_evidence": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/attrib-windows.independent-source-review.json",
+        "sha256": "6fbb37fee44ff1b7ba985d1205e503167ebdf72456d7a6b1e917d8eff695c85b"
+      },
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/windows-package-paths.lua#fallback-l-first",
+          "sha256": "d3700e1babb78724741101d2a2ce66a0add4525455ff40d6bc9047d5fd0337f4"
+        }
+      ]
+    },
+    {
+      "id": "windows-path-fallback-l-reload",
+      "start_byte": 4907,
+      "length_bytes": 8,
+      "source_sha256": "fcc1121c77338e326263978da0cbe2ee273f88a73ccdbc2c07dd0d807c7329a0",
+      "replacement_sha256": "0ef3c20bb44cf495d35898a940407dde74dee703bf69256f4870c06a60ee6110",
+      "decision": "accepted",
+      "author": "Codex /root/validation_delivery",
+      "reviewer": "Codex /root",
+      "rationale": "Independently inspected this exact expected-path literal and its unchanged loader/template assertions. Retain exact searchpath/require filename and loader-data equality using the original D helper; preserve all assertions and cache/reload behavior. Source generation only; actual native applicability and complete runtime observations remain mandatory.",
+      "review_evidence": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/attrib-windows.independent-source-review.json",
+        "sha256": "6fbb37fee44ff1b7ba985d1205e503167ebdf72456d7a6b1e917d8eff695c85b"
+      },
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/windows-package-paths.lua#fallback-l-reload",
+          "sha256": "d3700e1babb78724741101d2a2ce66a0add4525455ff40d6bc9047d5fd0337f4"
+        }
+      ]
+    },
+    {
+      "id": "windows-path-require-xx-x",
+      "start_byte": 5032,
+      "length_bytes": 11,
+      "source_sha256": "e886ba50850ab30a42967aab7231d673f3dd7af99edef00ca17d6ded279a92c5",
+      "replacement_sha256": "5752f8e2bfc260710c87f1b000baafa72167f467c096f0f92207a6ce7b10bd3c",
+      "decision": "accepted",
+      "author": "Codex /root/validation_delivery",
+      "reviewer": "Codex /root",
+      "rationale": "Independently inspected this exact expected-path literal and its unchanged loader/template assertions. Retain exact searchpath/require filename and loader-data equality using the original D helper; preserve all assertions and cache/reload behavior. Source generation only; actual native applicability and complete runtime observations remain mandatory.",
+      "review_evidence": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/attrib-windows.independent-source-review.json",
+        "sha256": "6fbb37fee44ff1b7ba985d1205e503167ebdf72456d7a6b1e917d8eff695c85b"
+      },
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/windows-package-paths.lua#require-xx-x",
+          "sha256": "d3700e1babb78724741101d2a2ce66a0add4525455ff40d6bc9047d5fd0337f4"
+        }
+      ]
+    },
+    {
+      "id": "windows-path-mixed-subpackage-template",
+      "start_byte": 5395,
+      "length_bytes": 18,
+      "source_sha256": "95946e9901cc6d2bb12a7f53e20f2d12d851be1e9ed862a53cd34cf4f137aa6b",
+      "replacement_sha256": "bb60c2cd06e7058183634fec106404020cc4aa37275e727bfc444f5ff525efb8",
+      "decision": "accepted",
+      "author": "Codex /root/validation_delivery",
+      "reviewer": "Codex /root",
+      "rationale": "Independently inspected this exact expected-path literal and its unchanged loader/template assertions. Retain exact require loader data from the original mixed-separator package template; preserve the literal /init.lua suffix. Source generation only; actual native applicability and complete runtime observations remain mandatory.",
+      "review_evidence": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/attrib-windows.independent-source-review.json",
+        "sha256": "6fbb37fee44ff1b7ba985d1205e503167ebdf72456d7a6b1e917d8eff695c85b"
+      },
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/windows-package-paths.lua#mixed-subpackage-template",
+          "sha256": "d3700e1babb78724741101d2a2ce66a0add4525455ff40d6bc9047d5fd0337f4"
+        }
+      ]
+    },
+    {
+      "id": "windows-path-subpackage-separator",
+      "start_byte": 5656,
+      "length_bytes": 18,
+      "source_sha256": "4a72755310afbe912134ef41b2c8184a77b03e641cc9946486ac620408cfbaf4",
+      "replacement_sha256": "2b7f4497aa4675f42039a8ac22c130952f70751e7970c1f3f2e26b0cc99d230a",
+      "decision": "accepted",
+      "author": "Codex /root/validation_delivery",
+      "reviewer": "Codex /root",
+      "rationale": "Independently inspected this exact expected-path literal and its unchanged loader/template assertions. Retain exact searchpath/require filename and loader-data equality using the original D helper; preserve all assertions and cache/reload behavior. Source generation only; actual native applicability and complete runtime observations remain mandatory.",
+      "review_evidence": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/attrib-windows.independent-source-review.json",
+        "sha256": "6fbb37fee44ff1b7ba985d1205e503167ebdf72456d7a6b1e917d8eff695c85b"
+      },
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/windows-package-paths.lua#subpackage-separator",
+          "sha256": "d3700e1babb78724741101d2a2ce66a0add4525455ff40d6bc9047d5fd0337f4"
+        }
+      ]
+    },
+    {
+      "id": "windows-path-hyphen-native-prefix",
+      "start_byte": 7894,
+      "length_bytes": 14,
+      "source_sha256": "0513b5871134bdad12d3de6e3dd2fefd7051e00e127d8be83fcaa62212e205c2",
+      "replacement_sha256": "47d077529e8f45324b6bac898b86916754c1a7b47f63d2ab53851477e91f06f7",
+      "decision": "accepted",
+      "author": "Codex /root/validation_delivery",
+      "reviewer": "Codex /root",
+      "rationale": "Independently inspected this exact expected-path literal and its unchanged loader/template assertions. Retain the native C-module path-prefix assertion and every loader/function/argument assertion, using the original D helper for the Windows separator. Source generation only; actual native applicability and complete runtime observations remain mandatory.",
+      "review_evidence": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/attrib-windows.independent-source-review.json",
+        "sha256": "6fbb37fee44ff1b7ba985d1205e503167ebdf72456d7a6b1e917d8eff695c85b"
+      },
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/windows-package-paths.lua#hyphen-native-prefix",
+          "sha256": "d3700e1babb78724741101d2a2ce66a0add4525455ff40d6bc9047d5fd0337f4"
+        }
+      ]
+    },
+    {
+      "id": "windows-path-c-root-native-prefix",
+      "start_byte": 8260,
+      "length_bytes": 11,
+      "source_sha256": "3a8a80127c8339d5ba05fc2460919fb3c4b8ae9b15eb4bf9f8f62208089cd98a",
+      "replacement_sha256": "ea9d03a3f79d239f36ee7ab4ce37fccd667b78a6ad21454ea9d773d49b09088a",
+      "decision": "accepted",
+      "author": "Codex /root/validation_delivery",
+      "reviewer": "Codex /root",
+      "rationale": "Independently inspected this exact expected-path literal and its unchanged loader/template assertions. Retain the native C-module path-prefix assertion and every loader/function/argument assertion, using the original D helper for the Windows separator. Source generation only; actual native applicability and complete runtime observations remain mandatory.",
+      "review_evidence": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/attrib-windows.independent-source-review.json",
+        "sha256": "6fbb37fee44ff1b7ba985d1205e503167ebdf72456d7a6b1e917d8eff695c85b"
+      },
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/windows-package-paths.lua#c-root-native-prefix",
+          "sha256": "d3700e1babb78724741101d2a2ce66a0add4525455ff40d6bc9047d5fd0337f4"
+        }
+      ]
+    }
+  ]
+}

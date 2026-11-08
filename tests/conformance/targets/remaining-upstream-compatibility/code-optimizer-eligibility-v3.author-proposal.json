@@ -1,0 +1,1108 @@
+{
+  "schema_version": 1,
+  "kind": "optimization-structure-eligibility-author-proposal",
+  "id": "code-private-optimizer-eligibility-v3",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "review_status": "pending-independent-schema-review",
+  "independent_reviewer": null,
+  "authority_installation": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_snapshot": {
+    "revision": "8202389933ff7dbc0aa5709ba9bcc5aa89e48a1f",
+    "runtime_pool_revision": "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+    "pending_owner_generation_fix_included": false
+  },
+  "feature_input": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.independent-feature-review.json",
+    "sha256": "7fa373d254f185c666841358225d5ec835dd82a15ea96f072075fd302b511e85"
+  },
+  "dated_v1_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/code-private-optimizer.author-proposal.json",
+    "sha256": "4fa7c8e24da8da67a0d1b11b5dec25235a8591dd60681425c6e64a9a8503ed2c"
+  },
+  "dated_transform_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/code-private-optimizer.transform.author-proposal.json",
+    "sha256": "603fcf7c3f6c9106c902d6c6bd5c72c75be54df6f5b0c139787284a04adad2a5"
+  },
+  "source": {
+    "path": "references/lua/testes/code.lua",
+    "sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663"
+  },
+  "proposed_version_contract": {
+    "selector": 3,
+    "compatibility": "V1 remains exactly strict false-visibility; V2 remains exactly the reviewed pure conjunct shape. Neither silently accepts structure exclusions.",
+    "allowlist": "Only the eight exact code.lua IDs/source hashes/spans below. New sources, shapes or widened spans require another independent schema/feature decision.",
+    "visibility": "module_observable must be true. Public binary output makes private optimizer choices observable; this says nothing about a public promise of exact C optimization.",
+    "compatibility_obligation": "module_compatibility_obligation, public_api and mixed_obligation must all be false after independent feature and retained-semantic review.",
+    "source_only": "Installed exclusion children must have empty evidence and never status passed. Lexical references and actual runtime obligations remain distinct.",
+    "original_anchors": "Preserve all51 original records and their exact identities. Derive8 new private children. Eighteen contained lexical anchors need independent reference/decomposition decisions; no implicit status rewrite or parent completion.",
+    "protected_history": "Existing protected-scope descriptors, all13 accepted partitions, any previous pass/evidence and public/mixed obligations remain unconditionally ineligible.",
+    "two_reviews": "The accepted-feature-only-with-required-revisions artifact is a relevance input, never enough to install exclusions. New independent retention and exact decisions must bind current witness contracts and original-parent decomposition.",
+    "transform": "Reuse exact source/policy-bound transforms; empty/complete-comment/punctuation replacements only. No executable replacement, fake T facade, helper short circuit, T=nil or broad flags/returns.",
+    "runtime": "Whole original-C/derived-Ada source execution, public counterparts, fresh named receipts, allocator cleanup and final-context envelopes remain separately required.",
+    "target_selector": "Available only through explicit TargetPolicy remaining-upstream-compatibility. Existing strict default completion, historical scopes and their semantics remain unchanged."
+  },
+  "candidates": [
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9001",
+      "review_status": "pending-schema-and-exact-review",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 800,
+      "byte_length": 143,
+      "anchor_sha256": "26aad09cfda55023d09d73d23353c892cb5e19ba423488629606efc828ddf3fd",
+      "proposed_eligibility": {
+        "eligibility_schema_version": 3,
+        "eligibility": "t-only-private-invariant",
+        "module_observable": true,
+        "module_compatibility_obligation": false,
+        "public_api": false,
+        "mixed_obligation": false,
+        "observation_kind": "private-optimization-structure",
+        "structure_kind": "constant-pool-layout",
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "mode": "absent-return",
+          "byte_offset": 83,
+          "byte_length": 104,
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+        },
+        "required_semantic_contract_ids": [
+          "compile-original",
+          "numeric-values-types-arity",
+          "callback-sequence",
+          "assignment-sequence"
+        ],
+        "original_anchor_links": [
+          {
+            "id": "LUA-CODE-INTERNAL-REFERENCE-0001",
+            "kind": "internal-reference",
+            "byte_offset": 812,
+            "byte_length": 7,
+            "anchor_sha256": "0f4f8500d5e3005e1445ef305004182f31d0c376f6be5b439dee17437d6e5d90",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          },
+          {
+            "id": "LUA-CODE-ASSERT-CALL-0002",
+            "kind": "assert-call",
+            "byte_offset": 828,
+            "byte_length": 6,
+            "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          },
+          {
+            "id": "LUA-CODE-ASSERT-CALL-0003",
+            "kind": "assert-call",
+            "byte_offset": 871,
+            "byte_length": 6,
+            "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          }
+        ],
+        "feature_review": {
+          "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.independent-feature-review.json",
+          "sha256": "7fa373d254f185c666841358225d5ec835dd82a15ea96f072075fd302b511e85"
+        },
+        "semantic_retention_review": {
+          "path": null,
+          "sha256": null
+        },
+        "exact_decision": {
+          "reviewer": null,
+          "artifact": null,
+          "sha256": null
+        }
+      },
+      "source_exclusion_evidence": []
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9002",
+      "review_status": "pending-schema-and-exact-review",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 1808,
+      "byte_length": 205,
+      "anchor_sha256": "41b6d2b52bb8f3f0d16dc0cf595c5fd6a4ca1b124b16b1bef028a1dda5f27f6b",
+      "proposed_eligibility": {
+        "eligibility_schema_version": 3,
+        "eligibility": "t-only-private-invariant",
+        "module_observable": true,
+        "module_compatibility_obligation": false,
+        "public_api": false,
+        "mixed_obligation": false,
+        "observation_kind": "private-optimization-structure",
+        "structure_kind": "opcode-sequence",
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "mode": "absent-return",
+          "byte_offset": 83,
+          "byte_length": 104,
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+        },
+        "required_semantic_contract_ids": [
+          "compile-original",
+          "retained-checkR",
+          "safe-return-cardinality"
+        ],
+        "original_anchor_links": [
+          {
+            "id": "LUA-CODE-INTERNAL-REFERENCE-0002",
+            "kind": "internal-reference",
+            "byte_offset": 1840,
+            "byte_length": 10,
+            "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          },
+          {
+            "id": "LUA-CODE-ASSERT-CALL-0004",
+            "kind": "assert-call",
+            "byte_offset": 1953,
+            "byte_length": 6,
+            "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          },
+          {
+            "id": "LUA-CODE-ASSERT-CALL-0005",
+            "kind": "assert-call",
+            "byte_offset": 1986,
+            "byte_length": 6,
+            "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          }
+        ],
+        "feature_review": {
+          "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.independent-feature-review.json",
+          "sha256": "7fa373d254f185c666841358225d5ec835dd82a15ea96f072075fd302b511e85"
+        },
+        "semantic_retention_review": {
+          "path": null,
+          "sha256": null
+        },
+        "exact_decision": {
+          "reviewer": null,
+          "artifact": null,
+          "sha256": null
+        }
+      },
+      "source_exclusion_evidence": []
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9003",
+      "review_status": "pending-schema-and-exact-review",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 2288,
+      "byte_length": 239,
+      "anchor_sha256": "5b3ddc7feef1ddadfa4a18c2526a31ced0495324141bde683ac399700a67e762",
+      "proposed_eligibility": {
+        "eligibility_schema_version": 3,
+        "eligibility": "t-only-private-invariant",
+        "module_observable": true,
+        "module_compatibility_obligation": false,
+        "public_api": false,
+        "mixed_obligation": false,
+        "observation_kind": "private-optimization-structure",
+        "structure_kind": "opcode-equality",
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "mode": "absent-return",
+          "byte_offset": 83,
+          "byte_length": 104,
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+        },
+        "required_semantic_contract_ids": [
+          "compile-original",
+          "retained-checkR"
+        ],
+        "original_anchor_links": [
+          {
+            "id": "LUA-CODE-INTERNAL-REFERENCE-0003",
+            "kind": "internal-reference",
+            "byte_offset": 2294,
+            "byte_length": 10,
+            "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          },
+          {
+            "id": "LUA-CODE-INTERNAL-REFERENCE-0004",
+            "kind": "internal-reference",
+            "byte_offset": 2314,
+            "byte_length": 10,
+            "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          },
+          {
+            "id": "LUA-CODE-ASSERT-CALL-0007",
+            "kind": "assert-call",
+            "byte_offset": 2330,
+            "byte_length": 6,
+            "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          },
+          {
+            "id": "LUA-CODE-ASSERT-CALL-0008",
+            "kind": "assert-call",
+            "byte_offset": 2500,
+            "byte_length": 6,
+            "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          }
+        ],
+        "feature_review": {
+          "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.independent-feature-review.json",
+          "sha256": "7fa373d254f185c666841358225d5ec835dd82a15ea96f072075fd302b511e85"
+        },
+        "semantic_retention_review": {
+          "path": null,
+          "sha256": null
+        },
+        "exact_decision": {
+          "reviewer": null,
+          "artifact": null,
+          "sha256": null
+        }
+      },
+      "source_exclusion_evidence": []
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9004",
+      "review_status": "pending-schema-and-exact-review",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 13327,
+      "byte_length": 32,
+      "anchor_sha256": "13c9570d19cf580345c831907370413a0a9b7c0c3d39f7b6660459373cd8e8af",
+      "proposed_eligibility": {
+        "eligibility_schema_version": 3,
+        "eligibility": "t-only-private-invariant",
+        "module_observable": true,
+        "module_compatibility_obligation": false,
+        "public_api": false,
+        "mixed_obligation": false,
+        "observation_kind": "private-optimization-structure",
+        "structure_kind": "outer-constant-placement",
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "mode": "absent-return",
+          "byte_offset": 83,
+          "byte_length": 104,
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+        },
+        "required_semantic_contract_ids": [
+          "nested-constant-lifetimes"
+        ],
+        "original_anchor_links": [
+          {
+            "id": "LUA-CODE-ASSERT-CALL-0014",
+            "kind": "assert-call",
+            "byte_offset": 13329,
+            "byte_length": 6,
+            "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          },
+          {
+            "id": "LUA-CODE-INTERNAL-REFERENCE-0006",
+            "kind": "internal-reference",
+            "byte_offset": 13336,
+            "byte_length": 7,
+            "anchor_sha256": "0f4f8500d5e3005e1445ef305004182f31d0c376f6be5b439dee17437d6e5d90",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          }
+        ],
+        "feature_review": {
+          "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.independent-feature-review.json",
+          "sha256": "7fa373d254f185c666841358225d5ec835dd82a15ea96f072075fd302b511e85"
+        },
+        "semantic_retention_review": {
+          "path": null,
+          "sha256": null
+        },
+        "exact_decision": {
+          "reviewer": null,
+          "artifact": null,
+          "sha256": null
+        }
+      },
+      "source_exclusion_evidence": []
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9005",
+      "review_status": "pending-schema-and-exact-review",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 13359,
+      "byte_length": 32,
+      "anchor_sha256": "4b1b8301af5f0f06a693bc66df7fa421860fdf06c9821e447ae6d4af791d8907",
+      "proposed_eligibility": {
+        "eligibility_schema_version": 3,
+        "eligibility": "t-only-private-invariant",
+        "module_observable": true,
+        "module_compatibility_obligation": false,
+        "public_api": false,
+        "mixed_obligation": false,
+        "observation_kind": "private-optimization-structure",
+        "structure_kind": "middle-constant-placement",
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "mode": "absent-return",
+          "byte_offset": 83,
+          "byte_length": 104,
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+        },
+        "required_semantic_contract_ids": [
+          "nested-constant-lifetimes"
+        ],
+        "original_anchor_links": [
+          {
+            "id": "LUA-CODE-ASSERT-CALL-0015",
+            "kind": "assert-call",
+            "byte_offset": 13361,
+            "byte_length": 6,
+            "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          },
+          {
+            "id": "LUA-CODE-INTERNAL-REFERENCE-0007",
+            "kind": "internal-reference",
+            "byte_offset": 13368,
+            "byte_length": 7,
+            "anchor_sha256": "0f4f8500d5e3005e1445ef305004182f31d0c376f6be5b439dee17437d6e5d90",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          }
+        ],
+        "feature_review": {
+          "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.independent-feature-review.json",
+          "sha256": "7fa373d254f185c666841358225d5ec835dd82a15ea96f072075fd302b511e85"
+        },
+        "semantic_retention_review": {
+          "path": null,
+          "sha256": null
+        },
+        "exact_decision": {
+          "reviewer": null,
+          "artifact": null,
+          "sha256": null
+        }
+      },
+      "source_exclusion_evidence": []
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9006",
+      "review_status": "pending-schema-and-exact-review",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 13587,
+      "byte_length": 10,
+      "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+      "proposed_eligibility": {
+        "eligibility_schema_version": 3,
+        "eligibility": "t-only-private-invariant",
+        "module_observable": true,
+        "module_compatibility_obligation": false,
+        "public_api": false,
+        "mixed_obligation": false,
+        "observation_kind": "private-optimization-structure",
+        "structure_kind": "private-register-inspection-wrapper",
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "mode": "absent-return",
+          "byte_offset": 83,
+          "byte_length": 104,
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+        },
+        "required_semantic_contract_ids": [
+          "register-load-boundaries"
+        ],
+        "original_anchor_links": [
+          {
+            "id": "LUA-CODE-INTERNAL-REFERENCE-0008",
+            "kind": "internal-reference",
+            "byte_offset": 13587,
+            "byte_length": 10,
+            "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          }
+        ],
+        "feature_review": {
+          "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.independent-feature-review.json",
+          "sha256": "7fa373d254f185c666841358225d5ec835dd82a15ea96f072075fd302b511e85"
+        },
+        "semantic_retention_review": {
+          "path": null,
+          "sha256": null
+        },
+        "exact_decision": {
+          "reviewer": null,
+          "artifact": null,
+          "sha256": null
+        }
+      },
+      "source_exclusion_evidence": []
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9007",
+      "review_status": "pending-schema-and-exact-review",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 13655,
+      "byte_length": 79,
+      "anchor_sha256": "120c5699b24c0b9102eded9963b92049e2d0f8213c5c43d77a64dc7dd3ecdac9",
+      "proposed_eligibility": {
+        "eligibility_schema_version": 3,
+        "eligibility": "t-only-private-invariant",
+        "module_observable": true,
+        "module_compatibility_obligation": false,
+        "public_api": false,
+        "mixed_obligation": false,
+        "observation_kind": "private-optimization-structure",
+        "structure_kind": "physical-register-numbering",
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "mode": "absent-return",
+          "byte_offset": 83,
+          "byte_length": 104,
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+        },
+        "required_semantic_contract_ids": [
+          "register-load-boundaries"
+        ],
+        "original_anchor_links": [
+          {
+            "id": "LUA-CODE-ASSERT-CALL-0017",
+            "kind": "assert-call",
+            "byte_offset": 13679,
+            "byte_length": 6,
+            "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          }
+        ],
+        "feature_review": {
+          "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.independent-feature-review.json",
+          "sha256": "7fa373d254f185c666841358225d5ec835dd82a15ea96f072075fd302b511e85"
+        },
+        "semantic_retention_review": {
+          "path": null,
+          "sha256": null
+        },
+        "exact_decision": {
+          "reviewer": null,
+          "artifact": null,
+          "sha256": null
+        }
+      },
+      "source_exclusion_evidence": []
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9008",
+      "review_status": "pending-schema-and-exact-review",
+      "source": "code.lua",
+      "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "byte_offset": 14141,
+      "byte_length": 175,
+      "anchor_sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6",
+      "proposed_eligibility": {
+        "eligibility_schema_version": 3,
+        "eligibility": "t-only-private-invariant",
+        "module_observable": true,
+        "module_compatibility_obligation": false,
+        "public_api": false,
+        "mixed_obligation": false,
+        "observation_kind": "private-optimization-structure",
+        "structure_kind": "constructor-opcode-count",
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "mode": "absent-return",
+          "byte_offset": 83,
+          "byte_length": 104,
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+        },
+        "required_semantic_contract_ids": [
+          "constructor-and-vararg-boundaries"
+        ],
+        "original_anchor_links": [
+          {
+            "id": "LUA-CODE-INTERNAL-REFERENCE-0009",
+            "kind": "internal-reference",
+            "byte_offset": 14169,
+            "byte_length": 10,
+            "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          },
+          {
+            "id": "LUA-CODE-ASSERT-CALL-0020",
+            "kind": "assert-call",
+            "byte_offset": 14297,
+            "byte_length": 6,
+            "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+            "requested_future_resolution": "independently-reviewed-reference-to-exact-private-child-and-required-retained-semantics",
+            "current_status": "pending"
+          }
+        ],
+        "feature_review": {
+          "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.independent-feature-review.json",
+          "sha256": "7fa373d254f185c666841358225d5ec835dd82a15ea96f072075fd302b511e85"
+        },
+        "semantic_retention_review": {
+          "path": null,
+          "sha256": null
+        },
+        "exact_decision": {
+          "reviewer": null,
+          "artifact": null,
+          "sha256": null
+        }
+      },
+      "source_exclusion_evidence": []
+    }
+  ],
+  "original_inventory": {
+    "path": "tests/conformance/coverage/code.jsonl",
+    "sha256": "27231932dffbd450a7fbdabfbf0de2c9edafd4ab0bbaecf3a16457af98e5fd94",
+    "records": 51,
+    "contained_private_reference_candidates": 18,
+    "remaining_original_records": [
+      {
+        "id": "LUA-CODE-MANUAL-AUDIT-0001",
+        "kind": "manual-audit",
+        "byte_offset": 0,
+        "byte_length": 14715,
+        "anchor_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0001",
+        "kind": "conditional-guard",
+        "byte_offset": 83,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-SKIP-REPORT-0001",
+        "kind": "skip-report",
+        "byte_offset": 101,
+        "byte_length": 7,
+        "anchor_sha256": "2f77668a9dfbf8d5848b9eeb4a7145ca94c6ed9236e4a773f6dcafa5132b2f91",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0001",
+        "kind": "assert-call",
+        "byte_offset": 492,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0006",
+        "kind": "assert-call",
+        "byte_offset": 2136,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0009",
+        "kind": "assert-call",
+        "byte_offset": 3295,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0002",
+        "kind": "conditional-guard",
+        "byte_offset": 5041,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0003",
+        "kind": "conditional-guard",
+        "byte_offset": 5137,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0004",
+        "kind": "conditional-guard",
+        "byte_offset": 5237,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0005",
+        "kind": "conditional-guard",
+        "byte_offset": 5339,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0006",
+        "kind": "conditional-guard",
+        "byte_offset": 5463,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0007",
+        "kind": "conditional-guard",
+        "byte_offset": 5607,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0008",
+        "kind": "conditional-guard",
+        "byte_offset": 5707,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0009",
+        "kind": "conditional-guard",
+        "byte_offset": 5810,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0010",
+        "kind": "conditional-guard",
+        "byte_offset": 5915,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0011",
+        "kind": "conditional-guard",
+        "byte_offset": 6012,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0012",
+        "kind": "conditional-guard",
+        "byte_offset": 6119,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0013",
+        "kind": "conditional-guard",
+        "byte_offset": 6219,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0014",
+        "kind": "conditional-guard",
+        "byte_offset": 6328,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0010",
+        "kind": "assert-call",
+        "byte_offset": 6535,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0011",
+        "kind": "assert-call",
+        "byte_offset": 6655,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0012",
+        "kind": "assert-call",
+        "byte_offset": 6775,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0005",
+        "kind": "internal-reference",
+        "byte_offset": 11826,
+        "byte_length": 3,
+        "anchor_sha256": "03adb9c919aecd32ae7c33502b1d67d9875d06cf81b3935a1b70b3dcb5b91609",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0015",
+        "kind": "conditional-guard",
+        "byte_offset": 12038,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0016",
+        "kind": "conditional-guard",
+        "byte_offset": 12107,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0017",
+        "kind": "conditional-guard",
+        "byte_offset": 12341,
+        "byte_length": 2,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0013",
+        "kind": "assert-call",
+        "byte_offset": 13246,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0016",
+        "kind": "assert-call",
+        "byte_offset": 13598,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0018",
+        "kind": "assert-call",
+        "byte_offset": 13903,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0019",
+        "kind": "assert-call",
+        "byte_offset": 14120,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0021",
+        "kind": "assert-call",
+        "byte_offset": 14501,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0022",
+        "kind": "assert-call",
+        "byte_offset": 14549,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0023",
+        "kind": "assert-call",
+        "byte_offset": 14599,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending"
+      }
+    ],
+    "manual_audit_parent": "LUA-CODE-MANUAL-AUDIT-0001",
+    "no_record_changes": true
+  },
+  "retained_checkR": {
+    "byte_offset": 2079,
+    "byte_length": 127,
+    "sha256": "324530f639ef49280bcc33a77b56351c3369cdfd13290c63934071985bb880dc",
+    "must_remain_byte_identical": true,
+    "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663"
+  },
+  "retained_semantic_witness": {
+    "status": "requires-independent-retention-review-and-fresh-context-observations",
+    "author_packet": {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/code-public-semantics.author-witness.json",
+      "sha256": "be1a08319ae947eda1bfcbe3279efdbd02e6fa4e7fe2309be05d6431a1e7f5bc"
+    },
+    "ordinary_lua_source": {
+      "path": "tests/lua/code_public_semantics.lua",
+      "sha256": "a5a6f949bced42fcad5ca68451f64019247f778ef3956907ce1a0dab7b55232a"
+    },
+    "aunit_source": {
+      "path": "tests/src/code_public_semantic_tests.adb",
+      "sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    "aunit_declaration": {
+      "path": "tests/src/code_public_semantic_tests.ads",
+      "sha256": "0e79dc85150a59a2b2d178f472aceffc21ba4d3ab3236ba29d5f846c2daa88db"
+    },
+    "named_cases": [
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#F_Zero",
+        "required_stdout_line": "OK code public semantics: f zero"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#I_Captured_Zero",
+        "required_stdout_line": "OK code public semantics: i captured zero"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#I_Zero_Floor",
+        "required_stdout_line": "OK code public semantics: i zero floor"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#K_Reciprocal",
+        "required_stdout_line": "OK code public semantics: k reciprocal"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#K_Power",
+        "required_stdout_line": "OK code public semantics: k power"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#K_Negative_Power",
+        "required_stdout_line": "OK code public semantics: k negative power"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#F_Floor",
+        "required_stdout_line": "OK code public semantics: f floor"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#I_Modulo",
+        "required_stdout_line": "OK code public semantics: i modulo"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#F_Division",
+        "required_stdout_line": "OK code public semantics: f division"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#F_Floor_Modulo",
+        "required_stdout_line": "OK code public semantics: f floor modulo"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#I_Bitwise_Mixed",
+        "required_stdout_line": "OK code public semantics: i bitwise mixed"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#I_Bitwise_Not",
+        "required_stdout_line": "OK code public semantics: i bitwise not"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#I_Bitwise_Float",
+        "required_stdout_line": "OK code public semantics: i bitwise float"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#I_Shifts",
+        "required_stdout_line": "OK code public semantics: i shifts"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Integer_Borders",
+        "required_stdout_line": "OK code public semantics: integer borders"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Float_Borders",
+        "required_stdout_line": "OK code public semantics: float borders"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Maximum_Integer",
+        "required_stdout_line": "OK code public semantics: maximum integer"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Minimum_Integer",
+        "required_stdout_line": "OK code public semantics: minimum integer"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Negative_Hex",
+        "required_stdout_line": "OK code public semantics: negative hex"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Nested_Constants",
+        "required_stdout_line": "OK code public semantics: nested constants"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Callback_Sequence",
+        "required_stdout_line": "OK code public semantics: callback sequence"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Assignment_Sequence",
+        "required_stdout_line": "OK code public semantics: assignment sequence"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Constructor_49",
+        "required_stdout_line": "OK code public semantics: constructor 49"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Constructor_50",
+        "required_stdout_line": "OK code public semantics: constructor 50"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Constructor_51",
+        "required_stdout_line": "OK code public semantics: constructor 51"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Return_Zero",
+        "required_stdout_line": "OK code public semantics: return zero"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Return_One_Nil",
+        "required_stdout_line": "OK code public semantics: return one nil"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Return_Multiple",
+        "required_stdout_line": "OK code public semantics: return multiple"
+      },
+      {
+        "case": "tests/src/code_public_semantic_tests.adb#Register_Load",
+        "required_stdout_line": "OK code public semantics: register load"
+      }
+    ],
+    "runtime_evidence": [],
+    "contracts": [
+      {
+        "id": "compile-original",
+        "requirement": "Retain every original closure/source construction and load/error boundary. Do not execute intentionally invalid/infinite opcode-only functions."
+      },
+      {
+        "id": "retained-checkR",
+        "requirement": "Keep all127 original checkR bytes and every actual function/value/type assertion unchanged."
+      },
+      {
+        "id": "numeric-values-types-arity",
+        "requirement": "All14 helper expressions, both5-value immediate groups and3 generated hex/dump round trips retain value, math.type and exactly1 result; nested string kind/bytes remain checked."
+      },
+      {
+        "id": "callback-sequence",
+        "requirement": "Actual original callback function produces all8 arguments in order, each with one argument, exact numeric value/kind and no invented pool metadata."
+      },
+      {
+        "id": "assignment-sequence",
+        "requirement": "Actual original repeated assignments produce all14 receiver/key/value transitions; absent-key recorder observes integer/float sequence without suppressing writes."
+      },
+      {
+        "id": "nested-constant-lifetimes",
+        "requirement": "Execute maker/middle/leaf with one result per layer and exact50-byte string; retain original final f3 assertion and public dump/reload behavior."
+      },
+      {
+        "id": "safe-return-cardinality",
+        "requirement": "Bounded safe zero, one-nil and multiple-result controls preserve exact nil/count/type behavior and binary round trips; no arbitrary opcode-only closure execution."
+      },
+      {
+        "id": "register-load-boundaries",
+        "requirement": "Retain successful maximum-register load and exact oversized-register failure with actual load calls; never call the intentionally nil target."
+      },
+      {
+        "id": "constructor-and-vararg-boundaries",
+        "requirement": "Retain original50-element successful compilation; public49/50/51 constructor/vararg controls check actual slots/values, iteration, result count and types without assuming nil-hole length."
+      }
+    ],
+    "future_final_consumer_requirements": [
+      "Fresh actual paired native/Ada public fixture observations in each required context, with executable/configuration/source/chunk/telemetry identities; prior component measurements remain dated evidence.",
+      "All29 actual named AUnit cases from source-bound same-image suite receipts. Case names and source links alone are not execution evidence.",
+      "Independent source review of all65 original source links in the author witness plus exact parent/retained obligation mapping.",
+      "Separate exact transform approval and whole original-C/derived-Ada code.lua captures; exclusion counters never become passing assertion counts."
+    ]
+  },
+  "required_validator_changes": [
+    {
+      "path": "scripts/ConformanceExclusionEligibility.psm1",
+      "change": "Add explicit v3 dispatch and exact pinned code8 structure registry. Preserve all v1/v2 semantics and include new semantic/link fields in review claims."
+    },
+    {
+      "path": "scripts/ConformanceInventory.psm1",
+      "change": "Validate exact structure bytes/T dominance, current independent feature+retention authority, explicit original-anchor decomposition and retained obligations; preserve protected-history/no-pass guards."
+    },
+    {
+      "path": "scripts/ConformanceTransforms.psm1",
+      "change": "Accept only the independently resolved exact v3 children under the existing comment/punctuation-only replacement rules and byte-identical checkR/load retention guards."
+    },
+    {
+      "path": "scripts/run-conformance.ps1",
+      "change": "Carry exact policy/exclusion/retention-contract identities in observations. Final source/operation acceptance requires retained public contracts, never a bare private-child exclusion."
+    },
+    {
+      "path": "scripts/ConformanceTargetMatrix.psm1",
+      "change": "Require fresh current-context public witness/named evidence for retained obligations before final target closure; raw exclusion evidence stays empty."
+    }
+  ],
+  "negative_regression_plan": {
+    "status": "planned-not-implemented-or-run",
+    "synthetic_binding_fixtures_are_non_execution": true,
+    "cases": [
+      "Exact8 observable private structures with reviewed retained contracts can be eligible; this is not a runtime pass.",
+      "V1 observable=true and v2 structure shape remain rejected.",
+      "Unknown source/ID/kind/span, one-byte widening, source/hash/configuration drift and missing/false T guard reject.",
+      "Public/API/mixed=true, module_compatibility_obligation=true or module_observable=false reject.",
+      "Protected accepted partition, previous pass/evidence or downgrade attempts reject.",
+      "Missing original anchor, duplicate decomposition, excluded manual parent or omitted retained checkR/runtime child reject.",
+      "Feature-only decision without fulfilled required revisions, missing semantic contracts, absent actual counterparts or self/unreviewed exact decision reject.",
+      "Missing or tampered numeric type/one-result, callback8/assignment14 sequences, nested lifetime, constructor, load/error or named receipt rejects final operation acceptance.",
+      "Any checkR alteration, public load removal, executable replacement, fake listk/listcode facade, T=nil, early return, broad filter or unterminated comment rejects.",
+      "No fabricated/synthetic review or component report may satisfy final actual context evidence."
+    ]
+  },
+  "next_actions": [
+    "Root independently reviews this bounded schema/decomposition proposal.",
+    "Implement accepted validator changes with meaningful positive/negative security regressions before any installation.",
+    "Independently review current29-case source retention and exact child decisions, then install policy and approve exact source bytes separately.",
+    "Keep publicCode ordinary default semantics in the generic campaign; classify new realT metadata fixture separately.",
+    "No adapted code.lua emission/execution until the independent exact authority exists."
+  ],
+  "installed_policy_snapshot": {
+    "sha256": "4917d6bbd7a3048f60a262f2e744a596af5e870039085ce9f2aa6d6945307224",
+    "optimizer_exclusions_installed": 0,
+    "path": "tests/conformance/targets/remaining-upstream-compatibility.exclusions.json",
+    "existing_exclusions": 1
+  }
+}

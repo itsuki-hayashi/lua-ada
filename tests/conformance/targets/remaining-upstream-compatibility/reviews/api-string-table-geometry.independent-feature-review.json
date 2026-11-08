@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-string-table-feature-review",
+  "candidate_id": "api-string-table-geometry",
+  "author": "Codex /root/remaining_suite",
+  "reviewer": "Codex /root",
+  "review_date": "2026-11-08",
+  "decision": "accepted-feature-only-with-required-counterparts",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api-string-table-geometry.author-proposal.json",
+    "sha256": "3379d81f9897ca7ad4d55c302c95d8a59626349f1069b98929e3b20da8c940c3"
+  },
+  "source": {
+    "path": "references/lua/testes/api.lua",
+    "sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0"
+  },
+  "configuration": "upstream-test",
+  "mixed_parent": "LUA-API-GENERATED-TEMPLATE-0002",
+  "candidates": [
+    {
+      "id": "initial-querystr",
+      "byte_offset": 37690,
+      "byte_length": 38,
+      "line": 1328,
+      "end_line": 1328,
+      "anchor_sha256": "fcc3b3b033e6015dce87629c3363af1ca3fa653797482fb99d0cd80c6d733875",
+      "original_bytes": "    local stsize, stuse = T.querystr()",
+      "decision": "accepted-feature-only",
+      "public_api": false,
+      "module_observable": true,
+      "module_compatibility_obligation": false,
+      "eligibility_scope": "Only the exact private size/population observation. Its ordinary workload, public API effects and lifetime obligations remain required."
+    },
+    {
+      "id": "short-string-population",
+      "byte_offset": 37729,
+      "byte_length": 24,
+      "line": 1329,
+      "end_line": 1329,
+      "anchor_sha256": "d214546eafb133509ceef01202e1f27e261ab5b1eebee31602caba872ca334ab",
+      "original_bytes": "    assert(stuse > 1000)",
+      "decision": "accepted-feature-only",
+      "public_api": false,
+      "module_observable": true,
+      "module_compatibility_obligation": false,
+      "eligibility_scope": "Only the exact private size/population observation. Its ordinary workload, public API effects and lifetime obligations remain required."
+    },
+    {
+      "id": "post-gc-bucket-capacity",
+      "byte_offset": 38144,
+      "byte_length": 34,
+      "line": 1343,
+      "end_line": 1343,
+      "anchor_sha256": "7c8dbf818abbdb04dc97eca65bdc3ef808265a5f263c531ec4f727aaee286ecf",
+      "original_bytes": "    assert(T.querystr() == stsize)",
+      "decision": "accepted-feature-only",
+      "public_api": false,
+      "module_observable": true,
+      "module_compatibility_obligation": false,
+      "eligibility_scope": "Only the exact private size/population observation. Its ordinary workload, public API effects and lifetime obligations remain required."
+    }
+  ],
+  "findings": [
+    "Native string_query directly reports global_State.strt size/nuse. Neither quantity is a public string or allocator contract.",
+    "Native luaS_resize restores old chains on refused shrink; Ada Grow_String_Index allocates replacement buckets before rewriting old chains. Ada collection does not promise to request a shrink.",
+    "Strings remain in Lua weak tables by language contract. A weak string value cannot witness intern-index reclamation.",
+    "Current Ada growth-only refusal is not evidence of exercising native unequal-size shrink refusal.",
+    "Existing intern identity, revival and rehash cases establish narrower invariants; no source block or final-context acceptance follows."
+  ],
+  "required_counterparts": [
+    "Retain all thousand dynamic short strings, minimal child libraries, original recursion and stack observations, a=nil, actual disabled-allocation collection, ok delivery and explicit close.",
+    "Inspect real heap/index membership to show dead headers detach, each chain entry is live and correctly bucketed, and live strings/keys retain bytes and identities.",
+    "Refuse an actual replacement-bucket growth through the selected provider, prove old chains and roots survive, then restore allocation and retry.",
+    "Require balanced selected raw bytes/blocks after finalization; no fabricated querystr statistics or no-T path.",
+    "Review exact replacement bytes, generated-template anchor decomposition and any exclusion/schema proposal separately. Keep mixed parent pending."
+  ],
+  "binding_audit": {
+    "file_bindings_checked": 22,
+    "stale_file_bindings": [
+      {
+        "path": "src/lua-engine.adb",
+        "proposed": "d6abfcb10636b43eb2faf0981f61bc879d33dae1db56e71255efde79d47ea797",
+        "actual": "a82b1e9aa69b39bd54289067827e89e74aa6683adb156a2f3b38addcd4ded9ad"
+      },
+      {
+        "path": "src/lua-engine.adb",
+        "proposed": "d6abfcb10636b43eb2faf0981f61bc879d33dae1db56e71255efde79d47ea797",
+        "actual": "a82b1e9aa69b39bd54289067827e89e74aa6683adb156a2f3b38addcd4ded9ad"
+      },
+      {
+        "path": "src/lua-engine.adb",
+        "proposed": "d6abfcb10636b43eb2faf0981f61bc879d33dae1db56e71255efde79d47ea797",
+        "actual": "a82b1e9aa69b39bd54289067827e89e74aa6683adb156a2f3b38addcd4ded9ad"
+      }
+    ],
+    "relocated_unchanged_spans": [
+      {
+        "path": "src/lua-engine.adb",
+        "proposed_offset": 67286,
+        "current_offset": 69893,
+        "anchor_sha256": "77955c20764aa4078862cd52f8932ab4ef743791d80fe299df01770076360f71"
+      },
+      {
+        "path": "src/lua-engine.adb",
+        "proposed_offset": 68839,
+        "current_offset": 71446,
+        "anchor_sha256": "54ef9e23ba4f77e2210616fd341d6d4f548eef8f004e8ea60541162811c6d5d1"
+      },
+      {
+        "path": "src/lua-engine.adb",
+        "proposed_offset": 5926,
+        "current_offset": 6697,
+        "anchor_sha256": "d88f5a3faea1a582a69292875b151806b40c8cddec7d4690a09414c1ef437c3b"
+      }
+    ],
+    "unavailable_historical_reports": [
+      "reports/debug-metadata/querystr-native-baseline/process.json",
+      "reports/debug-metadata/querystr-native-baseline/result.stdout",
+      "reports/debug-metadata/querystr-native-baseline/result.stderr",
+      "reports/debug-metadata/querystr-native-baseline/telemetry.59288.json"
+    ],
+    "limitation": "Dated proposal bindings remain historical. This feature decision does not renew exact source/counterpart authority; refresh changed sources before adaptation."
+  },
+  "prohibited_resolutions": [
+    "Whole generated-template exclusion",
+    "Public API or ordinary Lua behavior exclusion",
+    "Passing evidence on private exclusions",
+    "Inherited approval after source drift",
+    "Claiming native shrink refusal from a growth-only Ada control"
+  ]
+}

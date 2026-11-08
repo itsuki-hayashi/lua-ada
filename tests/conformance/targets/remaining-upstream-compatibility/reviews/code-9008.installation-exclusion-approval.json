@@ -1,0 +1,93 @@
+{
+  "schema_version": 3,
+  "kind": "t-exclusion-approval",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "protected_scopes": [
+    {
+      "id": "gc-io-events",
+      "path": "tests/conformance/scopes/gc-io-events.json",
+      "sha256": "79fa732f60f380c93be190f43640acf0b2ac595bdf9196d2fc8fd0a7ee62eae7"
+    },
+    {
+      "id": "expanded-t-conformance",
+      "path": "tests/conformance/scopes/expanded-t-conformance.json",
+      "sha256": "9df8642d10238abaa48c97184ed2345be7106d4c2c74668954e43bc0cb6ecdc1"
+    }
+  ],
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root/remaining_suite",
+  "decision": "accepted",
+  "exclusion": {
+    "id": "LUA-CODE-REVIEWED-BLOCK-9008",
+    "source": "code.lua",
+    "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+    "byte_offset": 14141,
+    "byte_length": 175,
+    "anchor_sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6",
+    "status": "excluded",
+    "disposition": "reviewed-t-internal-exclusion",
+    "configurations": [
+      "upstream-test"
+    ],
+    "eligibility": "t-only-private-invariant",
+    "public_api": false,
+    "mixed_obligation": false,
+    "module_observable": true,
+    "invariant": "Only the exact constructor-opcode-count inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+    "third_party_irrelevance": "The current independent feature decision distinguishes observable dump/constant/register choices from public loading, numeric kind, result cardinality, callback, assignment, constructor and lifetime behavior. No callable/public API or mixed assertion is proposed for removal.",
+    "t_guard": {
+      "mode": "absent-return",
+      "byte_offset": 83,
+      "byte_length": 104,
+      "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050"
+    },
+    "evidence": [],
+    "eligibility_schema_version": 3,
+    "module_compatibility_obligation": false,
+    "observation_kind": "private-optimization-structure",
+    "structure_kind": "constructor-opcode-count",
+    "required_semantic_contract_ids": [
+      "constructor-and-vararg-boundaries"
+    ],
+    "original_anchor_links": [
+      {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0009",
+        "kind": "internal-reference",
+        "byte_offset": 14169,
+        "byte_length": 10,
+        "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54"
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0020",
+        "kind": "assert-call",
+        "byte_offset": 14297,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+      }
+    ],
+    "feature_review": {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-ten-source-feature-review.json",
+      "sha256": "a0a24b7ee5b8b8cecbe327afced993b44942c0bd93ee85601e09a3083e724635"
+    },
+    "semantic_retention_review": {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+      "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+    }
+  },
+  "review_evidence": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-9008.installation-independent-review.json",
+    "sha256": "0b3ee247d9d776aade9dde0481b48cfab07d5c914876cfa6c96955e8e6278d31"
+  },
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "review_date": "2026-11-08",
+  "author_input_approval": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9008.exclusion-approval.draft.json",
+    "sha256": "a2c9d6f91f9920dceeb4848e61c502eda8948fa8a1c63b64c954f454ca0da6e5"
+  }
+}

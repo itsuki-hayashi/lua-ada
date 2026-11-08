@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "kind": "locals-tracegc-stderr-protocol-author-proposal",
+  "id": "locals-literal-dot-progress",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "review_status": "pending-independent-source-and-output-contract-review",
+  "independent_reviewer": null,
+  "authority_installation": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_snapshot": {
+    "revision": "ca48d679eb71b132a72229e9661d956d0d00ec04",
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+    "scope": "Dated original native File captures over released pre287 images. No current Ada T counterpart or acceptance."
+  },
+  "source_bindings": [
+    {
+      "path": "references/lua/testes/tracegc.lua",
+      "sha256": "b064a642e2d5d22c2101ec4fe0a5d805ba633ca5b69470d20ec48b4ee5ca360b"
+    },
+    {
+      "path": "references/lua/testes/locals.lua",
+      "sha256": "56b5126c40f48bb1a701f041af28cd72a3a7d50b3db9b05da5659f2485f740c1"
+    },
+    {
+      "path": "references/lua/manual/manual.of",
+      "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+    },
+    {
+      "path": "tests/conformance/target-file-completion.lua",
+      "sha256": "d366c500a8f08baa0f4f9673cbe01dff165b9ad3bec90093221c93af7ea7739c"
+    },
+    {
+      "path": "scripts/ConformanceFileProtocols.psm1",
+      "sha256": "0ff9d9617af38a209af4fdf59ff85ae1bab5d5800e23e2be3e898bb8f1c7c17d"
+    }
+  ],
+  "source_facts": {
+    "tracegc": [
+      {
+        "byte_offset": 472,
+        "byte_length": 35,
+        "sha256": "469a3362f07a087e329141d214809fb2292aee51cce3f242dc18f841a02de1b8",
+        "original_bytes": "stderr:write'.'    -- mark progress"
+      },
+      {
+        "byte_offset": 597,
+        "byte_length": 121,
+        "sha256": "fed0104bdf314efa73b315fa015f134cdde4c297af0d47900bf8c39840a5ae30",
+        "original_bytes": "function M.start ()\n  if not active then\n    active = true\n    setmetatable({}, mt)    -- create initial object\n  end\nend"
+      },
+      {
+        "byte_offset": 721,
+        "byte_length": 123,
+        "sha256": "a239a0783591f935288902df848b31918739687fe6c7aca5d846bbe0cc6faaf8",
+        "original_bytes": "function M.stop ()\n  if active then\n    active = false\n    collectgarbage()   -- call finalizer for the last time\n  end\nend"
+      }
+    ],
+    "locals_stop_restart": {
+      "byte_offset": 15858,
+      "byte_length": 80,
+      "sha256": "ca39e6a9fc6aeadd67a80f54a0151131e853dc06a2b5aabb20c73c536709393c",
+      "original_bytes": "    tracegc.stop()\n    st, obj = xpcall(overflow, errorh, 0)\n    tracegc.start()"
+    },
+    "classification": "Original informational progress output; not a source assertion, source exclusion or source transformation. The table finalizer and its actual side effect remain executed.",
+    "manual_review_questions": [
+      "Read finalizer timing, remarking and lua_close finalizer guarantees in the pinned manual. Is a positive count mandatory for this exact completed locals workload?",
+      "The proposed output contract preserves exact literal dot bytes but does not promise identical automatic collection counts across different implementations. Decide this interpretation independently; source guard remains ordinary default as well as T."
+    ]
+  },
+  "proposed_output_contract": {
+    "file": "locals.lua",
+    "configurations": [
+      "default",
+      "upstream-test"
+    ],
+    "target_roles": [
+      "ReferenceC",
+      "Ada"
+    ],
+    "stdout_and_return_protocol": "Unchanged original OK followed by actual wrapper observation of exactly two results: integer5 and function.",
+    "stderr_byte_language": "one-or-more ASCII bytes0x2e; no whitespace, newlines, warning prefix, control bytes, nonASCII or other diagnostics",
+    "minimum_bytes_proposed": 1,
+    "maximum_bytes": "Existing finite process capture limit; timeout/truncation/pipe failure remain failures.",
+    "count_handling": "Preserve actual raw bytes/hash/bytecount and report observed progress count. No source rewrite or filtering, no synthetic marker, no exact C collection-frequency promise.",
+    "scope": "Only the exact locals.lua dependency/source contract. Existing API continued warnings, memory-error numeric progress, main subprocess protocols and every other source retain their own requirements.",
+    "actual_runtime_obligations": [
+      "Original table finalizer executes and writes to actual stderr; original start/stop and overflow recovery remain unchanged.",
+      "All Lua assertions, original T guards, full insertion-refusal and later closing/reallocation campaigns remain required.",
+      "Actual return5/function arity, clean process, measured selected-owner0/0/shutdown and final context/native counterpart review remain required.",
+      "Any non-dot stderr byte, bad raw hash/bytecount, missing mandatory actual native evidence or source/configuration drift rejects."
+    ]
+  },
+  "dated_native_original_observations": [
+    {
+      "configuration": "default",
+      "target": "ReferenceC",
+      "report_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\configured-current\\c603f3762d7741bd9bdd67c8a1033f8d/locals-default/ReferenceC.json",
+      "report_sha256": "022454e20cf17e4382810231ddb9a6c82d5ec7713c72d8b1d91cc8292e305eca",
+      "report_status": "setup-failed",
+      "setup_error": "Unexpected target file protocol stderr",
+      "process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\conformance\\2536ec8ca7f94335a12534cb13e26182\\fixtures\\lua.exe",
+        "process_id": 68432,
+        "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+        "arguments": [
+          "-e",
+          "assert(_soft==nil and _port==nil and _U==nil and _nomsg==nil); warn('@on'); assert(T==nil); dofile('equivalent-source-profile-witness.lua')",
+          "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\conformance\\2536ec8ca7f94335a12534cb13e26182\\target-file-completion.lua",
+          "locals.lua",
+          "locals.lua"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\conformance\\2536ec8ca7f94335a12534cb13e26182\\fixtures",
+        "started_utc": "2026-11-08T06:32:55.6293822Z",
+        "elapsed_milliseconds": 850,
+        "timeout_seconds": 900,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 67108864,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\conformance\\2536ec8ca7f94335a12534cb13e26182\\execution.stdout",
+        "stdout_bytes": 387,
+        "stdout_sha256": "48040c42d8a8a682378e7f0697b1ffe7c47057ef0f41d2b9ceff3d2d5dfda98f",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\conformance\\2536ec8ca7f94335a12534cb13e26182\\execution.stderr",
+        "stderr_bytes": 2,
+        "stderr_sha256": "5ec1f7e700f37c3d0b2981d04855fc34b94aaa15457b05ca571817442d228f81"
+      },
+      "observed_ascii_dot_count": 2,
+      "source_disposition": "unchanged",
+      "output_protocol_still_rejected": true,
+      "operation_acceptance": false
+    },
+    {
+      "configuration": "upstream-test",
+      "target": "ReferenceC",
+      "report_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\configured-current\\c603f3762d7741bd9bdd67c8a1033f8d/locals-upstream-test/ReferenceC.json",
+      "report_sha256": "2b7dc2d9f9024b4ca81347e6bf02f30029ca4447163a58ecad43854c0f040637",
+      "report_status": "setup-failed",
+      "setup_error": "Unexpected target file protocol stderr",
+      "process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\conformance\\8ce82ae235cc4705aa39476f9e35916c\\fixtures\\lua.exe",
+        "process_id": 38312,
+        "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+        "arguments": [
+          "-e",
+          "assert(_soft==nil and _port==nil and _U==nil and _nomsg==nil); warn('@on'); assert(type(T)=='table' and type(T.checkmemory)=='function'); T.checkmemory(); dofile('equivalent-source-profile-witness.lua')",
+          "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\conformance\\8ce82ae235cc4705aa39476f9e35916c\\target-file-completion.lua",
+          "locals.lua",
+          "locals.lua"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\conformance\\8ce82ae235cc4705aa39476f9e35916c\\fixtures",
+        "started_utc": "2026-11-08T06:32:55.6389170Z",
+        "elapsed_milliseconds": 73,
+        "timeout_seconds": 900,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 67108864,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\conformance\\8ce82ae235cc4705aa39476f9e35916c\\execution.stdout",
+        "stdout_bytes": 432,
+        "stdout_sha256": "6f151d37bf2cce3514f67b9073669a2b7bfca498f789df9935418d8e655bfd61",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\conformance\\8ce82ae235cc4705aa39476f9e35916c\\execution.stderr",
+        "stderr_bytes": 9,
+        "stderr_sha256": "a350e9f897688140366f5f21456c728387e13fa74fa673a445a759bfb6a16747"
+      },
+      "observed_ascii_dot_count": 9,
+      "source_disposition": "unchanged",
+      "output_protocol_still_rejected": true,
+      "operation_acceptance": false
+    }
+  ],
+  "not_execution_evidence": "The observations above remain failed setup reports. Their successful child exit/return facts motivate a proposed checker correction; they do not supply a runtime pass or approval.",
+  "current_blockers": [
+    "Root287 runtime correction changes locals22 source counterparts. Independent current source review and fresh images are required before another adapted Ada T replay.",
+    "The completion manifest itself is an author proposal. A source-bound independent output contract decision must precede any passing target envelope."
+  ],
+  "implementation_status": "No stderr checker code changed by this proposal.",
+  "required_security_regressions": [
+    "Accept only a completed actual locals workload whose source/configuration/wrapper and exact return protocol match.",
+    "Reject empty progress if independent review confirms positive count is required.",
+    "Reject any newline/whitespace/ASCIIletter/control/nonASCII inserted beside dots, even with rehashed capture.",
+    "Reject this output language for any other source or use as warning/error suppression.",
+    "Reject altered tracegc/local stop-restart source identities or missing original native observations.",
+    "Preserve raw output and original failed dated observations; no relabelling as accepted."
+  ]
+}

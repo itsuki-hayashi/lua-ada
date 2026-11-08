@@ -9,6 +9,7 @@ with Lua.Engine.Machine;
 with Lua.Engine.Stacks;
 
 package body Lua.Engine.Canonical is
+   use type Lua.Prototypes.Constant_Kind;
    use Lua.Opcodes;
    use type Interfaces.Unsigned_8;
    use type Interfaces.Integer_8;
@@ -19,6 +20,7 @@ package body Lua.Engine.Canonical is
    use type Lua.Numbers.Number_Kind;
    use type Integer_Value;
    use type Real_Value;
+   use type System.Address;
 
    function Integer_Bits is new Ada.Unchecked_Conversion
      (Integer_Value, Interfaces.Unsigned_64);
@@ -38,91 +40,99 @@ package body Lua.Engine.Canonical is
    function Upvalue_Cell
      (State : in out World; Activation : Frame_Access; Index : Natural)
       return Object_Access;
-   function Register_List
-     (State : in out World; Activation : Frame_Access;
-      First, Count : Natural) return Values.Vector;
-   Unknown_Source : aliased constant String := "=?";
+   procedure Copy_Registers
+     (State : in out World; Target : in out Values.Vector;
+      Activation : Frame_Access; First, Count : Natural);
+   Unknown_Source : aliased constant String := "=?" & Character'Val (0);
+   Unknown_Name : aliased constant String :=
+     "(no name)" & Character'Val (0);
+
+   function String_Bytes
+     (Code : Prototype_Access; Id : Lua.Prototypes.String_Id)
+      return Byte_String;
+   function String_Bytes
+     (Code : Prototype_Access; Id : Lua.Prototypes.String_Id)
+      return Byte_String is
+     (Lua.Prototypes.String_Address (Code.Canonical_Owner.Model, Id),
+      Lua.Prototypes.String_Length (Code.Canonical_Owner.Model, Id));
 
    function Source_Bytes (Code : Prototype_Access) return Byte_String is
-      Result : Byte_String;
-      procedure Borrow (Text : String);
-      procedure Borrow (Text : String) is
-      begin
-         Result := (Text'Address, Text'Length);
-      end Borrow;
    begin
       if Code.Canonical_Node.Source = Lua.Prototypes.No_String then
-         return (Unknown_Source'Address, Unknown_Source'Length);
+         return (Unknown_Source'Address, Unknown_Source'Length - 1);
       end if;
-      --  Query borrows the model's managed buffer, not a copied Ada String.
-      --  Adopted graphs are immutable; the rooted wrapper owns its lifetime.
-      Lua.Prototypes.Query_String
-        (Code.Canonical_Owner.Model, Code.Canonical_Node.Source,
-         Borrow'Access);
-      return Result;
+      --  A frozen model owns stable preterminated buffers, including empty
+      --  names and arbitrary embedded bytes. C metadata borrows those bytes
+      --  without retaining a short-lived Query descriptor or making a copy.
+      return String_Bytes (Code, Code.Canonical_Node.Source);
    end Source_Bytes;
 
-   function Local_Name
-     (State : in out World; Code : Prototype_Access; Index : Positive;
-      PC : Natural) return Value
+   function Local_Bytes
+     (Code : Prototype_Access; Index : Positive; PC : Natural)
+      return Byte_String
    is
       Remaining : Natural := Index;
-      Result : Value;
-      procedure Publish (Text : String);
-      procedure Publish (Text : String) is
-      begin
-         Result := New_String (State, Text);
-      end Publish;
    begin
       --  Canonical local records are declaration ordered. An active local's
       --  ordinal is its stack slot + 1; compile-time constants have no slot
       --  and no live-local record. End_PC is exclusive, following
-      --  luaF_getlocalname.
+      --  luaF_getlocalname. Both Lua and C inspection use this one selection.
       for Item of Code.Canonical_Node.Locals loop
          if Item.Start_PC <= PC and then PC < Item.End_PC then
             Remaining := Remaining - 1;
             if Remaining = 0 then
                if Item.Name = Lua.Prototypes.No_String then
-                  return New_String (State, "(no name)");
+                  return (Unknown_Name'Address, Unknown_Name'Length - 1);
                end if;
-               Lua.Prototypes.Query_String
-                 (Code.Canonical_Owner.Model, Item.Name, Publish'Access);
-               return Result;
+               return String_Bytes (Code, Item.Name);
             end if;
          end if;
       end loop;
-      return Nil_Value;
+      return (others => <>);
+   end Local_Bytes;
+
+   function Upvalue_Bytes
+     (Code : Prototype_Access; Index : Positive) return Byte_String
+   is
+      Id : constant Lua.Prototypes.String_Id :=
+        Code.Canonical_Node.Upvalues (Index).Name;
+   begin
+      if Id = Lua.Prototypes.No_String then
+         return (Unknown_Name'Address, Unknown_Name'Length - 1);
+      end if;
+      return String_Bytes (Code, Id);
+   end Upvalue_Bytes;
+
+   function Local_Name
+     (State : in out World; Code : Prototype_Access; Index : Positive;
+      PC : Natural) return Value
+   is
+      Bytes : constant Byte_String := Local_Bytes (Code, Index, PC);
+   begin
+      return (if Bytes.Address = System.Null_Address then Nil_Value else
+                New_String (State, To_String (Bytes)));
    end Local_Name;
 
    function Upvalue_Name
      (State : in out World; Code : Prototype_Access; Index : Positive)
       return Value
    is
-      Result : Value;
-      Id : Lua.Prototypes.String_Id;
-      procedure Publish (Text : String);
-      procedure Publish (Text : String) is
-      begin
-         Result := New_String (State, Text);
-      end Publish;
    begin
       if Index > Code.Canonical_Node.Upvalues.Last_Index then
          Fail (State, "canonical upvalue name out of range");
       end if;
-      Id := Code.Canonical_Node.Upvalues (Index).Name;
-      if Id = Lua.Prototypes.No_String then
-         return New_String (State, "(no name)");
-      end if;
-      Lua.Prototypes.Query_String
-        (Code.Canonical_Owner.Model, Id, Publish'Access);
-      return Result;
+      return New_String (State, To_String (Upvalue_Bytes (Code, Index)));
    end Upvalue_Name;
 
    procedure Store_Results
      (State : in out World; Activation : Frame_Access;
       Base : Natural; Wanted : Integer; Results : Values.Vector);
+   subtype For_Number_Role is Lua.Engine.Machine.For_Failure_Kind range
+     Lua.Engine.Machine.Initial_Not_Number ..
+       Lua.Engine.Machine.Step_Not_Number;
+
    function Number
-     (State : in out World; Item : Value; Role : String)
+     (State : in out World; Item : Value; Role : For_Number_Role)
       return Lua.Numbers.Number;
    procedure Prepare_For
      (State : in out World; Activation : Frame_Access;
@@ -224,9 +234,11 @@ package body Lua.Engine.Canonical is
      (State : in out World; Activation : Frame_Access; From : Natural)
    is
    begin
-      --  C closes open upvalues before invoking __close. Freeze the live
-      --  stack slot now: a handler mutating an already closed upvalue must
-      --  not replace the object passed to a later close handler.
+      --  Detach copies each real open cell back into its departing scalar
+      --  before invoking handlers. A closed upvalue can then change without
+      --  replacing the pending scalar, while debug.setlocal still edits that
+      --  actual slot. Retain snapshot handling for existing packet entries;
+      --  ordinary canonical TBC now links slots without creating such entries.
       for Index in Activation.Closers.First_Index ..
         Activation.Closers.Last_Index
       loop
@@ -246,22 +258,30 @@ package body Lua.Engine.Canonical is
       Close_Cells (Activation, From);
    end Prepare_Close;
 
-   function Register_List
-     (State : in out World; Activation : Frame_Access;
-      First, Count : Natural) return Values.Vector
+   procedure Copy_Registers
+     (State : in out World; Target : in out Values.Vector;
+      Activation : Frame_Access; First, Count : Natural)
    is
-      Result : Values.Vector := Owned_Values (State);
    begin
       if First > Activation.Stack_Window_Length or else
         Count > Activation.Stack_Window_Length - First
       then
          Fail (State, "canonical register range out of bounds");
       end if;
+      --  The scalar window already roots this whole live argument/result
+      --  range. Copy directly into the activation-owned packet, preserving
+      --  its capacity across instructions and cached frame reuse. A fresh
+      --  temporary vector here allocated for every CALL, even when all real
+      --  call/stack capacity was already reserved. In particular it prevented
+      --  a warmed allocation-control callback from clearing provider refusal.
+      Target.Reserve_Capacity (Ada.Containers.Count_Type (Count));
+      Target.Clear;
       for Offset in 1 .. Count loop
-         Result.Append (Read_Register (State, Activation, First + Offset - 1));
+         Append_Root
+           (State, Target,
+            Read_Register (State, Activation, First + Offset - 1));
       end loop;
-      return Result;
-   end Register_List;
+   end Copy_Registers;
 
    procedure Store_Results
      (State : in out World; Activation : Frame_Access;
@@ -422,6 +442,7 @@ package body Lua.Engine.Canonical is
 
       Current : Prototype_Access;
       Pending_Text : Value;
+      Literal_Strings : Scalar_Values.Vector;
       procedure String_Value (Text : String);
       procedure String_Value (Text : String) is
       begin
@@ -439,6 +460,18 @@ package body Lua.Engine.Canonical is
       Lua.Prototypes.Move (Owner.Model, Program);
       Owner.Wrappers.Reserve_Capacity (Ada.Containers.Count_Type
         (Lua.Prototypes.Prototype_Count (Owner.Model)));
+      --  The owned model already interns literals across all nested nodes.
+      --  Materialize each such string once for this program, rather than
+      --  losing its identity when another wrapper mentions the same ID.
+      --  This temporary index uses the universe allocator and contains only
+      --  values already retained by registered wrappers; it creates no new
+      --  collector root or universe-wide long-string interning policy.
+      Literal_Strings.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Literal_Strings.Reserve_Capacity (Ada.Containers.Count_Type
+        (Lua.Prototypes.String_Count (Owner.Model)));
+      for Index in 1 .. Lua.Prototypes.String_Count (Owner.Model) loop
+         Literal_Strings.Append (Nil_Value);
+      end loop;
       --  Each wrapper is registered before materializing its constants. The
       --  compiling bridge roots partial construction during allocation retry;
       --  no opaque fake private instructions stand in for canonical metadata.
@@ -450,6 +483,12 @@ package body Lua.Engine.Canonical is
          Current.Canonical_Owner := Owner;
          Current.Canonical_Node :=
            Lua.Prototypes.Prototype_At (Owner.Model, Index);
+         --  Once a new literal exists, publication into its wrapper must
+         --  require no further allocation. Reserve all scalar slots before
+         --  creating heap values, keeping construction and cache publication
+         --  in one interval without a possible allocation safe point.
+         Current.Canonical_Constants.Reserve_Capacity
+           (Current.Canonical_Node.Constants.Length);
          Current.First_Line := Current.Canonical_Node.First_Line;
          Current.Last_Line := Current.Canonical_Node.Last_Line;
          Current.Register_Count := Natural (Current.Canonical_Node.Max_Stack);
@@ -470,11 +509,22 @@ package body Lua.Engine.Canonical is
                when Lua.Prototypes.Number_Constant =>
                   Pending_Text := (Real_Kind, Item.Number_Data);
                when Lua.Prototypes.String_Constant =>
-                  Lua.Prototypes.Query_String
-                    (Owner.Model, Item.String_Data, String_Value'Access);
+                  Pending_Text := Literal_Strings
+                    (Positive (Item.String_Data));
+                  if Pending_Text.Kind = Nil_Kind then
+                     Lua.Prototypes.Query_String
+                       (Owner.Model, Item.String_Data, String_Value'Access);
+                  end if;
             end case;
             Current.Canonical_Constants.Append (Pending_Text);
             Code_Barrier (State, Current);
+            if Item.Kind = Lua.Prototypes.String_Constant then
+               --  Publish in the non-rooting index only after the wrapper
+               --  owns the value. Capacity was reserved before construction,
+               --  so this update cannot allocate or introduce a safe point.
+               Literal_Strings.Replace_Element
+                 (Positive (Item.String_Data), Pending_Text);
+            end if;
          end loop;
       end loop;
       if Lua.Prototypes.Root (Owner.Model) = null then
@@ -537,7 +587,7 @@ package body Lua.Engine.Canonical is
    end Adopt;
 
    function Number
-     (State : in out World; Item : Value; Role : String)
+     (State : in out World; Item : Value; Role : For_Number_Role)
       return Lua.Numbers.Number
    is
       Result : Lua.Numbers.Number;
@@ -553,7 +603,7 @@ package body Lua.Engine.Canonical is
             end if;
          when others => null;
       end case;
-      Fail (State, "'for' " & Role & " value must be a number");
+      Lua.Engine.Machine.For_Error (State, Role, Item);
       return (Kind => Lua.Numbers.Invalid);
    end Number;
 
@@ -574,9 +624,9 @@ package body Lua.Engine.Canonical is
          Start := Initial.Integer_Data;
          Stride := Step.Integer_Data;
          if Stride = 0 then
-            Fail (State, "'for' step is zero");
+            Lua.Engine.Machine.For_Error (State, Lua.Engine.Machine.Zero_Step);
          end if;
-         Bound := Number (State, Limit, "limit");
+         Bound := Number (State, Limit, Lua.Engine.Machine.Limit_Not_Number);
          if Bound.Kind = Lua.Numbers.Integer_Number then
             Last := Bound.Integer_Item;
          else
@@ -621,12 +671,14 @@ package body Lua.Engine.Canonical is
       else
          --  Conversion order is observable when several operands are bad:
          --  Lua validates limit, step, then initial value in the float path.
-         F_Last := Lua.Numbers.To_Real (Number (State, Limit, "limit"));
-         F_Stride := Lua.Numbers.To_Real (Number (State, Step, "step"));
+         F_Last := Lua.Numbers.To_Real
+           (Number (State, Limit, Lua.Engine.Machine.Limit_Not_Number));
+         F_Stride := Lua.Numbers.To_Real
+           (Number (State, Step, Lua.Engine.Machine.Step_Not_Number));
          F_Start := Lua.Numbers.To_Real
-           (Number (State, Initial, "initial"));
+           (Number (State, Initial, Lua.Engine.Machine.Initial_Not_Number));
          if F_Stride = 0.0 then
-            Fail (State, "'for' step is zero");
+            Lua.Engine.Machine.For_Error (State, Lua.Engine.Machine.Zero_Step);
          end if;
          Skip := (if F_Stride > 0.0 then F_Last < F_Start
                   else F_Start < F_Last);
@@ -640,6 +692,57 @@ package body Lua.Engine.Canonical is
       end if;
    end Prepare_For;
 
+   procedure Charge_Companion (State : in out World);
+   procedure Charge_Companion (State : in out World) is
+   begin
+      --  Companion words share a VM dispatch boundary, as in pinned lvm.c,
+      --  but still consume the host's common work budget. Fusing an iterator
+      --  transfer must not turn bounded execution into an uncharged loop.
+      if State.Steps >= State.Bounds.Instructions then
+         Fail (State, "instruction limit exceeded", Resource => True);
+      end if;
+      if State.Policy = Bounded then State.Steps := State.Steps + 1; end if;
+   end Charge_Companion;
+
+   procedure Finish_Iterator_Call
+     (State : in out World; Activation : Frame_Access);
+   procedure Finish_Iterator_Call
+     (State : in out World; Activation : Frame_Access)
+   is
+      Prototype : constant Lua.Prototypes.Prototype_Access :=
+        Activation.Code.Canonical_Node;
+      Code : Word;
+      Base : Natural;
+      Target : Long_Long_Integer;
+   begin
+      --  TFORCALL consumes its following TFORLOOP after the iterator returns,
+      --  including after suspension. Results have already replaced the real
+      --  control register; no user callback or executor is entered here.
+      if Activation.PC > Prototype.Code.Last_Index or else
+        not Valid (Prototype.Code (Activation.PC)) or else
+        Lua.Opcodes.Operation (Prototype.Code (Activation.PC)) /= Op_TFORLOOP
+      then
+         Fail (State, "missing canonical iterator loop instruction");
+      end if;
+      Code := Prototype.Code (Activation.PC);
+      Base := Part (State, Code, A);
+      if Base + 3 /= Activation.Canonical_Base then
+         Fail (State, "canonical iterator loop register mismatch");
+      end if;
+      Charge_Companion (State);
+      Activation.PC := Activation.PC + 1;
+      if Read_Register (State, Activation, Base + 3).Kind /= Nil_Kind then
+         Target := Long_Long_Integer (Activation.PC) -
+           Long_Long_Integer (Part (State, Code, Bx));
+         if Target < 1 or else Target >
+           Long_Long_Integer (Prototype.Code.Last_Index) + 1
+         then
+            Fail (State, "canonical jump out of range");
+         end if;
+         Activation.PC := Positive (Target);
+      end if;
+   end Finish_Iterator_Call;
+
    procedure Deliver
      (State : in out World; Activation : Frame_Access;
       Results : Values.Vector)
@@ -648,8 +751,9 @@ package body Lua.Engine.Canonical is
         (if Results.Is_Empty then Nil_Value else Results.First_Element);
    begin
       --  This is called only after the scheduler has rooted the returned
-      --  packet. Clear pending callback arguments after publishing the result
-      --  or deciding the branch, so a collection sees one owner throughout.
+      --  packet. The producer bridge transfers helper/call packets once the
+      --  next activation owns them. The final clears below also retire any
+      --  remaining legacy request/result roots after delivery is published.
       case Activation.Canonical_Pending is
          when Store_Canonical_Results | Store_Call_Results =>
             declare
@@ -673,6 +777,14 @@ package body Lua.Engine.Canonical is
                   if Activation.Context.Stack_Window = Activation then
                      Activation.Context.Foreign_Top := Activation.Stack_Base +
                        Activation.Canonical_Top;
+                  end if;
+                  if Activation.PC > 1 and then
+                    Valid (Activation.Code.Canonical_Node.Code
+                      (Activation.PC - 1)) and then
+                    Lua.Opcodes.Operation (Activation.Code.Canonical_Node.Code
+                      (Activation.PC - 1)) = Op_TFORCALL
+                  then
+                     Finish_Iterator_Call (State, Activation);
                   end if;
                end if;
             end;
@@ -725,7 +837,32 @@ package body Lua.Engine.Canonical is
       procedure Binary_Request
         (Operator : Lua.Lexers.Token_Kind; A, B : Value; Destination : Natural;
          Test : Boolean := False);
+      function Primitive_Equal (A, B : Value) return Boolean;
+      function Primitive_Equal (A, B : Value) return Boolean is
+         Work : Natural := 0;
+      begin
+         --  Existing Equal owns numeric cross-kind/NaN and byte-string
+         --  semantics. A different long string can require a linear scan;
+         --  charge that actual possibility before bypassing helper dispatch.
+         if A.Kind = String_Kind and then B.Kind = String_Kind and then
+           A.Reference.Bytes.Address /= B.Reference.Bytes.Address and then
+           A.Reference.Bytes.Size = B.Reference.Bytes.Size
+         then
+            Work := A.Reference.Bytes.Size;
+         end if;
+         if State.Policy = Bounded then
+            if Work > State.Bounds.Instructions - Natural'Min
+              (State.Steps, State.Bounds.Instructions)
+            then
+               Fail (State, "instruction limit exceeded", Resource => True);
+            end if;
+            State.Steps := State.Steps + Work;
+         end if;
+         return Equal (A, B);
+      end Primitive_Equal;
+
       procedure Mark_Closing (Index : Natural);
+      procedure Invoke_Iterator (Base, Wanted : Natural);
       procedure Freeze_Closing (From : Natural);
       function Integral (Value_To_Test : Value) return Boolean;
       function Arithmetic_Operator (Operation_Id : Opcode)
@@ -760,6 +897,32 @@ package body Lua.Engine.Canonical is
             Fail (State, "missing canonical companion instruction");
          end if;
       end Require_Next;
+
+      procedure Invoke_Iterator (Base, Wanted : Natural) is
+      begin
+         Require_Next (Op_TFORLOOP);
+         if Part (State, Prototype.Code (Activation.PC), A) /= Base then
+            Fail (State, "canonical iterator loop register mismatch");
+         end if;
+         --  Keep the existing explicit call continuation and its real rooted
+         --  arguments. Entry preparation can invoke this same phase after
+         --  consuming TFORCALL, without an extra scheduler dispatch boundary.
+         Put (Base + 5, Reg (Base + 3));
+         Put (Base + 4, Reg (Base + 1));
+         Put (Base + 3, Reg (Base));
+         Copy_Registers
+           (State, Activation.Native_Arguments, Activation, Base + 4, 2);
+         Activation.Native_Captures.Clear;
+         Append_Root (State, Activation.Native_Captures, Reg (Base));
+         Activation.Canonical_Pending := Store_Call_Results;
+         Activation.Canonical_Base := Base + 3;
+         Activation.Canonical_Wanted := Wanted;
+         Result := (Kind => Invoke_Function,
+                    Function_Value => Reg (Base),
+                    Destination => Base + 4,
+                    Call_Base => Activation.Stack_Base + Base + 4,
+                    Has_Call_Window => True, others => <>);
+      end Invoke_Iterator;
 
       procedure Request
         (Name : String; Arguments : Values.Vector; Destination : Natural;
@@ -814,12 +977,24 @@ package body Lua.Engine.Canonical is
                  "' got a non-closable value");
             end;
          end if;
-         --  Register numbers are used only for canonical lifetime ordering.
-         --  Scope depth in a private frame remains its separate old meaning.
-         Activation.Closers.Append
-           (Close_Entry'(Cell => Capture_Cell (State, Activation, Index),
-                         Symbol => Index + 1, Depth => Index + 1,
-                         others => <>));
+         declare
+            Level : constant Positive :=
+              Absolute_Register (State, Activation, Index);
+         begin
+            --  TBC marks the existing scalar, not a lexical capture. Its
+            --  parallel link was reserved with the real register window;
+            --  neither marking nor an inactive nil/false entry allocates.
+            --  Actual closures still capture cells through Capture_Cell.
+            if Level <= Activation.Stack_Base or else
+              Level <= Activation.C_Closing_Level or else
+              Level > Activation.Stack_Base + Activation.Stack_Window_Length
+            then
+               raise Program_Error with "invalid canonical closing order";
+            end if;
+            Activation.Context.C_Close_Links.Replace_Element
+              (Level, (Previous => Activation.C_Closing_Level));
+            Activation.C_Closing_Level := Level;
+         end;
       end Mark_Closing;
 
       procedure Freeze_Closing (From : Natural) is
@@ -1067,7 +1242,13 @@ package body Lua.Engine.Canonical is
                Binary_Request (Metamethod_Operator (Reg_C), Left, Right,
                                Part (State, Previous, A));
             end;
-         when Op_UNM | Op_BNOT | Op_NOT | Op_LEN =>
+         when Op_NOT =>
+            --  Logical negation has no metamethod and never needs a helper
+            --  activation or argument packet. It must remain a scalar word
+            --  operation when an earlier protected failure has exhausted the
+            --  allocator, including checkerr's ordinary `not stat` test.
+            Put (Reg_A, (Boolean_Kind, not Truth (Reg (Reg_B))));
+         when Op_UNM | Op_BNOT | Op_LEN =>
             declare
                Arguments : Values.Vector := Owned_Values (State);
             begin
@@ -1076,7 +1257,6 @@ package body Lua.Engine.Canonical is
                  (case Op is
                      when Op_UNM => Lua.Lexers.Minus,
                      when Op_BNOT => Lua.Lexers.Bit_Xor,
-                     when Op_NOT => Lua.Lexers.Not_Word,
                      when others => Lua.Lexers.Length));
             end;
          when Op_CONCAT =>
@@ -1108,17 +1288,35 @@ package body Lua.Engine.Canonical is
                        others => <>);
          when Op_TBC => Mark_Closing (Reg_A);
          when Op_JMP => Branch (Operand (SJ));
-         when Op_EQ | Op_LT | Op_LE =>
+         when Op_EQ =>
+            Left := Reg (Reg_A);
+            Right := Reg (Reg_B);
+            if Left.Kind /= Right.Kind or else
+              Left.Kind not in Table_Kind | Userdata_Kind or else
+              Left.Reference = Right.Reference
+            then
+               --  Only distinct tables/full userdata can invoke __eq.
+               --  Primitive and same-object tests must not allocate an
+               --  argument packet after already warmed C/Lua call depth.
+               if Primitive_Equal (Left, Right) /= (Operand (K) /= 0) then
+                  Branch (1);
+               end if;
+            else
+               Binary_Request
+                 (Lua.Lexers.Equal, Left, Right, 0, Test => True);
+            end if;
+         when Op_LT | Op_LE =>
             Binary_Request
-              ((if Op = Op_EQ then Lua.Lexers.Equal
-                elsif Op = Op_LT then Lua.Lexers.Less
+              ((if Op = Op_LT then Lua.Lexers.Less
                 else Lua.Lexers.Less_Equal),
                Reg (Reg_A), Reg (Reg_B), 0, Test => True);
          when Op_EQK | Op_EQI =>
             Right := (if Op = Op_EQK then
                         Constant_At (State, Activation, Reg_B)
                       else (Integer_Kind, Integer_Value (Operand (SB))));
-            if Equal (Reg (Reg_A), Right) /= (Operand (K) /= 0) then
+            if Primitive_Equal (Reg (Reg_A), Right) /=
+              (Operand (K) /= 0)
+            then
                Branch (1);
             end if;
          when Op_LTI | Op_LEI | Op_GTI | Op_GEI =>
@@ -1149,9 +1347,9 @@ package body Lua.Engine.Canonical is
                Activation.Canonical_Top := Reg_A + Reg_B;
             end if;
             Activation.Canonical_GC_Top := Reg_A + Count + 1;
-            Copy_Roots
+            Copy_Registers
               (State, Activation.Native_Arguments,
-               Register_List (State, Activation, Reg_A + 1, Count));
+               Activation, Reg_A + 1, Count);
             Activation.Native_Captures.Clear;
             Append_Root
               (State, Activation.Native_Captures,
@@ -1163,7 +1361,6 @@ package body Lua.Engine.Canonical is
             Result := (Kind => (if Op = Op_CALL then Invoke_Function
                                 else Tail_Invoke),
                        Function_Value => Reg (Reg_A),
-                       Arguments => Activation.Native_Arguments,
                        Destination => Reg_A + 1,
                        Call_Base => Activation.Stack_Base + Reg_A + 1,
                        Has_Call_Window => True, others => <>);
@@ -1177,12 +1374,20 @@ package body Lua.Engine.Canonical is
                       elsif Op = Op_RETURN1 then 1
                       elsif Reg_B /= 0 then Reg_B - 1
                       else Activation.Canonical_Top - Reg_A);
-            Copy_Roots
-              (State, Activation.Unwind_Results,
-               Register_List (State, Activation, Reg_A, Count));
+            --  The real scalar range remains rooted through closing and
+            --  return hooks. A controlled Action copy would allocate for
+            --  every RETURN despite fully warmed frames and C stack space.
+            --  Machine consumes this range after Step returns, using the
+            --  frame's retained packet capacity only when delivery needs it.
+            Activation.Unwind_Results.Clear;
+            --  A return hook observes the actual source register range,
+            --  before result adjustment/movement to its caller. A packet's
+            --  element one alone cannot recover this public stack offset.
+            Activation.Transfer_First := Reg_A + 1;
+            Activation.Transfer_Count := Count;
+            Activation.Return_Window_Published := True;
             Freeze_Closing (0);
-            Result := (Kind => Return_Results,
-                       Arguments => Activation.Unwind_Results, others => <>);
+            Result := (Kind => Return_Results, others => <>);
          when Op_FORPREP =>
             Prepare_For (State, Activation, Reg_A, Skip);
             if Skip then Branch (Operand (Bx) + 1); end if;
@@ -1228,35 +1433,16 @@ package body Lua.Engine.Canonical is
             Put (Reg_A + 2, Item);
             Mark_Closing (Reg_A + 2);
             Branch (Operand (Bx));
+            Require_Next (Op_TFORCALL);
+            if Part (State, Prototype.Code (Activation.PC), A) /= Reg_A then
+               Fail (State, "canonical iterator call register mismatch");
+            end if;
+            Count := Part (State, Prototype.Code (Activation.PC), C);
+            Charge_Companion (State);
+            Activation.PC := Activation.PC + 1;
+            Invoke_Iterator (Reg_A, Count);
          when Op_TFORCALL =>
-            declare
-               Arguments : Values.Vector := Owned_Values (State);
-            begin
-               --  The iterator call preserves function/state/closer in the
-               --  first three registers and copies control before replacing
-               --  its old slot with the actual call function (lvm TFORCALL).
-               Put (Reg_A + 5, Reg (Reg_A + 3));
-               Put (Reg_A + 4, Reg (Reg_A + 1));
-               Put (Reg_A + 3, Reg (Reg_A));
-               Arguments.Append (Reg (Reg_A + 4));
-               Arguments.Append (Reg (Reg_A + 5));
-               Copy_Roots
-                 (State, Activation.Native_Arguments,
-                  Arguments);
-               Activation.Native_Captures.Clear;
-               Append_Root
-                 (State, Activation.Native_Captures,
-                  Reg (Reg_A));
-               Activation.Canonical_Pending := Store_Call_Results;
-               Activation.Canonical_Base := Reg_A + 3;
-               Activation.Canonical_Wanted := Reg_C;
-               Result := (Kind => Invoke_Function,
-                          Function_Value => Reg (Reg_A),
-                          Arguments => Arguments,
-                          Destination => Reg_A + 4,
-                          Call_Base => Activation.Stack_Base + Reg_A + 4,
-                          Has_Call_Window => True, others => <>);
-            end;
+            Invoke_Iterator (Reg_A, Reg_C);
          when Op_TFORLOOP =>
             if Reg (Reg_A + 3).Kind /= Nil_Kind then
                Branch (-Operand (Bx));

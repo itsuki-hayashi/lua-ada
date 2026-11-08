@@ -1,0 +1,36 @@
+{
+  "consumer": {
+    "sha256": "83bd099f975a35b3cbe0230db08f15d3ee6f20828e873c56373e2c80af831636",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json"
+  },
+  "schema_version": 1,
+  "coverage_authority": false,
+  "source_snapshot": {
+    "revision": "6d52343bf33066d1634732a944916e2bda5c2413",
+    "repository_dirty": true,
+    "kind": "repository-source-snapshot"
+  },
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "global_api": {
+    "sha256": "648454798c82bbdcb01deef161ae493a3fcb0098be8773f142a8c5941935962f",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/global-api.author-proposal.json"
+  },
+  "runtime_acceptance": false,
+  "review": {
+    "artifact_sha256": null,
+    "artifact": null,
+    "reviewer": null,
+    "author": "Codex /root/validation_delivery",
+    "status": "pending"
+  },
+  "aunit": {
+    "sha256": "bf0687e295a597d7897dc6b0ea01b260030b1f068a7d6183ecd9fe6ca65edd29",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/aunit-witness.author-proposal.json"
+  },
+  "kind": "target-witness-policy",
+  "target": "remaining-upstream-compatibility",
+  "compiled": {
+    "sha256": "accd8eecdc5d1e34440ccc0743fd42f10a518e110d85bcbd5c2c20e603848d47",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/compiled-witnesses.author-proposal.json"
+  }
+}

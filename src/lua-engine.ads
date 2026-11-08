@@ -1,14 +1,17 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
+with Lua.Builtin_Registry;
 with Lua.Lexers;
 with Lua.Prototypes;
 with Lua.Numbers;
+with Lua.Platform_Modules;
 with Interfaces;
 with Interfaces.C;
 with Lua.Storage;
 with Lua.Storage.Vectors;
 with Lua.Storage.Buffers;
 with Lua.Runtime_Configuration;
+with Lua.Diagnostic_Text;
 with System;
 
 private package Lua.Engine is
@@ -16,6 +19,7 @@ private package Lua.Engine is
    --  sessions expose ownership and diagnostics, never these heap pointers,
    --  register packets, or bytecode instructions.
    use Ada.Strings.Unbounded;
+   use type Lua.Builtin_Registry.Kind;
 
    subtype Integer_Value is Lua.Numbers.Integer_Value;
    subtype Real_Value is Lua.Numbers.Real_Value;
@@ -87,8 +91,8 @@ private package Lua.Engine is
       Address : System.Address := System.Null_Address;
       Size : Natural := 0;
    end record;
-   --  Immutable borrowed view of a string object's managed, NUL-terminated
-   --  payload. Copies do not own or extend its lifetime: retain the Lua value
+   --  Immutable borrowed view of a string object's owned/external payload,
+   --  always NUL-terminated. Copies do not extend it: retain the Lua value
    --  in traced storage whenever a view must survive a collection point.
    function To_String (Item : Byte_String) return String;
    function Length (Item : Byte_String) return Natural;
@@ -107,6 +111,18 @@ private package Lua.Engine is
    procedure Append (Item : in out Owned_Buffer; Text : Character)
      renames Lua.Storage.Buffers.Append;
 
+   type Native_Library_Node;
+   type Native_Library_Access is access Native_Library_Node;
+   for Native_Library_Access'Storage_Pool use Lua.Storage.Pool;
+   type Native_Library_Node is record
+      Previous : Native_Library_Access;
+      Path : Owned_Buffer;
+      Handle : System.Address := System.Null_Address;
+   end record;
+   --  Loader references belong to the world, outside the tracing heap.
+   --  Their selected-provider paths/records survive every finalizer and
+   --  external-string release; shutdown unloads them in reverse open order.
+
    type Heap_Kind is
      (String_Object, Table_Object, Environment, Closure, Native_Closure,
       Cell_Object, Thread_Object, Userdata_Object);
@@ -114,12 +130,33 @@ private package Lua.Engine is
      (Kind : Heap_Kind; Payload_Length : Lua.Storage.Byte_Count);
    type Object_Access is access Heap_Object;
    for Object_Access'Storage_Pool use Lua.Storage.Pool;
+   type Execution_Context;
+   type Context_Access is access Execution_Context;
+   for Context_Access'Storage_Pool use Lua.Storage.Pool;
+   type Frame;
+   type Frame_Access is access Frame;
+   for Frame_Access'Storage_Pool use Lua.Storage.Pool;
    type Prototype;
    type Prototype_Access is access Prototype;
    for Prototype_Access'Storage_Pool use Lua.Storage.Pool;
    type Canonical_Program;
    type Canonical_Program_Access is access Canonical_Program;
    for Canonical_Program_Access'Storage_Pool use Lua.Storage.Pool;
+
+   type Stack_View_Kind is (Callback_View, Hook_View);
+   type Stack_View_Lease is record
+      Context : Context_Access;
+      Window, Previous_Frame, Previous_View : Frame_Access;
+      Kind : Stack_View_Kind := Callback_View;
+      Previous_Base, Previous_Top : Natural := 0;
+      Window_Length, Live_Top, GC_Top, Stack_Used : Natural := 0;
+      Caller_Base, Caller_Top : Natural := 0;
+      Argument_Count : Natural := 0;
+      Restore_Arguments, Restore_Captures : Boolean := False;
+   end record;
+   --  Embedded, allocation-free ownership of one synchronous C stack view.
+   --  Context=null means inactive. Window remains a real active frame; the
+   --  lease borrows its scalar cells without creating a public call level.
 
    type Object_Color is (White_0, White_1, Gray, Black);
    subtype White_Color is Object_Color range White_0 .. White_1;
@@ -168,11 +205,41 @@ private package Lua.Engine is
    end record;
 
 
-   type Native_Kind is
-     (Print_Function, Assert_Function, Error_Function, Pcall_Function,
-      Type_Function, Tonumber_Function, Tostring_Function, Select_Function,
-      Next_Function, Pairs_Function, Ipairs_Function, Ipairs_Step,
-      Rawequal_Function, Rawget_Function, Rawset_Function, Rawlen_Function);
+   subtype Native_Kind is Lua.Builtin_Registry.Kind;
+   Print_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Print_Function;
+   Assert_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Assert_Function;
+   Error_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Error_Function;
+   Pcall_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Pcall_Function;
+   Type_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Type_Function;
+   Tonumber_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Tonumber_Function;
+   Tostring_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Tostring_Function;
+   Select_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Select_Function;
+   Next_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Next_Function;
+   Pairs_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Pairs_Function;
+   Ipairs_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Ipairs_Function;
+   Ipairs_Step : constant Native_Kind :=
+     Lua.Builtin_Registry.Ipairs_Step_Function;
+   Rawequal_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Rawequal_Function;
+   Rawget_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Rawget_Function;
+   Rawset_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Rawset_Function;
+   Rawlen_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Rawlen_Function;
+   subtype Primitive_Kind is Native_Kind range
+     Print_Function .. Rawlen_Function;
 
    type Value_Kind is
      (Nil_Kind, Boolean_Kind, Integer_Kind, Real_Kind, String_Kind,
@@ -292,8 +359,24 @@ private package Lua.Engine is
          when String_Object =>
             Bytes : Byte_String;
             C_Bytes : System.Address := System.Null_Address;
-            --  Optional stable NUL-terminated view owned by Memory.
+            --  The immutable NUL-terminated payload is either selected-owner
+            --  storage or an external borrow. A nonnull external allocator
+            --  releases the original pointer/length exactly once through a
+            --  guarded C portal. Lua API reentry uses the same active driver.
+            External_String : Boolean := False;
+            String_Allocator : Lua.Storage.Allocation_Function := null;
+            String_Allocator_Data : System.Address := System.Null_Address;
             String_Hash : Interfaces.Unsigned_64 := 0;
+            Intern_Next : Object_Access;
+            Interned : Boolean := False;
+            String_Root_Next : Object_Access;
+            String_Rooted : Boolean := False;
+            Release_Queued : Boolean := False;
+            Release_Next, Release_Active_Previous : Object_Access;
+            Release_View : Stack_View_Lease;
+            --  Bucket membership is weak. The second intrusive list roots
+            --  reused strings during one API/compiler operation without an
+            --  allocation on a successful short-string lookup.
          when Table_Object =>
             Members : Entries.Vector;
             Array_Index : Table_Indexes.Vector;
@@ -396,6 +479,9 @@ private package Lua.Engine is
      (Values.Vector, "=" => Values."=");
    type Close_Entry is record
       Cell : Object_Access;
+      Stack_Level : Natural := 0;
+      --  A C temporary closes the actual absolute scalar slot without
+      --  allocating an upvalue. Zero retains the private backend cell path.
       Symbol : Natural := 0;
       Depth : Natural := 0;
       Frozen_Value : Value := Nil_Value;
@@ -405,31 +491,26 @@ private package Lua.Engine is
       --  not replace a later handler's already departing stack-slot value.
    end record;
    package Close_Lists is new Lua.Storage.Vectors (Close_Entry);
+   type Closing_Link is record
+      Previous : Natural := 0;
+   end record;
+   package Closing_Links is new Lua.Storage.Vectors (Closing_Link);
    type Unwind_Reason is
      (No_Unwind, Scope_Exit, C_Slot_Exit, Jump_Exit, Return_Exit, Error_Exit,
       Coroutine_Exit);
    type Failure_Kind is
      (No_Failure, Language_Failure, Memory_Failure, Handling_Failure,
       Syntax_Failure, Unsupported_Failure, Host_Abort);
-   type Execution_Context;
-   type Context_Access is access Execution_Context;
-   for Context_Access'Storage_Pool use Lua.Storage.Pool;
    type Frame_Lifecycle is (Available, Active, Retiring);
-   type Frame;
-   type Frame_Access is access Frame;
-   for Frame_Access'Storage_Pool use Lua.Storage.Pool;
    package Frames is new Lua.Storage.Vectors (Frame_Access);
 
    type Frame is record
       Context : Context_Access;
       Cache_Next : Frame_Access;
-      Lifecycle : Frame_Lifecycle := Active;
       Stack_Base : Natural := 0;
       Stack_Window_Length : Natural := 0;
       Saved_Stack_Used : Natural := 0;
       Call_Base : Natural := 0;
-      Has_Stack_Window : Boolean := False;
-      Hidden_Varargs : Boolean := False;
       Vararg_Base : Natural := 0;
       Vararg_Count : Natural := 0;
       Stack_Live_Top : Natural := 0;
@@ -438,55 +519,75 @@ private package Lua.Engine is
       --  Indices survive arena growth. Current real-window linkage is
       --  borrowed metadata, never another owner or a hidden GC root.
       Memory : Lua.Storage.Owner_Access;
-      Is_Native : Boolean := False;
       Native_Name : Unbounded_String;
-      Native_Id : Native_Kind := Print_Function;
+      Native_Return_First : Natural := 0;
+      --  A finishing Ada builtin publishes its real result range once,
+      --  before return hooks. Zero means ordinary append placement; a phase
+      --  that normalizes its argument top records its actual first slot.
+      --  A real C function-pointer invocation borrows its original C frame.
+      --  The hidden continuation's Native_Id selects the same Ada library;
+      --  Native_Name stays @builtin.direct for logical-frame filtering.
       Native_Arguments : Values.Vector;
       Native_Results : Values.Vector;
       Error_Packet : Values.Vector;
-      Result_Failure_Class : Failure_Kind := No_Failure;
-      Result_Handler_Called : Boolean := False;
       Native_Captures : Values.Vector;
       Native_Self : Object_Access;
       Native_Buffer : Owned_Buffer;
+      Load_Reader_Arguments : Natural := 0;
+      Load_Reader_Mode_Offset : Natural := 0;
+      --  A real base.load reader call runs above a C-owned guard after Step
+      --  returns. Its existing buffer owns NUL-terminated name/mode bytes;
+      --  no parser state, foreign stack or callback closure is saved here.
+      Argument_Error_Index : Natural := 0;
+      Argument_Error_Detail : Owned_Buffer;
+      Argument_Error_Origin : Frame_Access;
+      --  An auxiliary name lookup can call registry __index before raising.
+      --  The failing activation retains its owned detail/index; a hidden
+      --  continuation borrows that still-active parent through Origin. No
+      --  saved Ada activation, value snapshot or exception text is borrowed.
       Native_Stage : Natural := 0;
       Native_Index : Natural := 0;
       Native_Aux : Natural := 0;
-      Native_Operator : Lua.Lexers.Token_Kind := Lua.Lexers.End_Of_Input;
+      C_Closing_Level : Natural := 0;
+      --  Intrusive closing links live with actual canonical/C scalar slots.
+      --  The historical C name remains private. This head borrows absolute
+      --  indices; marking owns no copied value, lexical cell or extra vector.
+      --  The packet backend retains its separate Closers entries.
       Foreign_Handler : System.Address := System.Null_Address;
       Foreign_Ticket : Interfaces.C.unsigned_long_long := 0;
       Foreign_Continuation : System.Address := System.Null_Address;
       Foreign_KContext : Interfaces.C.ptrdiff_t := 0;
       Foreign_KStatus : Interfaces.C.int := 0;
       Foreign_Yield_Count : Natural := 0;
-      Foreign_Suspended : Boolean := False;
       Foreign_Wanted : Integer := 0;
-      Foreign_Protected : Boolean := False;
-      --  C continuations retain scalar metadata, never an abandoned C stack.
-      --  A suspended boundary owns its result adjustment until resumption.
-      Warning_Phase : Warning_Event_Phase := No_Pending_Warning;
+      Error_Guard_Owner : Frame_Access;
+      Deferred_Error_Head, Deferred_Error_Next : Frame_Access;
+      Deferred_Error_Count : Natural := 0;
+      Error_Previous_Prefix : Natural := 0;
+      --  An unprotected regular C call first transfers through its exact
+      --  live callback guard. Its boundary owns the abandoned scope chain
+      --  until that guard acknowledges the error; no old opcode may resume.
+      --  Protected cleanup retains frozen ownership after retirement. An
+      --  unhandled coroutine error instead preserves its original traceback
+      --  windows until reset, as recorded by Deferred_Error_Traceback.
       Warning_Previous : Frame_Access;
-      Warning_Window : Frame_Access;
+      Warning_View : Stack_View_Lease;
       Warning_Borrow_Depth : Natural := 0;
+      Hook_View_Depth : Natural := 0;
+      --  A hook pauses this actual frame's argument/capture packet while C
+      --  operates on its cells; nested warning/release views preserve that.
       Warning_Ticket : Interfaces.C.unsigned_long_long := 0;
       Warning_Message : Byte_String;
       Warning_Root : Value;
-      Warning_To_Continue : Boolean := False;
       Warning_Handler : System.Address := System.Null_Address;
       Warning_Data : System.Address := System.Null_Address;
-      Warning_Previous_Base : Natural := 0;
-      Warning_Previous_Top : Natural := 0;
-      Warning_Previous_Frame : Frame_Access;
-      Warning_Failed : Boolean := False;
-      --  A warning borrows its actual current frame. Embedded event storage
-      --  and the linked previous event retain roots across nested C callbacks.
       Foreign_Base : Natural := 0;
       Foreign_Previous_Base : Natural := 0;
       Foreign_Previous_Frame : Frame_Access;
-      Foreign_Entered : Boolean := False;
-      --  A C callback has a base-relative public stack window. The previous
-      --  window is explicit frame data so reentrant calls and error unwinding
-      --  never depend on an abandoned Ada or C activation.
+      Foreign_Previous_View : Frame_Access;
+      Hook_View : Stack_View_Lease;
+      --  The actual C hook guard and its interrupted scalar view have
+      --  distinct lifetimes. A regular C entry saves/restores that view.
       Call_Site : Lua.Lexers.Source_Location;
       --  Native continuation storage is owned by the activation. Pending
       --  arguments/results/captures remain traced while Lua callbacks run.
@@ -497,62 +598,142 @@ private package Lua.Engine is
       Slots      : Packets.Vector;
       Active_Registers : Natural := 0;
       --  Retained rows above this bound are empty cached capacity.
-      Canonical_Registers : Scalar_Values.Vector;
-      Canonical_Cells : Cell_References.Vector;
+      --  Canonical registers and captured-cell associations belong to the
+      --  context's shared scalar stack, not additional per-frame arenas.
       Canonical_Top : Natural := 0;
       Canonical_GC_Top : Natural := 0;
       --  Exclusive live scalar stack bound while a caller is suspended.
-      Canonical_Pending : Canonical_Pending_Kind := No_Canonical_Result;
       Canonical_Base : Natural := 0;
       Canonical_Wanted : Integer := 0;
-      Canonical_Test : Boolean := False;
       Canonical_Concat_Last : Natural := 0;
       Varargs    : Values.Vector;
       Vararg_Table : Object_Access;
-      Completion : Completion_Policy := Deliver_Results;
-      Finalizer_Phase : Finalizer_Drive_Phase := Choosing_Finalizer;
-      Finalizer_Charge : Boolean := False;
       Return_To  : Natural := 0;
       Protection : Natural := 0;
       Message_Handler : Value;
-      Retain_On_Failure : Boolean := False;
-      --  Protected holders own their dynamic handler. A foreign sentinel
-      --  retains its packet until C takes it; Lua holders deliver on unwind.
       Slot_Cost : Natural := 0;
-      Native_Charge : Boolean := False;
-      Message_Charge : Boolean := False;
-      Unwind_Charge : Boolean := False;
-      Blocks_Yield : Boolean := False;
       Callee : Value;
-      Is_Tail_Call : Boolean := False;
-      Native_Tail_State : Native_Tail_Phase := No_Native_Tail;
+      Call_Metamethod_Count : Natural range 0 .. 15 := 0;
+      --  Receivers inserted on entry to this logical frame, independently
+      --  of ordinary arguments or varargs. Suspension and Lua tail reuse
+      --  retain this count; a separate native tail frame gets its own count.
       Call_Name : Unbounded_String;
+      Call_Name_Bytes : Owned_Buffer;
+      --  Owned, trailing-NUL view of an explicit call origin for C debug
+      --  inspection. Publish it when the activation is constructed, never
+      --  allocate scratch bytes during a read-only lua_getinfo query. The
+      --  borrow is valid until this activation is retired/reused.
       Name_Kind : Unbounded_String;
       Transfer_Count : Natural := 0;
-      Entry_Hook_Done : Boolean := False;
-      Return_Hook_Done : Boolean := False;
-      Hook_Line : Natural := 0;
+      Transfer_First : Positive := 1;
+      --  Actual first transferred slot relative to the callee function.
+      --  Calls start at one; canonical/C returns retain their real offset.
+      Hook_Line : Integer range -1 .. Integer'Last := -1;
+      --  Minus one means unseen; zero is a checked word without line data.
+      --  Keeping them distinct preserves a stripped frame's first event.
       Hook_PC : Natural := 0;
+      Hook_Trace_PC : Natural := 0;
       Last_Executed_PC : Natural := 0;
-      Line_Hook_Checked : Boolean := False;
       Closers : Close_Lists.Vector;
-      Unwind : Unwind_Reason := No_Unwind;
       Unwind_Owner : Frame_Access;
       Unwind_Depth : Natural := 0;
       Unwind_PC : Natural := 0;
       Unwind_Live : Registers.Vector;
       Unwind_Results : Values.Vector;
       Unwind_Error : Value;
+      Unwind_Previous_Prefix : Natural := 0;
+      --  An active close keeps any outer close's real scalar floor. A failed
+      --  handler transfers this floor to fresh recovery before dropping its
+      --  now-abandoned controller and original return temporaries.
+      Lifecycle : Frame_Lifecycle := Active;
+      Native_Id : Native_Kind := Print_Function;
+      Result_Failure_Class : Failure_Kind := No_Failure;
+      Native_Operator : Lua.Lexers.Token_Kind := Lua.Lexers.End_Of_Input;
+      Warning_Phase : Warning_Event_Phase := No_Pending_Warning;
+      Canonical_Pending : Canonical_Pending_Kind := No_Canonical_Result;
+      Completion : Completion_Policy := Deliver_Results;
+      Finalizer_Phase : Finalizer_Drive_Phase := Choosing_Finalizer;
+      Native_Tail_State : Native_Tail_Phase := No_Native_Tail;
+      Unwind : Unwind_Reason := No_Unwind;
       Unwind_Failure_Class : Failure_Kind := Language_Failure;
+      --  Keep static flags together to avoid alignment padding in every
+      --  retained activation. This private ordering changes no flag default,
+      --  ownership transition or relative order of controlled components.
+      Reset_Reserve : Boolean := False;
+      --  Dedicated empty continuation metadata, preserved across Clear_Frame
+      --  and loaned only during an actual reset. It owns no inactive values.
+      Has_Stack_Window : Boolean := False;
+      Hidden_Varargs : Boolean := False;
+      Is_Native : Boolean := False;
+      Native_Builtin_Direct : Boolean := False;
+      Return_Window_Published : Boolean := False;
+      --  The scalar source range and Transfer_First/Count are authoritative
+      --  through return closing/hooks, independently of copied result packets.
+      Result_Handler_Called : Boolean := False;
+      Load_Reader_Portal : Boolean := False;
+      Foreign_Suspended : Boolean := False;
+      Foreign_Protected : Boolean := False;
+      --  C continuations retain scalar metadata, never an abandoned C stack.
+      --  A suspended boundary owns its result adjustment until resumption.
+      Deferred_Error_Traceback : Boolean := False;
+      Pending_Error_Transfer : Boolean := False;
+      Warning_To_Continue : Boolean := False;
+      Warning_Failed : Boolean := False;
+      --  A warning borrows its actual current frame. Embedded event storage
+      --  and the linked previous event retain roots across nested C callbacks.
+      Foreign_Entered : Boolean := False;
+      --  A C callback has a base-relative public stack window. The previous
+      --  window is explicit frame data so reentrant calls and error unwinding
+      --  never depend on an abandoned Ada or C activation.
+      Canonical_Test : Boolean := False;
+      Finalizer_Charge : Boolean := False;
+      Retain_On_Failure : Boolean := False;
+      --  Protected holders own their dynamic handler. A foreign sentinel
+      --  retains its packet until C takes it; Lua holders deliver on unwind.
+      Native_Charge : Boolean := False;
+      Message_Charge : Boolean := False;
+      Unwind_Charge : Boolean := False;
+      Blocks_Yield : Boolean := False;
+      Is_C_Hook_Transport : Boolean := False;
+      --  A native hook borrows the interrupted frame. This actual scheduler
+      --  wrapper is transport even if the callback replaces/removes its hook
+      --  while running; mutable callback identity cannot identify the frame.
+      Is_C_Collector_Transport : Boolean := False;
+      --  The real C protected collector pump is an implementation transport,
+      --  not a Lua-visible call. Its identity is fixed before entry hooks.
+      Is_Finalizer_Call : Boolean := False;
+      --  This actual activation was entered by the finalizer controller.
+      --  It has the __gc origin even without a Lua calling opcode. Reuse and
+      --  Lua tail replacement clear the marker; descendants do not inherit it.
+      Logically_Unwound : Boolean := False;
+      --  Execution has genuinely abandoned this activation. Cells/closers
+      --  remain owned until cleanup; its calls/depth/barriers cannot resume.
+      Is_Tail_Call : Boolean := False;
+      Entry_Hook_Done : Boolean := False;
+      Return_Hook_Done : Boolean := False;
+      External_Return_Pending : Boolean := False;
+      External_Return_Independent : Boolean := False;
+      --  Unwind_Results owns a completed raw packet while external release
+      --  callbacks borrow this still-live actual departing activation.
+      Hook_Line_Mask : Boolean := False;
+      --  Traceexec snapshots its line mask before a count callback can change
+      --  hooks. The last actually traced/caller-return PC remains separate
+      --  from the executed PC while count-only hooks do not trace lines.
+      Line_Hook_Checked : Boolean := False;
       Unwind_Handler_Called : Boolean := False;
       Unwind_Has_Error : Boolean := False;
    end record;
    --  A packet preserves all results of a call/vararg expression. Scalar
    --  consumers read its first value; parentheses explicitly collapse it.
    --  Frames are explicit so tail calls need not consume the Ada call stack.
+   function Native_Operation_Name
+     (Activation : not null Frame_Access) return String;
+   --  Return the semantic Ada library phase. A direct C builtin invocation
+   --  retains an internal transport name on its hidden activation while its
+   --  scalar ID selects this same existing implementation.
 
    type Native_Action_Kind is
-     (Finished, Invoke, Continue_Step, Drain_Finalizers);
+     (Finished, Invoke, Continue_Step, Drain_Finalizers, Start_Reader_Portal);
    type Native_Action is record
       Kind : Native_Action_Kind := Finished;
       Results : Values.Vector;
@@ -581,15 +762,28 @@ private package Lua.Engine is
    --  roots until the scheduler hands them to the recipient activation.
 
    type Execution_Context is record
+      Frame_Capacity : Natural := 0;
+      --  Actual allocated activation records, including cached/reset/base
+      --  owners. C metadata reservations follow this capacity without forcing
+      --  an otherwise Ada-only context to construct a foreign surface.
       Cache_Head : Frame_Access;
       Cache_Count : Natural := 0;
+      Reset_Frame_Head : Frame_Access;
+      Reset_Frame_Count : Natural := 0;
       Memory : Lua.Storage.Owner_Access;
       Stack        : Frames.Vector;
       Arguments    : Values.Vector;
       Boundary_Results : Values.Vector;
       Foreign_Stack : Values.Vector;
       Stack_Cells : Cell_References.Vector;
+      C_Close_Links : Closing_Links.Vector;
+      --  Stack-reserved predecessor indices make valid lua_toclose marking
+      --  allocation-free, including when a cached Lua frame becomes C.
       Stack_Used : Natural := 0;
+      Closing_Stack_Prefix : Natural := 0;
+      --  Actual departing slots retained while reset/error cleanup invokes
+      --  closers. Cleanup owners save/restore their previous prefix floor;
+      --  this is a live scalar interval, never a copied value workspace.
       Foreign_Top : Natural := 0;
       Host_Stack_Top : Natural := 0;
       Stack_Window : Frame_Access;
@@ -600,7 +794,15 @@ private package Lua.Engine is
       Foreign_Control : System.Address := System.Null_Address;
       Foreign_Base : Natural := 0;
       Foreign_Activation : Frame_Access;
+      Foreign_View : Frame_Access;
+      --  Optional physical owner of a borrowed C view. Foreign_Activation
+      --  can still name the genuine callback guard/continuation owner.
+      Base_C_Frame : Frame_Access;
+      --  Reserved base C activation lazily owns API-level closing slots.
+      --  Its real scalar window starts at zero; like Lua's base CallInfo it
+      --  has no public debug frame and carries no native-call depth charge.
       Resume_Foreign_Activation : Frame_Access;
+      Resume_Foreign_View : Frame_Access;
       Resume_Foreign_Base : Natural := 0;
       Resume_Foreign_Top : Natural := 0;
       Resume_Stack_Used : Natural := 0;
@@ -615,7 +817,7 @@ private package Lua.Engine is
       --  A synchronous foreign call borrows it without changing ownership.
       Failure      : Value;
       Has_Failure_Value : Boolean := False;
-      Failure_Text : Unbounded_String;
+      Failure_Text : Lua.Diagnostic_Text.Text;
       Failure_At   : Lua.Lexers.Source_Location;
       Failure_Class : Failure_Kind := No_Failure;
       Failure_Handled : Boolean := False;
@@ -631,15 +833,31 @@ private package Lua.Engine is
       Host_Owned : Boolean := True;
       Non_Yieldable : Natural := 0;
       Stack_Slots : Natural := 0;
+      Deferred_Error_Depth : Natural := 0;
+      --  Detached cleanup records still consume metadata capacity. Reserving
+      --  for this count makes restoration after a C guard allocation-free.
+      Error_Recovery_Pending : Boolean := False;
+      Error_Recovery_Floor : Natural := 0;
+      --  A typed C ACK schedules recovery on this existing driver. The next
+      --  step processes the error before hooks, collection or an abandoned PC.
       Stack_Error_Phase : Stack_Space_Phase := Normal_Stack;
       Stack_Allocated_Bound : Natural := Initial_Stack_Size;
       --  The semantic allocated bound is independent of a backing vector's
       --  retained geometric capacity and the current real frame's ci.top.
       Native_Depth : Natural := 0;
       Hook : Value;
+      --  Only a foreign trampoline lives here. Lua callbacks belong to the
+      --  weak-key registry table, so replacing a public entry releases its
+      --  former callback instead of keeping a hidden strong context copy.
+      Lua_Hook_Installed : Boolean := False;
+      --  Installation is independent of the table entry, which Lua code may
+      --  replace or remove. A new thread inherits this flag/mask/count, but
+      --  receives no callback mapping until it is explicitly registered.
       Hook_Mask : Unbounded_String;
       Foreign_Hook : System.Address := System.Null_Address;
       Foreign_Hook_Mask : Interfaces.C.int := 0;
+      --  Actual low-byte installation mask, including Lua-dispatcher
+      --  installations queried/restored through the public C hook API.
       Hook_Count : Natural := 0;
       Hook_Reported_Count : Integer_Value := 0;
       Hook_Remaining : Natural := 0;
@@ -653,6 +871,16 @@ private package Lua.Engine is
       Hook_Transfer : Boolean := False;
       C_Resuming : Boolean := False;
       --  An explicit lua_resume boundary can drive even a fresh main thread.
+      C_Reset_Requested : Boolean := False;
+      C_Reset_Active : Boolean := False;
+      C_Reset_Self : Boolean := False;
+      C_Reset_Error : Boolean := False;
+      --  A terminal reset error is already rooted by Failure and its real
+      --  base stack slot; publishing it needs no newly allocating packet.
+      C_Reset_From_Depth : Natural := 0;
+      C_Reset_Return_Depth : Natural := 0;
+      --  Self-reset first abandons real C guards through typed transfers.
+      --  Only their final acknowledgment may retire this thread's frames.
       Cleanup_Depth : Natural := 0;
    end record;
    --  Contexts own frames and transient argument/error roots. Referenced
@@ -664,9 +892,12 @@ private package Lua.Engine is
    type Random_State is array (0 .. 3) of Interfaces.Unsigned_64;
 
    type World is limited record
+      Module_Code : Lua.Platform_Modules.Code_Lease;
+      --  This lease finalizes after Memory, including its residual raw frees.
       Memory : Lua.Storage.Owner;
       --  The allocator owner outlives every typed object and buffer in this
       --  universe. Explicit subpool allocators never borrow a global owner.
+      Native_Libraries : Native_Library_Access;
       Bounds       : Limits;
       Saved_Bounds : Limits;
       Policy : Execution_Policy := Bounded;
@@ -695,6 +926,11 @@ private package Lua.Engine is
       Program_Free_Head : Natural := 0;
       Live_Programs : Natural := 0;
       Heap         : Objects.Vector;
+      Short_Strings : Objects.Vector;
+      Short_String_Count : Natural := 0;
+      String_Root_Head : Object_Access;
+      External_Release_Head, External_Release_Tail : Object_Access;
+      External_Release_Active : Object_Access;
       Programs     : Prototypes.Vector;
       Foreign_Registry : Object_Access;
       Memory_Error_Value : Value;
@@ -772,13 +1008,18 @@ private package Lua.Engine is
      (Memory : not null Lua.Storage.Owner_Access; Text : Byte_String;
       Base : Natural := 0) return Lua.Numbers.Number;
    function Read_Number
+     (Text : String; Base : Natural := 0) return Lua.Numbers.Number;
+   function Read_Number
+     (Text : Byte_String; Base : Natural := 0) return Lua.Numbers.Number;
+   function Read_Number
      (State : in out World; Text : String; Base : Natural := 0)
       return Lua.Numbers.Number;
    function Read_Number
      (State : in out World; Text : Byte_String; Base : Natural := 0)
       return Lua.Numbers.Number;
-   --  Runtime conversions borrow source bytes and route every growable exact
-   --  conversion temporary through their explicit universe allocator.
+   --  Explicit-owner conversions retain their selected scratch provider.
+   --  No-owner/state conversions borrow source bytes and use fixed exact
+   --  numeric scratch. State overloads charge the shared linear scan budget.
 
    function Owned_Values
      (State : in out World; Source : Values.Vector := Values.Empty_Vector)
@@ -809,6 +1050,22 @@ private package Lua.Engine is
    procedure Fail (State : in out World; Message : String;
                    Resource : Boolean := False);
    --  Record a diagnostic before raising the internal transfer exception.
+
+   procedure Set_Failure_Text
+     (State : in out World; Context : not null Context_Access;
+      Message : String);
+   --  Copy a diagnostic through the selected owner, charging input-sized
+   --  work. Short emergency messages remain allocation-free under refusal.
+   procedure Diagnostic_Work (State : in out World; Bytes : Natural);
+   --  Charge an input-sized diagnostic pass before copying/scanning bytes.
+   --  The fixed inline bound is covered by ordinary activation bookkeeping.
+   function Failure_Image (Context : not null Context_Access) return String;
+   --  Materialize a host diagnostic. An actual Lua error is authoritative
+   --  and remains rooted in Context; its string is never copied for storage.
+   function Ensure_Error_Object
+     (State : in out World; Context : not null Context_Access) return Value;
+   --  Publish an existing error value, or build it directly from a borrowed
+   --  managed diagnostic. No input-sized unmanaged intermediate is created.
 
    procedure Begin_Operation (State : in out World);
    procedure End_Operation (State : in out World);
@@ -944,17 +1201,29 @@ private package Lua.Engine is
      (State : in out World; Emergency : Boolean := False);
    --  Mark/sweep sees globals, frames, packets, captures, and current failure.
 
-   function New_Thread (State : in out World; Entry_Function : Value)
-                        return Value;
-   --  Allocate a Lua-owned context and its unique thread object.
+   function New_Thread
+     (State : in out World; Entry_Function : Value;
+      Parent : Context_Access := null) return Value;
+   --  Allocate a Lua-owned context and its unique thread object. Inherit the
+   --  addressed parent's hook controls (State.Current when Parent is null),
+   --  with a fresh countdown but no Lua callback registry entry.
 
    function New_Frame
-     (State : in out World; Context : not null Context_Access)
-      return Frame_Access;
+     (State : in out World; Context : not null Context_Access;
+      Reuse_Cache : Boolean := True) return Frame_Access;
    function New_Frame (State : in out World) return Frame_Access;
    --  Borrow one clean activation from its context-owned intrusive cache.
-   --  A new record and every future buffer use State.Memory explicitly.
+   --  Reuse_Cache False reserves a dedicated reset record without consuming
+   --  ordinary depth already warmed by the program. A new record and every
+   --  future buffer use State.Memory explicitly.
    --  Publish on Context.Stack before any later allocation can collect.
+
+   Reset_Continuation_Frames : constant Positive := 8;
+   procedure Prepare_Reset_Frames
+     (State : in out World; Context : not null Context_Access);
+   --  Reserve bounded reset/close/protection metadata while a C
+   --  surface is constructed. Empty owned buffers retain their capacities;
+   --  normal user-call frames remain independently metered and allocated.
 
    procedure Prepare_Private_Registers
      (Item : not null Frame_Access; Count : Natural);
@@ -966,6 +1235,15 @@ private package Lua.Engine is
    --  Clear all Lua references and continuation state without dropping
    --  reserved capacity, then cache it in Item.Context. Null is a no-op;
    --  double retirement is internal misuse and raises Program_Error.
+
+   procedure Free_Frame (Item : in out Frame_Access);
+   --  Physically release one detached activation through its owning context.
+   --  The caller must unlink it from every active/cache/reset list and finish
+   --  all execution/borrow obligations first. This decrements actual frame
+   --  capacity and trims unused C metadata; outstanding records stay owned
+   --  until their genuine guard ACK. Context and memory outlive the call.
+   --  Null is a no-op; invalid owner/capacity raises Program_Error. This is
+   --  an internal lifecycle primitive, never a public embedding operation.
 
    procedure Destroy_Frames
      (State : in out World; Context : not null Context_Access);
@@ -981,6 +1259,18 @@ private package Lua.Engine is
    --  Bind every frame-owned managed container before any capacity grows.
 
    function New_String (State : in out World; Text : String) return Value;
+   function New_External_String
+     (State : in out World; Address : System.Address; Size : Natural;
+      Allocator : Lua.Storage.Allocation_Function;
+      Data : System.Address) return Value;
+   --  Adopt an immutable external NUL-terminated payload. The allocator's
+   --  address/data must outlive the string. The callback frees the original
+   --  payload and returns null; it may make ordinary synchronous Lua calls.
+   --  Before adoption, failure leaves ownership with the C boundary guard.
+   procedure Release_Detached_String
+     (State : in out World; Item : in out Object_Access);
+   --  Release a detached header after its C deallocator has acknowledged the
+   --  payload. The external release portal is its sole caller/owner.
    function New_String
      (State : in out World; Text : in out Owned_Buffer) return Value;
    --  Publish a managed builder through a borrowed view, avoiding an
@@ -1044,10 +1334,33 @@ private package Lua.Engine is
    function Equal (Left, Right : Value) return Boolean;
    function Truth (Item : Value) return Boolean;
    function Type_Name (Item : Value) return String;
+   function Diagnostic_Type (State : World; Item : Value) return String;
+   --  VM error type spelling: only table/userdata raw string __name fields
+   --  override primitive type(). The rendered name ends at its first NUL.
+   function Argument_Type
+     (State : World; Item : Value; Present : Boolean := True) return String;
+   --  Auxiliary argument spelling: any raw string __name takes priority,
+   --  then light userdata receives its special name. Present=False denotes
+   --  an absent slot rather than an explicit nil. Both queries invoke no
+   --  handlers and allocate no Lua objects; returned Ada text is immediate.
    function Image (Memory : not null Lua.Storage.Owner_Access;
                    Item : Value) return String;
    function Image (Item : Value) return String;
    --  Host/test convenience wrapper; runtime callers provide Memory.
+   function Pointer_Of
+     (State : in out World; Item : Value) return System.Address;
+   --  Actual public lua_topointer identity, shared by C and Lua rendering.
+   --  The returned borrow is valid while Item remains traced. Thread
+   --  identities may first reserve their C surface in an Ada-only world.
+   function Pointer_Image
+     (Pointer : System.Address; Width : Natural := 0;
+      Left_Aligned : Boolean := False) return String
+     with Pre => Width <= 99;
+   --  Bounded native %p spelling, with no selected-allocator request.
+   procedure Describe_Value
+     (State : in out World; Item : Value; Output : in out Owned_Buffer);
+   --  Default luaL_tolstring representation only, without invoking handlers.
+   --  Named output remains selected-owner storage; raw __name ends at NUL.
    function Get (Table : Value; Key : Value) return Value;
    procedure Set (State : in out World; Table, Key, Item : Value);
    function Table_Length (Table : Value) return Natural;

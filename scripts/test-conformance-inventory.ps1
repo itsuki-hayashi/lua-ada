@@ -692,4 +692,6 @@ Case 'unrelated root build artifacts do not become fixture inputs' {
 }
 
 Write-Output "PASS: $script:Cases focused conformance inventory tests"
+& (Join-Path $PSScriptRoot 'test-conformance-exclusions.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Conformance exclusion regressions failed' }
 exit 0

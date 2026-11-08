@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "kind": "t-equivalent-feature-review",
+  "candidate_id": "api-finalized-userdata-reclamation",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "decision": "accepted-feature-only",
+  "source": {
+    "sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+    "path": "references/lua/testes/api.lua"
+  },
+  "configuration": "upstream-test",
+  "original_anchor": {
+    "id": "LUA-API-ASSERT-CALL-0195",
+    "kind": "assert-call",
+    "byte_offset": 26638,
+    "byte_length": 6,
+    "line": 941,
+    "end_line": 941,
+    "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+    "status": "pending",
+    "disposition": "pending",
+    "invariant": null,
+    "configurations": [],
+    "evidence": [],
+    "review": null
+  },
+  "original_assertion": {
+    "byte_offset": 26638,
+    "byte_length": 38,
+    "anchor_sha256": "24b4ad560648daf4c61aabcc8daed4abc769e3a202dfb754d39fce6e7ded7250",
+    "original_bytes": "assert(collectgarbage(\"count\") <= x+1)"
+  },
+  "permitted_resolution": "ada-internal-equivalent",
+  "source_exclusions": [],
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "rationale": "The exact one-KiB post-workload allowance is a private capacity/footprint choice, but public finalization, transient resurrection, weak lifetimes and actual memory measurement are required. Actual slot return detaches the registry and deallocates the object; retained vector capacity is distinct from live userdata. The pinned manual requires normally reclaiming finalizable objects in the next cycle and truthful count, not a one-KiB capacity tolerance after1000 objects. Equivalent must verify every callback and actual object reclamation, preserve both collections and positive-growth measurements, and retain selected-owner shutdown evidence.",
+  "retained_requirements": [
+    "Original mixed assertion remains pending and required as an actual reviewed equivalent; no exclusion.",
+    "Same1000 zero-sized userdata, real __gc callback counts and unchanged actual collection timing.",
+    "After first GC:1000 callbacks and1000 still-live finalized userdata; after second: no duplicate callbacks and baseline live-userdata count.",
+    "Truthful count observations, existing positive-growth checks, weak-key/value lifetime, resurrection, balanced selected-owner closure.",
+    "Exact patch/span/configuration/counterpart review and fresh runtime evidence still required."
+  ],
+  "author_proposal": {
+    "sha256": "63cc140904ae4bd5fac178d16cabeb9dc65f2656961d3a85fb19a7c7783b73ad",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api-finalized-userdata-reclamation.author-proposal.json"
+  },
+  "public_contract_sources": [
+    {
+      "span": {
+        "byte_offset": 29609,
+        "byte_length": 2299,
+        "anchor_sha256": "d3ec94cabb265ed10f6844a889b25981aa085c5cb6bbcb12a23fe233da0d9fd2",
+        "original_bytes": "@sect3{finalizers| @title{Garbage-Collection Metamethods}\n\nYou can set garbage-collector metamethods for tables\nand, using the @N{C API},\nfor full userdata @see{metatable}.\nThese metamethods, called @def{finalizers},\nare called when the garbage collector detects that the\ncorresponding table or userdata is dead.\nFinalizers allow you to coordinate Lua's garbage collection\nwith external resource management such as closing files,\nnetwork or database connections,\nor freeing your own memory.\n\nFor an object (table or userdata) to be finalized when collected,\nyou must @emph{mark} it for finalization.\n@index{mark (for finalization)}\nYou mark an object for finalization when you set its metatable\nand the metatable has a @idx{__gc} metamethod.\nNote that if you set a metatable without a @idx{__gc} field\nand later create that field in the metatable,\nthe object will not be marked for finalization.\n\nWhen a marked object becomes dead,\nit is not collected immediately by the garbage collector.\nInstead, Lua puts it in a list.\nAfter the collection,\nLua goes through that list.\nFor each object in the list,\nit checks the object's @idx{__gc} metamethod:\nIf it is present,\nLua calls it with the object as its single argument.\n\nAt the end of each garbage-collection cycle,\nthe finalizers are called in\nthe reverse order that the objects were marked for finalization,\namong those collected in that cycle;\nthat is, the first finalizer to be called is the one associated\nwith the object marked last in the program.\nThe execution of each finalizer may occur at any point during\nthe execution of the regular code.\n\nBecause the object being collected must still be used by the finalizer,\nthat object (and other objects accessible only through it)\nmust be @emph{resurrected} by Lua.@index{resurrection}\nUsually, this resurrection is transient,\nand the object memory is freed in the next garbage-collection cycle.\nHowever, if the finalizer stores the object in some global place\n(e.g., a global variable),\nthen the resurrection is permanent.\nMoreover, if the finalizer marks a finalizing object for finalization again,\nits finalizer will be called again in the next cycle where the\nobject is dead.\nIn any case,\nthe object memory is freed only in a GC cycle where\nthe object is dead and not marked for finalization.\n\n"
+      },
+      "path": "references/lua/manual/manual.of",
+      "interpretation": "Finalizers observe dead objects; transient resurrection keeps them usable during finalization, with memory normally freed in the next collection cycle. Object lifetime and external-resource release remain required.",
+      "source_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+    },
+    {
+      "span": {
+        "byte_offset": 207730,
+        "byte_length": 181,
+        "anchor_sha256": "6544a330d17bb737cfb15e5f88b033f1c4dfb0508a7de1424203f0dd2a8511f8",
+        "original_bytes": "@item{@St{count}|\nReturns the total memory in use by Lua in Kbytes.\nThe value has a fractional part,\nso that it multiplied by 1024\ngives the exact number of bytes in use by Lua.\n}\n\n"
+      },
+      "path": "references/lua/manual/manual.of",
+      "interpretation": "Count reports actual memory in use. The proposed equivalent must keep truthful measurement; this paragraph does not require a one-KiB footprint after a1000-object workload.",
+      "source_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+    }
+  ],
+  "counterpart_source": {
+    "sha256": "43213950a0f88258a4dc19f893d73329c685ca5ae944026e4645583b38a9c8ac",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api-finalization-lifetimes.author.lua"
+  },
+  "observation_limits": "Author observations are diagnostics; this decision reviewed feature relevance and exact original/manual/counterpart bytes. It does not certify the author runtime images or final source/file/platform acceptance."
+}

@@ -3,12 +3,41 @@
 The [M2a contract](milestones/m2a.md) targets pinned default Lua 5.5.1.
 Current validation is recorded in the [session](sessions/2026-11-06-m2a-frontend.md).
 
+The interim checkpoint also runs `check-frontend.ps1 -Configuration upstream-test`
+against a T-enabled Ada probe and a separately built static C frontend oracle.
+Both oracle translation units use the selected private layout definitions.
+All generated grammar cases remain present: the local named `global` is an
+expected syntax error when pinned ltests.h disables LUA_COMPAT_GLOBAL. This
+matching-configuration campaign preserves the default M2a/ABI oracle scope and
+does not certify whole-suite execution.
+
 ## Checking and execution
 
 Lua.Syntax.Check accepts source bytes, an owned diagnostic source label, and
 source/token/node/nesting limits. It returns Success, Syntax_Error, or
 Resource_Error. Lexical and static-semantic rejection are syntax failures.
 It exposes no trees or runtime objects and has no Lua side effects.
+
+Syntax diagnostics retain pinned token spellings and near-token context through
+allocator-owned buffers. Semantic binding/goto errors retain source-line detail
+and omit lexical context. Lua string-load errors share debug's bounded chunk
+identifier; reader loads keep their explicit/default labels. The
+[diagnostic checkpoint](sessions/2026-11-08-syntax-diagnostic-tokens.md) records
+focused native/Ada evidence and the remaining runtime-error obligations.
+
+`Check_Result.Incomplete_Input` reports an unfinished quoted/long token or a
+grammar expectation at actual EOF. Interactive hosts can request more input
+from this structured fact, without inspecting diagnostic wording or introducing
+another grammar. Successful chunks, resource failures, malformed numerals or
+escapes, and static-semantic/resolver errors return false. In particular, an
+unresolved goto stays a final error even though label resolution happens after
+the scanner reaches EOF.
+
+Whole-buffer and foreign-reader loading share the same scanner, parser and
+checked binary decoder through the private demand-driven input boundary. See
+[ADR 0019](decisions/0019-demand-driven-input.md) for ownership, guarded refill
+and work-budget rules; the final delivery's runtime/platform evidence remains
+separate from that implementation decision.
 
 The CLI accepts --check with files, stdin, repeated -e, and --. Each source is
 a separate chunk. It stops on the first failure, prints errors on stderr, and
@@ -46,12 +75,28 @@ Defaults: 1,000,000 source bytes, 100,000 tokens including EOF, 200,000 syntax
 nodes/declarations, nesting 200. Runtime register limits remain independent.
 These are bounded-work/storage controls, not a hard OS memory quota.
 
-C stack exhaustion, bytecode register allocation/limits, code-size limits,
-constant folding/optimization, and exact instruction streams are excluded.
-C's 200 stack-local/255-upvalue representational constraints are not reproduced
-as grammar restrictions; Ada can accept source that fits its configured limits.
-No excluded implementation limit is counted as matching parser rejection.
-Diagnostics compare syntax/resource category and reported line, not wording.
+The standalone M2a checking comparison excludes C stack exhaustion, bytecode
+register allocation/limits, code-size limits, constant folding/optimization
+and exact instruction streams. Its grammar checker does not impose C's
+200-local/255-upvalue compiler constraints. That bounded checking domain does
+not exclude the separate M3 runtime obligations or certify their acceptance.
+M2a diagnostics compare syntax/resource category and reported line, not wording.
+
+Canonical execution enforces its actual local, upvalue and register encoding
+limits. Compatible parsing checks definite local register demand after an
+initializer has parsed, preserving initializer syntax and later block-error
+precedence. Possible compile-time constants retain the canonical compiler's
+authoritative storage classification; compiler-limit
+diagnostics retain the actual defining function's line. See the
+[context checkpoint](sessions/2026-11-08-compiler-limit-context.md).
+Under Lua_Compatible policy, excessive parser nesting is a catchable
+runtime stack failure with the original C-stack error text; public lua_load
+returns LUA_ERRRUN, preserving its distinction from LUA_ERRSYNTAX. Both
+contiguous and streamed input use the same parser. Function bodies charge
+their recursive block once. Bounded Ada sessions and standalone checking keep
+their configured host-depth accounting and Resource_Error behavior. The
+[parser limit checkpoint](sessions/2026-11-08-parser-stack-limits.md) records
+focused evidence; full source and final matrix acceptance remain separate.
 
 ## Oracle workflow
 

@@ -14,6 +14,9 @@ package body Lexer_Tests is
    procedure Check_Kinds (Source : String; Expected : Kind_Array);
    procedure Check_String (Source, Expected : String);
    procedure Check_Bad (Source : String);
+   procedure Check_Diagnostic (Source, Expected : String);
+   procedure Hex_Escape_Eof;
+   procedure Escape_Decoded_Prefix;
    procedure Keywords;
    procedure Keyword_Prefix_Names;
    procedure Longest_Operators;
@@ -75,6 +78,31 @@ package body Lexer_Tests is
       Assert (R.Tokens.Is_Empty, "failed scan has no partial tokens");
       Assert (Length (R.Message) > 0, "nonempty lexical diagnostic");
    end Check_Bad;
+
+   procedure Check_Diagnostic (Source, Expected : String) is
+      Result : constant Scan_Result := Scan (Source);
+   begin
+      Assert (Result.Status = Syntax_Error, "lexical syntax error");
+      Assert (Result.Tokens.Is_Empty, "no partial tokens on failure");
+      Assert (Result.Message = Expected,
+              "diagnostic bytes: " & To_String (Result.Message));
+   end Check_Diagnostic;
+
+   procedure Hex_Escape_Eof is
+      --  EOF during a hex escape retains the consumed escape in the token;
+      --  it does not become an ordinary unfinished-string diagnostic.
+   begin
+      Check_Diagnostic ("'abc\x",
+        "hexadecimal digit expected near ''abc\x'");
+   end Hex_Escape_Eof;
+
+   procedure Escape_Decoded_Prefix is
+      --  A valid preceding escape has already become a byte in Lua's token
+      --  buffer when the following malformed escape is diagnosed.
+   begin
+      Check_Diagnostic ("'\x41\xg'",
+        "hexadecimal digit expected near ''A\xg'");
+   end Escape_Decoded_Prefix;
 
    procedure Keywords is
       --  Each Lua keyword is recognized independently of ordinary names.
@@ -259,43 +287,47 @@ package body Lexer_Tests is
    procedure Unknown_Escape is
       --  An unknown backslash escape must not be silently copied.
    begin
-      Check_Bad ("'\q'");
+      Check_Diagnostic ("'\q'", "invalid escape sequence near ''\q'");
    end Unknown_Escape;
 
    procedure Decimal_Escape_Overflow is
       --  A decimal byte escape cannot exceed 255.
    begin
-      Check_Bad ("'\256'");
+      Check_Diagnostic ("'\256'", "decimal escape too large near ''\256''");
    end Decimal_Escape_Overflow;
 
    procedure Invalid_Hex_Escape is
       --  A two-digit hexadecimal escape rejects nonhex characters.
    begin
-      Check_Bad ("'\x0g'");
+      Check_Diagnostic ("'\x0g'",
+        "hexadecimal digit expected near ''\x0g'");
    end Invalid_Hex_Escape;
 
    procedure Empty_Unicode_Escape is
       --  Unicode escapes require at least one hexadecimal digit.
    begin
-      Check_Bad ("'\u{}'");
+      Check_Diagnostic ("'\u{}'",
+        "hexadecimal digit expected near ''\u{}'");
    end Empty_Unicode_Escape;
 
    procedure Unicode_Overflow is
       --  Lua's extended UTF-8 escape stops at 0x7fffffff.
    begin
-      Check_Bad ("'\u{80000000}'");
+      Check_Diagnostic ("'\u{80000000}'",
+        "UTF-8 value too large near ''\u{80000000'");
    end Unicode_Overflow;
 
    procedure Unclosed_Quote is
       --  An unfinished quoted literal must not return partial tokens.
    begin
-      Check_Bad ("'unfinished");
+      Check_Diagnostic ("'unfinished", "unfinished string near <eof>");
    end Unclosed_Quote;
 
    procedure Unclosed_Long_String is
       --  A long literal must find its matching bracket level.
    begin
-      Check_Bad ("[=[unfinished");
+      Check_Diagnostic ("[=[unfinished",
+        "unfinished long string (starting at line 1) near <eof>");
    end Unclosed_Long_String;
 
    procedure Unclosed_Long_Comment is
@@ -420,6 +452,11 @@ package body Lexer_Tests is
       Test_Support.Add
         (Suite, "lexer: invalid hex escape",
          Invalid_Hex_Escape'Access);
+      Test_Support.Add
+        (Suite, "lexer: hex escape EOF diagnostic", Hex_Escape_Eof'Access);
+      Test_Support.Add
+        (Suite, "lexer: decoded escape diagnostic prefix",
+         Escape_Decoded_Prefix'Access);
       Test_Support.Add
         (Suite, "lexer: empty unicode escape",
          Empty_Unicode_Escape'Access);

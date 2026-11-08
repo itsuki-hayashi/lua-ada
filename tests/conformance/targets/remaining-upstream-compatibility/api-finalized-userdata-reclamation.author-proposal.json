@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "kind": "api-finalized-userdata-reclamation-author-proposal",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source": {
+    "sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+    "path": "references/lua/testes/api.lua"
+  },
+  "configuration": "upstream-test",
+  "original_anchor": {
+    "id": "LUA-API-ASSERT-CALL-0195",
+    "kind": "assert-call",
+    "byte_offset": 26638,
+    "byte_length": 6,
+    "line": 941,
+    "end_line": 941,
+    "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+    "status": "pending",
+    "disposition": "pending",
+    "invariant": null,
+    "configurations": [],
+    "evidence": [],
+    "review": null
+  },
+  "original_expression": {
+    "byte_offset": 26638,
+    "byte_length": 38,
+    "anchor_sha256": "24b4ad560648daf4c61aabcc8daed4abc769e3a202dfb754d39fce6e7ded7250",
+    "original_bytes": "assert(collectgarbage(\"count\") <= x+1)"
+  },
+  "relevant_block": {
+    "byte_offset": 26244,
+    "byte_length": 460,
+    "anchor_sha256": "d0df5c3427d22e02a9297ab372d6115e3501923ef53d3f53f68bcb2540db5c5a",
+    "original_bytes": "-- udata with finalizer\n  collectgarbage()\n  x = collectgarbage(\"count\")\n  collectgarbage(\"stop\")\n  a = {__gc = function () end}\n  for i=1,1000 do debug.setmetatable(T.newuserdata(0), a) end\n  assert(collectgarbage(\"count\") >= x+10)\n  collectgarbage()  -- this collection only calls TM, without freeing memory\n  assert(collectgarbage(\"count\") >= x+10)\n  collectgarbage()  -- now frees memory\n  assert(collectgarbage(\"count\") <= x+1)\n  collectgarbage(\"restart\")"
+  },
+  "observability": {
+    "private_one_KiB_return_to_baseline_guarantee": false,
+    "module_observable": true,
+    "public_memory_measurement_required": true,
+    "public_finalization_and_reclamation_required": true
+  },
+  "candidate_resolution": {
+    "transformation_status": "not authored or installed; no API941 adapted source written or executed",
+    "reason": "The original assertion combines a public memory observation and reclamation intent with a C-specific one-KiB tolerance. The complete anchor remains required. Current pure-bound exclusion/verifier-reset schemas do not authorize replacing this call-bearing assertion.",
+    "source_exclusion_proposed": false,
+    "original_assertion": "pending reviewed-equivalent candidate",
+    "proposed_source_plan": [
+      "Keep both actual collection calls and truthful collectgarbage count observations.",
+      "Capture the pre-phase live-userdata baseline and observe an actual finalization counter while creating the same1000 zero-sized finalizable userdata.",
+      "Retain the existing positive-growth checks and require1000 callbacks plus1000 still-live finalized userdata after the first collection.",
+      "After the second collection require unchanged1000 callback count and live-userdata count restored to baseline, with source-linked public weak-key/value lifetime and selected owned-state cleanup counterparts.",
+      "Keep the original assertion as required reviewed-equivalent coverage; do not turn a source-only feature decision into a runtime pass. Exact patch bytes/schema and whole-file observations require a separate decision."
+    ]
+  },
+  "public_contract_sources": [
+    {
+      "span": {
+        "byte_offset": 29609,
+        "byte_length": 2299,
+        "anchor_sha256": "d3ec94cabb265ed10f6844a889b25981aa085c5cb6bbcb12a23fe233da0d9fd2",
+        "original_bytes": "@sect3{finalizers| @title{Garbage-Collection Metamethods}\n\nYou can set garbage-collector metamethods for tables\nand, using the @N{C API},\nfor full userdata @see{metatable}.\nThese metamethods, called @def{finalizers},\nare called when the garbage collector detects that the\ncorresponding table or userdata is dead.\nFinalizers allow you to coordinate Lua's garbage collection\nwith external resource management such as closing files,\nnetwork or database connections,\nor freeing your own memory.\n\nFor an object (table or userdata) to be finalized when collected,\nyou must @emph{mark} it for finalization.\n@index{mark (for finalization)}\nYou mark an object for finalization when you set its metatable\nand the metatable has a @idx{__gc} metamethod.\nNote that if you set a metatable without a @idx{__gc} field\nand later create that field in the metatable,\nthe object will not be marked for finalization.\n\nWhen a marked object becomes dead,\nit is not collected immediately by the garbage collector.\nInstead, Lua puts it in a list.\nAfter the collection,\nLua goes through that list.\nFor each object in the list,\nit checks the object's @idx{__gc} metamethod:\nIf it is present,\nLua calls it with the object as its single argument.\n\nAt the end of each garbage-collection cycle,\nthe finalizers are called in\nthe reverse order that the objects were marked for finalization,\namong those collected in that cycle;\nthat is, the first finalizer to be called is the one associated\nwith the object marked last in the program.\nThe execution of each finalizer may occur at any point during\nthe execution of the regular code.\n\nBecause the object being collected must still be used by the finalizer,\nthat object (and other objects accessible only through it)\nmust be @emph{resurrected} by Lua.@index{resurrection}\nUsually, this resurrection is transient,\nand the object memory is freed in the next garbage-collection cycle.\nHowever, if the finalizer stores the object in some global place\n(e.g., a global variable),\nthen the resurrection is permanent.\nMoreover, if the finalizer marks a finalizing object for finalization again,\nits finalizer will be called again in the next cycle where the\nobject is dead.\nIn any case,\nthe object memory is freed only in a GC cycle where\nthe object is dead and not marked for finalization.\n\n"
+      },
+      "path": "references/lua/manual/manual.of",
+      "interpretation": "Finalizers observe dead objects; transient resurrection keeps them usable during finalization, with memory normally freed in the next collection cycle. Object lifetime and external-resource release remain required.",
+      "source_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+    },
+    {
+      "span": {
+        "byte_offset": 207730,
+        "byte_length": 181,
+        "anchor_sha256": "6544a330d17bb737cfb15e5f88b033f1c4dfb0508a7de1424203f0dd2a8511f8",
+        "original_bytes": "@item{@St{count}|\nReturns the total memory in use by Lua in Kbytes.\nThe value has a fractional part,\nso that it multiplied by 1024\ngives the exact number of bytes in use by Lua.\n}\n\n"
+      },
+      "path": "references/lua/manual/manual.of",
+      "interpretation": "Count reports actual memory in use. The proposed equivalent must keep truthful measurement; this paragraph does not require a one-KiB footprint after a1000-object workload.",
+      "source_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+    }
+  ],
+  "implementation_source_analysis": {
+    "review_status": "author analysis awaiting independent source review",
+    "findings": [
+      "Reserve_Heap_Slot reuses Heap_Free_Head. Return_Heap_Slot replaces owning object with null and links the reusable slot; Release_Heap_Object unregisters then frees the actual object.",
+      "Collector Sweep_Object calls Release_Heap_Object for unreachable objects. World shutdown releases Heap and Heap_Free_Next storage; vector Clear and Release have different ownership/capacity effects.",
+      "T.totalmem userdata counts actual non-null Userdata_Object identities and excludes implementation cells/prototypes. This is an instrumented object-count counterpart, not a claim of C table/cache geometry.",
+      "Retained reusable allocation can explain an implementation-dependent post-GC footprint. Source inspection and six measured batches do not attribute every residual byte or prove bounded behavior for every workload."
+    ],
+    "source_revision": "bf6dbc36dabbdd22a60b98a523203170a172a9ba",
+    "source_bindings": [
+      {
+        "sha256": "cdb1c55f7d8ab086720c60b60105df1afd7ca8320c4e368dab742ebdcb8eb00d",
+        "path": "src/lua-engine.adb"
+      },
+      {
+        "sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687",
+        "path": "src/lua-engine-collector.adb"
+      },
+      {
+        "sha256": "6795bd60f6d3942eecb253fc089dda1b35c25c5c07e1266c26ea5773b36f3f21",
+        "path": "src/lua-storage-vectors.adb"
+      },
+      {
+        "sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0",
+        "path": "tests/src/lua-conformance_adapter.adb"
+      },
+      {
+        "sha256": "b68454ab6f4e0b30dc69a8fde89ece91674a760c60c672baca7d78b38b06931f",
+        "path": "src/lua-storage-vectors.ads"
+      },
+      {
+        "sha256": "cd29399060bc6f9d045f1d247d76a2419e06e62e9a5ca5055b27213c65c62b62",
+        "path": "src/lua-engine-finalizers.adb"
+      }
+    ]
+  },
+  "counterpart": {
+    "harness_dependency": "Actual T.newuserdata and T.totalmem supplied by nativeT or first-party Ada instrumented harness; public callbacks and weak tables perform the lifetime checks.",
+    "required_behavior": [
+      "Six batches of1000: exactly1000 new callbacks each; firstGC retains1000 userdata, secondGC returns to baseline, thirdGC repeats neither callbacks nor objects.",
+      "Separate64-object weak lifetime phase: finalizers access weak-key records, weak values are already removed, every object finalizes once, nextGC removes keys and returns userdata to baseline.",
+      "Actual allocator report after state closure must show zero outstanding bytes and blocks; Ada must additionally report completed shutdown and no accounting fault.",
+      "Capacity observation mode reports actual values without asserting a C-specific byte threshold. Lifecycle mode requires identical static completion output."
+    ],
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api-finalization-lifetimes.author.lua",
+    "sha256": "43213950a0f88258a4dc19f893d73329c685ca5ae944026e4645583b38a9c8ac"
+  },
+  "author_observations": {
+    "interpretation": "Both lifecycle runs exit0 with identical stdout and empty stderr. Both capacity diagnostic runs exit0; Ada post-GC memory is stable from the second through sixth batch. All raw provider snapshots have zero outstanding bytes/blocks; Ada snapshots report shutdown_complete true. These component observations support review but cannot discharge the original source anchor.",
+    "native_capacity_samples": [
+      32989,
+      32989,
+      32989,
+      32989,
+      32989,
+      32989
+    ],
+    "ada_capacity_samples": [
+      301755,
+      301978,
+      301978,
+      301978,
+      301978,
+      301978
+    ],
+    "sha256": "dc5303a2ead53a841345c9da2aa7ddd8e317f2492350b77c7e7bb9ff413d7291",
+    "scope": "First-party existing-executable component observations, not original api.lua, final matrix, semantic approval or verified build-context authority",
+    "path": "reports/api-finalization-author/6a79d830fff24135aad85f6e7945d36b/observations.json",
+    "lifecycle_stdout_sha256": "ca3113ffaf41b0454507293994cef94f7cad29f860f5b1b9aa2dfb6531436b2e"
+  },
+  "required_next_actions": [
+    "Root independent feature/manual/source/evidence review; no approval inherited from the API58018-byte decision.",
+    "Reject any proposal that skips collection, weak reachability, actual callback/reclaim counts, allocator failure/recovery or selected owned-state shutdown.",
+    "After feature approval, propose narrowly bound exact replacement bytes and retained original-anchor evidence; execute only after separate exact review.",
+    "Require original C and approved Ada whole-file/final-context evidence and complete global/source reconciliation."
+  ]
+}

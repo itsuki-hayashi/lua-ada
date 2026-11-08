@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "kind": "t-exclusion-approval",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "protected_scopes": [
+    {
+      "id": "gc-io-events",
+      "path": "tests/conformance/scopes/gc-io-events.json",
+      "sha256": "79fa732f60f380c93be190f43640acf0b2ac595bdf9196d2fc8fd0a7ee62eae7"
+    },
+    {
+      "id": "expanded-t-conformance",
+      "path": "tests/conformance/scopes/expanded-t-conformance.json",
+      "sha256": "9df8642d10238abaa48c97184ed2345be7106d4c2c74668954e43bc0cb6ecdc1"
+    }
+  ],
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "decision": "accepted",
+  "exclusion": {
+    "byte_offset": 17053,
+    "mixed_obligation": false,
+    "anchor_sha256": "f89400b75cf254feed3cc991449a9e7bc1679e6cd9b5b6be1b6598dfa176bf55",
+    "source": "api.lua",
+    "byte_length": 18,
+    "configurations": [
+      "upstream-test"
+    ],
+    "id": "LUA-API-REVIEWED-BLOCK-9001",
+    "observation_kind": "private-resource-bound",
+    "evidence": [],
+    "t_guard": {
+      "byte_length": 101,
+      "sha256": "6f5f4b60db25bfae9020333e97d5aaa7b3b807e4086af05ea36003dd45f81c90",
+      "byte_offset": 64,
+      "mode": "absent-return"
+    },
+    "module_observable": true,
+    "module_compatibility_obligation": false,
+    "public_api": false,
+    "third_party_irrelevance": "The pinned lua_load contract permits avoiding internal copies but promises no400-byte allocation delta. Memory use is observable; its exact implementation allocation footprint is not a public compatibility obligation.",
+    "invariant": "Only the exact 18-byte upper allocation-delta conjunct at byte17053 is private; the original mixed assertion is retained and required.",
+    "status": "excluded",
+    "eligibility_schema_version": 2,
+    "retained_parent": {
+      "id": "LUA-API-ASSERT-CALL-0125",
+      "byte_offset": 17039,
+      "byte_length": 33,
+      "anchor_sha256": "9c64cb79308eea2b302880a35a479936b515b820ed8c610d1d23f5158593b3d2"
+    },
+    "eligibility": "t-only-private-invariant",
+    "disposition": "reviewed-t-internal-exclusion",
+    "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0"
+  },
+  "review_evidence": {
+    "sha256": "ddf0e8cd59e985eb0a280cd20498d80678d697e064718b970d9a70e871b7c064",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-feature-review.json"
+  },
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "refresh_proposal": {
+    "sha256": "43af163d2928bc13974771cffdbce511fbea96a71f981f49dd2d133e6e98627f",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api18-parser-status-lower-graph.author-proposal.json"
+  },
+  "rationale": "New independent exact-child decision after reviewing original api550-605, pinned fixed-buffer contract and committed header preservation proof. Only the18-byte private400-byte upper footprint conjunct is excluded. Original positive growth, B-mode loading, source lifetime, X/Y result/types and line301 behavior remain required; original parent0125 and lifecycle parent0195 remain pending. New parser status witnesses preserve every previous header byte. No runtime or original-parent evidence is conferred."
+}

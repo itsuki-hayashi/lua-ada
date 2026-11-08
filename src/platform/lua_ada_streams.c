@@ -11,6 +11,10 @@
 #include <stdio.h>
 #if !defined(_WIN32)
 #include <sys/types.h>
+#include <unistd.h>
+#else
+#include <fcntl.h>
+#include <io.h>
 #endif
 
 size_t lua_ada_stream_pointer_text(FILE *file, char *bytes, size_t capacity) {
@@ -87,6 +91,30 @@ int lua_ada_stream_pclose(FILE *file, int *error) {
 #endif
     *error = errno;
     return result;
+}
+
+/* Select untranslated byte mode for a shared standard stream. Windows C
+ * text mode would turn CRLF into LF and stop at Ctrl-Z, which is not
+ * binary-safe for Lua source or precompiled chunks read from stdin. POSIX
+ * streams are already byte streams. Returns zero on success. */
+int lua_ada_stream_set_binary(FILE *file) {
+#if defined(_WIN32)
+    fflush(file);
+    return _setmode(_fileno(file), _O_BINARY) == -1 ? -1 : 0;
+#else
+    (void)file;
+    return 0;
+#endif
+}
+
+/* Report whether a stream is attached to an interactive terminal; used only
+ * to choose between batch stdin and the prompt loop. No bytes are consumed. */
+int lua_ada_stream_is_terminal(FILE *file) {
+#if defined(_WIN32)
+    return _isatty(_fileno(file)) != 0;
+#else
+    return isatty(fileno(file)) != 0;
+#endif
 }
 
 void lua_ada_stream_begin_read(FILE *file) {

@@ -1,0 +1,884 @@
+{
+  "schema_version": 1,
+  "kind": "cli-arg-lifecycle-author-observation",
+  "author": "Codex /root/runtime_gaps",
+  "date": "2026-11-08",
+  "source_snapshot_revision": "a4ab133377cf05a9ec88874177aaa94bef6b0a9e",
+  "selected_artifact_repository_revision": "836d900abb499f5147091b531a7b330b23c45c42",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "independent_feature_review": "pending",
+  "transformed_main_emitted": false,
+  "original_main_executed": false,
+  "modes": [],
+  "source_bindings": [
+    {
+      "path": "references/lua/testes/main.lua",
+      "sha256": "844d13f96bdbf03a554b8b466fdf21aeac2bcddb907ad2b971814c994898d457"
+    },
+    {
+      "path": "references/lua/lua.c",
+      "sha256": "17ce8e73dd3586b84076ceaad9d638887723a1c60945c6ee086d723a6e61453f"
+    },
+    {
+      "path": "references/lua/lauxlib.c",
+      "sha256": "12479bc0ada905452185278dc681d72eb865e1fc247a0143227c210bc3f9dd78"
+    },
+    {
+      "path": "scripts/ConformanceRunner.psm1",
+      "sha256": "a5715c2da32df777eed533d6eeb87ddef85ef5f854e64d25c00cc3e812acd245"
+    },
+    {
+      "path": "scripts/observe-cli-arg-lifecycle.ps1",
+      "sha256": "7c94f3d58279aced18d7ad50feaf883da8498c4548fd489fd638d2c99d88140e"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/cli-arg-lifecycle.author-cases.json",
+      "sha256": "4c6f8a663d26ecdc9018af12e48c3a73c6a4b9bac56405539b7e8fd846f06077"
+    },
+    {
+      "path": "tests/conformance/platform/cli-dynamic-arg.lua",
+      "sha256": "faebaa48ee366dcb6d8072f2652b75edfa70fd35ab871b20c266e290e912194f"
+    },
+    {
+      "path": "tests/conformance/platform/cli-dynamic-arg-refused-entry.lua",
+      "sha256": "a58e393d3da1d71f7632cf18d59f0f3f8e0b11f463471bc1ff535d096337d8ea"
+    },
+    {
+      "path": "cli/shared/lua_cli.adb",
+      "sha256": "62de30c3309a0693a769c496a9c65fbaad5878b6f3ba0f115bde5de5f6b134bc"
+    },
+    {
+      "path": "src/lua-sessions.adb",
+      "sha256": "bc2427a58d0fa0d45f24fef006571af91c2feeb1dee617cc9285a6f1d282cac7"
+    },
+    {
+      "path": "cli/shared/lua-sessions-cli.ads",
+      "sha256": "878499ac5847df9f02fe9ebb7814abf2fe7da2379d3aec6ff0446bc6785c6ee6"
+    },
+    {
+      "path": "cli/shared/lua-sessions-cli.adb",
+      "sha256": "aa56000998a806e5c09dd517af947c3830343672332360dc5e5725a10941b88e"
+    },
+    {
+      "path": "experiments/conformance/oracle.gpr",
+      "sha256": "05c9640918231db5ee6a09572d833ceb57831458e6c4531f76b14fdbd02366d0"
+    },
+    {
+      "path": "experiments/conformance/reference.gpr",
+      "sha256": "6c79ca4e821634be54685e72a159dc1afef528e13eeac1c59ef9fd4fcb24a676"
+    }
+  ],
+  "roles": [
+    {
+      "implementation": "ReferenceC",
+      "configuration_label": "default",
+      "artifacts": [
+        {
+          "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\bin\\lua.exe",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-default\\frozen\\lua.exe"
+        },
+        {
+          "sha256": "6fd51198bee9770aab18cf42ebaf7ccc133a26d4e3dedb22770c41aba84500b3",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\lib\\libconformance_lua.dll",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-default\\frozen\\libconformance_lua.dll"
+        }
+      ],
+      "configuration_process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-default\\frozen\\lua.exe",
+        "process_id": 13060,
+        "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+        "arguments": [
+          "--conformance-config"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-default\\frozen",
+        "started_utc": "2026-11-08T09:00:45.3979482Z",
+        "elapsed_milliseconds": 39,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 1048576,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-default\\configuration.stdout",
+        "stdout_bytes": 451,
+        "stdout_sha256": "6c63f956109c778efd508539cfdb94eabe3d06a41a56c2a6a1fae68983e20295",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-default\\configuration.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "configuration_data": {
+        "schema_version": 1,
+        "configuration": "default",
+        "implementation": "C Lua",
+        "test_adapter": false,
+        "lua_version": "Lua 5.5",
+        "lua_release": "Lua 5.5.1",
+        "integer_bytes": 8,
+        "number_bytes": 8,
+        "compat_global": 1,
+        "extra_space_bytes": 8,
+        "expected_extra_space_bytes": 8,
+        "pointer_bytes": 8,
+        "max_stack": 1000000,
+        "max_c_calls": 200,
+        "aux_buffer_bytes": 1024,
+        "rand32": false,
+        "compat_math": false,
+        "allocator_limit_bytes": 2147483648,
+        "allocator_accounting": "lua-managed-payload-bytes"
+      },
+      "cases": [
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-default\\length-real-c-frame-result-process.json",
+          "record_sha256": "b21b383ffec84d893d8e013afcb492581c64fda1170c2f8a3faeea7dbd96781b",
+          "matches_native_contract": true,
+          "stdout_sha256": "5e9876d37c3c08b09c25b59aca2dcfc5a0a0d0c10fb0e6b447a7c668695f5e97",
+          "id": "length-real-c-frame",
+          "exit_code": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-default\\global-real-c-frame-result-process.json",
+          "record_sha256": "762ce4099b1d9062081ef2bc039bfa8a9616b31edca44f422c6f7a9eaed14a6c",
+          "matches_native_contract": true,
+          "stdout_sha256": "939a17b4f8db6c0b4ddb915d94c2e8f3646f5e8b30f1b25d6544f9f8e8e3513a",
+          "id": "global-real-c-frame",
+          "exit_code": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-default\\syntax-before-length-result-process.json",
+          "record_sha256": "331fef2e3babb27beca95de30dadafb92eb03651c668b0424cf7e4abd9310a90",
+          "matches_native_contract": true,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "syntax-before-length",
+          "exit_code": 1,
+          "stderr_sha256": "7a5fdf6ed10f0f1a1fbb7617625f2e607e7032582cdfc21df30c93d9a5cf61b0"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-default\\missing-file-before-length-result-process.json",
+          "record_sha256": "b7f099c4789133407a0da19941f5d0e0c5910807803d5c13f5ac6c2621aa87fb",
+          "matches_native_contract": true,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "missing-file-before-length",
+          "exit_code": 1,
+          "stderr_sha256": "9b76829b6e88b186688c814874875e1b75c69e7677df022c6174711dff6fec8a"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-default\\loaded-initial-environment-result-process.json",
+          "record_sha256": "9a7e19bbb401e6e49a8c9c7aee94f9375cd0b5ea32b915bce31a35871e025771",
+          "matches_native_contract": true,
+          "stdout_sha256": "3f2ec9011a05fc7c35caca0b87c2118e98ed9212decc6372538d1242a6acb966",
+          "id": "loaded-initial-environment",
+          "exit_code": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-default\\length-exit-close-result-process.json",
+          "record_sha256": "4a517064b4110d912dedc65ee1e1a3f2699c7bfdac6ae92fc3fd53b4e082a7a3",
+          "matches_native_contract": true,
+          "stdout_sha256": "985d3ed702ebf799006788bbbd5b5b4dc875fc5c4b37654a56813eb259eb6ef0",
+          "id": "length-exit-close",
+          "exit_code": 37,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "passes_native_contract": 6,
+      "fails_native_contract": 0,
+      "omitted_T_cases": [
+        "length-refusal-recovery",
+        "refused-script-entry"
+      ],
+      "telemetry_required": true,
+      "product_configuration_note": "Product CLI has no conformance configuration command; build-path label is not an adapter claim. Actual _VERSION/type(T) are separately captured."
+    },
+    {
+      "implementation": "ReferenceC",
+      "configuration_label": "upstream-test",
+      "artifacts": [
+        {
+          "sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\bin\\lua.exe",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-upstream-test\\frozen\\lua.exe"
+        },
+        {
+          "sha256": "90cd6bb9cb2f5cdfe04a79ad2a2a8779f1e2cda590d53aaebb3caf5524fe973c",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\lib\\libconformance_lua.dll",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-upstream-test\\frozen\\libconformance_lua.dll"
+        }
+      ],
+      "configuration_process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-upstream-test\\frozen\\lua.exe",
+        "process_id": 82480,
+        "executable_sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
+        "arguments": [
+          "--conformance-config"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-upstream-test\\frozen",
+        "started_utc": "2026-11-08T09:00:45.7039330Z",
+        "elapsed_milliseconds": 28,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 1048576,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-upstream-test\\configuration.stdout",
+        "stdout_bytes": 456,
+        "stdout_sha256": "65bc59bb7bd1f68dc6670263547590fc5b3878f7cd7c205ec7aa8a9d9775ebfb",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-upstream-test\\configuration.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "configuration_data": {
+        "schema_version": 1,
+        "configuration": "upstream-test",
+        "implementation": "C Lua",
+        "test_adapter": true,
+        "lua_version": "Lua 5.5",
+        "lua_release": "Lua 5.5.1",
+        "integer_bytes": 8,
+        "number_bytes": 8,
+        "compat_global": 0,
+        "extra_space_bytes": 16,
+        "expected_extra_space_bytes": 16,
+        "pointer_bytes": 8,
+        "max_stack": 68000,
+        "max_c_calls": 180,
+        "aux_buffer_bytes": 23,
+        "rand32": true,
+        "compat_math": true,
+        "allocator_limit_bytes": 2147483648,
+        "allocator_accounting": "debug-allocator-backing-bytes"
+      },
+      "cases": [
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-upstream-test\\length-real-c-frame-result-process.json",
+          "record_sha256": "4c104b6d64e2145977810bf361cecbfe1526ece4a20eff21d579fd985879d212",
+          "matches_native_contract": true,
+          "stdout_sha256": "5e9876d37c3c08b09c25b59aca2dcfc5a0a0d0c10fb0e6b447a7c668695f5e97",
+          "id": "length-real-c-frame",
+          "exit_code": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-upstream-test\\global-real-c-frame-result-process.json",
+          "record_sha256": "26b9ea5eeec1010be59815b8742a4c990af4b891e46d0ae929cef6f8c437eb6e",
+          "matches_native_contract": true,
+          "stdout_sha256": "939a17b4f8db6c0b4ddb915d94c2e8f3646f5e8b30f1b25d6544f9f8e8e3513a",
+          "id": "global-real-c-frame",
+          "exit_code": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-upstream-test\\syntax-before-length-result-process.json",
+          "record_sha256": "0ca168e55400e630eb2b48b61a6e6866f3b4d1b9269e7c6a5f6e38f0e571bee2",
+          "matches_native_contract": true,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "syntax-before-length",
+          "exit_code": 1,
+          "stderr_sha256": "db62db05f27a35e7b35c7325336988735a37bf588086636840e47e2475a7cb99"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-upstream-test\\missing-file-before-length-result-process.json",
+          "record_sha256": "c47df39ada688c65ee6d81e8cf5507038efdb188bf02f90096b95f1912909705",
+          "matches_native_contract": true,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "missing-file-before-length",
+          "exit_code": 1,
+          "stderr_sha256": "814018881f316960c931c610d97f34eca96cb6c9c4f750d7320e4c83cba1599c"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-upstream-test\\loaded-initial-environment-result-process.json",
+          "record_sha256": "7ab1a956ada0797d113a31fba3f85a545121cb099959b15a3d5b35983bbd1f57",
+          "matches_native_contract": true,
+          "stdout_sha256": "3f2ec9011a05fc7c35caca0b87c2118e98ed9212decc6372538d1242a6acb966",
+          "id": "loaded-initial-environment",
+          "exit_code": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-upstream-test\\length-exit-close-result-process.json",
+          "record_sha256": "d6c6736598e90192e2b6ab232d930cd2f81b47c391af56839dced837162c46a7",
+          "matches_native_contract": true,
+          "stdout_sha256": "985d3ed702ebf799006788bbbd5b5b4dc875fc5c4b37654a56813eb259eb6ef0",
+          "id": "length-exit-close",
+          "exit_code": 37,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-upstream-test\\length-refusal-recovery-result-process.json",
+          "record_sha256": "70d493cb0f66204b9c1ca8053d2cc17305d6875fe4ec317cd1488c187614665f",
+          "matches_native_contract": true,
+          "stdout_sha256": "527b1e6472813d93cc029c5302da3e1005a27be2a9292293647b26dcc129816a",
+          "id": "length-refusal-recovery",
+          "exit_code": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\ReferenceC-upstream-test\\refused-script-entry-result-process.json",
+          "record_sha256": "a724f75059281e0f75531cc07ff66d63ad3eb0660762b9f714d87ebd16d5eb69",
+          "matches_native_contract": true,
+          "stdout_sha256": "bb1f9a56b5ed6d7191a3a7400142bac9f6be01568f8aff75d1d9fe9e63bfe3d6",
+          "id": "refused-script-entry",
+          "exit_code": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "passes_native_contract": 8,
+      "fails_native_contract": 0,
+      "omitted_T_cases": [],
+      "telemetry_required": true,
+      "product_configuration_note": "Product CLI has no conformance configuration command; build-path label is not an adapter claim. Actual _VERSION/type(T) are separately captured."
+    },
+    {
+      "implementation": "AdaConformance",
+      "configuration_label": "default",
+      "artifacts": [
+        {
+          "sha256": "e4b3f54b4017166662c247e8b94ad253c0b476ab9df32e52111b2dc16f973a95",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\tests\\bin\\static\\conformance_runner.exe",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-default\\frozen\\lua.exe"
+        }
+      ],
+      "configuration_process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-default\\frozen\\lua.exe",
+        "process_id": 78812,
+        "executable_sha256": "e4b3f54b4017166662c247e8b94ad253c0b476ab9df32e52111b2dc16f973a95",
+        "arguments": [
+          "--conformance-config"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-default\\frozen",
+        "started_utc": "2026-11-08T09:00:46.1921888Z",
+        "elapsed_milliseconds": 253,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 1048576,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-default\\configuration.stdout",
+        "stdout_bytes": 548,
+        "stdout_sha256": "52da7c70140c7c215757ad88bbbbd1db7f61f946569cd89206b1f5f164b142b4",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-default\\configuration.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "configuration_data": {
+        "schema_version": 1,
+        "implementation": "Lua Ada",
+        "lua_release": "Lua 5.5.1",
+        "configuration": "default",
+        "test_adapter": false,
+        "runtime_build_profile": "validation",
+        "launcher_build_profile": "validation",
+        "launcher_library_type": "static",
+        "integer_bytes": 8,
+        "number_bytes": 8,
+        "pointer_bytes": 8,
+        "extra_space_bytes": 8,
+        "expected_extra_space_bytes": 8,
+        "max_stack": 1000000,
+        "max_c_calls": 200,
+        "aux_buffer_bytes": 1024,
+        "compat_global": 1,
+        "rand32": false,
+        "compat_math": false,
+        "allocator_accounting": "managed-provider-raw-bytes",
+        "allocator_limit_bytes": 2147483648,
+        "telemetry": {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-default\\configuration-allocator.78812.json",
+          "sha256": "e35b0fd4fa095b3c1e87b79e1f3438233a14497a2441df5f454bf0f8419d2bd5"
+        }
+      },
+      "cases": [
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-default\\length-real-c-frame-result-process.json",
+          "record_sha256": "b704d166169d0627cc2c2e9f120957effefdbb03fc9e6c7df7e24d278b72c5b7",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "length-real-c-frame",
+          "exit_code": 1,
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-default\\global-real-c-frame-result-process.json",
+          "record_sha256": "219f36035d0fb3f3e68a2412a3bfca6786652e48300ab7788fcbbe8182d2aeef",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "global-real-c-frame",
+          "exit_code": 1,
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-default\\syntax-before-length-result-process.json",
+          "record_sha256": "8c942caae375d4f195e46e6b73814844cf3e46adeb15282562f3458136c75b53",
+          "matches_native_contract": true,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "syntax-before-length",
+          "exit_code": 1,
+          "stderr_sha256": "e7d576e35d91031523c0a2292560e393118649fc8ede6ff1e0aa7b0ad4924194"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-default\\missing-file-before-length-result-process.json",
+          "record_sha256": "bdfa2fe5ec94954534b1c4a4f24c5191fe64526bcbc2b69ae2feefd443568d76",
+          "matches_native_contract": true,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "missing-file-before-length",
+          "exit_code": 1,
+          "stderr_sha256": "fc140cfe0b61b439a17b00a4f234d95f31b28b618a58eb043822c3ac6eb5d467"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-default\\loaded-initial-environment-result-process.json",
+          "record_sha256": "eee2d3c85cb30abc7b1ba96cb326f8ccbf8dff8573149872a0553063a9f5058d",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "loaded-initial-environment",
+          "exit_code": 1,
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-default\\length-exit-close-result-process.json",
+          "record_sha256": "24817427c0e2f3a6bc60859433649366fc26e8be1cc3c5f785950409a19ecf42",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "length-exit-close",
+          "exit_code": 1,
+          "stderr_sha256": "9a5bdb653448e55b3926edac244e184738d4c5f25f3ed47b40f2d75a99f32ac5"
+        }
+      ],
+      "passes_native_contract": 2,
+      "fails_native_contract": 4,
+      "omitted_T_cases": [
+        "length-refusal-recovery",
+        "refused-script-entry"
+      ],
+      "telemetry_required": true,
+      "product_configuration_note": "Product CLI has no conformance configuration command; build-path label is not an adapter claim. Actual _VERSION/type(T) are separately captured."
+    },
+    {
+      "implementation": "AdaConformance",
+      "configuration_label": "upstream-test",
+      "artifacts": [
+        {
+          "sha256": "a157f03eba0782090aa9f946a70517dfe046fc4b924530cbb8d2561b82fc8de0",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\tests\\bin\\upstream-test\\static\\conformance_runner.exe",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-upstream-test\\frozen\\lua.exe"
+        }
+      ],
+      "configuration_process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-upstream-test\\frozen\\lua.exe",
+        "process_id": 29796,
+        "executable_sha256": "a157f03eba0782090aa9f946a70517dfe046fc4b924530cbb8d2561b82fc8de0",
+        "arguments": [
+          "--conformance-config"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-upstream-test\\frozen",
+        "started_utc": "2026-11-08T09:00:47.2649673Z",
+        "elapsed_milliseconds": 406,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 1048576,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-upstream-test\\configuration.stdout",
+        "stdout_bytes": 547,
+        "stdout_sha256": "2d100d0743d643c35d225646eb2bd8fe2b28b1c146c19109d0835943f613ca08",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-upstream-test\\configuration.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "configuration_data": {
+        "schema_version": 1,
+        "implementation": "Lua Ada",
+        "lua_release": "Lua 5.5.1",
+        "configuration": "upstream-test",
+        "test_adapter": true,
+        "runtime_build_profile": "validation",
+        "launcher_build_profile": "validation",
+        "launcher_library_type": "static",
+        "integer_bytes": 8,
+        "number_bytes": 8,
+        "pointer_bytes": 8,
+        "extra_space_bytes": 8,
+        "expected_extra_space_bytes": 8,
+        "max_stack": 68000,
+        "max_c_calls": 180,
+        "aux_buffer_bytes": 23,
+        "compat_global": 0,
+        "rand32": true,
+        "compat_math": true,
+        "allocator_accounting": "managed-provider-raw-bytes",
+        "allocator_limit_bytes": 2147483648,
+        "telemetry": {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-upstream-test\\configuration-allocator.29796.json",
+          "sha256": "ac6171dd6701f52bc4d0b4e3a72995b26cb77fd83be8724746fa4db987157b5d"
+        }
+      },
+      "cases": [
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-upstream-test\\length-real-c-frame-result-process.json",
+          "record_sha256": "f38e12585edcbc20279a59366e893c4d4cd356b49ada36c172d714aedaee4871",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "length-real-c-frame",
+          "exit_code": 1,
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-upstream-test\\global-real-c-frame-result-process.json",
+          "record_sha256": "1f24150d3df82f1f4e89f2a83d6ef56445653393cb42c528aa51406ccab88082",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "global-real-c-frame",
+          "exit_code": 1,
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-upstream-test\\syntax-before-length-result-process.json",
+          "record_sha256": "b8681cc8bf3cc108d972aa3ea5f05dab0684b891a0e28e6a38ad1b3b90c62fcc",
+          "matches_native_contract": true,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "syntax-before-length",
+          "exit_code": 1,
+          "stderr_sha256": "e7d576e35d91031523c0a2292560e393118649fc8ede6ff1e0aa7b0ad4924194"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-upstream-test\\missing-file-before-length-result-process.json",
+          "record_sha256": "61c30f877eddd61240cdafa5fb5866f855b05d13a4a361f18414833bc85dfa81",
+          "matches_native_contract": true,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "missing-file-before-length",
+          "exit_code": 1,
+          "stderr_sha256": "fc140cfe0b61b439a17b00a4f234d95f31b28b618a58eb043822c3ac6eb5d467"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-upstream-test\\loaded-initial-environment-result-process.json",
+          "record_sha256": "d3fa723f76718da1c8a59dc75dbf9940f1442336a75047bed8b1ccd3a703c9e6",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "loaded-initial-environment",
+          "exit_code": 1,
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-upstream-test\\length-exit-close-result-process.json",
+          "record_sha256": "6194437eda7f11955350ca6bf9ca0689742ceac393c9ac2f80e3867f6db08ef4",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "length-exit-close",
+          "exit_code": 1,
+          "stderr_sha256": "9a5bdb653448e55b3926edac244e184738d4c5f25f3ed47b40f2d75a99f32ac5"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-upstream-test\\length-refusal-recovery-result-process.json",
+          "record_sha256": "a13e09cf4a32cdc45ce750fa8066ac8726dea8945b675282c25ca68b89fa33fb",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "length-refusal-recovery",
+          "exit_code": 1,
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaConformance-upstream-test\\refused-script-entry-result-process.json",
+          "record_sha256": "29cff318dd9187ce69ce11e6d154cbffec9f002a820ff8fb1ded52d45a151915",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "refused-script-entry",
+          "exit_code": 1,
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6"
+        }
+      ],
+      "passes_native_contract": 2,
+      "fails_native_contract": 6,
+      "omitted_T_cases": [],
+      "telemetry_required": true,
+      "product_configuration_note": "Product CLI has no conformance configuration command; build-path label is not an adapter claim. Actual _VERSION/type(T) are separately captured."
+    },
+    {
+      "implementation": "AdaProduct",
+      "configuration_label": "default",
+      "artifacts": [
+        {
+          "sha256": "ff758dce5c6cb26c38651cb3f48b64ebdbf21ecd1377c6cee3493098889688a6",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\cli\\bin\\static\\lua_ada.exe",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-default\\frozen\\lua.exe"
+        }
+      ],
+      "configuration_process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-default\\frozen\\lua.exe",
+        "process_id": 2456,
+        "executable_sha256": "ff758dce5c6cb26c38651cb3f48b64ebdbf21ecd1377c6cee3493098889688a6",
+        "arguments": [
+          "-e",
+          "print(_VERSION,type(T))"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-default\\frozen",
+        "started_utc": "2026-11-08T09:00:48.4896212Z",
+        "elapsed_milliseconds": 255,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 1048576,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-default\\configuration.stdout",
+        "stdout_bytes": 13,
+        "stdout_sha256": "f3c9c7937aef234518043b1644c50a1cb7897d534aeb3ae7f1d471e2dfb79b3c",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-default\\configuration.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "configuration_data": {
+        "test_adapter": false,
+        "lua_version": "Lua 5.5",
+        "source": "actual user-level _VERSION/type(T) probe; no conformance metadata"
+      },
+      "cases": [
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-default\\length-real-c-frame-result-process.json",
+          "record_sha256": "3d75edf01706c28f422fb08ef2e94fa679e102d8449fbdf76527ae22f6d08088",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "length-real-c-frame",
+          "exit_code": 1,
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-default\\global-real-c-frame-result-process.json",
+          "record_sha256": "f2a0ac097b77d864d7bba3a9f3464a88ffc6417fcd5f4658d84a026c5f07e3fc",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "global-real-c-frame",
+          "exit_code": 1,
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-default\\syntax-before-length-result-process.json",
+          "record_sha256": "db5008cb35d52777ac52d2f415b5403366a6c08c5bdd1edddf3a271065fc5cb1",
+          "matches_native_contract": true,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "syntax-before-length",
+          "exit_code": 1,
+          "stderr_sha256": "e7d576e35d91031523c0a2292560e393118649fc8ede6ff1e0aa7b0ad4924194"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-default\\missing-file-before-length-result-process.json",
+          "record_sha256": "983372aceb728210f2955791d31bb80fb055d575cf7b340a81848cbefb5f6aee",
+          "matches_native_contract": true,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "missing-file-before-length",
+          "exit_code": 1,
+          "stderr_sha256": "fc140cfe0b61b439a17b00a4f234d95f31b28b618a58eb043822c3ac6eb5d467"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-default\\loaded-initial-environment-result-process.json",
+          "record_sha256": "f7b7dd0da13a6ab2ce4733a6e802190afc4021772ed74b8819194e5eb47c3342",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "loaded-initial-environment",
+          "exit_code": 1,
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-default\\length-exit-close-result-process.json",
+          "record_sha256": "ad254485e972179f452adb82b8adacff87657a2b08cd86a21e91af887e1e9b22",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "length-exit-close",
+          "exit_code": 1,
+          "stderr_sha256": "9a5bdb653448e55b3926edac244e184738d4c5f25f3ed47b40f2d75a99f32ac5"
+        }
+      ],
+      "passes_native_contract": 2,
+      "fails_native_contract": 4,
+      "omitted_T_cases": [
+        "length-refusal-recovery",
+        "refused-script-entry"
+      ],
+      "telemetry_required": false,
+      "product_configuration_note": "Product CLI has no conformance configuration command; build-path label is not an adapter claim. Actual _VERSION/type(T) are separately captured."
+    },
+    {
+      "implementation": "AdaProduct",
+      "configuration_label": "upstream-test",
+      "artifacts": [
+        {
+          "sha256": "b6d43685341aa49db5d07c51ad0f1f368da425d8e19860ffbf444114515a590a",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\cli\\bin\\upstream-test\\static\\lua_ada.exe",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-upstream-test\\frozen\\lua.exe"
+        }
+      ],
+      "configuration_process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-upstream-test\\frozen\\lua.exe",
+        "process_id": 43352,
+        "executable_sha256": "b6d43685341aa49db5d07c51ad0f1f368da425d8e19860ffbf444114515a590a",
+        "arguments": [
+          "-e",
+          "print(_VERSION,type(T))"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-upstream-test\\frozen",
+        "started_utc": "2026-11-08T09:00:49.3949178Z",
+        "elapsed_milliseconds": 243,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 1048576,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-upstream-test\\configuration.stdout",
+        "stdout_bytes": 13,
+        "stdout_sha256": "f3c9c7937aef234518043b1644c50a1cb7897d534aeb3ae7f1d471e2dfb79b3c",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-upstream-test\\configuration.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "configuration_data": {
+        "test_adapter": false,
+        "lua_version": "Lua 5.5",
+        "source": "actual user-level _VERSION/type(T) probe; no conformance metadata"
+      },
+      "cases": [
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-upstream-test\\length-real-c-frame-result-process.json",
+          "record_sha256": "5253283434f068ade535bee1f4e22d19b3860dd6b3a49433027c3d279ec6eb1f",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "length-real-c-frame",
+          "exit_code": 1,
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-upstream-test\\global-real-c-frame-result-process.json",
+          "record_sha256": "ca7beb197b77cee70ea4790980f33eecec098a97332be0a55fa55ca2f7e45dcc",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "global-real-c-frame",
+          "exit_code": 1,
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-upstream-test\\syntax-before-length-result-process.json",
+          "record_sha256": "7a547da31ee0dbd718ea7f759c734154f26e5d5cc8fd2fd43ec1634451181bac",
+          "matches_native_contract": true,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "syntax-before-length",
+          "exit_code": 1,
+          "stderr_sha256": "e7d576e35d91031523c0a2292560e393118649fc8ede6ff1e0aa7b0ad4924194"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-upstream-test\\missing-file-before-length-result-process.json",
+          "record_sha256": "fbe04c92e289b94bb57380a488bb34859c641411ba5cfc3a1322cdf4df602418",
+          "matches_native_contract": true,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "missing-file-before-length",
+          "exit_code": 1,
+          "stderr_sha256": "fc140cfe0b61b439a17b00a4f234d95f31b28b618a58eb043822c3ac6eb5d467"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-upstream-test\\loaded-initial-environment-result-process.json",
+          "record_sha256": "d9614c77f42d60cc254c367e046099f6560fd2729fff61c0882eda6b93734767",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "loaded-initial-environment",
+          "exit_code": 1,
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6"
+        },
+        {
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-arg-lifecycle\\6129280577c24245bac64f532cf61137\\AdaProduct-upstream-test\\length-exit-close-result-process.json",
+          "record_sha256": "8211b46b91451dc20efd0aed3048666c3de6f72dbeb39c7883b534c439c506dc",
+          "matches_native_contract": false,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "id": "length-exit-close",
+          "exit_code": 1,
+          "stderr_sha256": "9a5bdb653448e55b3926edac244e184738d4c5f25f3ed47b40f2d75a99f32ac5"
+        }
+      ],
+      "passes_native_contract": 2,
+      "fails_native_contract": 4,
+      "omitted_T_cases": [
+        "length-refusal-recovery",
+        "refused-script-entry"
+      ],
+      "telemetry_required": false,
+      "product_configuration_note": "Product CLI has no conformance configuration command; build-path label is not an adapter claim. Actual _VERSION/type(T) are separately captured."
+    }
+  ],
+  "compiler_flags_provenance": "Existing artifacts only; source/GPR hashes are not compile-command receipts.",
+  "limits": {
+    "conformance_allocator_limit_bytes": 2147483648,
+    "capture_limit_bytes": 1048576,
+    "per_process_timeout_seconds": 30,
+    "product_cli_allocator_ceiling_measured": false
+  },
+  "evidence_repository_root": "C:/Users/Itsuki/.codex/worktrees/remaining-c-api/lua-ada",
+  "evidence_directory": "reports/cli-arg-lifecycle/6129280577c24245bac64f532cf61137",
+  "raw_summary": {
+    "path": "reports/cli-arg-lifecycle/6129280577c24245bac64f532cf61137/observation.json",
+    "sha256": "8bb2deaa4b4f10a1d03229682fdfb8c469ce4786c5cd1fdc06d10a27c98c59b1"
+  },
+  "actual_implementation_changes": false,
+  "new_case_processes": 40,
+  "new_configuration_processes": 6,
+  "measured_workload_sidecars": 26,
+  "native_exit_sidecars_absent": 2,
+  "retained_21_case_revision": "a4ab133377cf05a9ec88874177aaa94bef6b0a9e",
+  "native_proofs": [
+    "Compiled closure exists in real anonymous C caller during global lookup and length.",
+    "Length retains original table as actual C temporary; raw kinds are recorded, no fixed-position/backing layout asserted.",
+    "Syntax and missing-file rejection precede length.",
+    "Loaded closure keeps old initial environment after length replaces registry globals and collects.",
+    "Length os.exit37,true closes actual lexical value and never enters script; native main-return telemetry absent.",
+    "Actual T refusal caught inside length recovers:2 managed refusals,0 backing refusals, then healthy allocation.",
+    "Native T warmed M0 through script entry succeeds with0 managed/backing refusals, reset occurs only in actual selected script."
+  ],
+  "limits_note": "Ordinary images do not execute the two mandatory T fault controls; omitted_T_cases are explicit and receive no credit. Default/T product images expose no T adapter or allocator telemetry.",
+  "implementation_recommendation": {
+    "status": "authorized-by-root-pending-implementation-and-review",
+    "new_machine_entry": false,
+    "new_root_field": false,
+    "scope": "CLI-only child, tiny public-primitive C transports, selected-script callsite",
+    "root_invariant": "Current.Arguments keeps closure/table/length/all copied actual arguments until existing Function_Value Start returns. Separate owned arg-only vector remains backed by those traced values. Start Begin_Operation does not clear Current.Arguments; Dispatch pins callee/args before new-frame publication. Only after successful Start clear host packet, avoiding stale roots before call hook/script. On failure cancel before dropping host roots.",
+    "capacity": "Pre-reserve Current.Arguments metadata+Minimum_C_Stack and separate owned arg arena Minimum_C_Stack before callbacks. Take_Results preserves fitting target capacity through existing Transfer_Result_Ownership. Reserve final n while full root packet remains; precharge copying/clear work and keep actual owner accounting/refusal.",
+    "no_early_clear": "Do not trim closure prefix and rely on a local Value, a local untraced vector, or temporary Operation_Roots pins across Start.",
+    "remaining": "Implementation, separately named regressions, native current-image replay and independent Root review still required."
+  },
+  "design_source_bindings": [
+    {
+      "path": "src/lua-engine-machine.adb",
+      "sha256": "a8679e1348552d54d9af30c86fe8c0143e7fea6146dffe336c159e0834fc2bf3"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409"
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "sha256": "d803883a7f07c8a3ecfa082b7c7c6addc72d29cde65ee35a149002ac6541ff8a"
+    },
+    {
+      "path": "src/lua-storage-vectors.ads",
+      "sha256": "b68454ab6f4e0b30dc69a8fde89ece91674a760c60c672baca7d78b38b06931f"
+    },
+    {
+      "path": "src/lua-storage-vectors.adb",
+      "sha256": "6795bd60f6d3942eecb253fc089dda1b35c25c5c07e1266c26ea5773b36f3f21"
+    }
+  ]
+}

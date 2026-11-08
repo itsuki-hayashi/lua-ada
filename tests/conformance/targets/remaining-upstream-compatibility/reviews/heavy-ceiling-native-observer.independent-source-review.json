@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "kind": "heavy-ceiling-native-observer-independent-source-review",
+  "author": "Codex /root",
+  "reviewer": "Codex /root/validation_delivery",
+  "review_date": "2026-11-08",
+  "decision": "accepted-source-correction",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "source_snapshot": {
+    "repository_revision": "a3447d226a26d363ced2a5045097a20f818ed3ea",
+    "repository_dirty": false,
+    "reviewed_source_is_uncommitted": false,
+    "final_implementation_commit": "a3447d226a26d363ced2a5045097a20f818ed3ea"
+  },
+  "reviewed_changed_sources": [
+    {
+      "path": "tests/src/lua-conformance_allocator.adb",
+      "sha256": "de41be3c4cdc2b0d0f0ba21cdccdd40e542601168aacb43615df7c86851beda5"
+    },
+    {
+      "path": "tests/src/lua-sessions-conformance.adb",
+      "sha256": "d85d2c0e94c2764de0f3ce8a61f812582c3170d59fe9d13304f416041d0f8890"
+    },
+    {
+      "path": "tests/src/lua-sessions-conformance.ads",
+      "sha256": "b8a43490815b05349b9ef4ee91c662393c53069bea4d3740953f6144b439a53f"
+    },
+    {
+      "path": "experiments/conformance/c/bounded_ltests.c",
+      "sha256": "44481102f011603794b72b3fe8d4b403ca1ba2ce5b2b8707a490c7343372f71f"
+    },
+    {
+      "path": "experiments/conformance/c/conformance_cli.c",
+      "sha256": "01790ca27bfd0d257a590045dc9e9b3da0b79fe18178ec45b672332f94119339"
+    },
+    {
+      "path": "experiments/conformance/c/allocator_observer_probe.c",
+      "sha256": "c86b7ef85087780039da38d7ce1aec3424ec6d5c74e7f6119572402edc40a22f"
+    },
+    {
+      "path": "scripts/test-conformance-allocator-ceiling.ps1",
+      "sha256": "7e15fa0d8e5b9709311571913a161e86b8a90a2be9bc3f114323a81949b357ac"
+    },
+    {
+      "path": "scripts/test-native-allocator-observer.ps1",
+      "sha256": "a1be664cbba250000c762b665e6368bc67066edbaed5c0cd661b5fe650813fb9"
+    },
+    {
+      "path": "scripts/ConformanceAllocatorEvidence.psm1",
+      "sha256": "d99197c97cb0626241b95f1bcfc3414e795550656e9afe6659d30315241c9742"
+    },
+    {
+      "path": "scripts/test-conformance-allocator-evidence.ps1",
+      "sha256": "15db5b7d8ce8241c830ca6408bb511b9be6da4e45cb20f80cc51e46dc116267c"
+    }
+  ],
+  "reviewed_context_sources": [
+    {
+      "path": "src/lua-storage.adb",
+      "sha256": "c025b2d9cdf08a4eafe003459c17f8ad8c2124f8bbb4144140532084a337dbda"
+    },
+    {
+      "path": "src/lua-storage.ads",
+      "sha256": "3fba9527f74bfc65ec72508108d36fab3dacea279d80a7e81228ed7236505587"
+    },
+    {
+      "path": "tests/src/lua-storage-conformance.ads",
+      "sha256": "bdee8486b34f92fa01941740e2a5ccbabaf232881ed2d9e082bbc8ce3355bd08"
+    },
+    {
+      "path": "tests/src/lua-storage-conformance.adb",
+      "sha256": "b72933c54a580fba2bca39cddad6f8168a497d450287aefe279bc54e6a49ac1b"
+    },
+    {
+      "path": "references/lua/ltests.c",
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
+    },
+    {
+      "path": "references/lua/ltests.h",
+      "sha256": "6d2e3db39c58bdadc3a0aaf3ded12873e0b56ad898ce11a872717da72efb4829"
+    },
+    {
+      "path": "experiments/conformance/c/allocator_limit.h",
+      "sha256": "e0e43f716da5b4d8a9f109e07cee68f42a5d5dd28c5eb34fddd236b55fe5f118"
+    },
+    {
+      "path": "experiments/conformance/reference.gpr",
+      "sha256": "6c79ca4e821634be54685e72a159dc1afef528e13eeac1c59ef9fd4fcb24a676"
+    },
+    {
+      "path": "scripts/ManagedTelemetry.psm1",
+      "sha256": "cda5cebf49c22e5b1f37560e776bc1506db66ba78a1f4217a59c45b3a9ff4f3e"
+    }
+  ],
+  "findings": [
+    {
+      "id": "CEILING-REVIEW-001",
+      "disposition": "addressed-in-current-helper-and-independently-tested",
+      "finding": "The original Sidecar function selected a singleton name.telemetry.*.json without checking the newly generated run_id or actual child PID. Reusing an output directory could pair stale refusal/cleanup data with a new process.",
+      "correction": "Read-ConformanceAllocatorSidecar now requires the exact actual-PID filename, generated32hex run_id, PID/config identity, typed nonnegative measurements, selected cap, balanced shutdown and a raw-byte SHA. Independently read all22 meaningful data guards and ran byte-identical helper/test copies under the child worktree reports; all22 passed, with explicitly synthetic non-execution fixtures."
+    },
+    {
+      "id": "CEILING-SOURCE",
+      "disposition": "source-direction-supported",
+      "finding": "Requested_Ceiling accepts only absent/default2147483648 and the exact67108864 Heavy selector, rejects other spellings, and calls Set_Ceiling before Attach. Attach snapshots that real owner ceiling as Host_Limit; telemetry now serializes Host_Limit instead of a hardcoded2GiB value. Reversible T controls cannot remove the independently selected host ceiling."
+    },
+    {
+      "id": "REFUSAL-ROUTES",
+      "disposition": "source-direction-supported",
+      "finding": "Storage.Check_Growth can increment the real owner refusal count and raise Allocation_Error before any provider callback. Managed or provider refusal is therefore the correct meaningful acceptance predicate for the bounded80MiB protected request; requiring both would invent a provider event. The same allocation must succeed under2GiB, preserve its length/end bytes, and shut down balanced."
+    },
+    {
+      "id": "NATIVE-RETURN-OBSERVER",
+      "disposition": "source-direction-supported",
+      "finding": "Including ltests.h before the function-like rename preserves the public debug_realloc declaration and bare allocator pointer uses. The pinned definition becomes a statically declared original_debug_realloc body; the public wrapper returns its unchanged result and counts only positive-size NULL returns, never the expected NULL return from freeing a block. The separate backing-refusal counter retains its narrower meaning. Original ltests files are unchanged."
+    },
+    {
+      "id": "MEANINGFUL-C-PROBE",
+      "disposition": "source-direction-supported",
+      "finding": "The seven C controls exercise the actual allocator function/data identity and original T startup assertion, fail-next/count/byte refusals before backing allocation with all128 old bytes retained, one backing-cap refusal counted in both views, successful growth and freeing without refusal increments, and original zero-ownership teardown. The report explicitly leaves loaded_runtime_linkage_verified false; these controls do not certify final frozen-image linkage."
+    }
+  ],
+  "inspected_dated_observations": [
+    {
+      "path": "reports/allocator-ceiling/484e7f5d88084b36a2cfcea056c3a3de/result.json",
+      "sha256": "092d520bd8b73aecbb9d0b2aa6f2d91f3c18184ceb815781dc8f6d0f6c55407e",
+      "passing_acceptance_authority": false
+    },
+    {
+      "path": "reports/allocator-ceiling/8bc0fc0571ad43779a4bf87595acab65/result.json",
+      "sha256": "48ffa2f6df3cee93dab02ead93ba046e40d80faeb1aae054e12360fbad1863ee",
+      "passing_acceptance_authority": false
+    },
+    {
+      "path": "reports/native-allocator-observer/baf66373901941448f2449db759ded49/result.json",
+      "sha256": "5a5f5fef6089647ed62595ce0e8d9457ed125167d9df79e9fd981739c9a9e00f",
+      "passing_acceptance_authority": false
+    },
+    {
+      "path": "reports/exact-equivalent-review/heavy-4d4e0ee6cf74425c833106eeeb62f7b2/results.json",
+      "sha256": "cd7f2fcf896e6b14ca468c3cb0403b05529faf35bc17d6f6f816d2fd0fda5ed7",
+      "passing_acceptance_authority": false
+    },
+    {
+      "path": "reports/allocator-ceiling/be5672c6cd6f402e9155d683520f6224/result.json",
+      "sha256": "6e510a98cb5a25ac4eebc02c37d9bf7a87723a5987697ec5e88e09b6e73493ae",
+      "passing_acceptance_authority": false
+    },
+    {
+      "path": "reports/allocator-ceiling/68cb5a44d8f24406ba495a0a53d76c38/result.json",
+      "sha256": "a68929bf946035d825dc77f29fa794a78d86ce936f89bd4b9f1c6c054adeb64a",
+      "passing_acceptance_authority": false
+    }
+  ],
+  "independent_observation_checks": [
+    "Read both actual13-process reports: three valid selections, eight invalid spellings, real protected80MiB refusal under64MiB, identical allocation success under2GiB. Owner refusal1/provider0 is recorded truthfully; all five success sidecars in each configuration report0bytes/0blocks and completed balanced shutdown.",
+    "Independently replayed all ten captured success sidecars through the new identity helper using their actual PID/run_id and original recorded SHA; all identities matched. This is read-only reconciliation of existing observations, not a fresh13-process run after the helper correction.",
+    "Read the actual strict C7 stdout, compile/process records and source hashes. The seven named operations complete with exit0. No new compiler, Alire build or Lua/C execution was performed by this reviewer.",
+    "Read the fresh four-role Heavy report and independently checked stdout/stderr file hashes, child PID/telemetry identity and measured/requested64MiB. All four children exit0, actual nativeT reports managed2/backing0, Ada reports managed2/provider0 and approximately48.5MiB peak with0/0 shutdown. Native C retains its original progress bytes on stderr; raw C/Ada stdout is not asserted identical.",
+    "Independently executed the22 data-identity guards on hash-verified copies of the exact current helper/test script. Root files were read only. Missing/stale/PID/run/config/type/hash/ownership/ceiling/shutdown cases reject, preserving managed1/provider0 as distinct measurements.",
+    "Inspected committed a3447d2 diff and owning session, then verified Git blob bytes for all ten reviewed changed/new sources and nine context sources against the independently recorded WIP hashes: all19 match. No changed source was approved by an automatic hash replacement.",
+    "Read the final-helper be567(default) and68cb(instrumented)13-process reports and independently replayed their ten success sidecars with actual PID/run_id, declared configuration/limit and recorded SHA. These dated component observations remain separate from a final clean context build or matrix receipt."
+  ],
+  "remaining_requirements": [
+    "This source-only decision binds exactly the reviewed a3447d2 source bytes. Later source changes require explicit review; it supplies no runtime, exclusion, adaptation or matrix acceptance authority.",
+    "Fresh final-context builds and13-process/7-C controls must preserve actual revision, executable, library, source and raw-capture identities; the inspected dated component observations do not certify final build provenance.",
+    "Refresh the configured corpus and CLI14 pending source proposals only on the combined Root snapshot including the oracle and new adapter/fixture checkpoint, then recapture actual nativeT CLI operations against that runtime.",
+    "Final per-file/Heavy semantic contracts, all source/global obligations, complete frozen context matrix and PR review/merge acceptance remain separate and pending."
+  ],
+  "initial_review_source_snapshot": {
+    "repository_revision": "0570ce8e7d753aaad970f37f190b1861b985b9a9",
+    "repository_dirty": true,
+    "reviewed_source_is_uncommitted": true,
+    "final_implementation_commit": null
+  },
+  "final_commit_review": {
+    "commit": "a3447d226a26d363ced2a5045097a20f818ed3ea",
+    "reviewed_changed_source_count": 10,
+    "reviewed_context_source_count": 9,
+    "first_party_blob_count": 17,
+    "pinned_reference_blob_count": 2,
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+    "reference_gitlink_verified": true,
+    "all_previously_reviewed_bytes_match_commit": true,
+    "source_diff_reinspected": true,
+    "owning_session": "docs/sessions/2026-11-08-heavy-allocator-observation.md",
+    "runtime_acceptance": false,
+    "coverage_authority": false
+  }
+}

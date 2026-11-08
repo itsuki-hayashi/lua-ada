@@ -1,0 +1,635 @@
+{
+  "date": "2026-11-08",
+  "schema_version": 1,
+  "scope_limits": [
+    "Author-only proposed source classification; no record is installed in the production coverage/exclusion ledgers.",
+    "No execution result, original C observation, feature acceptance or independent approval is supplied.",
+    "All original helper call sites and closure arguments remain; opcode-only helper bodies do not execute intentionally invalid/infinite closures.",
+    "checkR executes f(p) and checks result and math.type exactly as before. checkK/checkI/checkF and checkints execution assertions remain byte-identical.",
+    "Public maximum-register successful load and oversized-load diagnostic remain, with only T.listcode wrapping and physical MOVE inspection removed.",
+    "Root must review inferred type/constant-folding/return-cardinality implications and retain or add consumer-level witnesses; removing private metadata checks does not certify those implications."
+  ],
+  "required_next_actions": [
+    "Independently review each proposed private span and all encompassing/aliased source obligations.",
+    "Complete the whole-file semantic inventory; this packet only classifies proposed exclusions and preserved static assertion calls.",
+    "Review checkK/checkI/checkF numeric-type implications against unchanged explicit public type coverage or add focused native/Ada runtime counterparts.",
+    "Review RETURN0/RETURN1 cardinality implications against explicit calls/vararg runtime witnesses; never execute opcode-only closures indiscriminately because some intentionally error or loop forever.",
+    "Install independently approved source exclusions, rebind the transform to the final policy hash, and approve exact patch bytes separately.",
+    "Execute original instrumented C and reviewed derived Ada programs in every applicable context, preserving final output, code/API and allocator evidence."
+  ],
+  "proposed_obligations": [
+    {
+      "status": "pending",
+      "byte_length": 143,
+      "anchor_sha256": "26aad09cfda55023d09d73d23353c892cb5e19ba423488629606efc828ddf3fd",
+      "proposed_exclusion": {
+        "module_observable": false,
+        "eligibility": "t-only-private-invariant",
+        "byte_offset": 800,
+        "invariant": "Exact C constant-table cardinality, order, deduplication and stored metadata types",
+        "evidence": [],
+        "public_api": false,
+        "review": {
+          "status": "pending",
+          "author": "Codex /root/validation_delivery",
+          "artifact_sha256": null,
+          "reviewer": null,
+          "artifact": null
+        },
+        "byte_length": 143,
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050",
+          "mode": "absent-return",
+          "byte_length": 104,
+          "byte_offset": 83
+        },
+        "id": "LUA-CODE-REVIEWED-BLOCK-9001",
+        "status": "excluded",
+        "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+        "anchor_sha256": "26aad09cfda55023d09d73d23353c892cb5e19ba423488629606efc828ddf3fd",
+        "disposition": "reviewed-t-internal-exclusion",
+        "mixed_obligation": false,
+        "third_party_irrelevance": "T.listk exposes optimizer/prototype storage, not a module-facing API. Keep all callers and independent actual execution assertions; review implied numeric-type obligations separately.",
+        "source": "code.lua"
+      },
+      "disposition": "pending",
+      "byte_offset": 800,
+      "kind": "reviewed-block",
+      "review": null,
+      "configurations": [],
+      "author_reason": "T.listk exposes optimizer/prototype storage, not a module-facing API. Keep all callers and independent actual execution assertions; review implied numeric-type obligations separately.",
+      "id": "LUA-CODE-REVIEWED-BLOCK-9001",
+      "end_line": 45,
+      "invariant": null,
+      "evidence": [],
+      "line": 40
+    },
+    {
+      "status": "pending",
+      "byte_length": 205,
+      "anchor_sha256": "41b6d2b52bb8f3f0d16dc0cf595c5fd6a4ca1b124b16b1bef028a1dda5f27f6b",
+      "proposed_exclusion": {
+        "module_observable": false,
+        "eligibility": "t-only-private-invariant",
+        "byte_offset": 1808,
+        "invariant": "C optimizer-specific opcode sequence and length",
+        "evidence": [],
+        "public_api": false,
+        "review": {
+          "status": "pending",
+          "author": "Codex /root/validation_delivery",
+          "artifact_sha256": null,
+          "reviewer": null,
+          "artifact": null
+        },
+        "byte_length": 205,
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050",
+          "mode": "absent-return",
+          "byte_length": 104,
+          "byte_offset": 83
+        },
+        "id": "LUA-CODE-REVIEWED-BLOCK-9002",
+        "status": "excluded",
+        "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+        "anchor_sha256": "41b6d2b52bb8f3f0d16dc0cf595c5fd6a4ca1b124b16b1bef028a1dda5f27f6b",
+        "disposition": "reviewed-t-internal-exclusion",
+        "mixed_obligation": false,
+        "third_party_irrelevance": "The helper only inspects supplied closures; it never executes them. Keeping it as an explicit empty helper preserves all caller argument construction and avoids executing intentionally invalid/infinite functions. checkR continues to execute its function and assert value and numeric type.",
+        "source": "code.lua"
+      },
+      "disposition": "pending",
+      "byte_offset": 1808,
+      "kind": "reviewed-block",
+      "review": null,
+      "configurations": [],
+      "author_reason": "The helper only inspects supplied closures; it never executes them. Keeping it as an explicit empty helper preserves all caller argument construction and avoids executing intentionally invalid/infinite functions. checkR continues to execute its function and assert value and numeric type.",
+      "id": "LUA-CODE-REVIEWED-BLOCK-9002",
+      "end_line": 100,
+      "invariant": null,
+      "evidence": [],
+      "line": 92
+    },
+    {
+      "status": "pending",
+      "byte_length": 239,
+      "anchor_sha256": "5b3ddc7feef1ddadfa4a18c2526a31ced0495324141bde683ac399700a67e762",
+      "proposed_exclusion": {
+        "module_observable": false,
+        "eligibility": "t-only-private-invariant",
+        "byte_offset": 2288,
+        "invariant": "Equality of two C opcode streams after stripping line numbers",
+        "evidence": [],
+        "public_api": false,
+        "review": {
+          "status": "pending",
+          "author": "Codex /root/validation_delivery",
+          "artifact_sha256": null,
+          "reviewer": null,
+          "artifact": null
+        },
+        "byte_length": 239,
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050",
+          "mode": "absent-return",
+          "byte_length": 104,
+          "byte_offset": 83
+        },
+        "id": "LUA-CODE-REVIEWED-BLOCK-9003",
+        "status": "excluded",
+        "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+        "anchor_sha256": "5b3ddc7feef1ddadfa4a18c2526a31ced0495324141bde683ac399700a67e762",
+        "disposition": "reviewed-t-internal-exclusion",
+        "mixed_obligation": false,
+        "third_party_irrelevance": "Instruction-stream equality is optimizer-specific. Both closure arguments still compile; no supplied closure was executed by this inspection helper.",
+        "source": "code.lua"
+      },
+      "disposition": "pending",
+      "byte_offset": 2288,
+      "kind": "reviewed-block",
+      "review": null,
+      "configurations": [],
+      "author_reason": "Instruction-stream equality is optimizer-specific. Both closure arguments still compile; no supplied closure was executed by this inspection helper.",
+      "id": "LUA-CODE-REVIEWED-BLOCK-9003",
+      "end_line": 121,
+      "invariant": null,
+      "evidence": [],
+      "line": 113
+    },
+    {
+      "status": "pending",
+      "byte_length": 32,
+      "anchor_sha256": "13c9570d19cf580345c831907370413a0a9b7c0c3d39f7b6660459373cd8e8af",
+      "proposed_exclusion": {
+        "module_observable": false,
+        "eligibility": "t-only-private-invariant",
+        "byte_offset": 13327,
+        "invariant": "Outer f1 prototype stores no private string constant",
+        "evidence": [],
+        "public_api": false,
+        "review": {
+          "status": "pending",
+          "author": "Codex /root/validation_delivery",
+          "artifact_sha256": null,
+          "reviewer": null,
+          "artifact": null
+        },
+        "byte_length": 32,
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050",
+          "mode": "absent-return",
+          "byte_length": 104,
+          "byte_offset": 83
+        },
+        "id": "LUA-CODE-REVIEWED-BLOCK-9004",
+        "status": "excluded",
+        "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+        "anchor_sha256": "13c9570d19cf580345c831907370413a0a9b7c0c3d39f7b6660459373cd8e8af",
+        "disposition": "reviewed-t-internal-exclusion",
+        "mixed_obligation": false,
+        "third_party_irrelevance": "String placement among prototype constant arrays is internal. Keep f3() == k0, checkK(f3,k0), and all closure construction.",
+        "source": "code.lua"
+      },
+      "disposition": "pending",
+      "byte_offset": 13327,
+      "kind": "reviewed-block",
+      "review": null,
+      "configurations": [],
+      "author_reason": "String placement among prototype constant arrays is internal. Keep f3() == k0, checkK(f3,k0), and all closure construction.",
+      "id": "LUA-CODE-REVIEWED-BLOCK-9004",
+      "end_line": 456,
+      "invariant": null,
+      "evidence": [],
+      "line": 455
+    },
+    {
+      "status": "pending",
+      "byte_length": 32,
+      "anchor_sha256": "4b1b8301af5f0f06a693bc66df7fa421860fdf06c9821e447ae6d4af791d8907",
+      "proposed_exclusion": {
+        "module_observable": false,
+        "eligibility": "t-only-private-invariant",
+        "byte_offset": 13359,
+        "invariant": "Middle f2 prototype stores no private string constant",
+        "evidence": [],
+        "public_api": false,
+        "review": {
+          "status": "pending",
+          "author": "Codex /root/validation_delivery",
+          "artifact_sha256": null,
+          "reviewer": null,
+          "artifact": null
+        },
+        "byte_length": 32,
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050",
+          "mode": "absent-return",
+          "byte_length": 104,
+          "byte_offset": 83
+        },
+        "id": "LUA-CODE-REVIEWED-BLOCK-9005",
+        "status": "excluded",
+        "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+        "anchor_sha256": "4b1b8301af5f0f06a693bc66df7fa421860fdf06c9821e447ae6d4af791d8907",
+        "disposition": "reviewed-t-internal-exclusion",
+        "mixed_obligation": false,
+        "third_party_irrelevance": "String placement among prototype constant arrays is internal. Keep actual nested closure results and captures unchanged.",
+        "source": "code.lua"
+      },
+      "disposition": "pending",
+      "byte_offset": 13359,
+      "kind": "reviewed-block",
+      "review": null,
+      "configurations": [],
+      "author_reason": "String placement among prototype constant arrays is internal. Keep actual nested closure results and captures unchanged.",
+      "id": "LUA-CODE-REVIEWED-BLOCK-9005",
+      "end_line": 457,
+      "invariant": null,
+      "evidence": [],
+      "line": 456
+    },
+    {
+      "status": "pending",
+      "byte_length": 10,
+      "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+      "proposed_exclusion": {
+        "module_observable": false,
+        "eligibility": "t-only-private-invariant",
+        "byte_offset": 13587,
+        "invariant": "Obtain the private opcode list for the maximum-register probe",
+        "evidence": [],
+        "public_api": false,
+        "review": {
+          "status": "pending",
+          "author": "Codex /root/validation_delivery",
+          "artifact_sha256": null,
+          "reviewer": null,
+          "artifact": null
+        },
+        "byte_length": 10,
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050",
+          "mode": "absent-return",
+          "byte_length": 104,
+          "byte_offset": 83
+        },
+        "id": "LUA-CODE-REVIEWED-BLOCK-9006",
+        "status": "excluded",
+        "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+        "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+        "disposition": "reviewed-t-internal-exclusion",
+        "mixed_obligation": false,
+        "third_party_irrelevance": "Remove only the T.listcode identifier, leaving local prog = (assert(load(source))) verbatim around the original public successful compilation. No load/assert expression is removed.",
+        "source": "code.lua"
+      },
+      "disposition": "pending",
+      "byte_offset": 13587,
+      "kind": "reviewed-block",
+      "review": null,
+      "configurations": [],
+      "author_reason": "Remove only the T.listcode identifier, leaving local prog = (assert(load(source))) verbatim around the original public successful compilation. No load/assert expression is removed.",
+      "id": "LUA-CODE-REVIEWED-BLOCK-9006",
+      "end_line": 463,
+      "invariant": null,
+      "evidence": [],
+      "line": 463
+    },
+    {
+      "status": "pending",
+      "byte_length": 79,
+      "anchor_sha256": "120c5699b24c0b9102eded9963b92049e2d0f8213c5c43d77a64dc7dd3ecdac9",
+      "proposed_exclusion": {
+        "module_observable": false,
+        "eligibility": "t-only-private-invariant",
+        "byte_offset": 13655,
+        "invariant": "Exact MOVE stream and physical register numbers 1 through 254",
+        "evidence": [],
+        "public_api": false,
+        "review": {
+          "status": "pending",
+          "author": "Codex /root/validation_delivery",
+          "artifact_sha256": null,
+          "reviewer": null,
+          "artifact": null
+        },
+        "byte_length": 79,
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050",
+          "mode": "absent-return",
+          "byte_length": 104,
+          "byte_offset": 83
+        },
+        "id": "LUA-CODE-REVIEWED-BLOCK-9007",
+        "status": "excluded",
+        "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+        "anchor_sha256": "120c5699b24c0b9102eded9963b92049e2d0f8213c5c43d77a64dc7dd3ecdac9",
+        "disposition": "reviewed-t-internal-exclusion",
+        "mixed_obligation": false,
+        "third_party_irrelevance": "Keep successful compilation above and the next oversized source load plus too-many-registers diagnostic assertion below. Only physical stream inspection is removed.",
+        "source": "code.lua"
+      },
+      "disposition": "pending",
+      "byte_offset": 13655,
+      "kind": "reviewed-block",
+      "review": null,
+      "configurations": [],
+      "author_reason": "Keep successful compilation above and the next oversized source load plus too-many-registers diagnostic assertion below. Only physical stream inspection is removed.",
+      "id": "LUA-CODE-REVIEWED-BLOCK-9007",
+      "end_line": 468,
+      "invariant": null,
+      "evidence": [],
+      "line": 465
+    },
+    {
+      "status": "pending",
+      "byte_length": 175,
+      "anchor_sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6",
+      "proposed_exclusion": {
+        "module_observable": false,
+        "eligibility": "t-only-private-invariant",
+        "byte_offset": 14141,
+        "invariant": "Exactly one SETLIST instruction for a 50-element constructor",
+        "evidence": [],
+        "public_api": false,
+        "review": {
+          "status": "pending",
+          "author": "Codex /root/validation_delivery",
+          "artifact_sha256": null,
+          "reviewer": null,
+          "artifact": null
+        },
+        "byte_length": 175,
+        "configurations": [
+          "upstream-test"
+        ],
+        "t_guard": {
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050",
+          "mode": "absent-return",
+          "byte_length": 104,
+          "byte_offset": 83
+        },
+        "id": "LUA-CODE-REVIEWED-BLOCK-9008",
+        "status": "excluded",
+        "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+        "anchor_sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6",
+        "disposition": "reviewed-t-internal-exclusion",
+        "mixed_obligation": false,
+        "third_party_irrelevance": "Keep the generated source and assert(load(source)) unchanged. The count of C optimizer instructions is not the public constructor result; consumer table behavior remains a separate required obligation.",
+        "source": "code.lua"
+      },
+      "disposition": "pending",
+      "byte_offset": 14141,
+      "kind": "reviewed-block",
+      "review": null,
+      "configurations": [],
+      "author_reason": "Keep the generated source and assert(load(source)) unchanged. The count of C optimizer instructions is not the public constructor result; consumer table behavior remains a separate required obligation.",
+      "id": "LUA-CODE-REVIEWED-BLOCK-9008",
+      "end_line": 483,
+      "invariant": null,
+      "evidence": [],
+      "line": 479
+    }
+  ],
+  "coverage_authority": false,
+  "preserved_checkR": {
+    "generated_byte_offset": 1872,
+    "runtime_acceptance": false,
+    "original_span": {
+      "anchor_sha256": "05c57a068e599e92d432be7ba843cb49ba42e63cfd97ac1a320372c1f1aadfa8",
+      "byte_length": 126,
+      "end_line": 108,
+      "line": 104,
+      "byte_offset": 2079
+    },
+    "identical_bytes": true
+  },
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "runtime_acceptance": false,
+  "independent_review_status": "pending",
+  "kind": "code-private-optimizer-author-proposal",
+  "generated_sha256": "676304c019ee3afe8796da7ddfaf8f14cba43c2c49332d96f19b3f4c84211fe0",
+  "target": "remaining-upstream-compatibility",
+  "preserved_public_assertions": [
+    {
+      "generated_byte_offset": 492,
+      "line": 21,
+      "original_byte_offset": 492,
+      "sha256": "0ab267a6e190fc54332e84a6fbacc972b5e1de0fc64735207ebf3603b9fd15ab",
+      "byte_length": 15,
+      "runtime_acceptance": false,
+      "identical_bytes": true,
+      "runtime_evidence": [],
+      "id": "LUA-CODE-ASSERT-CALL-0001"
+    },
+    {
+      "generated_byte_offset": 1929,
+      "line": 106,
+      "original_byte_offset": 2136,
+      "sha256": "3f5d06abf7963ee1301d47577af99606a6e3ac591b965a8fdb37dcef03e0e457",
+      "byte_length": 49,
+      "runtime_acceptance": false,
+      "identical_bytes": true,
+      "runtime_evidence": [],
+      "id": "LUA-CODE-ASSERT-CALL-0006"
+    },
+    {
+      "generated_byte_offset": 2930,
+      "line": 153,
+      "original_byte_offset": 3295,
+      "sha256": "ede6ec0b963b4969449990b2eab96e95e725b9dbf3eaa68b47c810967fb677db",
+      "byte_length": 55,
+      "runtime_acceptance": false,
+      "identical_bytes": true,
+      "runtime_evidence": [],
+      "id": "LUA-CODE-ASSERT-CALL-0009"
+    },
+    {
+      "generated_byte_offset": 6170,
+      "line": 277,
+      "original_byte_offset": 6535,
+      "sha256": "b5afa4431cb6cba611b27e0960370baa0e2f52c997a8a6348cdccc30b425d805",
+      "byte_length": 21,
+      "runtime_acceptance": false,
+      "identical_bytes": true,
+      "runtime_evidence": [],
+      "id": "LUA-CODE-ASSERT-CALL-0010"
+    },
+    {
+      "generated_byte_offset": 6290,
+      "line": 283,
+      "original_byte_offset": 6655,
+      "sha256": "b5afa4431cb6cba611b27e0960370baa0e2f52c997a8a6348cdccc30b425d805",
+      "byte_length": 21,
+      "runtime_acceptance": false,
+      "identical_bytes": true,
+      "runtime_evidence": [],
+      "id": "LUA-CODE-ASSERT-CALL-0011"
+    },
+    {
+      "generated_byte_offset": 6410,
+      "line": 289,
+      "original_byte_offset": 6775,
+      "sha256": "b5afa4431cb6cba611b27e0960370baa0e2f52c997a8a6348cdccc30b425d805",
+      "byte_length": 21,
+      "runtime_acceptance": false,
+      "identical_bytes": true,
+      "runtime_evidence": [],
+      "id": "LUA-CODE-ASSERT-CALL-0012"
+    },
+    {
+      "generated_byte_offset": 12881,
+      "line": 452,
+      "original_byte_offset": 13246,
+      "sha256": "f57c14f32f1821594c6b21137e6449676cf3dfe8da94bd67179881b4dc5a6339",
+      "byte_length": 18,
+      "runtime_acceptance": false,
+      "identical_bytes": true,
+      "runtime_evidence": [],
+      "id": "LUA-CODE-ASSERT-CALL-0013"
+    },
+    {
+      "generated_byte_offset": 13306,
+      "line": 463,
+      "original_byte_offset": 13598,
+      "sha256": "9f4ec9621b1620b4a43a3cf6c7bbe989f6048578a774d1bb0ab19a4655879fad",
+      "byte_length": 20,
+      "runtime_acceptance": false,
+      "identical_bytes": true,
+      "runtime_evidence": [],
+      "id": "LUA-CODE-ASSERT-CALL-0016"
+    },
+    {
+      "generated_byte_offset": 13595,
+      "line": 471,
+      "original_byte_offset": 13903,
+      "sha256": "2a3a588a6625da1fc36021fa03620a2c9de695d2fe1dfa364095ad1690f0802c",
+      "byte_length": 46,
+      "runtime_acceptance": false,
+      "identical_bytes": true,
+      "runtime_evidence": [],
+      "id": "LUA-CODE-ASSERT-CALL-0018"
+    },
+    {
+      "generated_byte_offset": 13812,
+      "line": 478,
+      "original_byte_offset": 14120,
+      "sha256": "9f4ec9621b1620b4a43a3cf6c7bbe989f6048578a774d1bb0ab19a4655879fad",
+      "byte_length": 20,
+      "runtime_acceptance": false,
+      "identical_bytes": true,
+      "runtime_evidence": [],
+      "id": "LUA-CODE-ASSERT-CALL-0019"
+    },
+    {
+      "generated_byte_offset": 14085,
+      "line": 490,
+      "original_byte_offset": 14501,
+      "sha256": "9f4ec9621b1620b4a43a3cf6c7bbe989f6048578a774d1bb0ab19a4655879fad",
+      "byte_length": 20,
+      "runtime_acceptance": false,
+      "identical_bytes": true,
+      "runtime_evidence": [],
+      "id": "LUA-CODE-ASSERT-CALL-0021"
+    },
+    {
+      "generated_byte_offset": 14133,
+      "line": 492,
+      "original_byte_offset": 14549,
+      "sha256": "0d965c0ccbbce409a78aa8962f316564242f488ed67f0b08a629b04715c71544",
+      "byte_length": 16,
+      "runtime_acceptance": false,
+      "identical_bytes": true,
+      "runtime_evidence": [],
+      "id": "LUA-CODE-ASSERT-CALL-0022"
+    },
+    {
+      "generated_byte_offset": 14183,
+      "line": 494,
+      "original_byte_offset": 14599,
+      "sha256": "0d965c0ccbbce409a78aa8962f316564242f488ed67f0b08a629b04715c71544",
+      "byte_length": 16,
+      "runtime_acceptance": false,
+      "identical_bytes": true,
+      "runtime_evidence": [],
+      "id": "LUA-CODE-ASSERT-CALL-0023"
+    }
+  ],
+  "private_assertion_reference_proposals": [
+    {
+      "id": "LUA-CODE-ASSERT-CALL-0002",
+      "status": "pending-independent-review",
+      "proposed_runtime_obligation": "LUA-CODE-REVIEWED-BLOCK-9001"
+    },
+    {
+      "id": "LUA-CODE-ASSERT-CALL-0003",
+      "status": "pending-independent-review",
+      "proposed_runtime_obligation": "LUA-CODE-REVIEWED-BLOCK-9001"
+    },
+    {
+      "id": "LUA-CODE-ASSERT-CALL-0004",
+      "status": "pending-independent-review",
+      "proposed_runtime_obligation": "LUA-CODE-REVIEWED-BLOCK-9002"
+    },
+    {
+      "id": "LUA-CODE-ASSERT-CALL-0005",
+      "status": "pending-independent-review",
+      "proposed_runtime_obligation": "LUA-CODE-REVIEWED-BLOCK-9002"
+    },
+    {
+      "id": "LUA-CODE-ASSERT-CALL-0007",
+      "status": "pending-independent-review",
+      "proposed_runtime_obligation": "LUA-CODE-REVIEWED-BLOCK-9003"
+    },
+    {
+      "id": "LUA-CODE-ASSERT-CALL-0008",
+      "status": "pending-independent-review",
+      "proposed_runtime_obligation": "LUA-CODE-REVIEWED-BLOCK-9003"
+    },
+    {
+      "id": "LUA-CODE-ASSERT-CALL-0014",
+      "status": "pending-independent-review",
+      "proposed_runtime_obligation": "LUA-CODE-REVIEWED-BLOCK-9004"
+    },
+    {
+      "id": "LUA-CODE-ASSERT-CALL-0015",
+      "status": "pending-independent-review",
+      "proposed_runtime_obligation": "LUA-CODE-REVIEWED-BLOCK-9005"
+    },
+    {
+      "id": "LUA-CODE-ASSERT-CALL-0017",
+      "status": "pending-independent-review",
+      "proposed_runtime_obligation": "LUA-CODE-REVIEWED-BLOCK-9007"
+    },
+    {
+      "id": "LUA-CODE-ASSERT-CALL-0020",
+      "status": "pending-independent-review",
+      "proposed_runtime_obligation": "LUA-CODE-REVIEWED-BLOCK-9008"
+    }
+  ],
+  "source": {
+    "sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+    "path": "references/lua/testes/code.lua"
+  },
+  "author": "Codex /root/validation_delivery"
+}

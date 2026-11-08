@@ -1,6 +1,7 @@
 with Lua.Conformance_Adapter;
 with Ada.Text_IO;
 with Ada.Characters.Handling;
+with Ada.Environment_Variables;
 with Interfaces.C;
 with Interfaces.C.Strings;
 with Lua_Ada_Config;
@@ -77,6 +78,31 @@ package body Lua.Sessions.Conformance is
    end Print_Configuration;
 
    procedure Configure (Universe : in out Session) is
+      function Requested_Ceiling return Lua.Storage.Byte_Count;
+      function Requested_Ceiling return Lua.Storage.Byte_Count is
+      begin
+         --  This is the test process's independently enforced host ceiling,
+         --  not T.totalmem's reversible fault-injection limit. Accept only
+         --  the two canonical decimal limits in the acceptance contract;
+         --  malformed/unsupported configuration must not silently use2GiB.
+         if not Ada.Environment_Variables.Exists
+           ("LUA_ADA_CONFORMANCE_ALLOCATOR")
+         then
+            return 2_147_483_648;
+         end if;
+         declare
+            Text : constant String := Ada.Environment_Variables.Value
+              ("LUA_ADA_CONFORMANCE_ALLOCATOR");
+         begin
+            if Text = "2147483648" then
+               return 2_147_483_648;
+            elsif Text = "67108864" then
+               return 67_108_864;
+            end if;
+         end;
+         raise Program_Error with "invalid conformance allocator ceiling";
+      end Requested_Ceiling;
+
       procedure Install (Configuration : String);
       procedure Install (Configuration : String) is
       begin
@@ -94,7 +120,7 @@ package body Lua.Sessions.Conformance is
          end if;
       end Install;
    begin
-      Lua.Storage.Set_Ceiling (Universe.State.Memory, 2_147_483_648);
+      Lua.Storage.Set_Ceiling (Universe.State.Memory, Requested_Ceiling);
       Lua.Conformance_Allocator.Attach
         (Lua.Storage.Reference (Universe.State.Memory));
       Lua.Conformance_Adapter.Install_Platform (Universe.State.all);

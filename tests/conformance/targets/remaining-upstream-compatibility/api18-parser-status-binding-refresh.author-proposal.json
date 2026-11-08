@@ -1,0 +1,905 @@
+{
+  "schema_version": 1,
+  "kind": "source-binding-refresh-author-proposal",
+  "id": "api18-parser-status-bindings-f8d8f02",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "review_status": "pending-independent-review",
+  "independent_reviewer": null,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "authority_installation": false,
+  "source_snapshot": {
+    "repository_revision": "7f0a50b5288feb05dddaf37ce27e58ae80d75d85",
+    "header_commit": "f8d8f0275084e0039c27e597a64430db404bf20c",
+    "proposal_scope": "committed-header-binding-change-only",
+    "parser_commit_also_changes_runtime": true,
+    "runtime_pool_wip_included": false
+  },
+  "header_delta": {
+    "path": "c_api/tests/load_dump_contract.h",
+    "previous_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989",
+    "committed_sha256": "f8d056b921b31b72566978aed8a19226ce06029c81bd349d0c2051c5b92e2c0c",
+    "unchanged_named_function_bodies": [
+      {
+        "name": "test_binary_reader_every_split",
+        "sha256": "abaf4abfa2429b45fdb974f4f703bec67e7ebdc55c9cc5b19164424c87ff10fe",
+        "old_span": {
+          "name": "test_binary_reader_every_split",
+          "byte_offset": 28007,
+          "byte_length": 1148,
+          "sha256": "abaf4abfa2429b45fdb974f4f703bec67e7ebdc55c9cc5b19164424c87ff10fe"
+        },
+        "current_span": {
+          "name": "test_binary_reader_every_split",
+          "byte_offset": 28007,
+          "byte_length": 1148,
+          "sha256": "abaf4abfa2429b45fdb974f4f703bec67e7ebdc55c9cc5b19164424c87ff10fe"
+        }
+      },
+      {
+        "name": "test_binary_reader_failure_boundaries",
+        "sha256": "e2932917905741f5d460ae34b0cdd2910fdbcb093f20c806a87d86d0d03dae81",
+        "old_span": {
+          "name": "test_binary_reader_failure_boundaries",
+          "byte_offset": 17049,
+          "byte_length": 1754,
+          "sha256": "e2932917905741f5d460ae34b0cdd2910fdbcb093f20c806a87d86d0d03dae81"
+        },
+        "current_span": {
+          "name": "test_binary_reader_failure_boundaries",
+          "byte_offset": 17049,
+          "byte_length": 1754,
+          "sha256": "e2932917905741f5d460ae34b0cdd2910fdbcb093f20c806a87d86d0d03dae81"
+        }
+      },
+      {
+        "name": "test_dump_round_trip",
+        "sha256": "0a18f49da8f0a1349d421f51bf5e303569b9e89267997965a4ecf648791b7c47",
+        "old_span": {
+          "name": "test_dump_round_trip",
+          "byte_offset": 9803,
+          "byte_length": 1438,
+          "sha256": "0a18f49da8f0a1349d421f51bf5e303569b9e89267997965a4ecf648791b7c47"
+        },
+        "current_span": {
+          "name": "test_dump_round_trip",
+          "byte_offset": 9803,
+          "byte_length": 1438,
+          "sha256": "0a18f49da8f0a1349d421f51bf5e303569b9e89267997965a4ecf648791b7c47"
+        }
+      },
+      {
+        "name": "test_dump_terminal_status",
+        "sha256": "29ac4ba9e21f525de9d234fe5368383df24e36158d2393e33c62a89713f9470f",
+        "old_span": {
+          "name": "test_dump_terminal_status",
+          "byte_offset": 12632,
+          "byte_length": 620,
+          "sha256": "29ac4ba9e21f525de9d234fe5368383df24e36158d2393e33c62a89713f9470f"
+        },
+        "current_span": {
+          "name": "test_dump_terminal_status",
+          "byte_offset": 12632,
+          "byte_length": 620,
+          "sha256": "29ac4ba9e21f525de9d234fe5368383df24e36158d2393e33c62a89713f9470f"
+        }
+      },
+      {
+        "name": "test_dump_writer_error_identity",
+        "sha256": "4b2aba28bd0a7561715140edb00698115e2dbb88baa036c71fa50e0c62cdca9e",
+        "old_span": {
+          "name": "test_dump_writer_error_identity",
+          "byte_offset": 13546,
+          "byte_length": 532,
+          "sha256": "4b2aba28bd0a7561715140edb00698115e2dbb88baa036c71fa50e0c62cdca9e"
+        },
+        "current_span": {
+          "name": "test_dump_writer_error_identity",
+          "byte_offset": 13546,
+          "byte_length": 532,
+          "sha256": "4b2aba28bd0a7561715140edb00698115e2dbb88baa036c71fa50e0c62cdca9e"
+        }
+      },
+      {
+        "name": "test_dump_writer_stack_and_terminal",
+        "sha256": "fbae48b776b501638d1c9888bd6fffd35e3b0ab6904fb1df126d6f58fedee137",
+        "old_span": {
+          "name": "test_dump_writer_stack_and_terminal",
+          "byte_offset": 11243,
+          "byte_length": 757,
+          "sha256": "fbae48b776b501638d1c9888bd6fffd35e3b0ab6904fb1df126d6f58fedee137"
+        },
+        "current_span": {
+          "name": "test_dump_writer_stack_and_terminal",
+          "byte_offset": 11243,
+          "byte_length": 757,
+          "sha256": "fbae48b776b501638d1c9888bd6fffd35e3b0ab6904fb1df126d6f58fedee137"
+        }
+      },
+      {
+        "name": "test_dump_writer_stops_on_status",
+        "sha256": "16a9e81bf1bc21d4ff452b4baca68f8b62df1ef74590b4c8d13c9e65f98a5242",
+        "old_span": {
+          "name": "test_dump_writer_stops_on_status",
+          "byte_offset": 12002,
+          "byte_length": 628,
+          "sha256": "16a9e81bf1bc21d4ff452b4baca68f8b62df1ef74590b4c8d13c9e65f98a5242"
+        },
+        "current_span": {
+          "name": "test_dump_writer_stops_on_status",
+          "byte_offset": 12002,
+          "byte_length": 628,
+          "sha256": "16a9e81bf1bc21d4ff452b4baca68f8b62df1ef74590b4c8d13c9e65f98a5242"
+        }
+      },
+      {
+        "name": "test_fixed_binary_piece_requirements",
+        "sha256": "7234145861359e2e20055dc3e947ddbb2118df28d12c90cc200f9edb731a5fac",
+        "old_span": {
+          "name": "test_fixed_binary_piece_requirements",
+          "byte_offset": 29157,
+          "byte_length": 1400,
+          "sha256": "7234145861359e2e20055dc3e947ddbb2118df28d12c90cc200f9edb731a5fac"
+        },
+        "current_span": {
+          "name": "test_fixed_binary_piece_requirements",
+          "byte_offset": 29157,
+          "byte_length": 1400,
+          "sha256": "7234145861359e2e20055dc3e947ddbb2118df28d12c90cc200f9edb731a5fac"
+        }
+      },
+      {
+        "name": "test_fixed_binary_reader_count",
+        "sha256": "f1eb5e9709d400a563c2c9c9faf65b51d6e43fda676a79038eaae5106b5c2848",
+        "old_span": {
+          "name": "test_fixed_binary_reader_count",
+          "byte_offset": 16176,
+          "byte_length": 871,
+          "sha256": "f1eb5e9709d400a563c2c9c9faf65b51d6e43fda676a79038eaae5106b5c2848"
+        },
+        "current_span": {
+          "name": "test_fixed_binary_reader_count",
+          "byte_offset": 16176,
+          "byte_length": 871,
+          "sha256": "f1eb5e9709d400a563c2c9c9faf65b51d6e43fda676a79038eaae5106b5c2848"
+        }
+      },
+      {
+        "name": "test_partial_binary_reader_error_cleanup",
+        "sha256": "f35736e6865d844a103e43842ca16e94dc1ad9a2fe01d3bd0953ccd93792a4aa",
+        "old_span": {
+          "name": "test_partial_binary_reader_error_cleanup",
+          "byte_offset": 30559,
+          "byte_length": 1121,
+          "sha256": "f35736e6865d844a103e43842ca16e94dc1ad9a2fe01d3bd0953ccd93792a4aa"
+        },
+        "current_span": {
+          "name": "test_partial_binary_reader_error_cleanup",
+          "byte_offset": 30559,
+          "byte_length": 1121,
+          "sha256": "f35736e6865d844a103e43842ca16e94dc1ad9a2fe01d3bd0953ccd93792a4aa"
+        }
+      },
+      {
+        "name": "test_reader_allocation_refusal",
+        "sha256": "2fd933b0483cec2ed6ada80895be49a25cba4af6bc834ebd271b4f36bddae09f",
+        "old_span": {
+          "name": "test_reader_allocation_refusal",
+          "byte_offset": 14665,
+          "byte_length": 1162,
+          "sha256": "2fd933b0483cec2ed6ada80895be49a25cba4af6bc834ebd271b4f36bddae09f"
+        },
+        "current_span": {
+          "name": "test_reader_allocation_refusal",
+          "byte_offset": 14665,
+          "byte_length": 1162,
+          "sha256": "2fd933b0483cec2ed6ada80895be49a25cba4af6bc834ebd271b4f36bddae09f"
+        }
+      },
+      {
+        "name": "test_reader_avoids_prefix_reconstruction",
+        "sha256": "50b58914196ee7a2af40e36f11e091ae19a1f5997ac634177557ccb3c2714b62",
+        "old_span": {
+          "name": "test_reader_avoids_prefix_reconstruction",
+          "byte_offset": 32101,
+          "byte_length": 905,
+          "sha256": "50b58914196ee7a2af40e36f11e091ae19a1f5997ac634177557ccb3c2714b62"
+        },
+        "current_span": {
+          "name": "test_reader_avoids_prefix_reconstruction",
+          "byte_offset": 32101,
+          "byte_length": 905,
+          "sha256": "50b58914196ee7a2af40e36f11e091ae19a1f5997ac634177557ccb3c2714b62"
+        }
+      },
+      {
+        "name": "test_reader_delimiter_boundaries",
+        "sha256": "3ef619a58160d1875ceabbeb99698458602b71dbb3f9ca222c23544672724e2d",
+        "old_span": {
+          "name": "test_reader_delimiter_boundaries",
+          "byte_offset": 24012,
+          "byte_length": 815,
+          "sha256": "3ef619a58160d1875ceabbeb99698458602b71dbb3f9ca222c23544672724e2d"
+        },
+        "current_span": {
+          "name": "test_reader_delimiter_boundaries",
+          "byte_offset": 24012,
+          "byte_length": 815,
+          "sha256": "3ef619a58160d1875ceabbeb99698458602b71dbb3f9ca222c23544672724e2d"
+        }
+      },
+      {
+        "name": "test_reader_end_conditions",
+        "sha256": "6f2ec48dc2a28884c82b2fba7441f4ad11d8cb7af36d36ea9c16489af846cd5b",
+        "old_span": {
+          "name": "test_reader_end_conditions",
+          "byte_offset": 5495,
+          "byte_length": 728,
+          "sha256": "6f2ec48dc2a28884c82b2fba7441f4ad11d8cb7af36d36ea9c16489af846cd5b"
+        },
+        "current_span": {
+          "name": "test_reader_end_conditions",
+          "byte_offset": 5495,
+          "byte_length": 728,
+          "sha256": "6f2ec48dc2a28884c82b2fba7441f4ad11d8cb7af36d36ea9c16489af846cd5b"
+        }
+      },
+      {
+        "name": "test_reader_error_identity",
+        "sha256": "ac62ec6ecdf200d1a1632f55d6f2603efce0572ed16412b3619806c0e650d094",
+        "old_span": {
+          "name": "test_reader_error_identity",
+          "byte_offset": 4681,
+          "byte_length": 812,
+          "sha256": "ac62ec6ecdf200d1a1632f55d6f2603efce0572ed16412b3619806c0e650d094"
+        },
+        "current_span": {
+          "name": "test_reader_error_identity",
+          "byte_offset": 4681,
+          "byte_length": 812,
+          "sha256": "ac62ec6ecdf200d1a1632f55d6f2603efce0572ed16412b3619806c0e650d094"
+        }
+      },
+      {
+        "name": "test_reader_escape_boundaries",
+        "sha256": "19f23a6f4a6983ca52a1c812dac157d5aa2877d365818fdf884ae65438e3c96f",
+        "old_span": {
+          "name": "test_reader_escape_boundaries",
+          "byte_offset": 23194,
+          "byte_length": 816,
+          "sha256": "19f23a6f4a6983ca52a1c812dac157d5aa2877d365818fdf884ae65438e3c96f"
+        },
+        "current_span": {
+          "name": "test_reader_escape_boundaries",
+          "byte_offset": 23194,
+          "byte_length": 816,
+          "sha256": "19f23a6f4a6983ca52a1c812dac157d5aa2877d365818fdf884ae65438e3c96f"
+        }
+      },
+      {
+        "name": "test_reader_inherits_message_handler",
+        "sha256": "c5b76f8fe104be1fcceaa9f508d2dbcf00169f93408db25137da076701336546",
+        "old_span": {
+          "name": "test_reader_inherits_message_handler",
+          "byte_offset": 8193,
+          "byte_length": 702,
+          "sha256": "c5b76f8fe104be1fcceaa9f508d2dbcf00169f93408db25137da076701336546"
+        },
+        "current_span": {
+          "name": "test_reader_inherits_message_handler",
+          "byte_offset": 8193,
+          "byte_length": 702,
+          "sha256": "c5b76f8fe104be1fcceaa9f508d2dbcf00169f93408db25137da076701336546"
+        }
+      },
+      {
+        "name": "test_reader_keyword_boundaries",
+        "sha256": "9280504141ea2eb1550993903f0ccdffbc274b19ab527857fe0207930e6f1aa8",
+        "old_span": {
+          "name": "test_reader_keyword_boundaries",
+          "byte_offset": 21683,
+          "byte_length": 691,
+          "sha256": "9280504141ea2eb1550993903f0ccdffbc274b19ab527857fe0207930e6f1aa8"
+        },
+        "current_span": {
+          "name": "test_reader_keyword_boundaries",
+          "byte_offset": 21683,
+          "byte_length": 691,
+          "sha256": "9280504141ea2eb1550993903f0ccdffbc274b19ab527857fe0207930e6f1aa8"
+        }
+      },
+      {
+        "name": "test_reader_nested_guarded_sources",
+        "sha256": "d848445b8068f23e182c2ad2778b96eae0e42bf10f8299ecb9cb75f2ebbd932f",
+        "old_span": {
+          "name": "test_reader_nested_guarded_sources",
+          "byte_offset": 27307,
+          "byte_length": 698,
+          "sha256": "d848445b8068f23e182c2ad2778b96eae0e42bf10f8299ecb9cb75f2ebbd932f"
+        },
+        "current_span": {
+          "name": "test_reader_nested_guarded_sources",
+          "byte_offset": 27307,
+          "byte_length": 698,
+          "sha256": "d848445b8068f23e182c2ad2778b96eae0e42bf10f8299ecb9cb75f2ebbd932f"
+        }
+      },
+      {
+        "name": "test_reader_number_boundaries",
+        "sha256": "4cf7b398219a0b6bfac5060017dddc537381f0708227a42f15a60febc079bbe2",
+        "old_span": {
+          "name": "test_reader_number_boundaries",
+          "byte_offset": 22376,
+          "byte_length": 816,
+          "sha256": "4cf7b398219a0b6bfac5060017dddc537381f0708227a42f15a60febc079bbe2"
+        },
+        "current_span": {
+          "name": "test_reader_number_boundaries",
+          "byte_offset": 22376,
+          "byte_length": 816,
+          "sha256": "4cf7b398219a0b6bfac5060017dddc537381f0708227a42f15a60febc079bbe2"
+        }
+      },
+      {
+        "name": "test_reader_piece_lifetime",
+        "sha256": "6cd2c2e72f47d345e4a73b5e30d698ecb6f9d42025dbe3b92d5be6bba2714239",
+        "old_span": {
+          "name": "test_reader_piece_lifetime",
+          "byte_offset": 2924,
+          "byte_length": 973,
+          "sha256": "6cd2c2e72f47d345e4a73b5e30d698ecb6f9d42025dbe3b92d5be6bba2714239"
+        },
+        "current_span": {
+          "name": "test_reader_piece_lifetime",
+          "byte_offset": 2924,
+          "byte_length": 973,
+          "sha256": "6cd2c2e72f47d345e4a73b5e30d698ecb6f9d42025dbe3b92d5be6bba2714239"
+        }
+      },
+      {
+        "name": "test_reader_preserves_stack",
+        "sha256": "36993ab99442dbfddfde867993236cf5a138862c415e284b36c585f310746271",
+        "old_span": {
+          "name": "test_reader_preserves_stack",
+          "byte_offset": 3899,
+          "byte_length": 780,
+          "sha256": "36993ab99442dbfddfde867993236cf5a138862c415e284b36c585f310746271"
+        },
+        "current_span": {
+          "name": "test_reader_preserves_stack",
+          "byte_offset": 3899,
+          "byte_length": 780,
+          "sha256": "36993ab99442dbfddfde867993236cf5a138862c415e284b36c585f310746271"
+        }
+      },
+      {
+        "name": "test_reader_punctuation_prefetch",
+        "sha256": "868dbe0a3f007b5461b07fc3b8ab026fd522bb04bf339a2cbc152247538df62e",
+        "old_span": {
+          "name": "test_reader_punctuation_prefetch",
+          "byte_offset": 20208,
+          "byte_length": 742,
+          "sha256": "868dbe0a3f007b5461b07fc3b8ab026fd522bb04bf339a2cbc152247538df62e"
+        },
+        "current_span": {
+          "name": "test_reader_punctuation_prefetch",
+          "byte_offset": 20208,
+          "byte_length": 742,
+          "sha256": "868dbe0a3f007b5461b07fc3b8ab026fd522bb04bf339a2cbc152247538df62e"
+        }
+      },
+      {
+        "name": "test_reader_recursive_api_reentry",
+        "sha256": "9698ce8a3e4b2dccf3f3ce39776cb3c7bc9a24fca75ff4fb50dcb6b922caa0e8",
+        "old_span": {
+          "name": "test_reader_recursive_api_reentry",
+          "byte_offset": 25608,
+          "byte_length": 891,
+          "sha256": "9698ce8a3e4b2dccf3f3ce39776cb3c7bc9a24fca75ff4fb50dcb6b922caa0e8"
+        },
+        "current_span": {
+          "name": "test_reader_recursive_api_reentry",
+          "byte_offset": 25608,
+          "byte_length": 891,
+          "sha256": "9698ce8a3e4b2dccf3f3ce39776cb3c7bc9a24fca75ff4fb50dcb6b922caa0e8"
+        }
+      },
+      {
+        "name": "test_reader_stops_at_definitive_syntax",
+        "sha256": "81d8214c63057a2770939c83c2a674d3bac77fdb34e3c98ec525a6f2fa32e610",
+        "old_span": {
+          "name": "test_reader_stops_at_definitive_syntax",
+          "byte_offset": 19513,
+          "byte_length": 693,
+          "sha256": "81d8214c63057a2770939c83c2a674d3bac77fdb34e3c98ec525a6f2fa32e610"
+        },
+        "current_span": {
+          "name": "test_reader_stops_at_definitive_syntax",
+          "byte_offset": 19513,
+          "byte_length": 693,
+          "sha256": "81d8214c63057a2770939c83c2a674d3bac77fdb34e3c98ec525a6f2fa32e610"
+        }
+      },
+      {
+        "name": "test_reader_stops_at_invalid_escape",
+        "sha256": "4af53ef60f83e35c228946d089ec0c3b561ec2c5dec0b47628b1edf48db52a5b",
+        "old_span": {
+          "name": "test_reader_stops_at_invalid_escape",
+          "byte_offset": 20952,
+          "byte_length": 729,
+          "sha256": "4af53ef60f83e35c228946d089ec0c3b561ec2c5dec0b47628b1edf48db52a5b"
+        },
+        "current_span": {
+          "name": "test_reader_stops_at_invalid_escape",
+          "byte_offset": 20952,
+          "byte_length": 729,
+          "sha256": "4af53ef60f83e35c228946d089ec0c3b561ec2c5dec0b47628b1edf48db52a5b"
+        }
+      },
+      {
+        "name": "test_reader_syntax_and_mode_errors",
+        "sha256": "adfd7c2fd667675efefb961933454049c6513bd501efec8773070a31112c0290",
+        "old_span": {
+          "name": "test_reader_syntax_and_mode_errors",
+          "byte_offset": 8897,
+          "byte_length": 904,
+          "sha256": "adfd7c2fd667675efefb961933454049c6513bd501efec8773070a31112c0290"
+        },
+        "current_span": {
+          "name": "test_reader_syntax_and_mode_errors",
+          "byte_offset": 8897,
+          "byte_length": 904,
+          "sha256": "adfd7c2fd667675efefb961933454049c6513bd501efec8773070a31112c0290"
+        }
+      },
+      {
+        "name": "test_reader_yield_barrier",
+        "sha256": "3033fc3ec2d66b64a333bd3a7d4f367e355cfb286c18f0868b0972b042261b72",
+        "old_span": {
+          "name": "test_reader_yield_barrier",
+          "byte_offset": 6864,
+          "byte_length": 582,
+          "sha256": "3033fc3ec2d66b64a333bd3a7d4f367e355cfb286c18f0868b0972b042261b72"
+        },
+        "current_span": {
+          "name": "test_reader_yield_barrier",
+          "byte_offset": 6864,
+          "byte_length": 582,
+          "sha256": "3033fc3ec2d66b64a333bd3a7d4f367e355cfb286c18f0868b0972b042261b72"
+        }
+      }
+    ],
+    "changed_dispatch_functions": [
+      {
+        "name": "test_load_dump_contract",
+        "old_span": {
+          "name": "test_load_dump_contract",
+          "byte_offset": 33008,
+          "byte_length": 1289,
+          "sha256": "aec408ab298f745b457e1b74d7719cdae5bc2608ef204845faca0f561131be73"
+        },
+        "current_span": {
+          "name": "test_load_dump_contract",
+          "byte_offset": 34444,
+          "byte_length": 1369,
+          "sha256": "5d5f1a44e5433c3d7ff8353273e414f53c7baebe4752022e2496db4227289e43"
+        }
+      }
+    ],
+    "added_functions": [
+      {
+        "name": "test_parser_depth_status",
+        "byte_offset": 33008,
+        "byte_length": 1434,
+        "sha256": "a2af62775b2bab960228f2d91df37560a8a9347c8f4f5400c8e5b2750d3888d2"
+      }
+    ],
+    "added_operations": [
+      {
+        "stdout": "C API PASS: buffer parser depth runtime status",
+        "arguments": "test_parser_depth_status(state, 0)",
+        "name": "contiguous-parser-depth-runtime-status"
+      },
+      {
+        "stdout": "C API PASS: streamed parser depth runtime status",
+        "arguments": "test_parser_depth_status(state, 1)",
+        "name": "streamed-parser-depth-runtime-status"
+      }
+    ],
+    "delta_reconstruction": {
+      "insertions_in_new_source_coordinates": [
+        {
+          "id": "new-parser-status-helper",
+          "byte_offset": 33008,
+          "byte_length": 1436,
+          "sha256": "45e29284dedc91b4142303007e973fe4431cb1d8ab423ea3c7dda74aaac7492f"
+        },
+        {
+          "id": "two-new-dispatch-calls",
+          "byte_offset": 35732,
+          "byte_length": 80,
+          "sha256": "23d219155d4d1c2927d777dfe27b6af46466cdf0c834388607c48c217e5f92e9"
+        }
+      ],
+      "remove_only_insertions_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989",
+      "all_other_original_header_bytes_retained": true
+    },
+    "retained_semantics": "All original named C witness bodies are byte-identical except the dispatcher, which only appends the two new calls. The new helper checks LUA_ERRRUN, exact C stack overflow, original input stack, and same-state retry. These are source facts, not new execution evidence."
+  },
+  "current_live_nodes": [
+    {
+      "id": "feature-review",
+      "current_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json",
+      "current_sha256": "e2b2703a870b265b6505e68a7c8b1e52dc81c69f146c9442eb4fd6d1bdd93ab9",
+      "required_action": "new-independent-feature-decision",
+      "change": "Review unchanged retained fixed-buffer bodies and the two added parser-status operations; bind the new complete header hash without altering original private18 eligibility.",
+      "successor_review_status": "pending",
+      "successor_sha256": null,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "exclusion-approval",
+      "current_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.exclusion-approval.json",
+      "current_sha256": "ca513dc6dbd79ead0ea56b19fda23de9bc6596746893c7442837fc87717113b9",
+      "required_action": "new-independent-exclusion-binding-review",
+      "change": "Bind the successor feature decision; preserve the exact child projection and both protected scope descriptors.",
+      "successor_review_status": "pending",
+      "successor_sha256": null,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "exclusion-policy",
+      "current_path": "tests/conformance/targets/remaining-upstream-compatibility.exclusions.json",
+      "current_sha256": "c197e57cb129f0378b6d108c0807423a5577f4fc47cb107272d9caccfbed79ff",
+      "required_action": "authorized-mechanical-install-after-review",
+      "change": "Only after the new exclusion decision exists, bind its path/hash in the live policy; preserve exclusion9001, source span, public/mixed flags, evidence[] and protected partitions.",
+      "successor_review_status": "pending",
+      "successor_sha256": null,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "transform-narrative",
+      "current_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-transform-review.json",
+      "current_sha256": "4979c55ef9036249a1817835a71e40bd49f62210d17df6e204b3b8845c86247d",
+      "required_action": "new-independent-exact-transform-review",
+      "change": "Bind the successor feature decision and independently retain the identical18-byte removal, positive-growth assertion and every public behavior.",
+      "successor_review_status": "pending",
+      "successor_sha256": null,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "transform-approval",
+      "current_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.transform-approval.json",
+      "current_sha256": "0c756a649ecc78a6e3b2490e35a06361ced41abb5fe7373f5214e63f5969aaef",
+      "required_action": "new-independent-exact-transform-binding-review",
+      "change": "Bind the new policy SHA and successor exact-transform narrative, retaining all original source/patch/output fields.",
+      "successor_review_status": "pending",
+      "successor_sha256": null,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "transform-manifest",
+      "current_path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.transform.json",
+      "current_sha256": "f3e8a7e08239fed7c2f60c97add449d22e569e9252622196119bb2fc34c90f27",
+      "required_action": "authorized-mechanical-successor-after-review",
+      "change": "Bind the successor feature/transform decisions and new policy SHA. Preserve the dated author_proposal path/hash, exact empty replacement and output51389b... unchanged.",
+      "successor_review_status": "pending",
+      "successor_sha256": null,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "composition-narrative",
+      "current_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-private-bound-and-userdata-lifetimes.independent-composition-review.json",
+      "current_sha256": "fef368c2d9df9f8a5f811833c65bf47b59b784985eb2847bc83290bd1c613f83",
+      "required_action": "new-independent-composition-review",
+      "change": "Recompute the composite claim hash after new policy/inner-transform identities exist; independently verify unchanged disjoint union and both retained parents.",
+      "successor_review_status": "pending",
+      "successor_sha256": null,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "composition-approval",
+      "current_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-private-bound-and-userdata-lifetimes.composition-approval.json",
+      "current_sha256": "0e122fe6559a59e44fa1c3340ef4bd7df04b99d47ae6c97a2519de701771deba",
+      "required_action": "new-independent-composition-binding-review",
+      "change": "Bind the successor composition narrative and exact newly computed claims SHA. Do not copy an accepted review label from its predecessor.",
+      "successor_review_status": "pending",
+      "successor_sha256": null,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "composite-manifest",
+      "current_path": "tests/conformance/targets/remaining-upstream-compatibility/api-private-bound-and-userdata-lifetimes.composite.json",
+      "current_sha256": "2d330df74f94f666967020fa5453cf3e64fa2a05eabd9aa745c686e8d2e5b2c3",
+      "required_action": "authorized-mechanical-successor-after-review",
+      "change": "Bind the new policy SHA, successor private18 manifest and new composition approval. Keep the approved API941 inner mapping unchanged in this parser-only packet.",
+      "successor_review_status": "pending",
+      "successor_sha256": null,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    }
+  ],
+  "binding_edges": [
+    {
+      "from": "committed-header",
+      "to": "feature-review",
+      "json_pointer": "/feature_review/counterpart_source_bindings/0/sha256",
+      "current_value": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989",
+      "required_successor_value": "f8d056b921b31b72566978aed8a19226ce06029c81bd349d0c2051c5b92e2c0c",
+      "review_status": "pending"
+    },
+    {
+      "from": "feature-review",
+      "to": "exclusion-approval",
+      "json_pointer": "/review_evidence",
+      "current_value": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json",
+        "sha256": "e2b2703a870b265b6505e68a7c8b1e52dc81c69f146c9442eb4fd6d1bdd93ab9"
+      },
+      "required_successor_value": "new independently reviewed feature path + SHA",
+      "review_status": "pending"
+    },
+    {
+      "from": "exclusion-approval",
+      "to": "exclusion-policy",
+      "json_pointer": "/exclusions/0/review",
+      "current_value": {
+        "artifact_sha256": "ca513dc6dbd79ead0ea56b19fda23de9bc6596746893c7442837fc87717113b9",
+        "author": "Codex /root/validation_delivery",
+        "reviewer": "Codex /root",
+        "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.exclusion-approval.json",
+        "status": "accepted"
+      },
+      "required_successor_value": "new independently reviewed exclusion approval path + SHA",
+      "review_status": "pending"
+    },
+    {
+      "from": "feature-review",
+      "to": "transform-narrative",
+      "json_pointer": "/feature_review",
+      "current_value": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json",
+        "sha256": "e2b2703a870b265b6505e68a7c8b1e52dc81c69f146c9442eb4fd6d1bdd93ab9"
+      },
+      "required_successor_value": "new independently reviewed feature path + SHA",
+      "review_status": "pending"
+    },
+    {
+      "from": "transform-narrative",
+      "to": "transform-approval",
+      "json_pointer": "/review_evidence",
+      "current_value": {
+        "sha256": "4979c55ef9036249a1817835a71e40bd49f62210d17df6e204b3b8845c86247d",
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-transform-review.json"
+      },
+      "required_successor_value": "new independently reviewed transform narrative path + SHA",
+      "review_status": "pending"
+    },
+    {
+      "from": "exclusion-policy",
+      "to": "transform-approval",
+      "json_pointer": "/transform/exclusion_policy_sha256",
+      "current_value": "c197e57cb129f0378b6d108c0807423a5577f4fc47cb107272d9caccfbed79ff",
+      "required_successor_value": "SHA256 of reviewed successor live policy bytes",
+      "review_status": "pending"
+    },
+    {
+      "from": "exclusion-policy",
+      "to": "transform-manifest",
+      "json_pointer": "/exclusion_policy_sha256",
+      "current_value": "c197e57cb129f0378b6d108c0807423a5577f4fc47cb107272d9caccfbed79ff",
+      "required_successor_value": "SHA256 of reviewed successor live policy bytes",
+      "review_status": "pending"
+    },
+    {
+      "from": "feature-review",
+      "to": "transform-manifest",
+      "json_pointer": "/source_feature_review",
+      "current_value": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json",
+        "sha256": "e2b2703a870b265b6505e68a7c8b1e52dc81c69f146c9442eb4fd6d1bdd93ab9"
+      },
+      "required_successor_value": "new independently reviewed feature path + SHA",
+      "review_status": "pending"
+    },
+    {
+      "from": "transform-approval",
+      "to": "transform-manifest",
+      "json_pointer": "/review",
+      "current_value": {
+        "author": "Codex /root/validation_delivery",
+        "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.transform-approval.json",
+        "status": "accepted",
+        "artifact_sha256": "0c756a649ecc78a6e3b2490e35a06361ced41abb5fe7373f5214e63f5969aaef",
+        "reviewer": "Codex /root"
+      },
+      "required_successor_value": "new independently reviewed transform approval path + SHA",
+      "review_status": "pending"
+    },
+    {
+      "from": "exclusion-policy",
+      "to": "composite-manifest",
+      "json_pointer": "/exclusion_policy_sha256",
+      "current_value": "c197e57cb129f0378b6d108c0807423a5577f4fc47cb107272d9caccfbed79ff",
+      "required_successor_value": "SHA256 of reviewed successor live policy bytes",
+      "review_status": "pending"
+    },
+    {
+      "from": "transform-manifest",
+      "to": "composite-manifest",
+      "json_pointer": "/components/0/manifest",
+      "current_value": {
+        "sha256": "f3e8a7e08239fed7c2f60c97add449d22e569e9252622196119bb2fc34c90f27",
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.transform.json"
+      },
+      "required_successor_value": "new independently reviewed private18 manifest path + SHA",
+      "review_status": "pending"
+    },
+    {
+      "from": "composite-manifest",
+      "to": "composition-narrative",
+      "json_pointer": "/claims_sha256",
+      "current_value": "e4c1fd24bc0b1085fad4adc203bd0585b85dc47545c0b9918050aee8c3f104d5",
+      "required_successor_value": "Get-TargetWitnessPayloadHash(Get-TargetApiCompositeClaims(successor composite)); excludes review field",
+      "review_status": "pending"
+    },
+    {
+      "from": "composite-manifest",
+      "to": "composition-approval",
+      "json_pointer": "/claims_sha256",
+      "current_value": "e4c1fd24bc0b1085fad4adc203bd0585b85dc47545c0b9918050aee8c3f104d5",
+      "required_successor_value": "same new composite claims SHA",
+      "review_status": "pending"
+    },
+    {
+      "from": "composition-narrative",
+      "to": "composition-approval",
+      "json_pointer": "/review_evidence",
+      "current_value": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-private-bound-and-userdata-lifetimes.independent-composition-review.json",
+        "sha256": "fef368c2d9df9f8a5f811833c65bf47b59b784985eb2847bc83290bd1c613f83"
+      },
+      "required_successor_value": "new independently reviewed composition narrative path + SHA",
+      "review_status": "pending"
+    },
+    {
+      "from": "composition-approval",
+      "to": "composite-manifest",
+      "json_pointer": "/review",
+      "current_value": {
+        "author": "Codex /root/validation_delivery",
+        "artifact_sha256": "0e122fe6559a59e44fa1c3340ef4bd7df04b99d47ae6c97a2519de701771deba",
+        "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-private-bound-and-userdata-lifetimes.composition-approval.json",
+        "reviewer": "Codex /root",
+        "status": "accepted"
+      },
+      "required_successor_value": "new independently reviewed composition approval path + SHA",
+      "review_status": "pending"
+    }
+  ],
+  "current_values_are_predecessor_metadata_only": true,
+  "unchanged_other_feature_counterparts": [
+    {
+      "path": "src/lua-inputs.ads",
+      "sha256": "d30c069655d43c095937c916250670b1ec245a6bc51ee7c40ea7158978942a4c",
+      "status": "unchanged-source-only"
+    },
+    {
+      "path": "src/lua-chunks.ads",
+      "sha256": "8b681ec3b245bbcd6ac41d20b2260ff25039111b816c7c50feed140518d9844f",
+      "status": "unchanged-source-only"
+    },
+    {
+      "path": "src/lua-chunks.adb",
+      "sha256": "f799c90c42236fb22561a83de2a38460044ed57421ea1509a1249c9bf25d079f",
+      "status": "unchanged-source-only"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-public.lua",
+      "sha256": "93c98589d51546968f8ff84a435f792df5759e70cb57aba93bfecc750b33759f",
+      "status": "unchanged-source-only"
+    }
+  ],
+  "protected_scope_baselines": [
+    {
+      "id": "gc-io-events",
+      "path": "tests/conformance/scopes/gc-io-events.json",
+      "sha256": "79fa732f60f380c93be190f43640acf0b2ac595bdf9196d2fc8fd0a7ee62eae7"
+    },
+    {
+      "id": "expanded-t-conformance",
+      "path": "tests/conformance/scopes/expanded-t-conformance.json",
+      "sha256": "9df8642d10238abaa48c97184ed2345be7106d4c2c74668954e43bc0cb6ecdc1"
+    }
+  ],
+  "preserved_original_source": {
+    "path": "references/lua/testes/api.lua",
+    "sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+    "child_id": "LUA-API-REVIEWED-BLOCK-9001",
+    "child_start_byte": 17053,
+    "child_length_bytes": 18,
+    "child_sha256": "f89400b75cf254feed3cc991449a9e7bc1679e6cd9b5b6be1b6598dfa176bf55",
+    "removed_bytes": " and m2 - m1 < 400",
+    "private18_output_sha256": "51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc",
+    "composite_output_sha256": "c360ae605ad7d2e7935a38ad684a5bb0fd081e59d6d3cc397527864f75cc77d3",
+    "required_pending_parent_records": [
+      {
+        "id": "LUA-API-ASSERT-CALL-0125",
+        "kind": "assert-call",
+        "byte_offset": 17039,
+        "byte_length": 6,
+        "line": 580,
+        "end_line": 580,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-API-ASSERT-CALL-0195",
+        "kind": "assert-call",
+        "byte_offset": 26638,
+        "byte_length": 6,
+        "line": 941,
+        "end_line": 941,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      }
+    ]
+  },
+  "preservation_rules": [
+    "Do not edit dated author proposals, observation reports, original source/API ledgers, protected scope descriptors or historical approvals.",
+    "Use new independent successor review artifacts; no reviewer identity, accepted status, rationale or runtime authority may be inherited.",
+    "Successor hashes remain null until actual new reviewer artifacts exist. This proposal is intentionally not an executable approval, exclusion policy, transformation or composition.",
+    "Install any resulting live-policy/selector identity changes only after distinct independent review. Recompute transitive hashes in dependency order; composite claims exclude the review field, so the apparent final graph cycle is not a hash cycle.",
+    "Preserve the original author_proposal path/hash in successor transform metadata as dated evidence. Preserve both accepted historical scope descriptor identities and all already protected partitions.",
+    "No parser-only rebind changes the API941 inner equivalent, calls equivalent, memory verifier, source spans, replacement bytes, parent obligations or execution requirements."
+  ],
+  "downstream_refresh_requirements": [
+    "Any future execution selection or Aggregate manifest referring to the private18/composite manifest must bind the successor identity and obtain its own required selection review.",
+    "Fresh operation contracts and post-observation envelopes must bind the renewed policy/manifest and same-head raw observations. Do not rewrite old raw reports, envelopes or certificates to new hashes.",
+    "Pending header/global/API/witness proposals need an ordinary final-source regeneration later, including the two separately named parser-status operations; regeneration grants no semantic review or pass authority."
+  ],
+  "separate_runtime_pool_follow_up": {
+    "status": "awaiting-final-committed-runtime-pool",
+    "review_status": "pending",
+    "hashes_captured": false,
+    "candidate_dependency_paths": [
+      "src/lua-engine.ads",
+      "src/lua-engine.adb",
+      "src/lua-engine-foreign.adb"
+    ],
+    "required_action": "Inspect final pool/source semantics and actual affected exact-equivalent counterpart bindings separately; prepare author proposals and obtain new independent review before generation or execution."
+  },
+  "future_calls_observation": {
+    "status": "awaiting-renewed-authorities-and-final-committed-runtime",
+    "configuration": "upstream-test",
+    "ada_selector": "calls-undump-constant-pool.equivalent.json",
+    "native_source": "original references/lua/testes/calls.lua",
+    "requirements": [
+      "Clean final committed Root source and renewed current policy/selector reviews.",
+      "Fresh actual configuration/launcher/executable/library identities from that same runtime head.",
+      "Explicit File completion protocol and actual dump/return arity/function checks on both roles.",
+      "Raw reports remain observations with no target/source/API acceptance flag changes; record exact output agreement, empty stderr and balanced allocator/shutdown.",
+      "Final matrix acceptance still requires reviewed contracts/envelopes and the complete required contexts/operations, not this pair alone."
+    ]
+  }
+}

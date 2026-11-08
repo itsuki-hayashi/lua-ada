@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "kind": "target-api-source-composite",
+  "id": "api-private-bound-and-userdata-lifetimes",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "implementation": "Ada",
+  "configuration": "upstream-test",
+  "source": "references/lua/testes/api.lua",
+  "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+  "composition": "union-disjoint-original-byte-spans",
+  "components": [
+    {
+      "manifest": {
+        "sha256": "f3e8a7e08239fed7c2f60c97add449d22e569e9252622196119bb2fc34c90f27",
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.transform.json"
+      },
+      "output_sha256": "51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc",
+      "kind": "t-private"
+    },
+    {
+      "manifest": {
+        "sha256": "8de28e53ca1a85abf6f72f7651e7c6029347aa344ee98429b2ea2ff3311e2b68",
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/api-finalized-userdata-reclamation.equivalent.author-proposal.json"
+      },
+      "output_sha256": "2838c5b9183c835b3581f829657d30451c16be1bfca952e5b8638d67e5966897",
+      "kind": "equivalent"
+    }
+  ],
+  "exclusion_policy_sha256": "c197e57cb129f0378b6d108c0807423a5577f4fc47cb107272d9caccfbed79ff",
+  "source_exclusion_ids": [
+    "LUA-API-REVIEWED-BLOCK-9001"
+  ],
+  "original_required_obligations": [
+    "LUA-API-ASSERT-CALL-0125",
+    "LUA-API-ASSERT-CALL-0195"
+  ],
+  "output_sha256": "c360ae605ad7d2e7935a38ad684a5bb0fd081e59d6d3cc397527864f75cc77d3",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "review": {
+    "reviewer": null,
+    "artifact": null,
+    "author": "Codex /root/validation_delivery",
+    "artifact_sha256": null,
+    "status": "pending"
+  },
+  "integration_status": "Source-only bounded selector implemented. File/Aggregate selection and adapted source writing/execution remain blocked pending exact component and separate composition review.",
+  "synthetic_fixture": false
+}

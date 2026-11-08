@@ -1,5 +1,623 @@
 # Project Status
 
+The maintainer requested a
+[CI-verified interim checkpoint](sessions/2026-11-08-interim-compatibility-checkpoint.md)
+on 2026-11-08 and paused the remaining implementation. Completed runtime and
+tooling progress is cut for [PR #11](https://github.com/itsuki-hayashi/lua-ada/pull/11),
+whose checks and review record own checkpoint verification; full upstream
+acceptance is not claimed. The unfinished CLI host-main/message-handler/interrupt and
+host-receiver drafts are preserved on separate remote backup branches.
+Checkpoint CI is separate from the unchanged 26-context full-target contract.
+
+## Remaining upstream compatibility (2026-11-07)
+
+The [frame storage correction](sessions/2026-11-08-canonical-frame-footprint.md)
+removes two unused per-frame arenas. Local unchanged coroutine default peak
+falls from 1,968,500,975 to 1,896,476,423 managed bytes with the same 2 GiB
+ceiling and zero cleanup ownership. Eight strict local builds, both 2,665-case
+Windows AUnit suites and 26/27 C consumers pass. Checkpoint CI at 122d642 now
+passes the retained macOS default static/shared lifecycle watchdog with its
+unchanged 2 GiB limit, but a repeat at 412ddfd exceeds it. The subsequent
+[private scalar grouping](sessions/2026-11-08-private-frame-scalar-layout.md)
+reduces the measured frame from 1,232 to 1,160 bytes without changing fields
+or ownership. Fresh checkpoint CI must validate resident margin. The complete
+26-context matrix remains pending.
+
+The [native readline component](sessions/2026-11-08-cli-native-readline.md)
+retains rooted prompts through native input and selected-owner history buffers.
+Both local full AUnit suites pass 2,665 cases; fourteen exact paired Windows
+input cases pass per configuration. Unix/TTY and final-context acceptance are
+pending, including separate receipt/image reconciliation for these operations.
+
+The [retained Code component](sessions/2026-11-08-code-local-execution.md)
+matches native output locally with the approved instrumented adaptation and
+passes all eight paired binary compiler/VM execution roles. Exclusions remain
+source-only. The combined strict local builds pass 2,662 AUnit cases in each
+configuration; final matrix and global acceptance remain pending.
+
+The [debug console](sessions/2026-11-08-debug-console.md) executes commands
+through shared Ada compilation and protected continuations, including actual
+direct C calls and closing slots. Local default/T builds pass 2,629 AUnit
+cases, 16 paired console operations, four paired C modes and the retained
+CLI/C consumers. Full main.lua and final-context acceptance remain pending.
+
+The [bounded Nextvar counterparts](sessions/2026-11-08-nextvar-storage-counterparts.md)
+exercise all 529 constructor size pairs, real table churn/values and actual
+Ada storage walks without fabricating C capacities. Both local configurations
+pass 2,629 AUnit cases, including four actual constructor-provider refusals
+and healthy retries. Exact upstream source decisions and final acceptance
+remain separate; no Nextvar/Sort adaptation is installed by this checkpoint.
+
+The [typed CLI argument component](sessions/2026-11-08-cli-typed-arguments.md)
+loads the selected closure before resolving the current global arg table and
+preserves actual Lua values through guarded callbacks. Both isolated full
+AUnit suites pass 2,644 cases and both product CLI suites pass 112 controls;
+fresh frozen ordinary/T argument campaigns agree with native contracts.
+These component images do not establish original main.lua, platform transport
+or final immutable full-target acceptance.
+
+The [reviewed Verybig Windows replay](sessions/2026-11-08-verybig-approved-source.md)
+completes the full large-program workload in local native/Ada default/T roles,
+with identical output, single-result 10 and balanced measured ownership.
+Only the exact temporary-path expression changes; final context/native
+applicability reconciliation and complete-target acceptance remain pending.
+
+The [allocator ceiling correction](sessions/2026-11-08-heavy-allocator-observation.md)
+enforces the selected 64 MiB or 2 GiB limit in the conformance launcher and
+reports its actual stored ceiling. Both configurations pass 13 process checks,
+22 sidecar binding guards and the native observer's seven C checks. Fresh
+unchanged heavy workloads catch real allocation refusal in all four local
+roles at the measured 64 MiB cap. Final matrix and semantic reconciliation
+remain pending; the earlier misconfigured Heavy campaign is invalid.
+
+The [cached string-hash counterpart](sessions/2026-11-08-test-string-hash.md)
+reads the actual Ada key hash without cloning private C geometry. Both local
+configurations pass 2,612 AUnit cases and the public T fixture matches all four
+compiler/VM roles. The approved-path attrib T pair now completes its dump/load
+and single-result-27 protocol with matching stdout and balanced selected
+providers. Source-review renewals and final image/target acceptance remain.
+
+The [fixed external-string T driver](sessions/2026-11-08-fixed-external-string-driver.md)
+uses the exported external-string API in main and separately created states.
+Both local AUnit runs pass2,574 cases. Original strings now completes in
+default and instrumented C/Ada with matching stdout per configuration. These
+component observations retain their separate final matrix and ledger gates.
+
+The [native locale correction](sessions/2026-11-08-native-string-locales.md)
+connects string ordering, default sorting, recognized pattern classes and case
+conversion to the existing native locale boundary. Both full local AUnit runs
+pass2,570 cases and eight compiler/VM roles agree. Original default strings
+completes with byte-identical native/Ada stdout; the subsequent fixed-string
+driver completes its instrumented body too. Final context gates remain.
+
+The [table diagnostic correction](sessions/2026-11-08-table-error-arguments.md)
+retains full integer indices in concat errors and argument identity for missing
+pairs/ipairs receivers. Seven focused cases pass within2,556 AUnit cases in
+each local configuration; eight binary compiler/VM roles agree. Original
+default nextvar now completes. The subsequent locale/string driver closes the
+observed strings gaps; private table-inspection and final matrix gates remain.
+
+The [V4 resource verifier](sessions/2026-11-08-observable-resource-eligibility.md)
+implements a closed exact memerr allocation-count source rule with retained
+public materialization and optimized zero-allocation obligations. Sixty-eight
+binding cases and legacy suites pass; no Memerr resource policy row, review
+approval, transformation or runtime acceptance is installed. Code's ten-source
+graph is separately bound by its source-only installation below.
+
+Eight [materialized-vararg counterparts](sessions/2026-11-08-materialized-vararg-counterparts.md)
+separate ordinary table/value/capture semantics from mandatory real T fault
+sweeps and cleanup. Both local configurations pass 2,557 AUnit cases; ordinary
+and T fault binary roles match separately. The original private positive count,
+optimized zero-allocation block and whole-source acceptance retain their
+separate review/execution requirements.
+
+The [marked-slot correction](sessions/2026-11-08-marked-closing-mutation.md)
+preserves a scalar closing obligation after a debugger writes nil/false.
+Four ordinary native-paired cases cover type closers, actual replacement
+errors, weak collection and recovery; both local configurations pass 2,549
+AUnit cases. Current whole-source bindings and final acceptance remain pending.
+
+The [original main.lua diagnostics](sessions/2026-11-08-main-cli-native-baseline.md)
+fail the same Windows temporary-output redirection in native/Ada default/T.
+Parent/bare/arg identities and measured primary cleanup are verified. The
+[dynamic prompt checkpoint](sessions/2026-11-08-cli-dynamic-prompts.md) implements
+actual lookup/conversion and fatal prompt-error/typed-exit policy through a
+CLI-only child and real C callbacks. Both local modes pass 2,571 AUnit cases and
+112 product CLI process cases. Native T no-close teardown remains an explicit
+failed oracle diagnostic. Full main completion, platform equivalents and final
+immutable acceptance remain open; no source authority is granted here.
+
+The [IO error-location correction](sessions/2026-11-08-io-error-locations.md)
+uses the actual immediate public caller for raising file-open errors. Seven
+focused cases pass within2,528 AUnit cases in each local mode, and all eight
+compiler/VM roles match the public fixture. Full source/CLI/platform and final
+immutable acceptance remain pending.
+
+The [dated API941 tail/owner proposal](sessions/2026-11-08-api941-tail-owner-bindings.md)
+binds twenty actual counterparts and fifty ownership regions at c10ba1c. It
+preserves source operations and identifies stale inner/composition edges.
+Independent exact and composition decisions remain pending; no mapping,
+approval, adapted source, runtime evidence or original obligation is renewed.
+
+The [scalar closing checkpoint](sessions/2026-11-08-scalar-closing-links.md)
+marks canonical closing slots without artificial upvalue/list allocations.
+Both local modes pass 2,538 AUnit cases after the
+[owner-bound correction](sessions/2026-11-08-scalar-closing-owner-bound.md),
+and ordinary C consumers; twelve public
+cases match four T binary roles. Unchanged errors/coroutine files complete
+under the actual 2-GiB ceiling with balanced cleanup. Whole locals source
+bindings must be renewed before current whole-file acceptance.
+
+Three [intern-index fault witnesses](sessions/2026-11-08-intern-index-refusal.md)
+check actual provider-refused replacement, live roots under disabled-growth
+collection and dead-header disposal. The combined local checkout passes 2,510
+AUnit cases in each mode and both configured fixture campaigns. All79 ordinary
+default fixtures match native bytes, and the existing canonical/chunk/binary
+campaigns pass on the combined images. Original API
+source adaptation, final immutable image replay and whole-target acceptance
+remain pending; these cases supply no passing private C geometry assertion.
+
+The [original debug/vararg observations](sessions/2026-11-08-unreduced-debug-vararg-attrib.md)
+complete both files with matching native/Ada output and balanced shutdown in
+both local modes. Original attrib.lua fails the same Windows expected-path
+literal in all four images; its existing ten-operation public counterpart
+passes. These raw CLI observations neither capture the full file-completion
+protocol nor approve an adapted source or resolve source-ledger obligations.
+
+The [exact locals proposal](sessions/2026-11-08-locals-exact-source-proposal.md)
+and bounded source selector preserve the original deletion/collection/refusal
+sweep while proposing actual storage counts and original-key weak lifetime.
+All 38 source-definition/rejection checks pass. Independent exact approval is
+pending; no adapted locals source was emitted or executed and neither original
+anchor is resolved by this proposal.
+
+The [canonical tail ownership checkpoint](sessions/2026-11-08-canonical-tail-ownership.md)
+preserves the documented optimized-vararg result under real zero-growth and
+byte controls. Both local modes pass 2,518 AUnit cases and ordinary C consumers;
+ten Lua cases match all four T binary roles. Unchanged errors/coroutine files
+complete under 2 GiB; materialized-vararg exact counts and final source/platform
+acceptance remain separately pending.
+
+The [resetCI ownership correction](sessions/2026-11-08-resetci-owning-release.md)
+uses the checked private frame release and retires unused metadata reservations.
+Both local configurations pass 2,507 AUnit cases and all ordinary C consumers;
+twenty-one metadata witnesses match all four T producer/VM roles. Whole-source
+memory/API and final platform acceptance remain open.
+
+The [public optimizer witnesses](sessions/2026-11-08-code-public-semantics.md)
+preserve numeric values/kinds, exact result counts, callback/assignment order,
+constant dump/load and constructor boundaries. Both local modes pass 2,468
+AUnit cases, including 29 new cases; the public fixture matches all eight
+producer/VM roles. The [exact source installation](sessions/2026-11-08-code-v3-source-installation.md)
+now binds eight private Code exclusions, eighteen source-reference
+classifications and nine pending public nodes. Fourteen installed-graph guards
+pass; normal guarded generation preserves checkR and all retained semantics.
+No runtime or whole-file pass follows, and no exact opcode sequence is promised.
+
+The [table-storage inspector](sessions/2026-11-08-table-storage-inspection.md)
+checks actual Ada row/index/free-list safety and reports real row/live counts.
+Both local configurations pass 2,439 AUnit cases, including 25 new corruption,
+weak-lifetime, reuse and refusal cases; the public fixture matches all eight
+producer/VM roles. Exact locals.lua replacement/source approval and full-file
+execution remain pending. The private checker is not a passing C querytab test.
+
+The [C call metadata checkpoint](sessions/2026-11-08-c-call-metadata.md)
+reserves stable selected-owner records and physical C backing, preserves owned
+result arenas, and fixes successful assert/hook refusal paths. Both local
+configurations pass 2,448 AUnit cases and all ordinary C consumers. Seventeen
+T witnesses match all four producer/VM roles; unchanged errors.lua completes
+under 2 GiB in both modes with balanced shutdown. Full API/memory/source/platform
+and final aggregate acceptance remain open.
+
+The [declaration activation correction](sessions/2026-11-08-declaration-activation-correction.md)
+preserves folded-constant acceptance and initializer syntax precedence beyond
+the original errors.lua cases. Both local configurations pass 2,398 AUnit
+cases and the unchanged errors.lua; all eight context-fixture compiler/VM roles
+pass. The prior eager name-time limit check is superseded by this correction.
+
+The [compiler context checkpoint](sessions/2026-11-08-compiler-limit-context.md)
+completes unchanged errors.lua locally in default and retained-T execution.
+Ten focused cases pass within 2,394 AUnit cases per mode; all standalone C
+consumers and eight compiler/VM roles pass. Defining-function context and
+declaration-limit precedence are implemented. Global source and final matrix
+acceptance remain pending.
+
+The [hook-mask checkpoint](sessions/2026-11-08-hook-mask-transitions.md)
+preserves pending count/line phases, actual caller trace PCs and direct literal
+local stores. Both local configurations pass 2,400 AUnit cases; Lua controls
+match all producer/VM roles in both, and actual C hooks match all four T roles.
+The reviewed API source advances beyond original line1090 to original line1306's
+zero-allocation C-entry failure. That whole-file run and its interrupted child
+cleanup fail; final source, memory-refusal and platform acceptance remain open.
+
+The [parser stack checkpoint](sessions/2026-11-08-parser-stack-limits.md)
+preserves native runtime-error status/text and bounded Ada host quotas.
+Both local configurations pass 2,384 AUnit cases, all standalone C consumers
+and eight compiler/VM roles for the limit fixture. Unchanged errors.lua now
+reaches original line768's upvalue diagnostic context; the file remains open.
+
+The [retained T replay](sessions/2026-11-08-retained-t-source-replay.md)
+completes the reviewed calls.lua equivalent locally with unchanged native
+stdout. The later hook checkpoint advances the API lifecycle composition past
+its ordinary count/line assertion. Both original source parents and all final
+head/platform acceptance remain pending; source approval alone closes none.
+
+The [assert argument checkpoint](sessions/2026-11-08-assert-arguments.md)
+preserves missing-versus-nil diagnostics, collecting argument-name callbacks
+and successful tuples. Both local configurations pass 2,359 AUnit cases and
+all eight compiler/VM roles for its five-case fixture. Unchanged errors.lua
+now reaches generated compilation-limit checks, where parser nesting still
+escapes as a host limit. Full file and final matrix acceptance remain open.
+The [reader refusal/lifecycle follow-up](sessions/2026-11-08-reader-refusal-lifecycle.md)
+preserves protected memory-result tuples without post-callback packet growth.
+Both configurations pass 2,363 AUnit cases, including nine new refusal,
+self-close and protected-hook cases; the thirty-case balanced builtin consumer
+matches native in both. Ada self-close leaves zero selected bytes/blocks.
+Native partial-reader cleanup leaks and two T teardown assertions remain
+explicit failed oracle observations requiring final acceptance review.
+
+The [runtime failure-storage migration](sessions/2026-11-08-runtime-failure-storage.md)
+uses selected immutable diagnostics and preserves original Lua error values.
+Both local configurations pass 2,300 AUnit cases, all standalone C consumers
+and the eight compiler/VM roles for its public fixture. Long C-prefix mode
+errors and instruction-policy distinctions have focused regressions. The
+complete allocation audit and final source/platform acceptance remain open.
+The [thin T traceback command](sessions/2026-11-08-t-traceback-command.md)
+uses the public renderer for actual current/suspended frames. Three native-paired
+cases and instrumented four-way execution pass; both isolated configurations
+pass 2,301 AUnit cases. The driver inventory is now 97 names. Remaining
+zero-growth C entry, reader and aggregate obligations remain open.
+
+The [coroutine portal checkpoint](sessions/2026-11-08-coroutine-result-portals.md)
+returns native false/error behavior when a parent cannot hold child results,
+while preserving yielded/wrapped children and host-budget policy. Six new
+cases pass within 2,298 AUnit cases per isolated configuration. Unchanged
+coroutine.lua now matches native stdout with no _soft in both local modes,
+including its T API sections. Remote replay and full-target gates remain open.
+
+The [managed diagnostic-text component](sessions/2026-11-08-managed-diagnostic-text.md)
+passes fourteen focused ownership/refusal cases; both local configurations
+pass 2,281 AUnit cases. The private component is available, while actual engine
+failure-field migration and the complete allocation-path audit remain open.
+The [linear Lua reader checkpoint](sessions/2026-11-08-linear-lua-readers.md)
+uses the existing guarded streaming frontend once while preserving actual
+reader demand, C identities/cells, environment selection, hook results and
+typed host quotas. Forty-five focused cases pass within 2,312 AUnit cases in
+each configuration; all twenty-nine saved-builtin C cases match native in both.
+The shared multiple-closing declaration check now uses its consumed token line.
+Full unchanged-file/T, platform and final-head acceptance remain open.
+
+The [reviewed memory-verifier equivalent](sessions/2026-11-08-memerr-verifier.md)
+preserves actual application refusal and the original status/message assertion
+while restoring the test allocator before verification. It excludes no source
+obligation. Ada now reaches the later zero-allocation sweep; native Windows
+reaches a temporary-file permission failure. Both file results remain failing.
+
+Relevant T reader checks now use [actual Ada stack inspection](sessions/2026-11-08-stack-inspection.md).
+All 2,248 AUnit cases pass in both local configurations. Original calls.lua
+completes by default; its T run reaches private constant-pool identity
+inspection at line586, whose treatment and semantic witness remain pending.
+The [label semantic checkpoint](sessions/2026-11-08-label-semantic-boundaries.md)
+preserves no-op definition order, last-consumed source lines and later syntax
+precedence. Nineteen native-paired cases and direct goto controls pass in both
+configurations, within 2,263 passing AUnit cases each. Unchanged errors.lua
+now reaches the multiple-closing declaration's trailing-newline source line.
+Full source/T and immutable final-head acceptance remain open.
+
+The [C API self-value correction](sessions/2026-11-08-c-api-self-values.md)
+preserves the target cell when seti/setfield consume that same table. Thirty
+native/Ada C cases match in both configurations; the combined implementation
+passes 2,232 AUnit cases locally. Reviewed adapted api.lua now reaches its
+line-941 finalization footprint bound; the file remains incomplete.
+
+The [hidden named-vararg checkpoint](sessions/2026-11-08-hidden-named-varargs.md)
+completes unchanged vararg.lua in local default and T-enabled execution,
+matching the native output. Nine focused cases pass all eight C/Ada
+compiler/VM roles; both local configurations pass 2,194 AUnit cases. This is
+component evidence; final platform/source acceptance remains open.
+The [function store-site checkpoint](sessions/2026-11-08-function-store-sites.md)
+preserves opening definition stores, closing closure events and explicit
+global child/store sites. Twelve native-paired cases match four-way compiler/VM
+campaigns in both configurations; each local configuration passes 2,212 AUnit
+cases. Unchanged errors.lua now reaches duplicate-label syntax error lines.
+Full source/T and immutable final-head acceptance remain open.
+
+The [base setmetatable checkpoint](sessions/2026-11-08-metatable-argument-phases.md)
+preserves both argument origins, absent-versus-nil and validation order.
+Fifteen native-paired cases match four-way compiler/VM campaigns in both
+configurations; each local configuration passes 2,200 AUnit cases. Unchanged
+errors.lua now reaches function-statement store-line attribution. Full
+source/T and immutable final-head acceptance remain open.
+The [close-return checkpoint](sessions/2026-11-08-close-return-windows.md)
+retains edited scalar results through closers, including weak collection,
+yielding and later return hooks. Eleven new cases pass within 2,216 AUnit
+cases per isolated configuration. The native-paired C refusal case completes
+with zero attempted growth after its body freezes allocation. Parent
+coroutine result-portal capacity behavior remains a separate open correction.
+
+The [native tail correction](sessions/2026-11-08-native-tail-return-windows.md)
+publishes results into the retained Lua frame before return-hook inspection.
+Three additional cases pass within 2,205 AUnit cases per isolated configuration;
+the eighteen-case Lua fixture matches all four native/Ada producer/VM pairs.
+
+The [return-hook checkpoint](sessions/2026-11-08-return-hook-windows.md)
+delivers actual edited result slots and removes stale packet roots before
+callback collection. Seventeen new named cases pass within 2,202 AUnit cases
+per isolated configuration, with all four native/Ada producer/VM combinations
+matching. Result mutation by closers without a return hook remains open.
+
+The [sort argument checkpoint](sessions/2026-11-08-sort-argument-phases.md)
+preserves actual receiver/comparator argument names, validation order and
+failed-capture retirement. Fifteen native-paired cases match four-way
+compiler/VM campaigns in both configurations; each local configuration passes
+2,176 AUnit cases. Unchanged errors.lua progresses to setmetatable used as a
+gsub callback. Full source/T and final platform acceptance remain open.
+
+The [counted binary-source correction](sessions/2026-11-08-binary-source-nul.md)
+preserves full source metadata while matching native C-prefix display, after
+file-tail selection. Four cases match native/Ada default/T; the combined
+implementation passes 2,161 AUnit cases in each local configuration. Full
+binary/debug and remaining source/platform acceptance remain separate gates.
+
+The [selected debug-line checkpoint](sessions/2026-11-08-selected-line-baselines.md)
+uses the actual native-reader interval (default 128, T 3) for canonical line
+records. Its seven-case debug fixture and all retained string fixtures pass
+fresh four-way compiler/VM campaigns in both configurations. Both local
+configurations pass 2,157 AUnit cases. The measured T writer assertion is
+fixed; unchanged memerr.lua, errors.lua and full acceptance remain open.
+
+The [owned argument formatter](sessions/2026-11-08-owned-argument-labels.md)
+builds labels and complete argument messages in selected-owner buffers,
+without growing unmanaged formatter intermediates. Four native-paired cases
+and a key-scan quota case pass within 2,104 AUnit cases per local configuration.
+The final context failure-text store remains a separate ownership obligation.
+
+The [string checkpoint](sessions/2026-11-08-string-arguments-results.md) adds
+32 argument diagnostics and fifteen result/status/lifetime/refusal regressions.
+Both local configurations pass 2,146 AUnit cases; selected strict scalar
+refusal cases match actual native T. Default four-way compiler/VM fixtures
+pass, while a native T absolute-line estimate assertion remains explicit and
+assigned to the next compiler checkpoint. Unchanged errors.lua next fails
+table.sort callback argument naming. Full-source/T acceptance stays open.
+
+The [argument detail checkpoint](sessions/2026-11-08-owned-argument-detail.md)
+uses selected-owner text for type-detail construction, meters raw name
+processing and preserves nonstring raw-name temporaries. Four Lua cases match
+native/Ada default/T; each local Ada configuration passes 2,099 AUnit cases.
+The wider failure-rendering/storage audit and remaining full target stay open.
+
+The [borrowed C view checkpoint](sessions/2026-11-08-borrowed-c-stack-views.md)
+passes 2,103 AUnit cases per isolated local configuration, including nine
+actual-cell/guard/weak-root regressions. Eight hook cases match both native
+configurations; allocator reentry matches native default and remains blocked
+by native T private lock instrumentation. Return-hook result mutation and
+full-target acceptance remain open.
+
+The [combined public-boundary check](sessions/2026-11-08-public-boundary-integration.md)
+passes 2,094 AUnit cases in each local configuration after fixing a checked
+I/O argument-borrow interaction. All twenty-six ordinary standalone C
+consumers pass in both configurations; the separate private T buffer caller
+also passes. The native-module campaign was not rerun in this check. This
+combined evidence remains distinct from full-target acceptance.
+
+The [scalar NOT checkpoint](sessions/2026-11-08-scalar-not-refusal.md) removes
+an allocation from logical negation under provider refusal. Six named cases
+pass both local configurations and all four native/Ada producer/VM combinations
+match. The full integrated suites remain 2,088/2,094 with six I/O diagnostic
+borrow failures assigned to the parent; these are not passing full suites.
+Unchanged memerr.lua next reaches a fresh string.find result-vector allocation.
+
+The [traceback checkpoint](sessions/2026-11-08-shared-traceback.md) exports
+luaL_traceback through the same owned renderer as debug.traceback. Twenty-two
+C cases match both native and both Ada configurations; each local Ada
+configuration passes 2,052 AUnit cases, including two bounded-session cases.
+Registry metamethod continuation, remaining files/T paths and final platform
+acceptance remain open. See [ADR 0033](decisions/0033-shared-traceback-rendering.md).
+
+The [I/O and collector argument checkpoint](sessions/2026-11-08-io-collector-arguments.md)
+uses the shared argument diagnostic for invalid write operands and the first
+collector option. Ten focused Lua cases match both native configurations and
+both Ada configurations; each local configuration passes 2,028 AUnit cases.
+Unchanged errors.lua now reaches the string-method `bad self` diagnostic.
+This evidence does not establish completion of that file or the full target.
+The [argument registry checkpoint](sessions/2026-11-08-argument-registry-continuations.md)
+executes actual registry lookup callbacks before auxiliary errors, preserving
+original Lua/C owners, stack temporaries, collection and guard transfers.
+Both local configurations pass 2,039 AUnit cases; twenty-four builtin C cases
+match both native images. Borrowed Lua CI windows, remaining errors.lua and
+all final source/T/shared/platform acceptance remain open.
+
+The [public identity checkpoint](sessions/2026-11-08-public-value-identities.md)
+shares actual C/Lua identities and preserves returned long strings. Both
+local configurations pass 1,993 AUnit cases and twenty-two C consumers; eight
+C and twenty-three Lua cases match both native images. First C borrowing,
+weak-thread cleanup and real first-surface refusal have focused evidence.
+Unchanged errors.lua now next fails io.write argument naming; full target
+acceptance, remaining T drivers and traceback remain open.
+
+
+The [public C concat component](sessions/2026-11-08-c-concat-windows.md)
+folds original C scalar slots, preserving handler mutation and weak lifetimes.
+Twenty-one identical C cases match both native configurations and both Ada
+configurations; both local Ada configurations pass 1,983 AUnit cases. Grouped
+primitive construction fits an independently native-proven provider bound.
+The independently measured borrowed-Lua-CI scalar view and final acceptance
+remain open.
+
+The [metamethod argument ownership prerequisite](sessions/2026-11-08-metamethod-argument-roots.md)
+retires copied request inputs after the next activation owns them. Seven
+independently failing regressions now match native default/T and pass within
+1,935 local AUnit cases. Actual C concat windows and final acceptance remain.
+
+The [public file checkpoint](sessions/2026-11-08-public-file-loading.md)
+completes the auxiliary file export through owned shared input. Twenty-one
+C cases match both native configurations; both default and T local builds
+pass 1,898 AUnit cases. Sixteen byte-preserving stdin children cover both
+directions of C/Ada binary loading. Traceback, remaining drivers and final
+shared/platform/full-target acceptance remain open.
+
+
+The [panic/provider checkpoint](sessions/2026-11-08-panic-provider-controls.md)
+extends the [public driver](sessions/2026-11-08-public-api-driver.md) to 96
+command names with actual panic callbacks, pre-panic closing and shared test
+refusal across independent states. Both local configurations pass 1,973 AUnit
+cases, including a 513-position refusal sweep; fourteen new Lua witnesses match
+original native T and the identical C helper module. Unchanged soft T api.lua
+reaches line 580's fixed-buffer allocation delta; memerr.lua passes initial
+panic/oversized checks but still escapes memory refusal through checkerr.
+Borrowed Lua C views, fresh coroutine function slots, remaining drivers and
+final acceptance stay open. No source obligation is excluded by this checkpoint.
+
+The [literal substitution checkpoint](sessions/2026-11-08-auxiliary-substitution.md)
+completes two more public auxiliary exports through owned buffers. Sixteen
+C cases match native default/T; all 1,858 combined local AUnit cases pass,
+including three bounded-work/cleanup witnesses. The traceback helper and
+full-target instrumented/platform acceptance remain open.
+
+
+The [auxiliary allocator checkpoint](sessions/2026-11-08-public-auxiliary-allocator.md)
+completes the public allocator/seed and default-constructor identity locally.
+Thirteen shared-source cases match native default/T; 1,822 AUnit and eighteen
+standalone C consumers pass. Final instrumented/shared/platform evidence and
+the remaining traceback helper remain pending.
+
+
+The [library argument diagnostic checkpoint](sessions/2026-11-08-library-argument-diagnostics.md)
+shares VM/auxiliary type policies and actual argument call origins. Thirty
+new cases pass within 1,856 local AUnit cases; both producer/runtime paths
+and the nineteen-case C builtin contract have scoped native comparisons.
+Unchanged errors.lua next fails named tostring. Registry fallback callbacks,
+actual C concat windows and complete target acceptance remain open.
+
+The [concatenation operation checkpoint](sessions/2026-11-08-concat-operation-diagnostics.md)
+preserves actual operand capture, merged source events, primitive/index
+diagnostic names and rendered C name boundaries. Eighty named cases pass
+within 1,826 local AUnit cases, with two complete default four-way fixtures.
+Unchanged db.lua still matches native output; locals.lua assertions and stdout
+pass with an explicit collection-progress stderr difference. Full errors.lua
+next fails library argument diagnostics. Actual C concat windows, remaining T paths
+and full target acceptance remain open.
+
+The [auxiliary buffer checkpoint](sessions/2026-11-08-auxiliary-buffer-ownership.md)
+completes eight exports locally: seventeen identical-source C cases match
+both native configurations, and strict local builds pass 1,738 AUnit cases
+and fifteen retained C consumers. Captured providers, actual refused growth,
+bounded near-limit content and disposal without Lua have focused evidence.
+The remaining auxiliary surface and full target acceptance stay open.
+
+The [thread reset checkpoint](sessions/2026-11-08-thread-reset.md) implements
+public close/reset and typed self-close propagation through actual C guards.
+Twenty-four public cases match default C; native T matches twenty-three with
+one explicit warning-lock reentry skip. Strict local builds, all 1,737 AUnit
+cases and sixteen standalone C contracts pass. Additional Ada-owned reader,
+warning and host-quota cases preserve cleanup and the original shared budget.
+Fresh coroutine function slots, relevant T command-driver completion and final
+integrated image/platform/review acceptance remain open.
+
+The [native module checkpoint](sessions/2026-11-08-native-module-loading.md)
+builds the owned loader and CLI environment control locally, with 1,691
+passing AUnit cases and fourteen passing C consumers. Unchanged native
+fixtures load into the static host. A disposable Windows-corrected attrib.lua
+matches C output; its adaptation is not yet reviewed acceptance evidence.
+Native image receipts, lifetime/fault campaigns and final matrix remain open.
+
+Its subsequent nine-case C lifetime driver matches Ada default/static and
+both native C configurations, including finalizer calls, external payload
+release, balanced storage and actual OS unload. Integrated local source
+passes 1,714 AUnit cases; module-owned allocators, Ada T/shared/POSIX and
+immutable final acceptance remain pending in that session record.
+
+The [protected error-closing checkpoint](sessions/2026-11-08-protected-error-closing.md)
+wires actual execution retirement and saved scalar floors into error drivers.
+Eight new Lua/AUnit cases and thirteen same-source C cases have scoped native
+default/T evidence; all 1,713 local AUnit cases pass. Unchanged default locals.lua
+source runs reach OK with matching output. Ownerless guard policy, T-enabled
+locals obligations, thread reset and final matrix/review acceptance remain open.
+
+The [closing-prefix prerequisite](sessions/2026-11-08-closing-stack-prefix.md)
+retains actual departing scalars while execution ownership retires. Five
+new VM lifetime/refusal cases pass within 1,705 AUnit cases. Error callers now
+use this prerequisite; thread-reset callers and final public verification remain.
+
+The [host base C closing checkpoint](sessions/2026-11-08-base-c-closing.md)
+adds actual idle C closing slots and allocation-free registration/thread
+pointer queries. Thirteen C cases match both native configurations; strict
+local default builds and 1,695 AUnit cases pass. Thread reset/self-close,
+fresh coroutine function slots and integrated full acceptance remain open.
+
+The [C operator checkpoint](sessions/2026-11-08-c-operator-windows.md) adds
+arithmetic/comparison with actual caller slots and unary duplicate operands.
+Seventeen C cases match both native configurations; strict local default
+builds and 1,678 AUnit cases pass. Thread reset, host-base C closers and
+integrated final acceptance remain open.
+
+The [public value/auxiliary checkpoint](sessions/2026-11-08-public-value-auxiliary.md)
+has matching local C/Ada evidence for three core and 28 auxiliary exports.
+Its 20,000-value binary64 text fingerprint matches both C configurations;
+the six scalar and two auxiliary quota regressions pass within 1,664 AUnit
+cases. Full surface, runtime matrix and whole-target acceptance remain pending.
+
+The [public C numeric checkpoint](sessions/2026-11-08-c-numeric-conversion.md)
+adds allocation-free string conversion and exact `lua_ident` data. Eleven
+identical-source C cases match default and native T, including refusal and
+two thousand seeded round trips. Strict local default builds and 1,641 AUnit
+cases pass; integrated T/shared/platform and full acceptance remain pending.
+
+The [fixed numeric scratch checkpoint](sessions/2026-11-08-fixed-numeric-scratch.md)
+reuses the exact parser with a bounded local provider. Strict local default
+builds and 1,640 AUnit cases pass. Public C conversion wiring, integrated T,
+shared/platform and complete-suite acceptance remain separate obligations.
+
+The [C varargs formatting checkpoint](sessions/2026-11-08-c-varargs-formatting.md)
+passes strict Windows validation/static builds and all 1,551 current AUnit
+cases. Its four public C contracts also pass unchanged against default and
+instrumented C Lua, including actual growth-refusal sweeps and recovery.
+This completes two exports locally; full C surface and target acceptance
+remain open.
+
+The [external string checkpoint](sessions/2026-11-08-external-string-ownership.md)
+passes strict local Windows/default/static builds and 1,557 AUnit cases.
+Eighteen public C/Ada ownership/reentry cases match pinned default C;
+thirteen ownership cases match native T, with five reentry cases explicitly
+skipped because the native instrumented lock rejects them. Ordinary short
+strings now have weak universe-wide identity. Integrated Ada T, native-module
+unload ordering, all platforms and full acceptance remain pending.
+
+The [syntax diagnostic checkpoint](sessions/2026-11-08-syntax-diagnostic-tokens.md)
+passes strict Windows validation/static builds and 1,534 AUnit cases. Its
+focused Lua witness matches both C configurations; unchanged unreduced
+calls.lua reaches OK locally. Full file protocols, runtime error diagnostics,
+instrumented paths and final matrix acceptance remain open.
+
+The [table length checkpoint](sessions/2026-11-08-table-length-results.md)
+matches pinned conversion diagnostics and unpack ordering, with 1,507 passing
+local AUnit cases. Unchanged unreduced sort.lua reaches OK locally; literals.lua
+has a matching default C/Ada runner observation. Both require final-head matrix
+and relevant instrumented evidence before target acceptance.
+
+The [runtime numeric locale checkpoint](sessions/2026-11-08-runtime-numeric-locale.md)
+adds native-point string conversion while retaining source grammar and exact
+rounding. Its strict Windows validation/static component build passes 1,418
+AUnit cases, including eight new focused cases. Final integrated acceptance
+remains pending.
+
+The [CLI process checkpoint](sessions/2026-11-08-cli-process-controls.md)
+passes strict Windows validation/static builds, 1,422 component AUnit cases,
+86 Ada process protocols and 32 corresponding pinned-C protocols. Native
+loading, signals/readline and complete main.lua acceptance remain open.
+
+Implementation resumes from merged PR #10 on
+codex/m3-remaining-upstream-compatibility. The approved target includes all
+remaining primary files, aggregate, heavy case, helpers and native fixtures.
+Public C/Lua behavior remains mandatory; independently reviewed private T
+exclusions are reported separately under ADR 0018. Full acceptance, PR review
+and merge remain pending. See the
+[session](sessions/2026-11-07-remaining-upstream-compatibility.md).
+
+The first binary-module searcher repair passes the strict Windows validation/
+static build and 1,391 AUnit cases, with zero assertion failures or unexpected
+errors. This is component evidence, not a full upstream or platform pass.
+
 ## Expanded T conformance (2026-11-07)
 
 The delivery on codex/m3-expanded-t-conformance retains the nine previously

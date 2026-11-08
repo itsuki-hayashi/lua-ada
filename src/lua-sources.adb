@@ -34,10 +34,20 @@ package body Lua.Sources is
             end if;
          end loop;
          for Offset in Result.Skipped_Bytes .. Source'Length - 1 loop
-            exit when Source (Source'First + Offset) in
-              Character'Val (10) | Character'Val (13);
+            exit when Source (Source'First + Offset) = Character'Val (10);
             Result.Blanked_Bytes := Result.Blanked_Bytes + 1;
          end loop;
+         --  skipcomment ignores everything through LF. An interior lone CR
+         --  must not expose the rest of the interpreter line as Lua code.
+         --  Retain a final CRLF pair for the existing pure preparation API;
+         --  the lexer treats that pair as the one newline C inserts here.
+         if Result.Skipped_Bytes + Result.Blanked_Bytes < Source'Length
+           and then Result.Blanked_Bytes > 0 and then
+           Source (Source'First + Result.Skipped_Bytes +
+                     Result.Blanked_Bytes - 1) = Character'Val (13)
+         then
+            Result.Blanked_Bytes := Result.Blanked_Bytes - 1;
+         end if;
       end if;
       return Result;
    end Inspect_File_Preamble;

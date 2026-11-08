@@ -1,12 +1,25 @@
 param(
-    [Parameter(Mandatory)]
-    [string] $Interpreter
+    [Parameter(Mandatory)][string]$Interpreter,
+    [switch]$NativeProtocol,[switch]$PromptProtocol,[switch]$BatchProtocol,
+    [ValidateSet('Ada','ReferenceC')][string]$RuntimeRole='Ada',
+    [ValidateSet('default','upstream-test')][string]$Configuration='default',
+    [ValidateSet('development','validation','release')][string]$Profile='validation',
+    [ValidateSet('static','static-pic','relocatable')][string]$LibraryType='static',
+    [string]$Report='', [string]$RuntimeDirectory='',
+    [switch]$CollectAllObservations,[switch]$DevelopmentObservation
 )
-
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference='Stop'
+if(($CollectAllObservations -or $DevelopmentObservation) -and
+    (-not $CollectAllObservations -or -not $DevelopmentObservation -or
+     $RuntimeRole -cne 'ReferenceC' -or -not $PromptProtocol -or $NativeProtocol -or $BatchProtocol)){
+    throw 'CollectAllObservations requires explicit development-only native prompt observation'
+}
+Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
+Import-Module (Join-Path $PSScriptRoot 'CliFixtureEvidence.psm1')
+Import-Module (Join-Path $PSScriptRoot 'CliFixtureCases.psm1')
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $executable = (Resolve-Path -LiteralPath $Interpreter).Path
-$fixtureRoot = Join-Path $projectRoot 'reports/cli-fixtures'
+$fixtureRoot = Join-Path $projectRoot ('reports/core-image/'+[Guid]::NewGuid().ToString('N')+'/cli-fixtures')
 New-Item -ItemType Directory -Path $fixtureRoot -Force | Out-Null
 $utf8 = [Text.UTF8Encoding]::new($false)
 $newline = [Environment]::NewLine
@@ -17,165 +30,134 @@ $newline = [Environment]::NewLine
     'print(arg[1],arg[2]); print(...)', $utf8)
 [IO.File]::WriteAllText((Join-Path $fixtureRoot '-script.lua'), 'print(42)', $utf8)
 [IO.File]::WriteAllText((Join-Path $fixtureRoot 'empty.lua'), '', $utf8)
+[IO.File]::WriteAllText((Join-Path $fixtureRoot 'source-name.lua'),
+    'local d=debug.getinfo(1,"S"); print(d.source,d.short_src)', $utf8)
 [IO.File]::WriteAllText((Join-Path $fixtureRoot 'shebang.lua'),
     "#!/usr/bin/env lua`nprint(42)", $utf8)
 [IO.File]::WriteAllText((Join-Path $fixtureRoot 'bom.lua'),
     "#!/usr/bin/env lua`nprint(42)", [Text.UTF8Encoding]::new($true))
 
+[IO.File]::WriteAllText((Join-Path $fixtureRoot 'cli_lib.lua'),
+    "return { tag = 'lib' }", $utf8)
+[IO.File]::WriteAllText((Join-Path $fixtureRoot 'cli_init.lua'),
+    "init_ran = 'file'", $utf8)
+$banner = 'Lua 5.5.1  Copyright (C) 1994-2026 Lua.org, PUC-Rio'
+
 [IO.File]::WriteAllText((Join-Path $fixtureRoot 'large-source.lua'),
     ('--[[' + ('a' * 1000001) + ']] print(42)'), $utf8)
-
-function Invoke-Case {
-    param([hashtable] $Case)
-    $start = [Diagnostics.ProcessStartInfo]::new()
-    $start.FileName = $executable
-    $start.WorkingDirectory = $fixtureRoot
-    $start.UseShellExecute = $false
-    $start.RedirectStandardOutput = $true
-    $start.RedirectStandardError = $true
-    $start.RedirectStandardInput = $true
-    $start.StandardInputEncoding = $utf8
-    foreach ($argument in $Case.Args) { $start.ArgumentList.Add($argument) }
-
-    $process = [Diagnostics.Process]::new()
-    $process.StartInfo = $start
-    try {
-        [void]$process.Start()
-        $stdout = $process.StandardOutput.ReadToEndAsync()
-        $stderr = $process.StandardError.ReadToEndAsync()
-        if ($Case.ContainsKey('Input')) { $process.StandardInput.Write($Case.Input) }
-        $process.StandardInput.Close()
-        if (-not $process.WaitForExit(30000)) {
-            $process.Kill($true)
-            throw "CLI timed out: $($Case.Title)"
-        }
-        $output = $stdout.GetAwaiter().GetResult()
-        $errorOutput = $stderr.GetAwaiter().GetResult()
-        if ($Case.ContainsKey('ExitCode')) {
-            if ($process.ExitCode -ne $Case.ExitCode -or $errorOutput -ne '') {
-                throw "CLI typed exit mismatch: $($Case.Title): $errorOutput"
-            }
-        }
-        elseif ($Case.Fail) {
-            if ($process.ExitCode -eq 0 -or
-                -not $errorOutput.Contains($Case.Error)) {
-                throw "Expected CLI failure: $($Case.Title): $errorOutput"
-            }
-        }
-        elseif ($process.ExitCode -ne 0 -or $errorOutput -ne '') {
-            throw "CLI failed: $($Case.Title): $errorOutput"
-        }
-        if ($Case.ContainsKey('Output') -and $output -cne $Case.Output) {
-            throw "CLI output mismatch: $($Case.Title): <$output>"
-        }
-        if ($Case.ContainsKey('Contains') -and -not $output.Contains($Case.Contains)) {
-            throw "Missing CLI output: $($Case.Title): <$output>"
-        }
-        Write-Output "CLI PASS: $($Case.Title)"
-    }
-    finally { $process.Dispose() }
+[IO.File]::Copy((Join-Path $projectRoot 'tests/lua/cli_prompt_controls.lua'),
+    (Join-Path $fixtureRoot 'prompt-controls.lua'))
+if((Get-FileHash (Join-Path $projectRoot 'tests/lua/cli_prompt_controls.lua')).Hash -cne
+    (Get-FileHash (Join-Path $fixtureRoot 'prompt-controls.lua')).Hash){
+    throw 'Prompt callback fixture copy changed bytes'
 }
 
-$cases = @(
-    # Lua narrows lua_Integer to the native C int before process exit.
-    # Windows exposes the signed status; POSIX reports its lowest byte.
-    @{ Title = 'negative process exit retains native status';
-       ExitCode = $(if ($IsWindows) { -1 } else { 255 });
-       Args = @('-e', 'os.exit(-1,false)'); Output = '' },
-    @{ Title = 'oversized process exit retains low C int bits'; ExitCode = 0;
-       Args = @('-e', 'os.exit(4294967296,false); error("unreachable")'); Output = '' },
-    # The native unbuffered call ignores buffer capacity. A checked Ada
-    # range conversion must not reject the otherwise valid Lua integer.
-    @{ Title = 'unbuffered file accepts negative size_t input';
-       Args = @('-e', 'local f=assert(io.open("negative-size.tmp","w")); assert(f:setvbuf("no",-1)); assert(f:write("ok")); assert(f:close()); assert(os.remove("negative-size.tmp"))');
-       Output = '' },
-    @{ Title = 'typed exit without Lua close handlers'; ExitCode = 42;
-       Args = @('-e', 'saved=setmetatable({}, {__gc=function() print("finalized") end}); local x <close> = setmetatable({}, {__close=function() print("closed") end}); os.exit(42,false)', '-e', 'error("unreachable")');
-       Output = '' },
-    @{ Title = 'typed exit completes Lua close handlers'; ExitCode = 43;
-       Args = @('-e', 'saved=setmetatable({}, {__gc=function() print("finalized") end}); local x <close> = setmetatable({}, {__close=function() print("closed") end}); os.exit(43,true)', '-e', 'error("unreachable")');
-       Output = "closed${newline}finalized$newline" },
-    # A reachable finalizable object must run at explicit CLI state closure,
-    # after the chunk marker; physical Ada disposal alone cannot satisfy it.
-    @{ Title = 'state close finalizes reachable objects';
-       Args = @('-e', 'saved=setmetatable({}, {__gc=function() print("closed") end}); print("done")');
-       Output = "done${newline}closed$newline" },
-    @{ Title = 'failed snippet closes reachable objects';
-       Args = @('-e', 'saved=setmetatable({}, {__gc=function() print("closed") end}); error("expected")');
-       Fail = $true; Error = 'expected'; Output = "closed$newline" },
-    # No input is deliberately batch usage, rather than an implicit REPL.
-    @{ Title = 'no input displays usage'; Args = @(); Contains = 'Usage:' },
-    @{ Title = 'explicit help'; Args = @('--help'); Contains = 'Usage:' },
-    @{ Title = 'version'; Args = @('--version');
-       Output = "Lua Ada 0.1.0-dev (target 5.5.1)$newline" },
-    @{ Title = 'single snippet'; Args = @('-e', 'print(42)'); Output = "42$newline" },
-    @{ Title = 'attached snippet'; Args = @('-eprint(42)'); Output = "42$newline" },
-    # The second chunk observes the same session globals as the first.
-    @{ Title = 'repeated snippets'; Args = @('-e', 'answer=40', '-e', 'print(answer+2)');
-       Output = "42$newline" },
-    @{ Title = 'explicit stdin'; Args = @('-'); Input = "print(42)`n";
-       Output = "42$newline" },
-    # Options appearing after the script name are ordinary script arguments.
-    @{ Title = 'script arguments and varargs'; Args = @('arguments.lua', 'first', '-e');
-       Output = "first`t-e${newline}first`t-e$newline" },
-    @{ Title = 'snippets see negative argument indices';
-       Args = @('-e', 'assert(arg[-2]=="-e")', 'arguments.lua', 'first', 'second');
-       Output = "first`tsecond${newline}first`tsecond$newline" },
-    @{ Title = 'option terminator'; Args = @('--', '-script.lua'); Output = "42$newline" },
-    @{ Title = 'empty file'; Args = @('empty.lua'); Output = '' },
-    @{ Title = 'file shebang'; Args = @('shebang.lua'); Output = "42$newline" },
-    @{ Title = 'BOM and shebang'; Args = @('bom.lua'); Output = "42$newline" },
-    # Error classes have process-level contracts as well as Ada API tests.
-    @{ Title = 'syntax error'; Args = @('-e', 'local ='); Fail = $true;
-       Error = 'expected'; Output = '' },
-    @{ Title = 'runtime error'; Args = @('-e', "error('expected',0)"); Fail = $true;
-       Error = 'expected'; Output = '' },
-    @{ Title = 'output before runtime error'; Args = @('-e', "print(42); error('x',0)");
-       Fail = $true; Error = 'x'; Output = "42$newline" },
-    @{ Title = 'missing snippet argument'; Args = @('-e'); Fail = $true;
-       Error = '-e requires'; Output = '' },
-    @{ Title = 'unknown option'; Args = @('--invalid-option'); Fail = $true;
-       Error = 'unrecognized option'; Output = '' },
-    @{ Title = 'missing file'; Args = @('missing.lua'); Fail = $true;
-       Error = 'lua_ada:'; Output = '' }
-)
-$cases += @(
-    # Checking must accept deferred grammar and suppress every Lua side effect.
-    @{ Title = 'check snippet suppresses output';
-       Args = @('--check', '-e', 'print(42)'); Output = '' },
-    @{ Title = 'check valid deferred syntax';
-       Args = @('--check', '-e', 'local x<close>; goto done; ::done::'); Output = '' },
-    @{ Title = 'check repeated independent snippets';
-       Args = @('--check', '-e', 'global x', '-e', 'print(y)'); Output = '' },
-    @{ Title = 'check explicit stdin'; Args = @('--check', '-');
-       Input = 'print(42)'; Output = '' },
-    @{ Title = 'check file ignores script arguments';
-       Args = @('--check', 'arguments.lua', '--invalid-option'); Output = '' },
-    @{ Title = 'check option terminator';
-       Args = @('--check', '--', '-script.lua'); Output = '' },
-    @{ Title = 'check file preamble';
-       Args = @('--check', 'bom.lua'); Output = '' },
-    @{ Title = 'check syntax failure'; Args = @('--check', '-e', 'local =');
-       Fail = $true; Error = 'expected'; Output = '' },
-    @{ Title = 'check stops before later input';
-       Args = @('--check', '-e', 'local =', 'missing.lua');
-       Fail = $true; Error = 'expected'; Output = '' },
-    @{ Title = 'check no input'; Args = @('--check'); Contains = 'Usage:' },
-    @{ Title = 'execute resolved label';
-       Args = @('-e', 'print(42); ::done::'); Output = "42$newline" },
-    @{ Title = 'compatible instruction policy';
-       Args = @('-e', 'local n=0; for i=1,150000 do n=n+1 end; print(n)');
-       Output = "150000$newline" },
-    @{ Title = 'compatible file source policy';
-       Args = @('large-source.lua'); Output = "42$newline" },
-    @{ Title = 'compatible stdin source policy'; Args = @('-');
-       Input = ('--[[' + ('a' * 1000001) + ']] print(42)');
-       Output = "42$newline" },
-    @{ Title = 'compatible check source policy';
-       Args = @('--check', 'large-source.lua'); Output = '' },
-    @{ Title = 'compatible runtime load source policy';
-       Args = @('-e', "assert(load('--[['..string.rep('a',1000001)..']] return 42'))(); print(42)");
-       Output = "42$newline" }
-)
-foreach ($case in $cases) { Invoke-Case -Case $case }
+if(@($NativeProtocol,$PromptProtocol,$BatchProtocol|Where-Object{$_}).Count -gt 1){throw 'Choose one explicit CLI protocol subset'}
+$mode=if($BatchProtocol){'batch'}elseif($PromptProtocol){'prompt'}elseif($NativeProtocol){'native'}else{'full'}
+$platform=if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'}
+if($RuntimeDirectory -eq ''){
+    $part=if($Configuration -ceq 'upstream-test'){'upstream-test/'}else{''}
+    $RuntimeDirectory=Join-Path $projectRoot "lib/$part$Profile/$LibraryType"
+}
+$RuntimeDirectory=(Resolve-Path $RuntimeDirectory).Path
+if($Report -eq ''){$Report=Join-Path $fixtureRoot 'result.json'}
+$Report=[IO.Path]::GetFullPath($Report)
+[void][IO.Directory]::CreateDirectory((Split-Path -Parent $Report))
+$revision=(&git -C $projectRoot rev-parse HEAD).Trim()
+if($LASTEXITCODE -ne 0){throw 'Cannot identify CLI observation source'}
+$changes=@(&git -C $projectRoot -c core.fsmonitor=false status --porcelain=v1 --untracked-files=normal)
+if($LASTEXITCODE -ne 0){throw 'Cannot identify CLI observation source state'}
+$raw=@{schema_version=1;kind='cli-fixture-observations';mode=$mode;runtime_role=$RuntimeRole;synthetic_fixture=$false;
+    runtime_acceptance=$false;coverage_authority=$false;repository_revision=$revision;repository_dirty=($changes.Count -ne 0);
+    context=($Configuration+'/'+$platform+'/'+$Profile+'/'+$(if($LibraryType -ceq 'relocatable'){'shared'}else{$LibraryType}));
+    platform=$platform;executable=$executable;executable_sha256=(Get-FileHash $executable).Hash.ToLowerInvariant();
+    runtime_directory=$RuntimeDirectory;
+    library_files=@(Get-ChildItem $RuntimeDirectory -File|Where-Object{$_.Name -cmatch '\.(?:a|dll|dylib|so(?:\.[0-9.]+)?)$'}|
+        ForEach-Object{@{path=$_.FullName;sha256=(Get-FileHash $_.FullName).Hash.ToLowerInvariant()}});
+    working_directory=$fixtureRoot;source_repository_root=$projectRoot;
+    source_bindings=@(Get-CliFixtureSources|ForEach-Object{@{path=$_;sha256=(Get-FileHash (Join-Path $projectRoot $_)).Hash.ToLowerInvariant()}});
+    fixture_files=@(Get-ChildItem $fixtureRoot -File|ForEach-Object{@{name=$_.Name;sha256=(Get-FileHash $_.FullName).Hash.ToLowerInvariant()}});
+    processes=@()}
+if($CollectAllObservations){
+    $raw['development_observation']=$true
+    $raw['contract_failures']=@()
+}
+
+function Invoke-Case {
+    param([hashtable]$Case,[switch]$ConfigurationProbe)
+    # Freeze input and both output byte streams for every child. The shared
+    # reader rechecks the original contract against these physical captures.
+    $prefix=Join-Path $fixtureRoot ('captures/'+$(if($ConfigurationProbe){'configuration'}else{[string]$raw.processes.Count}))
+    [void][IO.Directory]::CreateDirectory((Split-Path -Parent $prefix))
+    $inputPath=$prefix+'.input'
+    [IO.File]::WriteAllText($inputPath,$(if($Case.Contains('Input')){$Case.Input}else{''}),$utf8)
+    $environment=if($Case.Contains('Env')){$Case.Env}else{@{}}
+    $processEnvironment=@{}
+    foreach($name in $environment.Keys){$processEnvironment[$name]=$environment[$name]}
+    foreach($name in @('PATH','LD_LIBRARY_PATH','DYLD_LIBRARY_PATH')){
+        $processEnvironment[$name]=$RuntimeDirectory+[IO.Path]::PathSeparator+[Environment]::GetEnvironmentVariable($name)
+    }
+    $process=Invoke-ConformanceProcess -Executable $executable -Arguments @($Case.Args) -Directory $fixtureRoot `
+        -OutputPrefix $prefix -TimeoutSeconds 30 -Environment $processEnvironment -StandardInputPath $inputPath `
+        -ObserveEarlyInputClose:($Case.Contains('InputMayCloseEarly') -and $Case.InputMayCloseEarly)
+    $diagnostic=$RuntimeRole -ceq 'ReferenceC' -and $Configuration -ceq 'upstream-test' -and
+        $mode -ceq 'prompt' -and $Case.Title -ceq 'REPL prompt typed exit without close retains status'
+    $collect=$CollectAllObservations -and -not $ConfigurationProbe -and $Case.Title.StartsWith('REPL ',[StringComparison]::Ordinal)
+    $unreviewedDiagnostic=$diagnostic -and $platform -cne 'windows'
+    $row=@{title=$Case.Title;environment=$environment;process=$process;
+        observation_disposition=$(if($diagnostic){'observed-native-test-teardown-diagnostic'}else{'clean-operation'});
+        passing_execution_evidence=(-not $diagnostic)}
+    if($diagnostic -and -not $unreviewedDiagnostic){
+        $row['feature_review']=Assert-CliNativeTestExitDirection -Root $projectRoot
+    }
+    if($ConfigurationProbe){$raw['configuration_probe']=$row}else{$raw.processes+=,$row}
+    try{
+        if($unreviewedDiagnostic){throw 'Native T no-close diagnostic requires fresh platform applicability review'}
+        $output=Assert-CliCaseCapture -Case $Case -Row $row -Executable $executable `
+            -ExecutableHash $raw.executable_sha256 -Directory $fixtureRoot -NativeTestDiagnostic:$diagnostic
+        if($collect){$row['contract_match']=$true}
+    }catch{
+        if(-not $collect){throw}
+        $row['contract_match']=$false
+        $row['contract_error']=$_.Exception.Message
+        $raw.contract_failures+=@{title=$Case.Title;message=$_.Exception.Message;
+            stdout_sha256=$process.stdout_sha256;stderr_sha256=$process.stderr_sha256;exit_code=$process.exit_code}
+        # Preserve the original stream even when a platform backend violates
+        # the current comparison contract. This return value supplies no pass.
+        $output=[IO.File]::ReadAllText($process.stdout_path)
+    }finally{
+        if($collect){
+            # The normal validator above evaluated a provisional contract
+            # row. Serialize only an observation label; no collected process
+            # is promoted to passing evidence by this development campaign.
+            $row.passing_execution_evidence=$false
+            $row.observation_disposition=if($unreviewedDiagnostic){'unreviewed-native-test-teardown-observation'}else{'development-only-observation'}
+        }
+    }
+    if($collect){
+        Write-Host "CLI COLLECTED: $($Case.Title); contract_match=$($row.contract_match); passing evidence=False"
+        return $output
+    }
+    if($diagnostic){Write-Host "CLI OBSERVED DIAGNOSTIC: $($Case.Title) (no passing or cleanup evidence)"}
+    else{Write-Host "CLI PASS: $($Case.Title)"}
+    return $output
+}
+
+try{
+    if($RuntimeRole -ceq 'ReferenceC'){$null=Invoke-Case (Get-CliConfigurationCase $Configuration) -ConfigurationProbe}
+    $probes=@(Get-CliProbeCases)
+    $defaultPath=Invoke-Case $probes[0]
+    $defaultCPath=Invoke-Case $probes[1]
+    $definitions=Get-CliCaseDefinitions -DefaultPackagePath $defaultPath `
+        -DefaultPackageCPath $defaultCPath -Platform $platform -Mode $mode
+    foreach($case in $definitions.cases){$null=Invoke-Case $case}
+    if($CollectAllObservations){
+        Write-Output "COLLECTED: CLI native prompt processes; contract_failures=$($raw.contract_failures.Count); development-only, strict pair remains unaccepted"
+    }else{
+        $observed=Assert-CliFixtureReport -Root $projectRoot -Report $raw -Interpreter $executable -Mode $mode
+        Write-Output "OBSERVED: CLI $mode ($($observed.clean_operations.Count) clean operations/$($observed.native_test_diagnostics.Count) native test diagnostics); runtime acceptance=False"
+    }
+}finally{
+    [IO.File]::WriteAllText($Report,(ConvertTo-Json -InputObject $raw -Depth 32).Replace("`r`n","`n")+"`n",$utf8)
+}
 exit 0

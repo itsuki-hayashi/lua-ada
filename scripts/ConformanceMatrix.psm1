@@ -647,4 +647,41 @@ function Test-ScopedMatrix {
         warning_regressions=$warningResults;full_m3_acceptance=$false}
 }
 
-Export-ModuleMember -Function Assert-ScopedMatrixIndex, Test-ScopedMatrix
+function Test-RetainedMatrixWitnesses {
+    param([Parameter(Mandatory)][string] $Root,
+          [Parameter(Mandatory)][Collections.IDictionary] $Manifest,
+          [Parameter(Mandatory)][string] $Bundle,
+          [Parameter(Mandatory)][Collections.IDictionary] $Suite,
+          [Collections.IDictionary] $TargetWitnessPolicy = $null,
+          [Collections.IDictionary] $TargetBuildWitnesses = @{})
+    # Full-target reconciliation reuses the actual named C/AUnit and warning
+    # protocols from the retained expanded scope. Exposing this replay avoids
+    # weakening them to a set of successful primary-file process exits.
+    if ($Manifest.scope -cne 'expanded-t-conformance') { throw 'Unknown retained matrix witness scope' }
+    $seenWarnings = @{}
+    foreach ($identity in $Manifest.warning_regressions) {
+        if ($identity.context -cnotin $Suite.acceptance_contexts -or $seenWarnings.ContainsKey($identity.context)) {
+            throw 'Unknown or duplicate retained warning context'
+        }
+        $seenWarnings[$identity.context] = $true
+    }
+    foreach ($context in $Suite.acceptance_contexts) {
+        if (-not $seenWarnings.ContainsKey($context)) { throw "Missing retained warning context: $context" }
+    }
+    if($null -eq $TargetWitnessPolicy){
+        $consumers = Test-MatrixNamedEvidence -Root $Root -Manifest $Manifest -Bundle $Bundle -Suite $Suite
+    }else{
+        if($TargetWitnessPolicy.source_reviewed -ne $true){throw 'Retained target witnesses need independently reviewed current-source catalogues'}
+        $consumers=@{}
+        foreach($context in $Suite.acceptance_contexts){
+            if(-not $TargetBuildWitnesses.Contains($context) -or $TargetBuildWitnesses[$context].build_witnesses_verified -ne $true){
+                throw 'Retained target actual named build evidence is missing'
+            }
+            $consumers[$context]=$TargetBuildWitnesses[$context].consumer_report
+        }
+    }
+    $warnings = @(Test-MatrixWarningEvidence -Root $Root -Manifest $Manifest -Bundle $Bundle)
+    return @{consumers=$consumers;warnings=$warnings}
+}
+
+Export-ModuleMember -Function Assert-ScopedMatrixIndex, Test-ScopedMatrix, Test-RetainedMatrixWitnesses

@@ -1,0 +1,286 @@
+{
+  "schema_version": 1,
+  "kind": "memerr-materialized-vararg-allocation-author-proposal",
+  "candidate_id": "memerr-materialized-vararg-allocation-count",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/runtime_gaps",
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "configuration": "upstream-test",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": {
+    "path": "references/lua/testes/memerr.lua",
+    "sha256": "02cc2a754e688bdfcbf507e009d899c4d367f27ced45094b68fdf208a6912491",
+    "byte_length": 7512
+  },
+  "scope": "Source-only feature proposal. Only the materialized vararg exact allocation count at original133 is a private-geometry candidate. No transformed file, installed exclusion, ledger/scope classification, semantic waiver, output normalization or execution acceptance is authored.",
+  "original_lexical_obligation": {
+    "id": "LUA-MEMERR-ASSERT-CALL-0004",
+    "kind": "assert-call",
+    "byte_offset": 3544,
+    "byte_length": 6,
+    "line": 133,
+    "end_line": 133,
+    "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+    "status": "pending",
+    "disposition": "pending",
+    "invariant": null,
+    "configurations": [],
+    "evidence": [],
+    "review": null
+  },
+  "relevant_mixed_block": {
+    "path": "references/lua/testes/memerr.lua",
+    "byte_offset": 3382,
+    "byte_length": 480,
+    "line": 128,
+    "end_line": 139,
+    "anchor_sha256": "40ecb673eb79fd04a13bde1cb7957b01998ee23e828bd1f919895c1fd81c78ca",
+    "original_bytes": "do  -- vararg tables\n  local function pack (...t) return t end\n  local b = testamem(\"vararg table\", function ()\n    return pack(10, 20, 30, 40, \"hello\")\n  end)\n  assert(b.aloc == 3)   -- new table uses three memory blocks\n  -- table optimized away\n  local function sel (n, ...arg) return arg[n] + arg.n end\n  local b = testamem(\"optimized vararg table\",\n        function () return sel(2.0, 20, 30) end)\n  assert(b.res == 32 and b.aloc == 0)   -- no memory needed for this case\nend"
+  },
+  "private_candidate": {
+    "span": {
+      "path": "references/lua/testes/memerr.lua",
+      "byte_offset": 3544,
+      "byte_length": 19,
+      "line": 133,
+      "end_line": 133,
+      "anchor_sha256": "671d423d19a8f100b52a4f4a1402dcbc11e2aa6eadaa7a1eaa77bf09640add01",
+      "original_bytes": "assert(b.aloc == 3)"
+    },
+    "classification": "candidate exact native storage-allocation count",
+    "public_api_entry": false,
+    "module_observable": true,
+    "original_invariant": "Materializing and returning five named varargs uses exactly three counted native allocation attempts after real warmup and failure sweeps.",
+    "rationale": "The selected allocator is public and its actual failures remain observable and required. Its exact positive call count for one table representation is not a public allocation-geometry promise. Native createvarargtab constructs a Table plus resized array/hash storage; Ada stores its actual table object, member entries and array/hash indices separately. Copying native count3 or imposing native backing layout would not establish language/ABI/root safety. Source bindings and actual observations, not cost, motivate the candidate.",
+    "proposed_treatment": "Independently review this pure exact-count comparison for a narrow private child or reviewed Ada safety equivalent. Preserve the actual materialization workload, original byte/count fault sweeps and all semantic requirements. Require source-linked payload/freshness/rooting/refusal cleanup counterparts before final acceptance; do not classify the complete block or optimized assertion."
+  },
+  "retained_materialization": {
+    "path": "references/lua/testes/memerr.lua",
+    "byte_offset": 3403,
+    "byte_length": 200,
+    "line": 129,
+    "end_line": 133,
+    "anchor_sha256": "d8c6835f0c908ecff84063b0ad1cc6829c0930c914a3abe256efe10462ace352",
+    "original_bytes": "  local function pack (...t) return t end\n  local b = testamem(\"vararg table\", function ()\n    return pack(10, 20, 30, 40, \"hello\")\n  end)\n  assert(b.aloc == 3)   -- new table uses three memory blocks"
+  },
+  "retained_optimized_block": {
+    "path": "references/lua/testes/memerr.lua",
+    "byte_offset": 3604,
+    "byte_length": 254,
+    "line": 134,
+    "end_line": 138,
+    "anchor_sha256": "065e3973d7ca76db008fd02bda7d3321d0daeffa35b11a18281ec77b01917976",
+    "original_bytes": "  -- table optimized away\n  local function sel (n, ...arg) return arg[n] + arg.n end\n  local b = testamem(\"optimized vararg table\",\n        function () return sel(2.0, 20, 30) end)\n  assert(b.res == 32 and b.aloc == 0)   -- no memory needed for this case"
+  },
+  "retained_requirements": [
+    {
+      "behavior": "Original materialized named-vararg function and exact five arguments",
+      "constraint": "Keep pack(...t) returning the actual t and testamem calling pack(10,20,30,40,\"hello\"). No literal/global memoized table or forced compiler flag substitutes for it."
+    },
+    {
+      "behavior": "Actual count and byte failure/recovery sweeps",
+      "constraint": "Keep testalloc and testbytes, both GC calls, deep(4), all real controls and status/error checks, increments, final result and printed measurements. This proposal approves neither native/Ada diagnostic equality nor output normalization."
+    },
+    {
+      "behavior": "Documented optimized named-vararg access",
+      "constraint": "Keep the entire original sel(n,...arg) return arg[n]+arg.n workload, the integral-real index2.0, result32 and aloc0 comparison byte-identical. Preserve the separate exact zero-extra-byte behavior exercised by testbytes; no materialized-count exclusion waives it."
+    },
+    {
+      "behavior": "Actual table semantics and identity",
+      "constraint": "Require a reviewed source-linked counterpart for type(table), n=5, values10/20/30/40/hello, absent sixth element and distinct new table identity on a repeated call. Include meaningful nil/count/mutation coverage where needed without weakening the original five-argument workload."
+    },
+    {
+      "behavior": "Partial construction and cleanup",
+      "constraint": "Require actual selected-provider failures through materialization, correct typed memory errors, rooted reachable payloads, successful retry, collector/list invariants and zero outstanding selected bytes/blocks on shutdown. Do not fabricate counts or use a passing T-absent return."
+    }
+  ],
+  "primary_evidence": [
+    {
+      "span": {
+        "path": "references/lua/ltm.c",
+        "byte_offset": 6586,
+        "byte_length": 552,
+        "line": 231,
+        "end_line": 246,
+        "anchor_sha256": "1fc7a2d9ee19132ef1c0426ce97928cb8bfeb1cfd2a681909a14957c59bec395",
+        "original_bytes": "static void createvarargtab (lua_State *L, StkId f, int n) {\n  int i;\n  TValue key, value;\n  Table *t = luaH_new(L);\n  sethvalue(L, s2v(L->top.p), t);\n  L->top.p++;\n  luaH_resize(L, t, cast_uint(n), 1);\n  setsvalue(L, &key, luaS_new(L, \"n\"));  /* key is \"n\" */\n  setivalue(&value, n);  /* value is n */\n  /* No need to anchor the key: Due to the resize, the next operation\n     cannot trigger a garbage collection */\n  luaH_set(L, t, &key, &value);  /* t.n = n */\n  for (i = 0; i < n; i++)\n    luaH_setint(L, t, i + 1, s2v(f + i));\n  luaC_checkGC(L);\n}"
+      },
+      "finding": "Native creation allocates an actual table, resizes array/hash storage, installs n and copies the original extra values; the exact storage split is C representation."
+    },
+    {
+      "span": {
+        "path": "references/lua/ltm.c",
+        "byte_offset": 8046,
+        "byte_length": 799,
+        "line": 272,
+        "end_line": 289,
+        "anchor_sha256": "11ce54ade08f90d0b6874fc927b59d0a823ba1794384dc758885734d5b19f338",
+        "original_bytes": "void luaT_adjustvarargs (lua_State *L, CallInfo *ci, const Proto *p) {\n  int totalargs = cast_int(L->top.p - ci->func.p) - 1;\n  int nfixparams = p->numparams;\n  int nextra = totalargs - nfixparams;  /* number of extra arguments */\n  if (p->flag & PF_VATAB) {  /* does it need a vararg table? */\n    lua_assert(!(p->flag & PF_VAHID));\n    createvarargtab(L, ci->func.p + nfixparams + 1, nextra);\n    /* move table to proper place (last parameter) */\n    setobjs2s(L, ci->func.p + nfixparams + 1, L->top.p - 1);\n  }\n  else {  /* no table */\n    lua_assert(p->flag & PF_VAHID);\n    buildhiddenargs(L, ci, p, totalargs, nfixparams, nextra);\n    /* set vararg parameter to nil */\n    setnilvalue2s(ci->func.p + nfixparams + 1);\n    lua_assert(L->top.p <= ci->top.p && ci->top.p <= L->stack_last.p);\n  }\n}"
+      },
+      "finding": "PF_VATAB requires materialization; the other path builds hidden arguments and stores nil in the named slot."
+    },
+    {
+      "span": {
+        "path": "references/lua/manual/manual.of",
+        "byte_offset": 83183,
+        "byte_length": 499,
+        "line": 2419,
+        "end_line": 2429,
+        "anchor_sha256": "bb8a7a8ebe35d993fa45a7fd9ee89994590f479037e1fd5c2b27b69aa111ffa0",
+        "original_bytes": "As an optimization,\nif the vararg table satisfies some conditions,\nthe code does not create an actual table and instead translates\nthe indexing expressions and the vararg expressions\ninto accesses to the internal vararg data.\nThe conditions are as follows:\nIf the vararg table has a name,\nthat name is not an upvalue in a nested function\nand it is used only as the base table\nin the syntactic constructions @T{t[exp]} or @T{t.id}.\nNote that an anonymous vararg table always satisfy these conditions."
+      },
+      "finding": "The optimization and indexing behavior are documented. The read-only uncaptured sel case remains a real no-materialized-table obligation, not an optimizer-stream exclusion."
+    },
+    {
+      "span": {
+        "path": "src/lua-engine-tables.adb",
+        "byte_offset": 9811,
+        "byte_length": 1465,
+        "line": 264,
+        "end_line": 294,
+        "anchor_sha256": "dbea1ceaab7002472bfdd7a1ec5801a1c3c49dc83a5180c2c13bf2699f4b2414",
+        "original_bytes": "   procedure Reserve\n     (State : in out World; Table : Object_Access;\n      Sequence_Size, Hash_Size : Natural)\n   is\n      Total : constant Integer_Value := Integer_Value (Sequence_Size) +\n        Integer_Value (Hash_Size);\n      Buckets : Natural := (if Hash_Size = 0 then 0 else 8);\n   begin\n      if Total > Integer_Value (State.Bounds.Table_Entries) then\n         Fail (State, \"table entry limit exceeded\", Resource => True);\n      end if;\n      --  These are real allocations through this table's selected provider,\n      --  not a reported capacity hint. Members hold eventual keys/values;\n      --  the dense index and chained hash buckets retain their own layout.\n      while Buckets < Hash_Size loop\n         if Buckets > Natural'Last / 2 then\n            Fail (State, \"table overflow\");\n         end if;\n         Buckets := Buckets * 2;\n      end loop;\n      Table.Members.Reserve_Capacity (Ada.Containers.Count_Type (Total));\n      Table.Array_Index.Reserve_Capacity\n        (Ada.Containers.Count_Type (Sequence_Size));\n      Table.Hash_Index.Reserve_Capacity (Ada.Containers.Count_Type (Buckets));\n      --  Publish lengths only after every reserve succeeds. Rebuild writes\n      --  all newly live scalar index slots before any lookup can read them.\n      Table.Array_Index.Set_Length\n        (Ada.Containers.Count_Type (Sequence_Size));\n      Table.Hash_Index.Set_Length (Ada.Containers.Count_Type (Buckets));\n      Rebuild (Table);\n   end Reserve;"
+      },
+      "finding": "Actual member, dense-index and hash-index buffers reserve through the selected owner before logical lengths are published. No native allocation count is reported."
+    }
+  ],
+  "source_bindings": [
+    {
+      "path": "references/lua/ltm.c",
+      "sha256": "86e85bbb147f63fbbc67dc451f401fe4bb9b7ecc8c05e003f664dfe9717d860b"
+    },
+    {
+      "path": "references/lua/ltable.c",
+      "sha256": "a271ba45de53d05c7b47cf8ad86628f2c35c85e920c9d29f6c7e133c5b7664f2"
+    },
+    {
+      "path": "references/lua/lvm.c",
+      "sha256": "632ca1fc6400301e3b11195d4830e948e6b4a50b6262187307eb8afe1f769c22"
+    },
+    {
+      "path": "references/lua/lparser.c",
+      "sha256": "918436a59eb67e22e08cc0aede69926a9af9ee106c97ce6bd9568b05c728a8c6"
+    },
+    {
+      "path": "references/lua/lcode.c",
+      "sha256": "9ad73605143555e094f00bd87b0dadb3002c440e7ed743bdd09637e73466cbb6"
+    },
+    {
+      "path": "references/lua/ltests.c",
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
+    },
+    {
+      "path": "references/lua/manual/manual.of",
+      "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409"
+    },
+    {
+      "path": "src/lua-engine-tables.adb",
+      "sha256": "31db4043d6b387c08b61a2ff6f6197d9a5495626200d67cf56cfad66f0821173"
+    },
+    {
+      "path": "src/lua-engine-canonical.adb",
+      "sha256": "71963fbe8a1c8ac7ca39064ead7e3818c89adc17d940b9576bd638bb86563539"
+    },
+    {
+      "path": "src/lua-canonical_compiler.adb",
+      "sha256": "afd7c271850015208d5f302735ba5a7feb2cb2a6263ff3daecd033c1039f761c"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3"
+    },
+    {
+      "path": "tests/src/lua-conformance_allocator.adb",
+      "sha256": "c5f0347be0e16db96e1d93d7fb7aa4a3ac316fdc7efc3355d8d19f591b548b36"
+    },
+    {
+      "path": "tests/lua/lazy_named_vararg.lua",
+      "sha256": "bd2fbdbc27ea34aafc8e27ec890ab459e30faa0d981ae88b0a9c8770e5613c83"
+    },
+    {
+      "path": "tests/src/lazy_vararg_tests.adb",
+      "sha256": "929ecaf75dc56738f2673dba900d93ef4b86167fe81cf843a8d1c760570db2b5"
+    },
+    {
+      "path": "docs/decisions/0018-relevant-t-compatibility.md",
+      "sha256": "80a6d12a3ad9e5064176920e8da775d38970c86fcbb63b061e6c3231af3359cc"
+    }
+  ],
+  "existing_counterpart_context": {
+    "paths": [
+      "tests/lua/lazy_named_vararg.lua",
+      "tests/src/lazy_vararg_tests.adb"
+    ],
+    "limitation": "Existing public lazy/materialized/captured/mutating vararg tests establish narrower behaviors, not this whole memory block, its full fault campaign, or source acceptance.",
+    "new_component": "8950f415a487de97c85c0985bb82a0bbb643e679",
+    "new_component_scope": "Canonical tail request ownership removes an actual temporary copy. Its ten public controls and eleven AUnit behaviors include res32 under actual M0 and zero extra bytes, weak roots, hooks, yield/close and real refusal/recovery. This proposal imports no passing whole-file obligation from that component."
+  },
+  "diagnostic_observation": {
+    "provenance": "Fresh separate native original/Ada exact-approved-verifier suite copies after the owned-tail component, no soft flags, timeout900 and 2GiB. Actual failing progression, not acceptance.",
+    "directory": "reports/hook-top/memerr-tail-13123c3a3a284eac8eec3f0debb95cd5",
+    "files": [
+      {
+        "path": "reports/hook-top/memerr-tail-13123c3a3a284eac8eec3f0debb95cd5/ada-process.json",
+        "sha256": "62a611ab38daf55b4bb63987e09083d5447b0d5d565a23e34e425e9c3ab5dac1"
+      },
+      {
+        "path": "reports/hook-top/memerr-tail-13123c3a3a284eac8eec3f0debb95cd5/ada.stdout",
+        "sha256": "e3093fa2b1d4f25ab1b0f9b19ee1b2d0ecd03d89659a76d1743d456653d8d64e"
+      },
+      {
+        "path": "reports/hook-top/memerr-tail-13123c3a3a284eac8eec3f0debb95cd5/ada.stderr",
+        "sha256": "e068fbfe2ff955933b80f39347ede14adbf93e0cdb831cfcc430b048a59f07f5"
+      },
+      {
+        "path": "reports/hook-top/memerr-tail-13123c3a3a284eac8eec3f0debb95cd5/native-process.json",
+        "sha256": "1c73498b5b657967f814678f9a04eace2c11686d4ccb0e35fd87aa71d4a90315"
+      },
+      {
+        "path": "reports/hook-top/memerr-tail-13123c3a3a284eac8eec3f0debb95cd5/native.stdout",
+        "sha256": "8e100d07d4230f7baf794582959711d26daeddc13fd7efeb2d17bc4eda568762"
+      },
+      {
+        "path": "reports/hook-top/memerr-tail-13123c3a3a284eac8eec3f0debb95cd5/native.stderr",
+        "sha256": "ac080a64139c962df7cba31ea315c938c5d5849273ee8640997f9c5f0c8bd89c"
+      }
+    ],
+    "native": {
+      "source_kind": "unchanged original",
+      "materialized_allocations": 3,
+      "optimized_allocations": 0,
+      "optimized_result": 32,
+      "exit_code": 1,
+      "first_failure": "original205 os.tmpname fixture Permission denied on this Windows host"
+    },
+    "ada": {
+      "source_kind": "existing approved17-byte checkerr verifier insertion only",
+      "source_sha256": "880d83e6ee5b5cf621c59d410fa928340375ac4f4191913c8092a5f385bbda76",
+      "materialized_allocations": 5,
+      "exit_code": 1,
+      "first_failure": "adapted134/original133 exact materialized allocation-count assertion",
+      "limitation": "The later optimized block is not reached by this whole-file run. Its actual zero-growth semantic controls are separately component-tested and still mandatory."
+    }
+  },
+  "forbidden_shortcuts": [
+    "Exclude the full mixed do block, testamem invocation, or optimized result32/aloc0 assertion.",
+    "Change the allocator limit, deep warmup, increment, collection, typed status/message or actual partial-construction workload.",
+    "Hard-code count3, synthesize success, return one reused table, fake a pointer or introduce C VM/table storage.",
+    "Reclassify all allocation counts as irrelevant or waive another source assertion by analogy.",
+    "Treat source approval, diagnostic completion of one phase, standalone counterparts or printed minimum counts as passing original source execution.",
+    "Write/adapt a disposable full memerr source, install an exclusion or change final output policy before independent exact source review."
+  ],
+  "required_next_actions": [
+    "Root independently reviews original/manual/native/Ada bindings and candidate eligibility under ADR0018.",
+    "Review and implement any missing retained payload/freshness/refusal/lifetime counterpart with actual named evidence.",
+    "Separately authorize exact derived spans/replacement bytes/schema changes and refresh source bindings before any adaptation.",
+    "Run original native and approved Ada full-source campaigns with actual controls in every required context; preserve native Windows applicability failure until resolved/reviewed.",
+    "Keep final matrix, original parent and independently reviewed source resolution distinct; no acceptance authority comes from this packet."
+  ]
+}

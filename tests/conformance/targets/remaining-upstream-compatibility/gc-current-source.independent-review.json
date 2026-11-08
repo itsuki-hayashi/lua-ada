@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "kind": "gc-current-source-independent-review",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "review_date": "2026-11-08",
+  "decision": "accepted-source-mapping-only",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/gc-current-source-bindings.author-proposal.json",
+    "sha256": "ef037a2f2d320a3f4f37ffb2e2cfdd99aca360d782d371977bfe4f2df423de26"
+  },
+  "source_snapshot": {
+    "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+    "path": "tests/src/lua-conformance_adapter_tests.adb",
+    "sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e"
+  },
+  "verified_baselines": [
+    {
+      "revision": "f535250d4984067a4bca84ad4a280dd745b728ce",
+      "original_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "named_bodies_and_registrations_unchanged": 3,
+      "helper_delta_only": "managed diagnostic accessor"
+    },
+    {
+      "revision": "fc6be6bf9cecccb1d4401a7109ca78ea3a78292b",
+      "original_sha256": "26e26e3c389384ebdf49740e80f6e83608a42b42c5dd0b847a633659a022a0e3",
+      "named_bodies_and_registrations_unchanged": 3,
+      "helper_delta_only": "managed diagnostic accessor"
+    }
+  ],
+  "current_implementation_inputs": [
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409"
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687"
+    },
+    {
+      "path": "src/lua-engine-finalizers.adb",
+      "sha256": "cd29399060bc6f9d045f1d247d76a2419e06e62e9a5ca5055b27213c65c62b62"
+    }
+  ],
+  "helper_review": "Initialize, actual adapter installation and Execute action, allocation-failure clearing, exception finalization, successful finalization and zero-block assertion are unchanged. Failure_Image reads the actual managed diagnostic for assertion reporting; it does not change the Execute outcome or remove cleanup.",
+  "exact_decisions": [
+    {
+      "id": "measure-live-payloads",
+      "rationale": "Measure actual managed live storage after both original4MiB payloads and the transient weak key exist. Preserve all original weak-key/value workload and subsequent collection; no fabricated C allocation size is substituted."
+    },
+    {
+      "id": "reclaim-payloads",
+      "rationale": "Require actual release of at least both4MiB payloads relative to their measured live baseline. All original empty traversal, deleted last entry, recreated byte lookup and dead-key safety assertions remain. Retained Ada table capacity is not C residual geometry."
+    },
+    {
+      "id": "stable-cell-color",
+      "rationale": "Current Store_Cell applies the production write barrier before publishing the actual cell value. A black independently owned cell shades its new child gray. Retain the same atomic-cycle weak coroutine collection and final closure value30; change only the private white-versus-gray observation."
+    },
+    {
+      "id": "measured-emergency-headroom",
+      "rationale": "The actual adapter measures one real empty-table cost, permits exactly that measured headroom and performs200 real allocations under the production test ceiling. Real refusal and emergency-collection deltas must each reach199. The host ceiling remains independent, and success/exception paths restore test limits and operation start."
+    }
+  ],
+  "preservation": "Only the four original-coordinate source operations are approved anew. Original reference files, frozen historical scopes and review artifacts remain unchanged. The target-owned manifest must bind separately named current review/approval artifacts.",
+  "limitations": [
+    "No source/API/global ledger completion or prior runtime result is inherited.",
+    "Fresh final-image named tests, whole default/T GC execution, allocator cleanup and final matrix reconciliation remain required."
+  ]
+}

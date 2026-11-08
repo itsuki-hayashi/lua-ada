@@ -1,5 +1,561 @@
 # Backlog
 
+## Deferred remaining-suite delivery
+
+The maintainer paused the full delivery on 2026-11-08 to merge a validated
+[interim checkpoint](sessions/2026-11-08-interim-compatibility-checkpoint.md).
+Resume the remaining work in a new task from updated master. Preserve these
+obligations and the fail-closed ledgers rather than describing them as completed:
+
+- Finish the real persistent CLI host-main, message-handler/print behavior and
+  signal lease; the temporary per-docall draft has a known hook mismatch.
+- Complete current-source approvals for API composition, GC, locals, Memerr,
+  Querystr and Nextvar/Sort. Never renew stale hashes without semantic review.
+- Finish all remaining primary/aggregate/heavy/helper protocols, revalidate
+  accepted files and reconcile the original 26-context final-head matrix.
+- Connect console, typed-argument and readline receipts to final frozen images,
+  review native backend prompt contracts and publish the independent certificate.
+- Complete real TTY/platform evidence and retain explicit native T warning and
+  abrupt-exit diagnostics; component or batch CLI results do not close these gates.
+
+Preserve the dated [macOS coroutine resident watchdog failure](sessions/2026-11-08-lifecycle-watchdog-evidence.md).
+The frame-storage correction passes the retained default macOS static/shared
+watchdog at checkpoint 122d642 without changing its threshold, but a repeat at
+412ddfd fails. The [private scalar layout correction](sessions/2026-11-08-private-frame-scalar-layout.md)
+needs fresh checkpoint resident evidence and later full 26-context execution.
+The prior failed observations remain failed. Readline is a separate operation.
+
+Validate the [native readline component](sessions/2026-11-08-cli-native-readline.md)
+on Linux/macOS and real TTYs. Reconcile actual optional-backend selection,
+library warnings/-E, raw input, history and final-context report identities.
+Retain the Windows fixed-buffer/NUL/text-mode witnesses and actual history
+provider refusal; pipe comparisons alone do not establish TTY behavior.
+
+Reconcile the [local Code observations](sessions/2026-11-08-code-local-execution.md)
+with fresh final immutable contexts. Retain separate original native optimizer
+execution, adapted Ada semantic execution and source-only exclusion accounting.
+Do not give default T-absent returns instrumented credit.
+
+Integrate the [debug-console campaigns](sessions/2026-11-08-debug-console.md)
+into routine/frozen builds and refresh affected source/callable bindings.
+Preserve actual C prefix publication and closing before argument release.
+The component does not replace main.lua's subprocess, signal, environment,
+message-handler or complete file protocol obligations.
+
+Review the [exact Nextvar/Sort author proposal](sessions/2026-11-08-nextvar-sort-exact-proposal.md)
+before any source emission. Keep useful storage invariants separate from the
+private positive constructor allowance candidate; current V4 eligibility and
+the reviewed-source selector do not admit this packet. Preserve all original
+anchors/mixed behavior and require current independent source/retention review.
+
+Independently review the [bounded Nextvar storage counterparts](sessions/2026-11-08-nextvar-storage-counterparts.md)
+before any exact mixed-source equivalent. Preserve all construction/warm-call,
+GC, values, expected mp2 evaluations and original 100,000-cycle churn. Actual
+rows/live counts must never replace a physical-rehash termination condition.
+Retain actual provider refusal/retry and measured 529-constructor walk cost;
+neither supplies private C geometry or automatic source-review authority.
+
+Retain the [typed CLI argument component](sessions/2026-11-08-cli-typed-arguments.md)
+and its separate length-result correction during integration. Preserve loaded
+closure/table/value roots, actual C ancestry, one shared budget and callback
+M0/exit behavior. Renew actual immutable images and source bindings before
+claiming original main completion; Windows transport, remaining CLI behavior
+and final review/matrix obligations stay open.
+
+Carry the [reviewed Verybig replay](sessions/2026-11-08-verybig-approved-source.md)
+into final Windows contexts with actual rooted-name/fresh-CWD applicability
+evidence. Preserve the four complete local observations without promoting
+them to global matrix acceptance; Linux/macOS retain original source.
+
+Integrate the [actual allocator-ceiling observations](sessions/2026-11-08-heavy-allocator-observation.md)
+into immutable context builds and final Heavy reconciliation. Keep actual
+owner/provider/backing counters distinct, require fresh PID/run/hash-bound
+sidecars and reject the old two-GiB Ada run requested as Heavy64. Native
+progress output and implementation-dependent table sizes need semantic review.
+
+Preserve the [actual cached string-hash invariant](sessions/2026-11-08-test-string-hash.md)
+and completed approved-path attrib T observation in final contexts. Its adapter
+source changes require renewed verifier/API/locals reviews. Do not interpret
+the narrower main-state string query as C's physical-position or numerical-width
+contract, or waive the original external-string key/iteration assertions.
+
+Retain the [complete original strings observations](sessions/2026-11-08-fixed-external-string-driver.md)
+for fresh final-image replay. Its new C-backed fixed-string wrapper changes
+the adapter source hash: existing exact verifier/API/locals bindings must be
+reviewed again rather than silently rehashed. No upstream source was adapted
+or private obligation excluded by this driver checkpoint.
+
+Preserve the [native locale behavior](sessions/2026-11-08-native-string-locales.md)
+in final contexts with matching native observations. An unavailable optional
+locale supplies no non-C coverage; borrowed external payload lifetimes and
+explicit deallocation behavior remain real runtime obligations.
+
+Continue the [original-file observations](sessions/2026-11-08-table-error-arguments.md)
+after the public table diagnostic correction. Instrumented nextvar/sort
+still require reviewed treatment
+of private table inspection. Preserve ordinary assertions and all complete
+return protocols; neither a diagnostic pass nor a T omission closes them.
+
+Preserve the [V4 resource verifier](sessions/2026-11-08-observable-resource-eligibility.md)
+and Code's separately installed ten-source graph. Review current materialized
+counterpart sources before separately authoring any exact Memerr child/source decision. No
+policy installation or source execution is authorized by the verifier alone;
+querystr and all mandatory public/refusal/optimized obligations remain separate.
+
+Review the [source-bound materialized-vararg counterparts](sessions/2026-11-08-materialized-vararg-counterparts.md)
+before any exact private-count eligibility or source decomposition. Eight
+focused public/refusal cases preserve real values, aliases, fault increments,
+roots and recovery; they install no exclusion and do not waive the original
+optimized32/count0/zero-extra-byte obligation or passing whole-file evidence.
+
+Include the [marked-slot mutation correction](sessions/2026-11-08-marked-closing-mutation.md)
+when renewing current locals runtime/checker bindings. Its four ordinary
+counterparts establish the focused nil/false/type-closing behavior, not a
+source-equivalence decision or complete upstream/platform acceptance.
+
+The [dynamic prompt component](sessions/2026-11-08-cli-dynamic-prompts.md) now
+passes 26 named cases within both full 2,571-case AUnit suites and both 112-case
+product CLI suites. Preserve actual anonymous C callers, root-through-flush
+lifetime and typed exit/error behavior during final integration. Native T
+os.exit(false) teardown remains a retained failed diagnostic, not a cleanup pass.
+Separately review Windows main.lua equivalents
+for the shared native shell/temp-file dependencies while preserving every
+public CLI operation and actual interrupt/module/child cleanup obligation.
+Original main.lua fails in every measured role; no body or protocol is waived.
+
+The [IO caller-location cases](sessions/2026-11-08-io-error-locations.md) pass
+both full local AUnit runs and all public binary roles. Preserve immediate C
+caller/stripped-code behavior while continuing original source and CLI gates.
+Replay the reviewed locals T source after current exact binding renewal. Its
+previous allocator-disabled closing failure motivated the scalar-link and
+marked-value fixes; focused regressions do not establish whole-file completion.
+
+Independently review the [API941 tail/owner binding proposal](sessions/2026-11-08-api941-tail-owner-bindings.md)
+against its twenty-file snapshot. Preserve userdata/weak/finalizer lifetimes
+while renewing three exact decisions, then separately renew composition with
+concrete current private18/policy identities. Capture subsequent Machine drift
+again; this dated author packet supplies no automatic renewal, adapted-source
+execution or final acceptance.
+
+Renew the locals source/runtime/checker bindings after the
+[scalar closing repair](sessions/2026-11-08-scalar-closing-links.md), then replay
+the exact reviewed whole source. The mandatory enter(0) callback now lifts real
+refusal; fifteen focused cases and unchanged large error/coroutine witnesses
+pass. This component supplies no source-adaptation authority or whole-file gate.
+
+The [intern-index fault cases](sessions/2026-11-08-intern-index-refusal.md)
+pass actual provider refusal/retry, live-root and dead-header checks in both
+local configurations. Continue independent exact API string-table source
+review, retained fresh-child workload execution, current-head named evidence
+and final context reconciliation; no querystr source obligation is closed.
+
+Preserve the [unreduced debug/vararg/package observations](sessions/2026-11-08-unreduced-debug-vararg-attrib.md)
+as diagnostics bound to their actual four images. Independently review the
+existing Windows attrib expected-path proposal before emitting any equivalent;
+retain the original package/module operations and final integer-27 return.
+Require reviewed completion protocols and final-context evidence even for the
+matching raw db.lua/vararg.lua CLI runs. No source parent is closed here.
+
+Independently review the [exact locals two-span proposal](sessions/2026-11-08-locals-exact-source-proposal.md)
+outside both original/revision authors, including its current owner/resetCI and
+checker/VM source bindings. Its 38 passing definition/rejection checks supply
+no source emission or runtime authority. After approval, preserve original
+native/default source and require actual Ada T equivalent plus unchanged
+insertion-refusal execution before any original-anchor/file acceptance.
+
+The [owned canonical tail checkpoint](sessions/2026-11-08-canonical-tail-ownership.md)
+passes actual optimized-vararg zero-growth/result, weak-root, hook, yield,
+closing/error/refusal and host-budget controls within 2,518 AUnit cases per
+local mode. Preserve its independent request-owner and actual callee identity
+while reviewing the separate materialized-table count candidate. Original
+whole memory/API and final target gates remain required.
+
+The [resetCI owning-release follow-up](sessions/2026-11-08-resetci-owning-release.md)
+passes actual warmed-cache capacity/release, outstanding-guard and permanent
+refusal controls within 2,507 AUnit cases per local mode. Preserve its physical
+frame-count/metadata-trim invariant while continuing the reviewed memory/API
+sources and final matrix; no source obligation is closed by this component.
+
+The [source-linked optimizer witnesses](sessions/2026-11-08-code-public-semantics.md)
+pass 29 new cases within 2,468 AUnit cases in each local mode and all eight
+compiler/VM roles. The [exact source installation](sessions/2026-11-08-code-v3-source-installation.md)
+now supplies independently bound Code8 decisions, eighteen source references,
+nine pending public nodes and a coherent API18 policy successor. Run fresh
+current-image Code/public-witness and binary-role protocols before runtime
+acceptance. Preserve checkR, actual loads/errors and all original parents;
+neither an exclusion nor source classification is a passing assertion.
+
+The [actual table-storage inspector](sessions/2026-11-08-table-storage-inspection.md)
+and 25 focused cases are implemented; both local modes pass 2,439 AUnit cases.
+Independently review exact locals.lua replacement spans, refreshed checker/
+counterpart bindings and original-anchor coverage before adapting any source.
+Preserve its original deletion/collection and insertion-refusal sweep, then
+require actual whole-file/final-context evidence. No exclusion is installed.
+
+The [C metadata/result checkpoint](sessions/2026-11-08-c-call-metadata.md)
+passes the first and nested deep(4)/M=0 entry, primitive equality, successful
+assert tuple/hook, cold-hook recovery and fresh independent checkstack
+witnesses. Both modes pass 2,448 AUnit cases; unchanged errors.lua remains
+within its mandatory 2 GiB ceiling. Continue unreduced reviewed API/memory
+source replay, the complete allocation audit and final platform/aggregate
+gates; focused witnesses do not close the source ledger.
+
+The [compiler context checkpoint](sessions/2026-11-08-compiler-limit-context.md)
+completes unchanged errors.lua in both local configurations, with 2,394 passing
+AUnit cases per mode. Revalidate it at final head in all applicable contexts;
+local completion does not close its source ledger. Continue the pending C
+metadata/refusal, hook-ordering, table-storage safety and aggregate obligations.
+
+The [hook-mask checkpoint](sessions/2026-11-08-hook-mask-transitions.md)
+passes sixteen focused behaviors within 2,400 AUnit cases per local mode.
+Preserve captured instruction masks and real return PCs while continuing the
+reviewed API file at original line1306's T.testC child-state zero-allocation
+entry. Keep the failing whole-file/provider cleanup record and require fresh
+final-head, source/T and platform acceptance after the entry repair.
+
+The [parser stack checkpoint](sessions/2026-11-08-parser-stack-limits.md)
+passes sixteen focused cases within 2,384 AUnit cases per configuration.
+Continue unchanged errors.lua at original line768: excessive upvalues must
+retain their defining function's line context. Preserve final target gates
+and the separately pending allocation, hooks, native/CLI and aggregate work.
+
+The [assert argument checkpoint](sessions/2026-11-08-assert-arguments.md)
+passes five focused cases and 2,359 AUnit cases per local configuration.
+Continue unchanged errors.lua at generated parser/compiler limits: compatible
+load must report a catchable syntax failure while bounded Ada policies retain
+their host quotas. Preserve the final source, T and platform obligations.
+The [reader refusal/lifecycle follow-up](sessions/2026-11-08-reader-refusal-lifecycle.md)
+completes its nine focused behaviors within 2,363 passing AUnit cases per
+configuration. Preserve the separately failed native partial-reader cleanup
+observations for final review; require Ada's zero selected-byte/block invariant.
+The subsequent hook checkpoint repairs the T API count/line sequence without
+changing that original source block. Whole-source/T and platform acceptance
+remain open.
+
+The [Context failure-text migration](sessions/2026-11-08-runtime-failure-storage.md)
+is implemented and locally verified. Continue the actual C call metadata and
+canonical return-packet refusal paths, legacy input-sized builders, registry
+traceback callbacks and linear reader integration. Both local 2,300-case AUnit
+passes and focused C/binary witnesses leave all final target gates required.
+The [coroutine result portal](sessions/2026-11-08-coroutine-result-portals.md)
+checkpoint passes six focused cases and original unchanged coroutine.lua in
+both local configurations. The separate [thin T traceback command](sessions/2026-11-08-t-traceback-command.md)
+adds three passing actual-frame cases within 2,301 local AUnit cases per mode.
+Continue exact unreduced testC memory-refusal entry, reusable call metadata,
+scalar return storage, reader portal and remote/aggregate acceptance. No source
+gate is omitted by either checkpoint.
+
+Integrate the [managed diagnostic-text component](sessions/2026-11-08-managed-diagnostic-text.md)
+into failure delivery after the pending return/close checkpoint. Preserve
+original Lua error values, allocation-free propagation/recovery and selected
+ownership across contexts; replace input-sized temporary formatting views.
+Fourteen component cases and 2,281 local AUnit passes do not close that audit.
+The [linear Lua reader checkpoint](sessions/2026-11-08-linear-lua-readers.md)
+repairs the multiple-closing declaration's consumed-token line and actual
+reader early stop, with forty-five focused cases and 2,312 passing AUnit cases
+per configuration. Resume bounded unchanged errors.lua diagnostics after
+integration, after separately proving the new Lua portal's reader-injected
+permanent refusal and self-close paths. Preserve source/T and platform gates;
+the measured one-byte campaign supplies no full-file acceptance.
+
+The [exact memory-verifier equivalent](sessions/2026-11-08-memerr-verifier.md)
+has independent source approval and a bounded disposable generator. Implement
+allocation-safe T.testC entry under the later zero-growth sweep, then resolve
+the measured native Windows temporary-file applicability issue. Source review
+and generation supply no passing source or whole-file evidence.
+
+The [actual stack inspector](sessions/2026-11-08-stack-inspection.md) enables
+calls.lua's retained reader invariants. Review its remaining T constant-pool
+identity check with a retained three-function semantic witness. Private arena
+size assertions elsewhere still require feature review; whole-target and
+platform acceptance remain open despite both local 2,248-case AUnit passes.
+Label diagnostics have [semantic-boundary evidence](sessions/2026-11-08-label-semantic-boundaries.md):
+nineteen native-paired behaviors, four-way compiler/VM control paths in each
+matching configuration and 2,263 passing AUnit cases per configuration.
+The subsequent reader checkpoint repairs the closing-declaration boundary.
+Keep full T memerr.lua's cold scalar output refusal and all other
+remaining full-target obligations open.
+
+Public C seti/setfield self assignments have [focused evidence](sessions/2026-11-08-c-api-self-values.md).
+Continue instrumented api.lua from line941 with independent review of the
+private retained-capacity bound and actual finalizer/reclamation witnesses.
+Keep the full API parent/runtime, all remaining source and platform gates open.
+
+Read-only named varargs now have [fresh local evidence](sessions/2026-11-08-hidden-named-varargs.md):
+unchanged vararg.lua completes in default/T with native output, nine focused
+cases match all compiler/VM combinations, and 2,194 AUnit cases pass in each
+configuration. Retain final matrix obligations, actual mutable/escaping table
+behavior, and the separately open T API, memory-failure and aggregate gates.
+Function statement stores have [source-phase evidence](sessions/2026-11-08-function-store-sites.md):
+twelve native-paired behaviors, four-way compiler/VM checks in each matching
+configuration and 2,212 passing AUnit cases per configuration. Continue
+unchanged errors.lua from duplicate-label semantic errors at the trailing
+newline/EOF boundary. Keep full T memerr.lua's cold scalar output refusal and
+all remaining full-target obligations open.
+
+Base setmetatable has [argument-phase evidence](sessions/2026-11-08-metatable-argument-phases.md):
+fifteen native-paired behaviors, four-way compiler/VM checks in each matching
+configuration and 2,200 passing AUnit cases per configuration. Correct the
+measured function-statement definition store line in unchanged errors.lua
+while preserving closure end-line events. Full T memerr.lua's cold scalar
+output refusal and all remaining full-target obligations remain open.
+The [close-return window](sessions/2026-11-08-close-return-windows.md)
+checkpoint passes eleven new native-paired cases and 2,216 AUnit cases per
+isolated configuration. Continue the independently confirmed parent coroutine
+result-capacity false/error correction, the thin T traceback command, and
+the unreduced memory-refusal test driver entry observation. Full-source and
+final platform acceptance remain open.
+
+The [native tail return correction](sessions/2026-11-08-native-tail-return-windows.md)
+closes an observing-hook nil regression before integration of the result-window
+delivery. Its three new cases and complete eighteen-case binary campaign pass;
+continue the separately confirmed pre-close result snapshot/root obligation.
+
+The [actual return-hook window](sessions/2026-11-08-return-hook-windows.md)
+checkpoint passes seventeen new native-paired cases and 2,202 AUnit cases per
+isolated configuration. Continue the confirmed pre-close result snapshot
+obligation: a closer's actual outgoing-slot edit is lost without a return
+hook. Then continue remaining public T commands and original source gates.
+
+Table.sort's argument phases have [local evidence](sessions/2026-11-08-sort-argument-phases.md):
+fifteen native-paired behaviors, four-way compiler/VM checks in both matching
+configurations and 2,176 passing AUnit cases per configuration. Continue
+unchanged errors.lua from setmetatable used as the gsub callback, and the
+separately measured cold string.find output refusal in unchanged T memerr.lua.
+Borrowed Lua CI and all remaining full-target obligations stay open.
+
+Counted source metadata and printable NUL behavior have
+[fresh native-paired evidence](sessions/2026-11-08-binary-source-nul.md), with
+2,161 passing AUnit cases per local configuration after integrating the
+selected debug-line writer interval. Continue sort diagnostics, cold refusal
+results, borrowed C views/hooks, traceback callbacks and final storage gates.
+
+Canonical debug metadata has [selected-interval evidence](sessions/2026-11-08-selected-line-baselines.md):
+the measured native T getbaseline assertion is fixed, seven debug behaviors
+match all four compiler/VM paths in each configuration and all 2,157 AUnit
+cases pass locally in both configurations. Continue unchanged errors.lua
+table.sort naming and trace the next actual unchanged T memerr.lua refusal;
+its line-7 failure is still open. Complete all remaining full-target gates.
+
+Argument labels and message formatting have
+[owned-builder evidence](sessions/2026-11-08-owned-argument-labels.md), with
+2,104 passing AUnit cases per local configuration. Migrate the final context
+failure-text store separately, preserving refusal-safe propagation, emergency
+errors and exact cross-context ownership alongside the active hook work.
+
+String diagnostics and warmed scalar outputs have [component evidence](sessions/2026-11-08-string-arguments-results.md):
+47 named regressions within 2,146 passing AUnit cases per configuration,
+selected real T refusal witnesses and default four-way compiler/VM checks.
+Correct the measured native T absolute-line checkpoint interval assertion,
+then continue unchanged errors.lua from table.sort callback argument naming.
+Full memerr.lua and remaining source/T/shared/platform acceptance stay open.
+
+Type-detail construction has [owned-prefix evidence](sessions/2026-11-08-owned-argument-detail.md),
+four native-paired Lua cases and five AUnit regressions within 2,099 passing
+cases per configuration. Continue the wider failure-text/renderer allocation
+audit; this component does not establish that every error temporary is owned.
+
+The [shared C view checkpoint](sessions/2026-11-08-borrowed-c-stack-views.md)
+adds actual interrupted scalar views and typed guard restoration, with nine
+named cases and 2,103 passing AUnit cases per isolated configuration. Continue
+the actual return-hook result window and weak-root lifetime checkpoint, then
+remaining public T commands and unreduced source acceptance. Native T's
+allocator-reentry lock abort remains a recorded counterpart limit.
+
+The [combined public-boundary replay](sessions/2026-11-08-public-boundary-integration.md)
+passes 2,094 AUnit cases per local configuration after preserving the checked
+argument-borrow lifetime. Continue original string/self diagnostics, the
+plain-find refusal result path, borrowed Lua CI/hooks, traceback registry
+callbacks and the remaining source/helper/aggregate/final-platform campaigns.
+
+The [scalar NOT correction](sessions/2026-11-08-scalar-not-refusal.md) has six
+native-paired refusal cases and clean strict builds. Correct the six integrated
+I/O borrowed-operand diagnostic failures without weakening the borrow check,
+then continue string.find's fresh result-packet allocation under refusal and
+the assigned common Lua CI/custom C hook view. Full target acceptance is open.
+
+The [shared traceback renderer](sessions/2026-11-08-shared-traceback.md) has
+twenty-two native-paired C cases and two host-policy regressions within 2,052
+passing AUnit cases per local configuration. Complete the retained registry
+metamethod callback path, integrate the independently checked registry/panic
+checkpoints, and continue original errors.lua and remaining suite campaigns.
+
+Continue the unchanged errors.lua campaign from the string-method `bad self`
+failure after the [I/O/collector argument checkpoint](sessions/2026-11-08-io-collector-arguments.md).
+Its ten native-paired regressions and 2,028 AUnit cases in each local
+configuration cover the argument gates; remaining method diagnostics,
+traceback, relevant T paths and final platform acceptance remain open.
+Auxiliary registry lookup has
+[actual continuation evidence](sessions/2026-11-08-argument-registry-continuations.md):
+fifteen native-paired Lua cases, five real C owner/root/guard cases and a
+bounded recovery case within 2,039 passing AUnit cases in each configuration.
+Continue remaining errors.lua string argument/self diagnostics, the borrowed
+Lua CI scalar view and all unresolved source/T/final-head obligations.
+
+Public identities have [local evidence](sessions/2026-11-08-public-value-identities.md):
+1,993 AUnit cases in each configuration, native-paired pointer/rendering,
+actual first-surface refusal, retry and balanced shutdown. Fix the next
+unchanged errors.lua io.write argument-name failure and complete traceback,
+remaining T drivers and final same-head platform acceptance.
+
+
+Public C concat has [original-slot component evidence](sessions/2026-11-08-c-concat-windows.md):
+twenty-one native/Ada default/T paired cases and four bounded cases within
+1,983 passing AUnit cases in each configuration. Grouped primitive suffixes
+fit a native-proven provider allowance. Complete the independently measured
+borrowed-Lua-CI scalar view, then all remaining source/T/final matrices. The
+subsequent registry checkpoint above implements its retained callback route.
+
+Metamethod request packets now have [actual ownership evidence](sessions/2026-11-08-metamethod-argument-roots.md):
+seven before/after weak-lifetime cases, 1,935 passing local AUnit cases and
+twenty-one passing public C consumers. Complete actual C concatenation
+windows using these transfers, then the remaining source/T/final matrices.
+
+Public file loading has [component evidence](sessions/2026-11-08-public-file-loading.md):
+twenty-one native-matched cases, actual-growth refusal/recovery and sixteen
+text/binary child processes. Both configurations pass 1,898 local AUnit cases.
+Complete traceback, relevant T drivers and final shared/platform matrices;
+none of these local observations closes the full source/API ledger.
+
+
+Public T commands now have [panic/provider evidence](sessions/2026-11-08-panic-provider-controls.md):
+96 implemented names, actual checkpanic/pre-panic closing and inherited-provider
+byte/count controls. Both local configurations pass 1,973 AUnit cases, including
+513 refusal positions; fourteen additional witnesses match native T and the
+same C module. Continue actual borrowed Lua C views and permanent-refusal
+behavior, remaining traceback/private-driver review, unchanged api.lua/memerr.lua
+and final matrices. The api.lua fixed-buffer delta at 580 remains unreviewed;
+no missing driver or physical-shape failure is an exclusion by itself.
+
+Literal substitution has [component evidence](sessions/2026-11-08-auxiliary-substitution.md):
+sixteen native-matched C cases and three bounded policy/cleanup witnesses.
+Complete the public traceback helper and final instrumented/shared/platform
+replay; these observations do not resolve the full source/API ledger.
+
+
+Public allocator/seed now have [component evidence](sessions/2026-11-08-public-auxiliary-allocator.md),
+including default-constructor identity, inert seed behavior and thirteen
+native-matched C cases. Finish the traceback helper and the
+final allocator/lifecycle campaign across every required context.
+
+
+Shared library argument diagnostics have [local evidence](sessions/2026-11-08-library-argument-diagnostics.md):
+thirty new named cases within 1,856 passing AUnit cases and nineteen matched
+public builtin C cases. Complete named tostring and remaining errors.lua,
+actual registry-fallback callback continuations and C concat windows, then
+the original T/platform/final-head acceptance obligations.
+
+Concatenation has [local evaluation/diagnostic evidence](sessions/2026-11-08-concat-operation-diagnostics.md):
+eighty named primitive/index/name-boundary cases within 1,826 passing
+AUnit cases, two complete default four-way fixtures and a matching unchanged
+db.lua replay. Library argument diagnostics are the next unchanged errors.lua
+failure. Finish those, actual public C concat windows, the locals.lua progress
+output policy, T paths and final-head matrices; component results do not
+complete these obligations.
+
+Eight public buffer exports have [local ownership evidence](sessions/2026-11-08-auxiliary-buffer-ownership.md),
+including seventeen native-default/T matched C cases and 1,738 passing
+AUnit cases. Finish the traceback helper,
+instrumented/shared/POSIX and immutable full-target replay.
+
+Public reset/self-close now has [scoped evidence](sessions/2026-11-08-thread-reset.md):
+twenty-four default-native matched C cases, twenty-three native-T matches with
+one explicit instrumentation skip, and 1,737 passing local AUnit cases. Actual
+guard acknowledgements precede retirement; simple C closers and repeated error
+publication work under refusal. Complete fresh Lua-created coroutine function
+slots, relevant T command-driver operations, integrated final-head matrices and
+review. The native partial-reader cleanup defect is recorded, not counted as a
+passing C ownership test or copied into Ada behavior.
+
+Native loading now has [local component observations](sessions/2026-11-08-native-module-loading.md).
+Complete immutable same-image fixtures, reviewed platform counterparts,
+explicit unload/provider fault witnesses and instrumented/shared/POSIX gates.
+The diagnostic attrib.lua pair does not close its source or runtime ledger.
+
+Protected error drivers now have [regular C guard/closing evidence](sessions/2026-11-08-protected-error-closing.md):
+eight named Lua/AUnit cases, thirteen C cases matching default/native T and
+1,713 passing local AUnit cases. Default unchanged locals.lua source pairs
+reach OK. Complete the ownerless-guard policy, integrated reset/self-close,
+remaining T obligations and final-head matrices/review before acceptance.
+
+Actual scalar [closing-prefix support](sessions/2026-11-08-closing-stack-prefix.md)
+has five scoped VM lifetime/refusal regressions within 1,705 passing AUnit
+cases. Saved floors are wired into error recovery; thread-reset drivers still
+need their own public evidence. Standalone helper coverage does not complete them.
+
+Host base C slots have [scoped closing evidence](sessions/2026-11-08-base-c-closing.md):
+thirteen identical-source cases match native default/T and 1,695 AUnit cases
+pass. Stack-reserved links preserve allocation-free registration and retained
+refusal recovery. Thread reset, fresh coroutine function slots, public buffers
+and integrated target acceptance remain separate unfinished obligations.
+
+Public C arithmetic/comparison have [caller-window evidence](sessions/2026-11-08-c-operator-windows.md):
+seventeen native-default/T matched cases and 1,678 passing local AUnit cases.
+Thread reset, host-base C closing slots and integrated full acceptance remain.
+
+`lua_stringtonumber`, numeric-string C conversions under refusal, and exported
+`lua_ident` have [scoped evidence](sessions/2026-11-08-c-numeric-conversion.md):
+eleven C cases match both native configurations and 1,641 AUnit cases pass.
+Arithmetic/comparison/thread-close and integrated final acceptance remain open.
+
+The [fixed numeric scratch primitive](sessions/2026-11-08-fixed-numeric-scratch.md)
+passes strict local builds and 1,640 AUnit cases. Its shared exact parser has
+bounded local backing; the public C conversions still require wiring and
+actual allocator-refusal C consumer evidence.
+
+External payload ownership, guarded deallocator reentry and weak short-string
+identities have a scoped local checkpoint: 1,557 passing AUnit cases, eighteen
+native-default paired C cases, and thirteen native-T ownership cases with five
+explicit reentry skips caused by the reference instrumentation's lock.
+See [evidence and remaining gates](sessions/2026-11-08-external-string-ownership.md).
+This does not establish integrated Ada-T, module-unload or full-suite acceptance.
+
+The 2026-11-07 approved remaining-upstream-compatibility delivery resumes from
+merged PR #10 on codex/m3-remaining-upstream-compatibility. It supersedes older
+pause and branch instructions below for this task. Complete the remaining 17
+primary files, aggregate/stress/helpers, native fixtures and relevant T paths,
+then review and merge one PR after all 26 contexts pass. ADR 0018 owns the
+reviewed private-T exclusion policy; exclusions never count as passing tests.
+The [session](sessions/2026-11-07-remaining-upstream-compatibility.md) records
+component progress. The binary Lua searcher now accepts native chunks and its
+focused caching/loader-data regression passes within 1,391 local AUnit cases.
+Full target and all original unfinished M3 gates remain open.
+
+Three public value operations and 28 auxiliary helpers now have actual
+same-source C/Ada component evidence, including zero-provider number output
+and exact seeded decimal spellings. See the
+[checkpoint](sessions/2026-11-08-public-value-auxiliary.md). Remaining public
+buffer/file/traceback and core functions, relevant T drivers and native-module
+loading stay required; component evidence does not close the global ledgers.
+
+The two public C formatting exports now have focused native/Ada comparisons,
+allocation-failure sweeps and bounded-session regressions within a passing
+1,551-case local run. See the
+[checkpoint](sessions/2026-11-08-c-varargs-formatting.md). Remaining auxiliary
+exports, native fixtures and final target reconciliation remain mandatory.
+
+Shared parser token/semantic diagnostics, Lua load-name formatting and fixed
+return-count refusal now have 16 focused regressions and matching native/Ada
+evidence. See the [checkpoint](sessions/2026-11-08-syntax-diagnostic-tokens.md).
+The next observed errors.lua mismatch concerns bitwise runtime diagnostics;
+the source/global API and final platform gates remain open.
+
+Table library length conversion/order now has focused native/Ada evidence;
+unreduced sort.lua completes locally and literals.lua has a fresh matching
+default runner pair. The dated
+[record](sessions/2026-11-08-table-length-results.md) preserves their revision
+limits and unfinished instrumented/matrix obligations.
+
+Runtime numeric-string locale conversion now has eight focused regressions
+within a passing 1,418-case component run. See its dated
+[checkpoint](sessions/2026-11-08-runtime-numeric-locale.md); this does not close
+literals.lua or the full library gate without fresh integrated execution.
+
+Ordered CLI controls, environment initialization, shared binary stdin and host
+REPL phases now have passing component AUnit/process evidence. The dated
+[checkpoint](sessions/2026-11-08-cli-process-controls.md) preserves remaining
+main.lua and platform obligations; this does not close M3-11.
+
 IDs are stable. Completion requires evidence, including relevant platform gates.
 M1 is complete; [all five gates passed](validation.md).
 

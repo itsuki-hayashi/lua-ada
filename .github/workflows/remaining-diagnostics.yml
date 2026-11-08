@@ -1,0 +1,148 @@
+name: Remaining upstream diagnostics (deferred manual campaign)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: remaining-build-diagnostics-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  diagnostic:
+    name: Diagnostic ${{ matrix.context }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            context: default/windows/validation/static
+            id: default-windows-validation-static
+          - os: windows-latest
+            context: upstream-test/windows/validation/static
+            id: upstream-test-windows-validation-static
+          - os: ubuntu-latest
+            context: default/linux/validation/static
+            id: default-linux-validation-static
+          - os: ubuntu-latest
+            context: upstream-test/linux/validation/static
+            id: upstream-test-linux-validation-static
+          - os: macos-latest
+            context: default/macos/validation/static
+            id: default-macos-validation-static
+          - os: macos-latest
+            context: upstream-test/macos/validation/static
+            id: upstream-test-macos-validation-static
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
+    steps:
+      - name: Preserve pinned source bytes
+        shell: pwsh
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          # Frozen reconstruction tests verify original predecessor blobs.
+          fetch-depth: 0
+          submodules: recursive
+      - uses: alire-project/setup-alire@v6
+      - name: Select stable native toolchain
+        shell: pwsh
+        run: |
+          alr --version
+          ./scripts/select-stable-toolchain.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          alr -n toolchain
+          alr exec -- gcc --version
+          alr exec -- gcc -dumpmachine
+          alr exec -- gprbuild --version
+      - name: Install Linux C oracle prerequisite
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libreadline-dev
+      - name: Collect actual build and named regression observations
+        shell: pwsh
+        run: |
+          Write-Output 'Development diagnostics only; no source approval, global API coverage or acceptance certificate.'
+          ./scripts/build-target-context.ps1 -Context '${{ matrix.context }}' -DevelopmentObservation
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Observe native readline after an incomplete development campaign
+        if: always()
+        shell: pwsh
+        run: |
+          # This separate operation cannot repair the earlier failed build,
+          # renew source approvals or supply full context/image acceptance.
+          $configuration = '${{ matrix.context }}'.Split('/')[0]
+          $suffix = if ($IsWindows) { '.exe' } else { '' }
+          $part = if ($configuration -ceq 'upstream-test') { 'upstream-test/' } else { '' }
+          $cli = "$PWD/cli/bin/${part}static/lua_ada$suffix"
+          if (-not (Test-Path -LiteralPath $cli -PathType Leaf)) {
+            throw 'Readline observation not run: no built Ada CLI'
+          }
+          alr exec -- gprbuild -P experiments/conformance/oracle.gpr "-XLUA_CONFORMANCE_CONFIGURATION=$configuration"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./scripts/check-cli-readline.ps1 -Interpreter $cli `
+            -ReferenceInterpreter "$PWD/build/conformance/$configuration/bin/lua$suffix" `
+            -ReferenceLibraryDirectory "$PWD/build/conformance/$configuration/lib" `
+            -Configuration $configuration `
+            -OutputDirectory "$PWD/reports/core-image/readline-diagnostic/${{ matrix.id }}"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Preserve all native CLI prompt observations
+        if: always()
+        shell: pwsh
+        run: |
+          # Every collected row remains unaccepted, including matching rows.
+          # The default readline backend is retained to review its protocol.
+          $configuration = '${{ matrix.context }}'.Split('/')[0]
+          $suffix = if ($IsWindows) { '.exe' } else { '' }
+          $native = "$PWD/build/conformance/$configuration/bin/lua$suffix"
+          if (-not (Test-Path -LiteralPath $native -PathType Leaf)) {
+            throw 'Native prompt observation not run: no built C oracle'
+          }
+          ./scripts/check-cli.ps1 -Interpreter $native -PromptProtocol `
+            -RuntimeRole ReferenceC -Configuration $configuration `
+            -RuntimeDirectory "$PWD/build/conformance/$configuration/lib" `
+            -CollectAllObservations -DevelopmentObservation `
+            -Report "$PWD/reports/core-image/native-cli-diagnostic/${{ matrix.id }}/result.json"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Record diagnostic scope
+        if: always()
+        shell: pwsh
+        run: |
+          $directory = 'reports/development-diagnostics/${{ matrix.id }}'
+          New-Item -ItemType Directory -Path $directory -Force | Out-Null
+          $record = [ordered]@{
+            kind = 'target-development-build-diagnostic'
+            revision = '${{ github.sha }}'
+            context = '${{ matrix.context }}'
+            job_status = '${{ job.status }}'
+            development_observation = $true
+            runtime_acceptance = $false
+            coverage_authority = $false
+          }
+          $text = (ConvertTo-Json $record).Replace("`r`n", "`n") + "`n"
+          [IO.File]::WriteAllText((Join-Path $directory 'scope.json'), $text, [Text.UTF8Encoding]::new($false))
+          'Development build diagnostics only. Source review, complete runtime matrix, global API reconciliation and post-observation acceptance remain required.' >> $env:GITHUB_STEP_SUMMARY
+      - name: Preserve diagnostics even after failure
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: remaining-build-diagnostics-${{ matrix.id }}-${{ github.sha }}
+          path: |
+            reports/development-diagnostics/${{ matrix.id }}/**
+            reports/target-builds/${{ matrix.id }}/**
+            reports/core-image/**
+            reports/instrumented/**
+            reports/abi/**
+            reports/windows-buffered-failure/**
+            reports/posix-files/**
+            reports/managed-telemetry/**
+            reports/launcher-selftest/**
+            reports/lifecycle/**
+            reports/m3-lifecycle-campaign*
+          if-no-files-found: warn
+          retention-days: 30

@@ -19,8 +19,13 @@ package Lua.Engine.Canonical is
       Has_Call_Window : Boolean := False;
       --  Absolute original callee slot, distinct from relative result IDs.
    end record;
-   --  Every callback packet is also retained in its owning frame before Step
-   --  returns. Machine publishes it into the next explicit activation before
+   --  Every callback packet is retained in its owning frame before Step
+   --  returns. Invoke_Function/Tail_Invoke borrow Native_Arguments directly;
+   --  their scalar action must not copy a controlled vector on every call.
+   --  Return_Results likewise borrows the published Transfer_First/Count
+   --  scalar span until Machine delivers or starts its actual close walk.
+   --  Other actions carry an owned copy where retirement needs independent
+   --  lifetime. Machine publishes the packet into the next activation before
    --  ending the current operation. Destination is register index + 1.
 
    function Adopt_Program
@@ -44,7 +49,8 @@ package Lua.Engine.Canonical is
 
    function Step
      (State : in out World; Activation : Frame_Access) return Action;
-   --  Execute one real canonical instruction, or request a scheduler action.
+   --  Execute one canonical dispatch phase, including required companion
+   --  words, or request a scheduler action. Iterator calls resume explicitly.
    --  Lua representation errors are controlled language errors; no invalid
    --  opcode/operand is passed to an unchecked enumeration conversion.
 
@@ -60,6 +66,14 @@ package Lua.Engine.Canonical is
 
    function Source_Bytes (Code : Prototype_Access) return Byte_String;
    --  Borrow the immutable model's source bytes while Code remains rooted.
+   function Local_Bytes
+     (Code : Prototype_Access; Index : Positive; PC : Natural)
+      return Byte_String;
+   function Upvalue_Bytes
+     (Code : Prototype_Access; Index : Positive) return Byte_String;
+   --  Borrow actual NUL-terminated debug names from the same immutable
+   --  model. An absent local has a null address; stripped names use the
+   --  pinned static marker. No allocation or runtime string is needed.
    function Local_Name
      (State : in out World; Code : Prototype_Access; Index : Positive;
       PC : Natural) return Value;

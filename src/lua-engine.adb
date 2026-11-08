@@ -2,20 +2,26 @@ with Lua.Engine.Library_Openers;
 with Lua.Engine.Canonical;
 with Lua.Engine.Finalizers;
 with Lua.Engine.Warnings;
+with Lua.Engine.External_Releases;
+with Lua.Engine.Formats;
+with Lua.Engine.Native_Modules;
+with Lua.Storage.Fixed_Arenas;
 with Lua.Platform_Streams;
 with Lua.Engine.Stacks;
 with Lua.Number_Parsing;
+with Lua.Platform_Locales;
+with Lua.Platform_Numerics;
 with Ada.Exceptions;
 with System.Address_To_Access_Conversions;
 with System.Storage_Elements;
 with Ada.Strings.Fixed;
-with Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 with Ada.Unchecked_Conversion;
 with Lua_Ada_Config;
 with Lua.Engine.Compiler;
 with Lua.Engine.Tables;
 with Lua.Engine.Machine;
+with Lua.Engine.Foreign;
 
 package body Lua.Engine is
    use type Ada.Containers.Count_Type;
@@ -29,6 +35,8 @@ package body Lua.Engine is
    use type Interfaces.Unsigned_64;
    use type Lua.Prototypes.Prototype_Access;
    use type Lua.Storage.Owner_Access;
+   use type Lua.Storage.Allocation_Function;
+   package Locales renames Lua.Platform_Locales;
 
    package Characters is new
      System.Address_To_Access_Conversions (Character);
@@ -103,8 +111,23 @@ package body Lua.Engine is
      (Heap_Object, Object_Access);
    procedure Release_Prototype is new Ada.Unchecked_Deallocation
      (Prototype, Prototype_Access);
-   procedure Free_Frame is new Ada.Unchecked_Deallocation
+   procedure Free_Frame_Storage is new Ada.Unchecked_Deallocation
      (Frame, Frame_Access);
+   procedure Free_Frame (Item : in out Frame_Access) is
+      Context : Context_Access;
+   begin
+      if Item = null then return; end if;
+      Context := Item.Context;
+      if Context = null or else Context.Frame_Capacity = 0 then
+         raise Program_Error with "invalid physical activation owner";
+      end if;
+      --  Cached return does not reach this path. Physical destruction alone
+      --  relinquishes one metadata reservation; a live C pump may still own
+      --  its record, so trimming never frees an outstanding record.
+      Context.Frame_Capacity := Context.Frame_Capacity - 1;
+      Lua.Engine.Foreign.Trim_Call_Metadata (Context);
+      Free_Frame_Storage (Item);
+   end Free_Frame;
    --  Deallocation is confined to this owning world. Lua values themselves
    --  never free objects, which is essential for shared/cyclic graphs.
 
@@ -157,19 +180,76 @@ package body Lua.Engine is
       end if;
       --  C observes this immutable view only while the Lua string is live.
       --  Release it with the string, never through a permanent facade cache.
-      if Item /= null and then Item.Kind = String_Object and then
-        Item.C_Bytes /= System.Null_Address
-      then
-         Lua.Storage.Release (State.Memory, Item.C_Bytes);
+      if Item /= null and then Item.Kind = String_Object then
+         if Item.Interned then
+            declare
+               Bucket : constant Positive := Natural
+                 (Item.String_Hash mod Interfaces.Unsigned_64
+                    (State.Short_Strings.Length)) + 1;
+               Cursor : Object_Access := State.Short_Strings (Bucket);
+               Previous : Object_Access;
+            begin
+               --  Unlink while the header and chain are still valid. The
+               --  weak index never marks a string or delays its collection.
+               while Cursor /= Item loop
+                  Previous := Cursor;
+                  Cursor := Cursor.Intern_Next;
+               end loop;
+               if Previous = null then
+                  State.Short_Strings.Replace_Element
+                    (Bucket, Item.Intern_Next);
+               else
+                  Previous.Intern_Next := Item.Intern_Next;
+               end if;
+               State.Short_String_Count := State.Short_String_Count - 1;
+               Item.Interned := False;
+               Item.Intern_Next := null;
+            end;
+         end if;
+         if Item.External_String then
+            if Item.Release_Queued or else Item.String_Allocator /= null then
+               --  The collector detaches ownership before this call. Keep
+               --  the existing header as an allocation-free release packet;
+               --  no foreign code executes inside this Ada sweep/teardown.
+               External_Releases.Enqueue (State, Item);
+               Item := null;
+               return;
+            end if;
+         elsif Item.C_Bytes /= System.Null_Address then
+            Lua.Storage.Release (State.Memory, Item.C_Bytes);
+         end if;
       end if;
       Release_Object (Item);
    end Free_Object;
+
+   procedure Release_Detached_String
+     (State : in out World; Item : in out Object_Access) is
+   begin
+      if Item = null or else Item.Registry_Slot /= 0 or else
+        Item.String_Allocator /= null or else Item.Release_Queued
+      then
+         raise Program_Error with "invalid external header retirement";
+      end if;
+      Free_Object (State, Item);
+   end Release_Detached_String;
+
+   function Current_Decimal_Point return Character is
+     (Character'Val (Integer (Locales.Decimal_Point)));
+   --  Read the native localeconv()->decimal_point[0] byte at each runtime
+   --  conversion, so an os.setlocale change is seen by the next tonumber or
+   --  arithmetic coercion. Nothing is cached, allocated or charged here: the
+   --  call only supplies one byte to the existing shared parser. Callers that
+   --  change locale elsewhere must serialize it with this read, as documented
+   --  in Lua.Platform_Locales.
 
    function Read_Number
      (Memory : not null Lua.Storage.Owner_Access; Text : String;
       Base : Natural := 0) return Lua.Numbers.Number is
    begin
-      return Lua.Number_Parsing.Read (Text, Memory, Base);
+      --  The parser retains its exact-decimal default for every other caller;
+      --  only this runtime boundary passes the current native separator.
+      return Lua.Number_Parsing.Read
+        (Text, Memory, Base, Current_Decimal_Point);
    end Read_Number;
 
    function Read_Number
@@ -182,7 +262,8 @@ package body Lua.Engine is
       --  The caller's frame, stack window or operation root retains this
       --  immutable string object throughout conversion. The parser owns only
       --  its limb scratch; it neither copies nor caches the borrowed payload.
-      return Lua.Number_Parsing.Read (View, Memory, Base);
+      return Lua.Number_Parsing.Read
+        (View, Memory, Base, Current_Decimal_Point);
    end Read_Number;
 
    function Read_Number
@@ -197,7 +278,7 @@ package body Lua.Engine is
          end if;
          State.Steps := State.Steps + Text'Length;
       end if;
-      return Read_Number (Lua.Storage.Reference (State.Memory), Text, Base);
+      return Read_Number (Text, Base);
    end Read_Number;
 
    function Read_Number
@@ -215,7 +296,23 @@ package body Lua.Engine is
          end if;
          State.Steps := State.Steps + Text.Size;
       end if;
-      return Read_Number (Lua.Storage.Reference (State.Memory), Text, Base);
+      return Read_Number (Text, Base);
+   end Read_Number;
+
+   function Read_Number
+     (Text : String; Base : Natural := 0) return Lua.Numbers.Number is
+   begin
+      return Lua.Number_Parsing.Read_Without_Allocation
+        (Text, Base, Current_Decimal_Point);
+   end Read_Number;
+
+   function Read_Number
+     (Text : Byte_String; Base : Natural := 0) return Lua.Numbers.Number
+   is
+      View : constant String (1 .. Text.Size)
+        with Import, Address => Text.Address;
+   begin
+      return Read_Number (View, Base);
    end Read_Number;
 
    function Owned_Values
@@ -265,6 +362,7 @@ package body Lua.Engine is
    is
    begin
       if Context /= null then
+         Lua.Engine.Foreign.Release_Context_Control (State, Context);
          Lua.Storage.Release (State.Memory, Context.Foreign_Block);
          Lua.Storage.Release (State.Memory, Context.Foreign_Control);
          Context.Foreign_State := System.Null_Address;
@@ -292,6 +390,7 @@ package body Lua.Engine is
       Item.Boundary_Results.Set_Owner (Item.Memory);
       Item.Foreign_Stack.Set_Owner (Item.Memory);
       Item.Stack_Cells.Set_Owner (Item.Memory);
+      Item.C_Close_Links.Set_Owner (Item.Memory);
       Item.Transfer.Results.Set_Owner (Item.Memory);
       --  Registration transfers ownership. Failed vector growth leaves the
       --  allocation local, so release it before propagating Storage_Error.
@@ -299,6 +398,13 @@ package body Lua.Engine is
          --  Error publication must work after provider refusal. Reserve its
          --  bounded packet while context construction can still fail cleanly.
          Item.Boundary_Results.Reserve_Capacity (2);
+         Item.Stack.Reserve_Capacity (1);
+         --  A valid lua_toclose cannot request allocator storage. Reserve
+         --  the actual base CallInfo and stack-resident closing links
+         --  during context construction; it acquires a window only on use.
+         Item.Base_C_Frame := New_Frame (State, Item);
+         Item.Base_C_Frame.Native_Name :=
+           To_Unbounded_String ("@host.base");
          Stacks.Reserve
            (State, Item, Initial_Stack_Size + Extra_Stack);
          Item.Stack_Used := Minimum_C_Stack;
@@ -313,6 +419,9 @@ package body Lua.Engine is
          State.Contexts.Append (Item);
       exception
          when others =>
+            if Item.Base_C_Frame /= null then
+               Free_Frame (Item.Base_C_Frame);
+            end if;
             Free_Context (Item);
             raise;
       end;
@@ -334,9 +443,7 @@ package body Lua.Engine is
    function Allocate
      (State : in out World; Kind : Heap_Kind;
       Payload_Length : Lua.Storage.Byte_Count := 0) return Object_Access;
-   function Real_Image
-     (Memory : not null Lua.Storage.Owner_Access;
-      Item : Real_Value) return String;
+   function Real_Image (Item : Real_Value) return String;
    function NaN_Image (Item : Real_Value; Host : String) return String;
    --  Keep host formatting policy separate from arithmetic and test values.
 
@@ -356,11 +463,76 @@ package body Lua.Engine is
         (if Zero = 0 then Text'Last else Zero - 1));
    end C_Option;
 
+   procedure Diagnostic_Work (State : in out World; Bytes : Natural)
+   is
+   begin
+      --  The fixed inline path is bounded bookkeeping. Longer immutable
+      --  payload construction copies every byte and consumes the same host
+      --  budget as other native input-sized loops, before allocating.
+      if Bytes > Lua.Diagnostic_Text.Inline_Capacity and then
+        State.Policy = Bounded and then State.Memory_Ready
+      then
+         if Bytes > State.Bounds.Instructions - Natural'Min
+           (State.Steps, State.Bounds.Instructions)
+         then
+            Fail (State, "instruction limit exceeded", Resource => True);
+         end if;
+         State.Steps := State.Steps + Bytes;
+      end if;
+   end Diagnostic_Work;
+
+   procedure Set_Failure_Text
+     (State : in out World; Context : not null Context_Access;
+      Message : String)
+   is
+   begin
+      Diagnostic_Work (State, Message'Length);
+      Lua.Diagnostic_Text.Set_Value
+        (Context.Failure_Text, Context.Memory, Message);
+   end Set_Failure_Text;
+
+   function Failure_Image (Context : not null Context_Access) return String is
+   begin
+      --  Failure text is only the pending builder representation. Once a real
+      --  Lua error exists, preserve its original bytes/identity instead of
+      --  requiring another allocation during error delivery or propagation.
+      if Lua.Diagnostic_Text.Length (Context.Failure_Text) = 0 and then
+        Context.Has_Failure_Value
+      then
+         return Image (Context.Memory, Context.Failure);
+      end if;
+      return Lua.Diagnostic_Text.To_String (Context.Failure_Text);
+   end Failure_Image;
+
+   function Ensure_Error_Object
+     (State : in out World; Context : not null Context_Access) return Value
+   is
+      procedure Publish (Bytes : String);
+      procedure Publish (Bytes : String) is
+      begin
+         --  The Lua string constructor hashes and copies the pending bytes.
+         --  Charge both real passes; existing Lua error objects skip them.
+         Diagnostic_Work (State, Bytes'Length);
+         Diagnostic_Work (State, Bytes'Length);
+         Context.Failure := New_String (State, Bytes);
+         Root_Barrier (State, Context.Failure);
+         Context.Has_Failure_Value := True;
+      end Publish;
+   begin
+      if not Context.Has_Failure_Value then
+         --  Query's immutable snapshot survives collection/refusal, and its
+         --  bounded handle copy cannot allocate while reporting another error.
+         Lua.Diagnostic_Text.Query (Context.Failure_Text, Publish'Access);
+      end if;
+      Lua.Diagnostic_Text.Clear (Context.Failure_Text);
+      return Context.Failure;
+   end Ensure_Error_Object;
+
    procedure Fail (State : in out World; Message : String;
                    Resource : Boolean := False)
    is
    begin
-      State.Current.Failure_Text := To_Unbounded_String (Message);
+      Set_Failure_Text (State, State.Current, Message);
       State.Current.Failure := Nil_Value;
       State.Current.Has_Failure_Value := False;
       State.Current.Failure_Handled := False;
@@ -377,14 +549,20 @@ package body Lua.Engine is
 
    procedure Begin_Operation (State : in out World) is
    begin
-      State.Operation_Roots.Clear;
-      State.Operation_Programs.Clear;
+      End_Operation (State);
       State.Operation_Start := State.Next_Object;
       State.Operation_Active := True;
    end Begin_Operation;
 
    procedure End_Operation (State : in out World) is
+      Item : Object_Access;
    begin
+      while State.String_Root_Head /= null loop
+         Item := State.String_Root_Head;
+         State.String_Root_Head := Item.String_Root_Next;
+         Item.String_Root_Next := null;
+         Item.String_Rooted := False;
+      end loop;
       State.Operation_Roots.Clear;
       State.Operation_Programs.Clear;
       State.Operation_Active := False;
@@ -430,7 +608,7 @@ package body Lua.Engine is
       Lua.Storage.Acknowledge_Refusal (State.Memory);
       State.Current.Failure := State.Memory_Error_Value;
       State.Current.Has_Failure_Value := True;
-      State.Current.Failure_Text := To_Unbounded_String ("not enough memory");
+      Set_Failure_Text (State, State.Current, "not enough memory");
       State.Current.Failure_Class := Memory_Failure;
       State.Current.Failure_Handled := False;
    end Record_Memory_Error;
@@ -461,6 +639,8 @@ package body Lua.Engine is
       procedure Root_Barrier (State : in out World; Item : Value);
       procedure Root_Barrier
         (State : in out World; Item : Object_Access);
+      procedure Revive_String
+        (State : in out World; Item : not null Object_Access);
       procedure Code_Barrier
         (State : in out World; Item : Prototype_Access);
       procedure Write_Barrier
@@ -538,6 +718,7 @@ package body Lua.Engine is
       --  provider callbacks can never observe a deallocated stale identity.
       Collector.Unregister_Object (State, Item);
       Return_Heap_Slot (State, Slot);
+      Item.Registry_Slot := 0;
       State.Live_Objects := State.Live_Objects - 1;
       if Item.Kind = Table_Object then
          State.Entry_Count :=
@@ -1025,19 +1206,37 @@ package body Lua.Engine is
       return Cell;
    end New_Cell;
 
-   function New_Thread (State : in out World; Entry_Function : Value)
-                        return Value
+   function New_Thread
+     (State : in out World; Entry_Function : Value;
+      Parent : Context_Access := null) return Value
    is
       Id : constant Context_Id := Create_Context (State);
       Thread : Object_Access;
       Context : constant Context_Access := State.Contexts (Positive (Id));
+      Origin : constant Context_Access :=
+        (if Parent = null then State.Current else Parent);
    begin
+      Lua.Engine.Foreign.Prepare_Thread_Surface (State, Id);
       Thread := Allocate (State, Thread_Object);
       Thread.Context_Index := Positive (Id);
       Context.Thread := Thread;
       Root_Barrier (State, Entry_Function);
       Context.Entry_Function := Entry_Function;
       Context.Host_Owned := False;
+      --  lstate.c:lua_newthread copies the actual hook dispatcher pointer,
+      --  mask and base count, then resets the countdown. A Lua dispatcher is
+      --  inherited without its thread-keyed callback entry: gethook can
+      --  therefore return nil plus the inherited mask/count, and registering
+      --  a mapping later activates those same controls. Foreign dispatchers
+      --  retain their non-owning scalar trampoline/callback identities.
+      Context.Hook := Origin.Hook;
+      Context.Lua_Hook_Installed := Origin.Lua_Hook_Installed;
+      Context.Hook_Mask := Origin.Hook_Mask;
+      Context.Foreign_Hook := Origin.Foreign_Hook;
+      Context.Foreign_Hook_Mask := Origin.Foreign_Hook_Mask;
+      Context.Hook_Count := Origin.Hook_Count;
+      Context.Hook_Reported_Count := Origin.Hook_Reported_Count;
+      Context.Hook_Remaining := Origin.Hook_Count;
       return (Thread_Kind, Thread);
    exception
       when others =>
@@ -1046,6 +1245,7 @@ package body Lua.Engine is
          declare
             Abandoned : Context_Access := Context;
          begin
+            Destroy_Frames (State, Abandoned);
             Release_Foreign_Context (State, Abandoned);
             Free_Context (Abandoned);
             State.Contexts.Replace_Element (Positive (Id), null);
@@ -1075,12 +1275,12 @@ package body Lua.Engine is
       Item.Error_Packet.Clear;
       Item.Native_Captures.Clear;
       Item.Native_Buffer.Clear;
+      Item.Argument_Error_Detail.Clear;
+      Item.Call_Name_Bytes.Clear;
       for Index in Item.Slots.First_Index .. Item.Slots.Last_Index loop
          Item.Slots.Update_Element (Index, Clear_Packet'Access);
       end loop;
       Item.Active_Registers := 0;
-      Item.Canonical_Registers.Clear;
-      Item.Canonical_Cells.Clear;
       Item.Varargs.Clear;
       Item.Closers.Clear;
       Item.Unwind_Live.Clear;
@@ -1096,6 +1296,19 @@ package body Lua.Engine is
       Item.Varargs.Set_Owner (Item.Memory);
       Item.Unwind_Results.Set_Owner (Item.Memory);
 
+      if Item.Native_Arguments.Capacity = 0 and then
+        Item.Native_Results.Capacity >= 2
+      then
+         --  A refusing protected call can adopt its argument buffer for the
+         --  false/error result. Scalar delivery then leaves that capacity in
+         --  Results. Both packets are empty now: reclaim it for the next C
+         --  call so cached metadata can clear refusal without allocating a
+         --  replacement argument vector. Moving empty storage creates no
+         --  Lua edge; explicitly rebind the emptied source for later reuse.
+         Values.Move (Item.Native_Arguments, Item.Native_Results);
+         Item.Native_Results.Set_Owner (Item.Memory);
+      end if;
+
       --  Never assign a default Frame aggregate: controlled component
       --  assignment would replace owned buffers rather than reusing them.
       --  Each pointer, value and scheduler phase is reset explicitly so an
@@ -1103,13 +1316,22 @@ package body Lua.Engine is
       Item.Is_Native := False;
       Item.Native_Name := Null_Unbounded_String;
       Item.Native_Id := Print_Function;
+      Item.Native_Builtin_Direct := False;
+      Item.Return_Window_Published := False;
+      Item.Native_Return_First := 0;
+      Item.Load_Reader_Portal := False;
+      Item.Load_Reader_Arguments := 0;
+      Item.Load_Reader_Mode_Offset := 0;
       Item.Result_Failure_Class := No_Failure;
       Item.Result_Handler_Called := False;
       Item.Native_Self := null;
       Item.Native_Stage := 0;
       Item.Native_Index := 0;
       Item.Native_Aux := 0;
+      Item.Argument_Error_Index := 0;
+      Item.Argument_Error_Origin := null;
       Item.Native_Operator := Lua.Lexers.End_Of_Input;
+      Item.C_Closing_Level := 0;
       Item.Foreign_Handler := System.Null_Address;
       Item.Foreign_Ticket := 0;
       Item.Foreign_Continuation := System.Null_Address;
@@ -1119,23 +1341,30 @@ package body Lua.Engine is
       Item.Foreign_Suspended := False;
       Item.Foreign_Wanted := 0;
       Item.Foreign_Protected := False;
+      Item.Error_Guard_Owner := null;
+      Item.Deferred_Error_Head := null;
+      Item.Deferred_Error_Next := null;
+      Item.Deferred_Error_Count := 0;
+      Item.Deferred_Error_Traceback := False;
+      Item.Pending_Error_Transfer := False;
+      Item.Error_Previous_Prefix := 0;
       Item.Warning_Phase := No_Pending_Warning;
       Item.Warning_Previous := null;
-      Item.Warning_Window := null;
+      Item.Warning_View := (others => <>);
       Item.Warning_Borrow_Depth := 0;
+      Item.Hook_View_Depth := 0;
       Item.Warning_Ticket := 0;
       Item.Warning_Message := (others => <>);
       Item.Warning_Root := Nil_Value;
       Item.Warning_To_Continue := False;
       Item.Warning_Handler := System.Null_Address;
       Item.Warning_Data := System.Null_Address;
-      Item.Warning_Previous_Base := 0;
-      Item.Warning_Previous_Top := 0;
-      Item.Warning_Previous_Frame := null;
       Item.Warning_Failed := False;
       Item.Foreign_Base := 0;
       Item.Foreign_Previous_Base := 0;
       Item.Foreign_Previous_Frame := null;
+      Item.Foreign_Previous_View := null;
+      Item.Hook_View := (others => <>);
       Item.Foreign_Entered := False;
       Item.Call_Site := (others => 1);
       Item.Code := null;
@@ -1174,15 +1403,25 @@ package body Lua.Engine is
       Item.Unwind_Charge := False;
       Item.Blocks_Yield := False;
       Item.Callee := Nil_Value;
+      Item.Is_C_Hook_Transport := False;
+      Item.Is_C_Collector_Transport := False;
+      Item.Is_Finalizer_Call := False;
+      Item.Logically_Unwound := False;
       Item.Is_Tail_Call := False;
+      Item.Call_Metamethod_Count := 0;
       Item.Native_Tail_State := No_Native_Tail;
       Item.Call_Name := Null_Unbounded_String;
       Item.Name_Kind := Null_Unbounded_String;
       Item.Transfer_Count := 0;
+      Item.Transfer_First := 1;
       Item.Entry_Hook_Done := False;
       Item.Return_Hook_Done := False;
-      Item.Hook_Line := 0;
+      Item.External_Return_Pending := False;
+      Item.External_Return_Independent := False;
+      Item.Hook_Line := -1;
       Item.Hook_PC := 0;
+      Item.Hook_Trace_PC := 0;
+      Item.Hook_Line_Mask := False;
       Item.Last_Executed_PC := 0;
       Item.Line_Hook_Checked := False;
       Item.Unwind := No_Unwind;
@@ -1193,11 +1432,12 @@ package body Lua.Engine is
       Item.Unwind_Failure_Class := Language_Failure;
       Item.Unwind_Handler_Called := False;
       Item.Unwind_Has_Error := False;
+      Item.Unwind_Previous_Prefix := 0;
    end Clear_Frame;
 
    function New_Frame
-     (State : in out World; Context : not null Context_Access)
-      return Frame_Access
+     (State : in out World; Context : not null Context_Access;
+      Reuse_Cache : Boolean := True) return Frame_Access
    is
       Item : Frame_Access;
       Retried : Boolean := False;
@@ -1205,7 +1445,21 @@ package body Lua.Engine is
       if Context.Memory /= Lua.Storage.Reference (State.Memory) then
          raise Program_Error with "activation belongs to another universe";
       end if;
-      if Context.Cache_Head /= null then
+      if Reuse_Cache and then Context.C_Reset_Active and then
+        Context.Reset_Frame_Head /= null
+      then
+         Item := Context.Reset_Frame_Head;
+         if Item.Lifecycle /= Available or else Item.Context /= Context or
+           else not Item.Reset_Reserve
+         then
+            raise Program_Error with "invalid reserved reset activation";
+         end if;
+         Context.Reset_Frame_Head := Item.Cache_Next;
+         Context.Reset_Frame_Count := Context.Reset_Frame_Count - 1;
+         Item.Cache_Next := null;
+         Item.Lifecycle := Active;
+         return Item;
+      elsif Reuse_Cache and then Context.Cache_Head /= null then
          Item := Context.Cache_Head;
          if Item.Lifecycle /= Available or else Item.Context /= Context then
             raise Program_Error with "invalid cached activation owner";
@@ -1219,6 +1473,32 @@ package body Lua.Engine is
       loop
          begin
             Item := new (Lua.Storage.Handle (State.Memory)) Frame;
+            Item.Context := Context;
+            Item.Memory := Context.Memory;
+            if Context.Frame_Capacity >= Natural'Last - 1 then
+               Free_Frame_Storage (Item);
+               Fail (State, "activation capacity overflow");
+            end if;
+            Context.Frame_Capacity := Context.Frame_Capacity + 1;
+            begin
+               --  Charge the selected owner before exposing either new
+               --  capacity. A refusing metadata reservation cannot leave an
+               --  unowned frame or an inflated capacity count. Emergency GC
+               --  may shrink other cached frames before a later retry.
+               --  Every actual allocated frame must already fit its owning
+               --  reference vector, including the dedicated reset reserve.
+               --  A cached borrow cannot discover new metadata growth merely
+               --  because its real C/error path retains additional holders.
+               Context.Stack.Reserve_Capacity
+                 (Ada.Containers.Count_Type (Context.Frame_Capacity + 1));
+               Lua.Engine.Foreign.Reserve_Call_Metadata (State, Context);
+            exception
+               when others =>
+                  Context.Frame_Capacity := Context.Frame_Capacity - 1;
+                  Lua.Engine.Foreign.Trim_Call_Metadata (Context);
+                  Free_Frame_Storage (Item);
+                  raise;
+            end;
             exit;
          exception
             when Lua.Storage.Allocation_Error =>
@@ -1232,6 +1512,8 @@ package body Lua.Engine is
       Item.Context := Context;
       Item.Memory := Context.Memory;
       Item.Native_Buffer.Set_Owner (Item.Memory);
+      Item.Argument_Error_Detail.Set_Owner (Item.Memory);
+      Item.Call_Name_Bytes.Set_Owner (Item.Memory);
       Item.Native_Arguments.Set_Owner (Item.Memory);
       Item.Native_Results.Set_Owner (Item.Memory);
       Item.Error_Packet.Set_Owner (Item.Memory);
@@ -1241,10 +1523,44 @@ package body Lua.Engine is
       Item.Closers.Set_Owner (Item.Memory);
       Item.Unwind_Live.Set_Owner (Item.Memory);
       Item.Unwind_Results.Set_Owner (Item.Memory);
-      Item.Canonical_Registers.Set_Owner (Item.Memory);
-      Item.Canonical_Cells.Set_Owner (Item.Memory);
       return Item;
    end New_Frame;
+
+   procedure Prepare_Reset_Frames
+     (State : in out World; Context : not null Context_Access)
+   is
+      Item : Frame_Access;
+   begin
+      Context.Stack.Reserve_Capacity
+        (Context.Stack.Length +
+           Ada.Containers.Count_Type (Context.Deferred_Error_Depth +
+             Reset_Continuation_Frames + 1));
+      while Context.Reset_Frame_Count < Reset_Continuation_Frames loop
+         --  First C exposure may occur after the program warmed ordinary
+         --  call depth, immediately before T.alloccount enables refusal.
+         --  Reserve reset owners separately; stealing that warm cache would
+         --  force a new ordinary frame inside the next protected C call.
+         Item := New_Frame (State, Context, Reuse_Cache => False);
+         begin
+            --  These are actual continuation-owned argument/result owners,
+            --  not copies of live stack values. Three close arguments plus
+            --  protected success/error pairs fit without refusal-time growth.
+            Item.Native_Arguments.Reserve_Capacity (4);
+            Item.Native_Results.Reserve_Capacity (4);
+            Item.Error_Packet.Reserve_Capacity (2);
+            Item.Unwind_Results.Reserve_Capacity (2);
+            Item.Native_Captures.Reserve_Capacity (4);
+            Item.Call_Name_Bytes.Set_Value ("__close");
+            Item.Call_Name_Bytes.Clear;
+            Item.Reset_Reserve := True;
+            Return_Frame (Item);
+         exception
+            when others =>
+               Return_Frame (Item);
+               raise;
+         end;
+      end loop;
+   end Prepare_Reset_Frames;
 
    function New_Frame (State : in out World) return Frame_Access is
    begin
@@ -1285,8 +1601,27 @@ package body Lua.Engine is
          raise Program_Error with "activation is not borrowed";
       end if;
       Context := Item.Context;
+      if Item.Deferred_Error_Head /= null then
+         raise Program_Error with "returning owned deferred error scopes";
+      end if;
       Item.Lifecycle := Retiring;
       Clear_Frame (Item);
+      if Context.Base_C_Frame = Item then
+         --  The base CallInfo has its own lifetime, equal to the context's.
+         --  Keep its empty reserved metadata outside the ordinary cache so
+         --  collection cannot shrink away allocation-free C registration.
+         Item.Lifecycle := Active;
+         Item := null;
+         return;
+      end if;
+      if Item.Reset_Reserve then
+         Item.Cache_Next := Context.Reset_Frame_Head;
+         Item.Lifecycle := Available;
+         Context.Reset_Frame_Head := Item;
+         Context.Reset_Frame_Count := Context.Reset_Frame_Count + 1;
+         Item := null;
+         return;
+      end if;
       --  This link publishes only an empty record. Cached frames are never
       --  traced as roots, and no user callback runs during this transition.
       Item.Cache_Next := Context.Cache_Head;
@@ -1300,6 +1635,7 @@ package body Lua.Engine is
      (State : in out World; Context : not null Context_Access)
    is
       Item : Frame_Access;
+      Deferred : Frame_Access;
    begin
       if Context.Memory /= Lua.Storage.Reference (State.Memory) then
          raise Program_Error with "teardown belongs to another universe";
@@ -1316,9 +1652,28 @@ package body Lua.Engine is
       while not Context.Stack.Is_Empty loop
          Item := Context.Stack.Last_Element;
          Context.Stack.Delete_Last;
+         if Context.Base_C_Frame = Item then
+            Context.Base_C_Frame := null;
+         end if;
+         --  A host abort may destroy a context while C error transfer owns
+         --  detached, already retired scopes. No callback can execute here;
+         --  remove every intrusive owner before freeing its record.
+         while Item.Deferred_Error_Head /= null loop
+            Deferred := Item.Deferred_Error_Head;
+            Item.Deferred_Error_Head := Deferred.Deferred_Error_Next;
+            if Deferred.Deferred_Error_Head /= null then
+               raise Program_Error with "nested deferred scope ownership";
+            end if;
+            Deferred.Deferred_Error_Next := null;
+            Clear_Frame (Deferred);
+            Free_Frame (Deferred);
+         end loop;
          Clear_Frame (Item);
          Free_Frame (Item);
       end loop;
+      if Context.Base_C_Frame /= null then
+         Free_Frame (Context.Base_C_Frame);
+      end if;
       while Context.Cache_Head /= null loop
          Item := Context.Cache_Head;
          Context.Cache_Head := Item.Cache_Next;
@@ -1326,10 +1681,20 @@ package body Lua.Engine is
          Item.Cache_Next := null;
          Free_Frame (Item);
       end loop;
+      while Context.Reset_Frame_Head /= null loop
+         Item := Context.Reset_Frame_Head;
+         Context.Reset_Frame_Head := Item.Cache_Next;
+         Context.Reset_Frame_Count := Context.Reset_Frame_Count - 1;
+         Item.Cache_Next := null;
+         Free_Frame (Item);
+      end loop;
       --  Scheduler yield has already excluded an inactive context's native
       --  depth from the active resumer chain. Reclaim only its own counters;
       --  subtracting again would corrupt an unrelated running context.
       Context.Stack_Slots := 0;
+      Context.Deferred_Error_Depth := 0;
+      Context.Error_Recovery_Pending := False;
+      Context.Error_Recovery_Floor := 0;
       Context.Native_Depth := 0;
       Context.Non_Yieldable := 0;
       Context.Message_Depth := 0;
@@ -1338,6 +1703,10 @@ package body Lua.Engine is
       Context.Hook_Suspended := False;
       Context.Hook_Yield_Pending := False;
       Context.Foreign_Activation := null;
+      Context.Foreign_View := null;
+      Context.Resume_Foreign_View := null;
+      Context.Base_C_Frame := null;
+      Context.Closing_Stack_Prefix := 0;
       Context.Stack_Window := null;
    end Destroy_Frames;
 
@@ -1405,14 +1774,98 @@ package body Lua.Engine is
       return Result;
    end New_String;
 
+   procedure String_Work (State : in out World; Count : Natural);
+   procedure Grow_String_Index (State : in out World);
+
+   procedure String_Work (State : in out World; Count : Natural) is
+   begin
+      if State.Policy /= Bounded or else not State.Memory_Ready then
+         return;
+      elsif Count > State.Bounds.Instructions -
+        Natural'Min (State.Steps, State.Bounds.Instructions)
+      then
+         Fail (State, "instruction limit exceeded", Resource => True);
+      end if;
+      State.Steps := State.Steps + Count;
+   end String_Work;
+
+   procedure Grow_String_Index (State : in out World) is
+      Buckets : Objects.Vector;
+      Retried : Boolean := False;
+      Size : constant Positive :=
+        (if State.Short_Strings.Is_Empty then 128
+         else State.Short_Strings.Last_Index * 2);
+      Item, Next : Object_Access;
+      Target : Positive;
+   begin
+      Buckets.Set_Owner (Lua.Storage.Reference (State.Memory));
+      String_Work (State, Size);
+      String_Work (State, State.Short_String_Count);
+      --  Allocate the replacement first. Refusal/emergency collection may
+      --  unlink dead strings from the old chains; no chain is rewritten
+      --  until allocation has succeeded and the complete new index exists.
+      loop
+         begin
+            Buckets.Reserve_Capacity (Ada.Containers.Count_Type (Size));
+            exit;
+         exception
+            when Lua.Storage.Allocation_Error =>
+               if not Retry_Allocation (State, Retried) then raise; end if;
+         end;
+      end loop;
+      for Index in 1 .. Size loop
+         Buckets.Append (null);
+      end loop;
+      for Head of State.Short_Strings loop
+         Item := Head;
+         while Item /= null loop
+            Next := Item.Intern_Next;
+            Target := Natural
+              (Item.String_Hash mod Interfaces.Unsigned_64 (Size)) + 1;
+            Item.Intern_Next := Buckets (Target);
+            Buckets.Replace_Element (Target, Item);
+            Item := Next;
+         end loop;
+      end loop;
+      Objects.Move (State.Short_Strings, Buckets);
+   end Grow_String_Index;
+
    function New_String (State : in out World; Text : String) return Value is
       Item : Object_Access;
       Retried : Boolean := False;
+      Hash : Interfaces.Unsigned_64;
+      Bucket : Positive;
    begin
       if Text'Length = Natural'Last then
          Fail (State, "string length overflow");
       elsif Text'Length > State.Bounds.String_Bytes then
          Fail (State, "string byte limit exceeded", Resource => True);
+      end if;
+      Hash := Tables.Hash_Bytes (Text);
+      if Text'Length <= 40 then
+         if not State.Short_Strings.Is_Empty then
+            Bucket := Natural
+              (Hash mod Interfaces.Unsigned_64
+                 (State.Short_Strings.Length)) + 1;
+            Item := State.Short_Strings (Bucket);
+            while Item /= null loop
+               String_Work (State, 1);
+               if Item.String_Hash = Hash and then Item.Bytes = Text then
+                  Collector.Revive_String (State, Item);
+                  if State.Operation_Active and then not Item.String_Rooted
+                  then
+                     Item.String_Root_Next := State.String_Root_Head;
+                     State.String_Root_Head := Item;
+                     Item.String_Rooted := True;
+                  end if;
+                  return (String_Kind, Item);
+               end if;
+               Item := Item.Intern_Next;
+            end loop;
+         end if;
+         if State.Short_String_Count >= State.Short_Strings.Last_Index then
+            Grow_String_Index (State);
+         end if;
       end if;
       Item := Allocate (State, String_Object);
       loop
@@ -1435,9 +1888,51 @@ package body Lua.Engine is
          View (1 .. Text'Length) := Text;
          View (View'Last) := ASCII.NUL;
       end;
-      Item.String_Hash := Tables.Hash_Bytes (Text);
+      Item.String_Hash := Hash;
+      if Text'Length <= 40 then
+         Bucket := Natural
+           (Hash mod Interfaces.Unsigned_64 (State.Short_Strings.Length)) + 1;
+         Item.Intern_Next := State.Short_Strings (Bucket);
+         State.Short_Strings.Replace_Element (Bucket, Item);
+         Item.Interned := True;
+         State.Short_String_Count := State.Short_String_Count + 1;
+      end if;
       return (String_Kind, Item);
    end New_String;
+
+   function New_External_String
+     (State : in out World; Address : System.Address; Size : Natural;
+      Allocator : Lua.Storage.Allocation_Function;
+      Data : System.Address) return Value
+   is
+      Item : Object_Access;
+   begin
+      if Size = Natural'Last then
+         Fail (State, "string length overflow");
+      elsif Size > State.Bounds.String_Bytes then
+         Fail (State, "string byte limit exceeded", Resource => True);
+      end if;
+      --  Hashing an external payload is actual shared runtime work. Charge
+      --  before adopting the caller's ownership so quota failure remains a
+      --  C-guard cleanup path, without a partially adopted header.
+      String_Work (State, Size);
+      Item := Allocate (State, String_Object);
+      --  External strings are deliberately never interned here, including
+      --  zero-length/short buffers. The exact caller payload remains the
+      --  returned C view until release. Table insertion normalizes a short
+      --  external key separately, matching Lua 5.5's luaS_normstr boundary.
+      Item.External_String := True;
+      Item.Bytes := (Address, Size);
+      Item.C_Bytes := Address;
+      Item.String_Allocator := Allocator;
+      Item.String_Allocator_Data := Data;
+      declare
+         Text : constant String (1 .. Size) with Import, Address => Address;
+      begin
+         Item.String_Hash := Tables.Hash_Bytes (Text);
+      end;
+      return (String_Kind, Item);
+   end New_External_String;
 
    function Userdata_Address (Item : Value) return System.Address is
      (if Item.Kind = Userdata_Kind then Item.Reference.Payload'Address
@@ -1479,7 +1974,10 @@ package body Lua.Engine is
       --  one-byte subtype includes every fixed component and tail padding,
       --  so this conservative exact-type bound never undercounts storage.
       if Size > Lua.Storage.Byte_Count'Last - Header_Bytes - Block_Bytes then
-         raise Lua.Storage.Allocation_Error with "userdata block too large";
+         --  This is a representability error before a provider request, not
+         --  refusal of a valid allocation. The public C API exposes Lua's
+         --  ordinary "block too big" runtime error for this distinction.
+         Fail (State, "block too big");
       end if;
       Item := Allocate (State, Userdata_Object, Physical);
       Item.Userdata_Size := Size;
@@ -1603,8 +2101,17 @@ package body Lua.Engine is
      (State : in out World; Name : String;
       Captures : Values.Vector := Values.Empty_Vector) return Value
    is
-      Item : constant Object_Access := Allocate (State, Native_Closure);
+      Found : constant Lua.Builtin_Registry.Lookup :=
+        Lua.Builtin_Registry.Find (Name);
+      Item : Object_Access;
    begin
+      --  A stateless builtin is an actual light C function identity: no
+      --  closure object/cache survives in the universe merely to remember a
+      --  name. Stateful functions still own distinct real upvalue cells.
+      if Captures.Is_Empty and then Found.Exists then
+         return (Native_Kind_Value, Found.Id);
+      end if;
+      Item := Allocate (State, Native_Closure);
       Item.Native_Name := To_Unbounded_String (Name);
       for Capture of Captures loop
          declare
@@ -1619,6 +2126,13 @@ package body Lua.Engine is
       end loop;
       return (Native_Closure_Kind, Item);
    end New_Native;
+
+   function Native_Operation_Name
+     (Activation : not null Frame_Access) return String is
+     (if Activation.Native_Builtin_Direct and then
+         Activation.Native_Name = "@builtin.direct"
+      then Lua.Builtin_Registry.Implementation (Activation.Native_Id)
+      else To_String (Activation.Native_Name));
 
    function Metatable_Kind (Kind : Value_Kind) return Value_Kind;
    function Metatable_Kind (Kind : Value_Kind) return Value_Kind is
@@ -1723,98 +2237,106 @@ package body Lua.Engine is
            Foreign_Function_Kind =>
             "function");
 
-   function Real_Image
-     (Memory : not null Lua.Storage.Owner_Access;
-      Item : Real_Value) return String is
-      package Real_IO is new Ada.Text_IO.Float_IO (Real_Value);
-      Buffer : String (1 .. 64);
-      Precision : Positive := 15;
+   function Error_Type
+     (State : World; Item : Value; Auxiliary : Boolean) return String;
+   function Error_Type
+     (State : World; Item : Value; Auxiliary : Boolean) return String
+   is
+      Meta : constant Object_Access := Raw_Metatable (State, Item);
+      Name : constant Value :=
+        (if Meta /= null and then
+           (Auxiliary or else Item.Kind in Table_Kind | Userdata_Kind)
+         then Tables.Raw_Field (Meta, "__name") else Nil_Value);
+   begin
+      --  luaT_objtypename and luaL_typeerror have deliberately different
+      --  primitive-metatable policies. Both read a raw field and use its C
+      --  string prefix. Borrow actual immutable bytes for the scan so a NUL
+      --  near the start does not first copy a potentially huge counted name.
+      if Name.Kind = String_Kind then
+         declare
+            Bytes : constant Byte_String := Name.Reference.Bytes;
+            Text : String (1 .. Bytes.Size)
+              with Import, Address => Bytes.Address;
+         begin
+            for Index in Text'Range loop
+               if Text (Index) = Character'Val (0) then
+                  return Text (Text'First .. Index - 1);
+               end if;
+            end loop;
+            return Text;
+         end;
+      elsif Auxiliary and then Item.Kind = Light_Identity_Kind then
+         return "light userdata";
+      end if;
+      return Type_Name (Item);
+   end Error_Type;
+
+   function Diagnostic_Type (State : World; Item : Value) return String is
+     (Error_Type (State, Item, Auxiliary => False));
+
+   function Argument_Type
+     (State : World; Item : Value; Present : Boolean := True) return String is
+     (if not Present then "no value" else
+        Error_Type (State, Item, Auxiliary => True));
+
+   function Real_Image (Item : Real_Value) return String is
    begin
       if Item /= Item then
-         --  Windows and macOS printf omit NaN's sign; Linux retains it.
-         --  Three-platform differential runs established this distinction.
-         --  Numeric comparisons still use the original IEEE representation.
          return NaN_Image (Item, Lua_Ada_Config.Alire_Host_OS);
       elsif Item > Real_Value'Last then
          return "inf";
       elsif Item < -Real_Value'Last then
          return "-inf";
       end if;
-      --  Lua 5.5 first formats fifteen significant digits, then uses
-      --  seventeen when that text would not round-trip to the same double.
-      --  Ada supplies rounded digits; we implement general-format selection
-      --  and Lua's integer-looking .0 suffix without importing printf.
-      loop
-         Real_IO.Put (Buffer, Item, Aft => Precision - 1, Exp => 3);
-         exit when Precision = 17 or else Lua.Numbers.To_Real
-           (Read_Number
-              (Memory, Ada.Strings.Fixed.Trim
-                 (Buffer, Ada.Strings.Both))) = Item;
-         Precision := 17;
-      end loop;
       declare
-         Text : constant String :=
-           Ada.Strings.Fixed.Trim (Buffer, Ada.Strings.Both);
-         E : constant Positive := Ada.Strings.Fixed.Index (Text, "E");
-         Power : constant Integer := Integer'Value (Text (E + 1 .. Text'Last));
-         Negative : constant Boolean := Text (Text'First) = '-';
-         First : constant Positive := (if Negative then 2 else 1);
-         Digits_Text : Unbounded_String;
-         Result : Unbounded_String;
-         Point : constant Integer := Power + 1;
+         Arena : Lua.Storage.Fixed_Arenas.Arena;
+         Memory : Lua.Storage.Owner;
+         Output : Owned_Buffer;
+         Precision : Positive := 15;
+         Text : String (1 .. 64);
+         Size : Natural;
+         Integer_Looking : Boolean := True;
+         Point : constant Character := Character'Val (Locales.Decimal_Point);
       begin
-         for Index in First .. E - 1 loop
-            if Text (Index) /= '.' then
-               Append (Digits_Text, Text (Index));
-            end if;
-         end loop;
-         while Length (Digits_Text) > 1 and then
-           Element (Digits_Text, Length (Digits_Text)) = '0'
+         --  Finite binary64 conversion has a fixed rational/digit bound.
+         --  Run the existing exact renderer and parser in a scoped fixed
+         --  arena: public numbertocstring must make no Lua allocator request
+         --  even when every provider growth is refused. The arena precedes
+         --  its owner and all buffers, preserving reverse-order teardown.
+         Lua.Storage.Fixed_Arenas.Bind (Arena, Memory);
+         Output.Set_Owner (Lua.Storage.Reference (Memory));
          loop
-            Delete (Digits_Text, Length (Digits_Text), Length (Digits_Text));
+            Formats.Finite_Number_Image
+              (Lua.Storage.Reference (Memory), Item, Precision, Output);
+            exit when Precision = 17 or else Lua.Numbers.To_Real
+              (Read_Number (Lua.Storage.Reference (Memory),
+                            Output.To_String)) = Item;
+            Precision := 17;
          end loop;
-         if Negative then
-            Append (Result, '-');
-         end if;
-         if Power < -4 or else Power >= Precision then
-            Append (Result, Element (Digits_Text, 1));
-            if Length (Digits_Text) > 1 then
-               Append (Result, '.' & Slice (Digits_Text, 2,
-                                           Length (Digits_Text)));
+         Size := Output.Length;
+         for Index in 1 .. Size loop
+            Text (Index) := Output.Element (Index);
+            if Text (Index) not in '-' | '0' .. '9' then
+               Integer_Looking := False;
             end if;
-            declare
-               Magnitude : constant String := Ada.Strings.Fixed.Trim
-                 (Integer'Image (abs Power), Ada.Strings.Both);
-            begin
-               Append (Result, 'e');
-               Append (Result, (if Power < 0 then '-' else '+'));
-               if Magnitude'Length < 2 then
-                  Append (Result, '0');
-               end if;
-               Append (Result, Magnitude);
-            end;
-         elsif Point <= 0 then
-            Append (Result, "0.");
-            for Index in 1 .. -Point loop
-               Append (Result, '0');
-            end loop;
-            Append (Result, Digits_Text);
-         elsif Point >= Length (Digits_Text) then
-            Append (Result, Digits_Text);
-            for Index in Length (Digits_Text) + 1 .. Point loop
-               Append (Result, '0');
-            end loop;
-            Append (Result, ".0");
-         else
-            Append (Result, Slice (Digits_Text, 1, Point) & '.' &
-                    Slice (Digits_Text, Point + 1, Length (Digits_Text)));
+            if Text (Index) = '.' then
+               Text (Index) := Point;
+            end if;
+         end loop;
+         if Integer_Looking then
+            --  Preserve a real value's numeric type when it has an integer
+            --  looking general spelling, including either sign of zero.
+            Text (Size + 1) := Point;
+            Text (Size + 2) := '0';
+            Size := Size + 2;
          end if;
-         return To_String (Result);
+         return Text (1 .. Size);
       end;
    end Real_Image;
 
    function Image (Memory : not null Lua.Storage.Owner_Access;
                    Item : Value) return String is
+      pragma Unreferenced (Memory);
    begin
       case Item.Kind is
          when Light_Identity_Kind =>
@@ -1827,14 +2349,16 @@ package body Lua.Engine is
          when Integer_Kind =>
             return Ada.Strings.Fixed.Trim
               (Item.Integer_Data'Image, Ada.Strings.Both);
-         when Real_Kind => return Real_Image (Memory, Item.Real_Data);
+         when Real_Kind => return Real_Image (Item.Real_Data);
          when String_Kind => return To_String (Item.Reference.Bytes);
          when Table_Kind | Closure_Kind | Native_Closure_Kind | Thread_Kind |
            Userdata_Kind =>
             return Type_Name (Item) & ": " &
               Ada.Strings.Fixed.Trim
                 (Item.Reference.Serial'Image, Ada.Strings.Both);
-         when Native_Kind_Value => return "function: native";
+         when Native_Kind_Value =>
+            return "function: " &
+              Lua.Builtin_Registry.Handler_Address (Item.Native_Data)'Image;
       end case;
    end Image;
 
@@ -1845,6 +2369,107 @@ package body Lua.Engine is
       --  provide the universe instead of allocating hidden numeric scratch.
       return Image (Lua.Storage.Reference (Memory), Item);
    end Image;
+
+   function Pointer_Of
+     (State : in out World; Item : Value) return System.Address
+   is
+   begin
+      case Item.Kind is
+         when Thread_Kind =>
+            return Lua.Engine.Foreign.Thread_Identity
+              (State, Context_Id (Item.Reference.Context_Index));
+         when Light_Identity_Kind | Foreign_Function_Kind =>
+            return Item.Identity;
+         when Native_Kind_Value =>
+            return Lua.Builtin_Registry.Handler_Address (Item.Native_Data);
+         when Userdata_Kind => return Userdata_Address (Item);
+         when String_Kind | Table_Kind | Closure_Kind | Native_Closure_Kind =>
+            return Item.Reference.all'Address;
+         when others => return System.Null_Address;
+      end case;
+   end Pointer_Of;
+
+   function Pointer_Image
+     (Pointer : System.Address; Width : Natural := 0;
+      Left_Aligned : Boolean := False) return String
+   is
+      Text : aliased String (1 .. 128);
+      Size : constant Interfaces.C.size_t := Lua.Platform_Numerics.Pointer_Text
+        (Pointer, Text'Address, Text'Length, Interfaces.C.int (Width),
+         Boolean'Pos (Left_Aligned));
+   begin
+      if Size = 0 then
+         raise Program_Error with "native pointer text exceeded fixed bound";
+      end if;
+      return Text (1 .. Natural (Size));
+   end Pointer_Image;
+
+   procedure Describe_Value
+     (State : in out World; Item : Value; Output : in out Owned_Buffer)
+   is
+      Name : Value;
+      procedure Append_Name (Text : String);
+      procedure Work (Count : Natural);
+
+      procedure Work (Count : Natural) is
+      begin
+         if State.Policy = Bounded then
+            if Count > State.Bounds.Instructions - State.Steps then
+               Fail (State, "instruction limit exceeded", Resource => True);
+            end if;
+            State.Steps := State.Steps + Count;
+         end if;
+      end Work;
+
+      procedure Append_Name (Text : String) is
+         Size : Natural := 0;
+         Pending : Natural := 0;
+      begin
+         --  Borrow the counted bytes only while scanning/copying their C
+         --  prefix. A short name before NUL never copies the huge suffix to
+         --  an Ada String temporary. Scan and owned copy charge separately.
+         for Byte of Text loop
+            Pending := Pending + 1;
+            exit when Byte = Character'Val (0);
+            Size := Size + 1;
+            if Pending = 4_096 then
+               Work (Pending);
+               Pending := 0;
+            end if;
+         end loop;
+         Work (Pending);
+         Work (Size);
+         Output.Append (Text (Text'First .. (Text'First - 1) + Size));
+      end Append_Name;
+   begin
+      Output.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Output.Clear;
+      if Item.Kind in Nil_Kind | Boolean_Kind | Integer_Kind | Real_Kind then
+         Output.Set_Value (Image (State.Current.Memory, Item));
+      elsif Item.Kind = String_Kind then
+         declare
+            Text : String (1 .. Item.Reference.Bytes.Size)
+              with Import, Address => Item.Reference.Bytes.Address;
+         begin
+            Work (Text'Length);
+            Output.Set_Value (Text);
+         end;
+      else
+         Name := Metafield (State, Item, "__name");
+         if Name.Kind = String_Kind then
+            declare
+               Text : String (1 .. Name.Reference.Bytes.Size)
+                 with Import, Address => Name.Reference.Bytes.Address;
+            begin
+               Append_Name (Text);
+            end;
+         else
+            Output.Append (Type_Name (Item));
+         end if;
+         Output.Append (": ");
+         Output.Append (Pointer_Image (Pointer_Of (State, Item)));
+      end if;
+   end Describe_Value;
 
    function Get (Table : Value; Key : Value) return Value is
       Index : Natural;
@@ -2062,6 +2687,7 @@ package body Lua.Engine is
       --  allocate a context or heap object. No registry grows implicitly.
       State.Contexts.Set_Owner (Lua.Storage.Reference (State.Memory));
       State.Heap.Set_Owner (Lua.Storage.Reference (State.Memory));
+      State.Short_Strings.Set_Owner (Lua.Storage.Reference (State.Memory));
       State.Heap_Free_Next.Set_Owner (Lua.Storage.Reference (State.Memory));
       State.Program_Free_Next.Set_Owner
         (Lua.Storage.Reference (State.Memory));
@@ -2130,6 +2756,22 @@ package body Lua.Engine is
      (State : in out World;
       Reason : Resource_Release_Reason := Host_Disposal) is
    begin
+      End_Operation (State);
+      loop
+         External_Releases.Prepare_Close (State);
+         exit when not External_Releases.Pending (State);
+         State.Current := State.Main_Context;
+         begin
+            Machine.Drain_External_Releases (State);
+         exception
+            when Language_Error =>
+               --  A host quota/error may stop Lua called by a deallocator.
+               --  Its C guard has already acknowledged/released the active
+               --  header. Physical disposal still owns every remaining
+               --  packet and must finish rather than abandon this universe.
+               null;
+         end;
+      end loop;
       --  A session is the unique allocator owner, so finalization can release
       --  all remaining objects without tracing or invoking user code.
       for Context of State.Contexts loop
@@ -2156,6 +2798,8 @@ package body Lua.Engine is
          end;
       end loop;
       State.Heap.Release;
+      State.Short_Strings.Release;
+      State.Short_String_Count := 0;
       State.Heap_Free_Next.Release;
       State.Live_Objects := 0;
       State.Heap_Free_Head := 0;
@@ -2187,6 +2831,10 @@ package body Lua.Engine is
       State.Operation_Roots.Release;
       State.Operation_Programs.Release;
       State.Memory_Ready := False;
+      --  Foreign finalizers, external-string releasers and all heap/context
+      --  payload cleanup have finished. Native code remains loaded through
+      --  those phases and through its own provider-owned cache metadata.
+      Native_Modules.Close_All (State);
    end Finalize;
 
    function Execute
@@ -2197,7 +2845,7 @@ package body Lua.Engine is
       State.Current.Status := Running_Context;
       State.Current.Failure := Nil_Value;
       State.Current.Has_Failure_Value := False;
-      State.Current.Failure_Text := Null_Unbounded_String;
+      Lua.Diagnostic_Text.Clear (State.Current.Failure_Text);
       State.Current.Failure_Class := No_Failure;
       State.Current.Failure_Handled := False;
       State.Current.Protected_Failure_Class := No_Failure;
@@ -2259,8 +2907,7 @@ package body Lua.Engine is
          Machine.Clear_Frames (State);
          State.Current.Failure_Class := Host_Abort;
          State.Current.Transfer := (Kind => Host_Stopped, others => <>);
-         State.Current.Failure_Text := To_Unbounded_String
-           ("host storage exhausted");
+         Set_Failure_Text (State, State.Current, "host storage exhausted");
          return False;
       when Error : Constraint_Error | Program_Error =>
          State.Entry_Code := null;
@@ -2274,8 +2921,9 @@ package body Lua.Engine is
          --  Keep the embedding boundary exception-safe, but make an internal
          --  check failure explicit so tests cannot mistake it for Lua parity.
          Machine.Clear_Frames (State);
-         State.Current.Failure_Text := To_Unbounded_String
-           ("internal Ada check: " & Ada.Exceptions.Exception_Message (Error));
+         Set_Failure_Text
+           (State, State.Current,
+            "internal Ada check: " & Ada.Exceptions.Exception_Message (Error));
          return False;
    end Execute;
 end Lua.Engine;

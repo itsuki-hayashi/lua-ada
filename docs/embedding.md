@@ -48,6 +48,21 @@ receives the completed output synchronously and is never retained. Sink
 exceptions produce `Host_Error`; Lua syntax/runtime/resource failures have
 separate statuses and do not escape as unhandled Ada language exceptions.
 
+`Execute_Display` supports host read-eval-print loops without exposing returned
+objects. It executes one chunk, retains all returned values as traced roots,
+then resolves and calls the current global `print` through a second sequential
+drive. Environment lookup and callable metamethods retain ordinary Lua behavior.
+The two phases share one instruction budget; callbacks cannot restart it.
+`Display_Failed` distinguishes a failure during display from a failed chunk.
+An empty result packet does not call `print`. Output policy and typed exit
+requests have the same meaning as for `Execute`.
+
+`Set_Warnings_Enabled` sends an actual warning control from an idle session.
+It is independent of the public `warn` global, so host options retain their
+meaning after Lua code replaces that global. Custom C warning handlers use the
+same guarded callback portal. Both methods require serialized session access;
+neither may be called recursively from an active callback.
+
 Sessions initialize and reset to Output_Policy.Captured. Set_Output_Policy
 can explicitly select Process_Streams without changing globals or execution
 quotas. That mode publishes bytes to actual C stdout during execution and
@@ -101,7 +116,7 @@ private string metatable, and loaded/preload registries. Reset removes previous
 module caches and metatable mutations; separate sessions never share these
 mutable objects.
 
-Lua code may load text through `load`, `loadfile`, `dofile`, and Lua-only
+Lua code may load text through `load`, `loadfile`, `dofile`, and
 `require`. Loaded closures retain their initial `_ENV`, including an explicitly
 nil environment. Compilation errors from `load` return nil/message; resource
 failures retain the execution-abort policy. Native Lua 5.5.1 binary chunks are
@@ -109,13 +124,26 @@ validated and executed through the canonical backend; string.dump serializes a
 real selected function subtree. The codec checks native widths/byte order.
 File preambles are handled as file input; bytes passed to Execute or load are
 raw text or native chunks. See [binary chunks](binary-chunks.md) for current
-verification and explicit limits. Default package lookup is local (`./?.lua;./?/init.lua`), without
-native modules or environment-driven path initialization. The library does not
-promise a filesystem sandbox.
+verification and explicit limits. Bounded-session package lookup defaults to
+local Lua and native-module templates and ignores ambient path initialization.
+Native modules use the actual public C boundary and remain loaded through
+state cleanup; see [ADR 0025](decisions/0025-native-module-lifetimes.md).
+Execution limits govern managed Ada work and storage; arbitrary native code
+has the host process's capabilities and must be trusted by its embedding
+application. The library does not promise a filesystem sandbox. The CLI and
+C-compatible states use the pinned SDK environment path behavior.
 
 Ada host callback registration, exposed object handles and thread synchronization
 remain deferred. The separate C facade has a partial real exported surface;
 its current pilot is not complete public API/ABI acceptance. A sink is an output destination, not a Lua host-function API.
+
+The public C value/auxiliary checkpoint implements metamethod-aware length,
+right-fold concatenation and fixed-buffer number output, plus 28 argument,
+metatable, reference, registration and error/result helpers. Their actual
+operations share the Ada runtime and C-owned continuation portal. Scalar
+number output uses fixed owned scratch and requests no Lua allocator storage.
+See [ADR 0023](decisions/0023-public-value-auxiliary-operations.md) and its dated
+validation record for the local scope and remaining C-surface obligations.
 
 The real C surface includes luaopen_io and luaopen_os. Each pushes a fresh
 module table without publishing a global or loaded-module entry. IO opening

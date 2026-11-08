@@ -1,5 +1,6 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+Import-Module (Join-Path $PSScriptRoot 'ConformanceExclusionEligibility.psm1')
 
 function Invoke-ConformanceProcess {
     [CmdletBinding()]
@@ -10,13 +11,34 @@ function Invoke-ConformanceProcess {
         [Parameter(Mandatory)][string] $OutputPrefix,
         [ValidateRange(1, 3600)][int] $TimeoutSeconds,
         [hashtable] $Environment = @{},
-        [ValidateRange(1024, 1073741824)][long] $CaptureLimitBytes = 67108864
+        [ValidateRange(1024, 1073741824)][long] $CaptureLimitBytes = 67108864,
+        [string] $StandardInputPath = '',
+        [ValidateRange(1, 1073741824)][long] $InputLimitBytes = 67108864,
+        [switch] $ObserveEarlyInputClose
     )
     # Streams go directly to files, preserving invalid UTF-8 and avoiding an
     # unbounded in-memory capture. Classification decodes a separate view only.
     $outPath = $OutputPrefix + '.stdout'
     $errPath = $OutputPrefix + '.stderr'
     [void][IO.Directory]::CreateDirectory((Split-Path -Parent $outPath))
+    $inputFile=$null;$inputRecord=$null;$inputTask=$null;$inputClosed=$false
+    if($StandardInputPath -ne ''){
+        # Freeze the bytes actually supplied, including empty input, NUL and
+        # invalid UTF-8. A later change to the producer's output cannot rewrite
+        # the consumer's evidence. Copy before opening stdout, since a caller
+        # may intentionally use an earlier stdout capture as its input.
+        $sourceInput=(Resolve-Path -LiteralPath $StandardInputPath -ErrorAction Stop).Path
+        if(-not (Test-Path -LiteralPath $sourceInput -PathType Leaf) -or
+            (Get-Item -LiteralPath $sourceInput).Length -gt $InputLimitBytes){throw 'Standard input file is missing or exceeds its byte limit'}
+        $inputPath=$OutputPrefix+'.stdin'
+        [IO.File]::Copy($sourceInput,$inputPath,$false)
+        if((Get-Item -LiteralPath $inputPath).Length -gt $InputLimitBytes){throw 'Standard input snapshot exceeds its byte limit'}
+        $inputFile=[IO.File]::OpenRead($inputPath)
+        $inputRecord=[ordered]@{source_path=$sourceInput;path=$inputPath;bytes=$inputFile.Length;
+            sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($inputFile)).ToLowerInvariant();
+            byte_limit=$InputLimitBytes;write_completed=$false;eof_sent=$false;close_requested=$false}
+        $inputFile.Position=0
+    }
     $outFile = [IO.File]::Create($outPath)
     $errFile = [IO.File]::Create($errPath)
     $start = [Diagnostics.ProcessStartInfo]::new()
@@ -43,6 +65,8 @@ function Invoke-ConformanceProcess {
     $timedOut = $false
     $captureExceeded = $false
     $drainFailed = $false
+    $outputDrainFailed=$false
+    $inputWriteFailed=$false
     $killError = $null
     $started = $false
     $startedAt = [DateTime]::UtcNow.ToString('o')
@@ -50,14 +74,25 @@ function Invoke-ConformanceProcess {
         [void]$process.Start()
         $started = $true
         $processId = $process.Id
-        $process.StandardInput.Close()
         $outTask = $process.StandardOutput.BaseStream.CopyToAsync($outFile)
         $errTask = $process.StandardError.BaseStream.CopyToAsync($errFile)
+        if($null -eq $inputFile){$process.StandardInput.Close();$inputClosed=$true}
+        else{
+            # Output draining starts before the asynchronous input write: a
+            # child may fill stdout before reading stdin, or stop reading.
+            # Neither case may block the timer on a synchronous pipe write.
+            $inputTask=$inputFile.CopyToAsync($process.StandardInput.BaseStream)
+        }
         while (-not $process.WaitForExit(50)) {
+            if($null -ne $inputTask -and $inputTask.IsCompleted -and -not $inputClosed){
+                $process.StandardInput.BaseStream.Close();$inputClosed=$true
+                $inputRecord.close_requested=$true;$inputRecord.eof_sent=$inputTask.IsCompletedSuccessfully
+            }
             $timedOut = $watch.Elapsed.TotalSeconds -ge $TimeoutSeconds
             $captureExceeded = $outFile.Length -gt $CaptureLimitBytes -or
                                $errFile.Length -gt $CaptureLimitBytes
-            if ($timedOut -or $captureExceeded -or $outTask.IsFaulted -or $errTask.IsFaulted) {
+            if ($timedOut -or $captureExceeded -or $outTask.IsFaulted -or $errTask.IsFaulted -or
+                ($null -ne $inputTask -and $inputTask.IsFaulted -and -not $ObserveEarlyInputClose)) {
                 try { $process.Kill($true) } catch { $killError = $_.Exception.Message }
                 break
             }
@@ -68,13 +103,35 @@ function Invoke-ConformanceProcess {
         if (-not $process.WaitForExit(5000)) {
             try { $process.Kill($true) } catch { $killError = $_.Exception.Message }
             $drainFailed = $true
+            $outputDrainFailed=$true
         }
-        $tasks = [Threading.Tasks.Task[]]@($outTask, $errTask)
+        [Threading.Tasks.Task[]]$tasks = @($outTask, $errTask)
+        if($null -ne $inputTask){$tasks+=$inputTask}
         $combined = [Threading.Tasks.Task]::WhenAll($tasks)
         try {
             if (-not $combined.Wait(5000)) { $drainFailed = $true }
         }
         catch { $drainFailed = $true }
+        # Preserve the distinction between truncated output and a child that
+        # deliberately closes stdin before the producer finishes. The latter
+        # remains a failed generic pipe observation; only a source-defined
+        # protocol may interpret it as its expected before-input termination.
+        $outputDrainFailed=$outputDrainFailed -or -not $outTask.IsCompletedSuccessfully -or -not $errTask.IsCompletedSuccessfully
+        if($null -ne $inputTask){
+            # Close the raw stream, avoiding any text writer encoding or BOM.
+            # A child which exits before reading the supplied data leaves an
+            # explicit failed pipe observation even if it returned status 0.
+            if(-not $inputClosed){$process.StandardInput.BaseStream.Close();$inputClosed=$true;$inputRecord.close_requested=$true}
+            $inputRecord.write_completed=$inputTask.IsCompletedSuccessfully
+            # A closed writer alone does not prove delivery. A broken or
+            # partial write records its close request without claiming EOF
+            # followed a complete input stream in the child.
+            $inputRecord.eof_sent=$inputRecord.write_completed
+            if(-not $inputRecord.write_completed){
+                $drainFailed=$true;$inputWriteFailed=$true
+                $inputRecord['write_error']=if($null -ne $inputTask.Exception){$inputTask.Exception.GetBaseException().Message}else{'input task did not complete'}
+            }
+        }
         if ($drainFailed) {
             $process.StandardOutput.Close()
             $process.StandardError.Close()
@@ -91,6 +148,7 @@ function Invoke-ConformanceProcess {
             try { $process.Kill($true) } catch { $killError = $_.Exception.Message }
         }
         $process.Dispose()
+        if($null -ne $inputFile){$inputFile.Dispose()}
         $outFile.Dispose()
         $errFile.Dispose()
     }
@@ -103,7 +161,7 @@ function Invoke-ConformanceProcess {
                     'possible-posix-signal-status'
                 }
                 else { $null }
-    return [ordered]@{
+    $record=[ordered]@{
         executable = $Executable
         process_id = $processId
         executable_sha256 = (Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -118,6 +176,9 @@ function Invoke-ConformanceProcess {
         capture_limit_bytes = $CaptureLimitBytes
         capture_exceeded = $captureExceeded
         pipe_drain_failed = $drainFailed
+        output_drain_failed=$outputDrainFailed
+        input_write_failed=$inputWriteFailed
+        early_input_close_requested=[bool]$ObserveEarlyInputClose
         process_tree_kill_error = $killError
         stdout_path = $outPath
         stdout_bytes = (Get-Item -LiteralPath $outPath).Length
@@ -126,6 +187,8 @@ function Invoke-ConformanceProcess {
         stderr_bytes = (Get-Item -LiteralPath $errPath).Length
         stderr_sha256 = (Get-FileHash -LiteralPath $errPath -Algorithm SHA256).Hash.ToLowerInvariant()
     }
+    if($null -ne $inputRecord){$record.standard_input=$inputRecord}
+    return $record
 }
 
 function Get-ConformanceOutcome {
@@ -248,11 +311,17 @@ function Test-ConformanceAcceptance {
           [Parameter(Mandatory)][long] $AllocatorLimitBytes,
           [bool] $CoverageComplete = $false,
           [System.Collections.IDictionary] $CoverageRecords = @{},
-          [System.Collections.IDictionary] $Telemetry)
+          [System.Collections.IDictionary] $Telemetry,
+          [ValidateSet('strict-upstream','remaining-upstream-compatibility')]
+          [string] $TargetPolicy = 'strict-upstream',
+          [Collections.IDictionary] $ResolvedExclusions = @{})
     # A process observation deliberately carries no coverage authority. This
     # second, explicit gate requires the reviewed execution protocol AND the
     # complete source/API ledger. Callers cannot promote an OK marker alone.
     if (-not $CoverageComplete) { throw 'Complete reviewed coverage is required for acceptance' }
+    if ($TargetPolicy -ceq 'strict-upstream' -and $ResolvedExclusions.Count -ne 0) {
+        throw 'Strict upstream execution cannot consume target exclusions'
+    }
     foreach ($field in @('schema_version','operation','context','reference_revision',
                           'source_hashes','review','completion_marker','stdout_required',
                           'stderr_expected','expected_skips')) {
@@ -320,6 +389,7 @@ function Test-ConformanceAcceptance {
     }
     $expectedSkips = @($Contract.expected_skips)
     $actualSkips = @($Outcome.skip_messages)
+    $excludedOmissions = @{}
     if ($expectedSkips.Count -ne $actualSkips.Count) { throw 'Unreviewed or missing omission message' }
     foreach ($skip in $expectedSkips) {
         $expectedCount = @($expectedSkips | Where-Object { $_.message -ceq $skip.message }).Count
@@ -336,6 +406,25 @@ function Test-ConformanceAcceptance {
                 throw "Omission names an unknown coverage obligation: $id"
             }
             $record = $CoverageRecords[$id]
+            if ($TargetPolicy -ceq 'remaining-upstream-compatibility' -and $ResolvedExclusions.Contains($id)) {
+                # The inventory caller has already checked original bytes and
+                # independent exclusion authority. Only a genuine default-T
+                # absence may link to that decision here. It remains a named
+                # exclusion, without inventing instrumented execution proof.
+                $excluded = $ResolvedExclusions[$id]
+                if ($Configuration -cne 'default' -or $skip.message -cnotmatch 'testC not active' -or
+                    $record.kind -cnotin @('assert-call','reviewed-block') -or $record.status -cne 'pending' -or
+                    $excluded.id -cne $id -or $excluded.status -cne 'excluded' -or
+                    $excluded.disposition -cne 'reviewed-t-internal-exclusion' -or
+                    $excluded.eligibility -cne 't-only-private-invariant' -or
+                    @($excluded.configurations).Count -ne 1 -or $excluded.configurations[0] -cne 'upstream-test' -or
+                    -not (Test-ConformanceExclusionCompatibilityShape $excluded) -or
+                    @($excluded.evidence).Count -ne 0) {
+                    throw "Omission cannot use this target exclusion: $id"
+                }
+                $excludedOmissions[$id] = $true
+                continue
+            }
             if ($record.status -cne 'passed' -or
                 $record.kind -notin @('assert-call','reviewed-block') -or
                 @($record.evidence | Where-Object { $_.result -ceq 'passed' }).Count -eq 0) {
@@ -379,7 +468,8 @@ function Test-ConformanceAcceptance {
         throw 'heavy.lua did not demonstrate caught managed-allocation refusal'
     }
     return [ordered]@{ gate_acceptance=$true; operation=$Operation; context=$Context;
-        review_artifact=$review.artifact; allocator_telemetry_verified=$true }
+        review_artifact=$review.artifact; allocator_telemetry_verified=$true;
+        excluded_omissions=@($excludedOmissions.Keys | Sort-Object) }
 }
 
 function Copy-ConformanceFixtures {

@@ -6,7 +6,7 @@
 #include "../../../references/lua/luaconf.h"
 #if defined(_WIN32)
 #undef LUA_API
-#define LUA_API extern
+#define LUA_API extern __declspec(dllimport)
 #undef LUAMOD_API
 #define LUAMOD_API __declspec(dllexport)
 #endif

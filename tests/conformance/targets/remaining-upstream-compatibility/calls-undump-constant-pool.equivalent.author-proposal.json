@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "kind": "target-source-equivalent-author-proposal",
+  "id": "calls-undump-constant-pool",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": "references/lua/testes/calls.lua",
+  "source_sha256": "e0331ba5557c09ba844c11a54810ca7cc01998638316d5192e252a2ab0a2d407",
+  "configuration": "upstream-test",
+  "disposition": "ada-internal-equivalent",
+  "feature_review": {
+    "sha256": "641b9541139b53f56c054b59d29e965c80dfd8f0dee99264465e592f35e72ff4",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/calls-undump-constant-pool.independent-feature-review.json"
+  },
+  "original_required_obligations": [
+    "LUA-CALLS-ASSERT-CALL-0097"
+  ],
+  "source_exclusions": [],
+  "replacements": [
+    {
+      "id": "execute-all-decoded-string-results",
+      "start_byte": 14425,
+      "length_bytes": 105,
+      "source_sha256": "d350bbaa91f6e9d428a04e5507d4eb0cfb3596e882bffdbf5c30655054063c8e",
+      "replacement": "for i=1,3 do\n      assert(type(funcs[i]) == \"function\")\n      local result = table.pack(funcs[i]())\n      assert(result.n == 1 and type(result[1]) == \"string\")\n      assert(#result[1] == 52 and result[1] == str)\n      local pointer = string.format(\"%p\", result[1])\n      assert(type(pointer) == \"string\" and #pointer > 0)\n      collectgarbage(); collectgarbage()\n      assert(string.format(\"%p\", result[1]) == pointer)\n      assert(result[1] == str)\n    end",
+      "invariant": "Preserve the original T guard, load(dump) and preceding count2; execute all3functions with arity/string/fullbytes and held-value percentp identity through GC, replacing only private Proto.k sharing inspection.",
+      "counterpart_tests": [
+        "tests/conformance/targets/remaining-upstream-compatibility/reviews/calls-undump-constant-pool.independent-feature-review.json",
+        "tests/conformance/targets/remaining-upstream-compatibility/calls-undump-string-values.author.lua",
+        "references/lua/manual/manual.of",
+        "references/lua/ltests.c",
+        "c_api/tests/pointer_identity_contract.c"
+      ]
+    }
+  ],
+  "output_sha256": "ffed3d0bb8241c5258a616950552552316b14a1cc122c034d56550410e4b9b6c",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "review": {
+    "reviewer": null,
+    "artifact": null,
+    "author": "Codex /root/validation_delivery",
+    "artifact_sha256": null,
+    "status": "pending"
+  },
+  "counterpart_source_snapshot": {
+    "kind": "author-only-source-bindings",
+    "revision": "9ce9f00c545c8aab111bd4f74d5f578705b2e29e",
+    "independent_review_status": "pending",
+    "runtime_acceptance": false,
+    "coverage_authority": false,
+    "bindings": [
+      {
+        "path": "c_api/tests/pointer_identity_contract.c",
+        "sha256": "818f9704798b6983887ba0b50a6e114b2770c1026ae6a4453b8a09e51f106c14"
+      },
+      {
+        "path": "references/lua/ltests.c",
+        "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
+      },
+      {
+        "path": "references/lua/manual/manual.of",
+        "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+      },
+      {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/calls-undump-string-values.author.lua",
+        "sha256": "d1ef08edca513407c8906b7f2542a274e00d6e3c46b1091de04620f34ada8795"
+      },
+      {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/calls-undump-constant-pool.independent-feature-review.json",
+        "sha256": "641b9541139b53f56c054b59d29e965c80dfd8f0dee99264465e592f35e72ff4"
+      }
+    ]
+  }
+}

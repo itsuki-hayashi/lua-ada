@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "gc-ada-remaining-upstream",
+  "source": "references/lua/testes/gc.lua",
+  "source_sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99",
+  "configuration": "default-and-upstream-test",
+  "review": {
+    "artifact_sha256": "c928d0d24d8191fdf69af8a6093e288380c02fbdb71fccac1414aa761161828e",
+    "status": "accepted",
+    "author": "Codex /root/validation_delivery",
+    "reviewer": "Codex /root",
+    "artifact": "tests/conformance/targets/remaining-upstream-compatibility/gc-current-source.approval.json"
+  },
+  "replacements": [
+    {
+      "id": "measure-live-payloads",
+      "start_byte": 11479,
+      "length_bytes": 49,
+      "source_sha256": "4bb49bacb1a6d2575ad3abbb475fd83ff2e7ad65102d29c93d02e7bdf43f700e",
+      "invariant": "Measure actual live bytes with both long string payloads retained before collection.",
+      "counterpart_tests": [
+        "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads"
+      ],
+      "replacement": "a[{}] = 14; local ada_live = collectgarbage(\"count\") -- measured payloads"
+    },
+    {
+      "id": "reclaim-payloads",
+      "start_byte": 11963,
+      "length_bytes": 40,
+      "source_sha256": "c520c19e1c58d291af4e63c84b5083a165dd416be4983767261653ccd569cbc6",
+      "invariant": "Both 4 MiB string payloads are released; retained empty Ada table capacity is excluded from the C one-KiB allowance.",
+      "counterpart_tests": [
+        "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads"
+      ],
+      "replacement": "assert(collectgarbage(\"count\") <= ada_live - 2^13)"
+    },
+    {
+      "id": "stable-cell-color",
+      "start_byte": 14278,
+      "length_bytes": 31,
+      "source_sha256": "3368876c423554b8967a1fca42de51cf3fc6dc96f2dbe3bc3263b2f14b5aacdf",
+      "invariant": "A black independently owned Ada cell forward-marks its new child; the same cycle must still collect the weak coroutine and preserve the final captured value.",
+      "counterpart_tests": [
+        "tests/src/lua-conformance_adapter_tests.adb#Atomic_Orphan_Cell"
+      ],
+      "replacement": "assert(T.gccolor(a) == \"gray\")"
+    },
+    {
+      "id": "measured-emergency-headroom",
+      "start_byte": 16478,
+      "length_bytes": 80,
+      "source_sha256": "342a5139c4c1d3792c706e27094019af1eb85691e390a7fafbca2ad2d3b75559",
+      "invariant": "200 real Ada table allocations within one measured table of headroom require actual allocator refusals and emergency recovery; the independent host ceiling remains active.",
+      "counterpart_tests": [
+        "tests/src/lua-conformance_adapter_tests.adb#Measured_Emergency_Headroom"
+      ],
+      "replacement": "local r,c,b = T.ada_emergency_tables(200)\n  assert(r >= 199 and c >= 199)\n  assert(b > 0)"
+    }
+  ],
+  "disposition": "ada-internal-equivalent",
+  "target": "remaining-upstream-compatibility",
+  "authoring_observation": {
+    "sha256": "b00e1251fb9cb9a7b5a363dd43c46f59f28dd45c142075c4d91a5b81246efbb2",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/gc-equivalence.source.author-proposal.json"
+  },
+  "independent_review_status": "accepted-source-mapping",
+  "coverage_authority": false,
+  "runtime_acceptance": false
+}

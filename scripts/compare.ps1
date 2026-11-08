@@ -1,17 +1,40 @@
 param(
     [string] $Interpreter = '',
-    [switch] $OracleOnly
+    [switch] $OracleOnly,
+    [string] $ConfiguredWitnessReport = '',
+    [string] $ConfiguredInterpreter = '',
+    [string] $HostCliReport = ''
 )
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $originalLocation = Get-Location
 $suffix = if ($IsWindows) { '.exe' } else { '' }
+Import-Module (Join-Path $PSScriptRoot 'ConfiguredFixtureEvidence.psm1')
+Import-Module (Join-Path $PSScriptRoot 'CliFixtureEvidence.psm1')
+$sourceAudit=Get-ConfiguredFixtureAudit -Root $projectRoot
+$hostOnly=@($sourceAudit.entries|Where-Object selection -CEQ configured-host-CLI-only|ForEach-Object{[IO.Path]::GetFileName($_.path)})
+$defaultDefinitions=@(Get-ConfiguredFixtureDefinitions default)
+$defaultConfigured=@($defaultDefinitions|Where-Object{-not $_.Contains('generic_default') -or -not $_.generic_default}|ForEach-Object{[IO.Path]::GetFileName($_.source)})
+$instrumentedConfigured=@(Get-ConfiguredFixtureDefinitions upstream-test|ForEach-Object{[IO.Path]::GetFileName($_.source)})
+$allDefaultConfigured=@($defaultDefinitions|ForEach-Object{[IO.Path]::GetFileName($_.source)})
+$instrumentedOnly=@($instrumentedConfigured|Where-Object{$_ -cnotin $allDefaultConfigured})
+if(-not $OracleOnly){
+    if($ConfiguredWitnessReport -eq '' -or $ConfiguredInterpreter -eq ''){
+        throw 'Default differential fixtures require the actual configured fixture pair report and its Ada interpreter'
+    }
+    $configured=Get-Content -LiteralPath $ConfiguredWitnessReport -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+    $null=Assert-ConfiguredFixtureReport -Root $projectRoot -Report $configured -Configuration default -Interpreter $ConfiguredInterpreter
+    if($HostCliReport -eq ''){throw 'Default differential fixtures require the actual host CLI pair report'}
+    $cli=Get-Content $HostCliReport -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+    $null=Assert-CliFixturePair -Root $projectRoot -Report $cli -Interpreter (Resolve-Path $Interpreter).Path
+}
 
 function Invoke-Program {
-    param([string] $Executable, [string] $Script)
+    param([string] $Executable, [string] $Script,[string[]]$PreludeArguments=@())
     $start = [Diagnostics.ProcessStartInfo]::new()
     $start.FileName = $Executable
+    foreach($argument in $PreludeArguments){$start.ArgumentList.Add($argument)}
     $start.ArgumentList.Add($Script)
     $start.WorkingDirectory = $projectRoot
     $start.UseShellExecute = $false
@@ -68,13 +91,44 @@ try {
     & alr exec -- gprbuild -P experiments/abi/oracle.gpr
     if ($LASTEXITCODE -ne 0) { throw 'Reference interpreter build failed' }
     $oracle = Join-Path $projectRoot "build/oracle/bin/lua$suffix"
+    if($OracleOnly){
+        # Host setup chunks need the same explicit case selection even during
+        # oracle diagnostics. Observe the native prompt campaign first.
+        & (Join-Path $PSScriptRoot 'check-cli.ps1') -Interpreter $oracle -PromptProtocol -RuntimeRole ReferenceC `
+            -RuntimeDirectory (Join-Path $projectRoot 'build/abi/oracle-lib')
+        if($LASTEXITCODE -ne 0){throw 'Native host CLI prompt protocol failed'}
+    }
     if (-not $OracleOnly -and -not (Test-Path -LiteralPath $Interpreter -PathType Leaf)) {
         throw 'Supply -Interpreter with the Ada executable to compare'
     }
     if (-not $OracleOnly) { $Interpreter = (Resolve-Path -LiteralPath $Interpreter).Path }
     $mismatches = @()
     foreach ($script in Get-ChildItem tests/lua -Filter *.lua | Sort-Object Name) {
-        $expected = Invoke-Program -Executable $oracle -Script $script.FullName
+        if($script.Name -cin $hostOnly){
+            if($script.Name -ceq 'cli_argument_controls.lua'){
+                throw 'CLI argument setup still requires its actual portable frozen-context process protocol; no generic execution is omitted as passing'
+            }
+            Write-Output "HOST CLI OBSERVED: $($script.Name) (explicit CLI case protocol; no standalone-script pass)"
+            continue
+        }
+        # These are configured witnesses, not default T-absent successes.
+        # The default portal pair has already run with measured matching stack
+        # limits. The real-T file is mandatory in check-instrumented.ps1.
+        if($script.Name -cin $instrumentedOnly){
+            Write-Output "CONFIGURED T REQUIRED: $($script.Name) (mandatory instrumented campaign; no default observation)"
+            continue
+        }
+        if($script.Name -cin $defaultConfigured -and -not $OracleOnly){
+            Write-Output "CONFIGURED PARITY: $($script.Name) (verified dedicated native/Ada report)"
+            continue
+        }
+        $prelude=@()
+        if($script.Name -ceq 'coroutine_result_portal.lua'){
+            # Oracle-only diagnostics still execute the actual default portal
+            # with the pinned stack limit; they never claim Ada parity.
+            $prelude=@('-e',@(Get-ConfiguredFixtureDefinitions default)[0].setup)
+        }
+        $expected = Invoke-Program -Executable $oracle -Script $script.FullName -PreludeArguments $prelude
         if ($expected.Code -ne 0 -or $expected.Err -ne '') {
             throw "Reference fixture failed: $($script.Name): $($expected.Err)"
         }

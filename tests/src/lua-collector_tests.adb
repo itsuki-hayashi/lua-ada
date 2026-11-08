@@ -266,11 +266,14 @@ package body Lua.Collector_Tests is
       Item : Value;
    begin
       --  Garbage owns both typed table records and actual auxiliary buffers.
+      --  Distinct payload bytes require 200 real short-string headers even
+      --  with the ordinary universe-wide weak intern index enabled.
       --  Reclamation must reduce the chosen provider's real live-byte count,
       --  without fabricating bytes from semantic stack or object counters.
       for Index in 1 .. 200 loop
          Item := New_Table (State);
-         Set (State, Item, (Integer_Kind, 1), New_String (State, "payload"));
+         Set (State, Item, (Integer_Kind, 1),
+              New_String (State, "payload" & Index'Image));
       end loop;
       Before := Statistics (State.Memory).Raw_Bytes;
       Count := State.Live_Objects;

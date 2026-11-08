@@ -72,6 +72,7 @@ static lua_State *conformance_newstate(void) {
 LUA_API size_t conformance_live_bytes(void);
 LUA_API size_t conformance_live_blocks(void);
 LUA_API unsigned long long conformance_refusals(void);
+LUA_API unsigned long long conformance_backing_refusals(void);
 LUA_API unsigned long long conformance_expected_finalizer_warnings(void);
 #endif
 
@@ -104,9 +105,10 @@ static int write_allocator_telemetry(void) {
 #if defined(CONFORMANCE_UPSTREAM_TEST)
   fprintf(output, "\"configuration\":\"upstream-test\","
           "\"expected_finalizer_warnings\":%llu,"
-          "\"managed_refusals\":%llu,\"outstanding_bytes\":%llu,"
+          "\"managed_refusals\":%llu,\"backing_refusals\":%llu,\"outstanding_bytes\":%llu,"
           "\"outstanding_blocks\":%llu}\n",
           conformance_expected_finalizer_warnings(), conformance_refusals(),
+          conformance_backing_refusals(),
           (unsigned long long)conformance_live_bytes(),
           (unsigned long long)conformance_live_blocks());
 #else

@@ -1,0 +1,495 @@
+{
+  "schema_version": 1,
+  "kind": "author-component-observation",
+  "id": "test-cached-string-hash",
+  "date": "2026-11-08",
+  "author": "Codex /root/remaining_suite",
+  "base_revision": "4c8fb6cacafed2b657aaf2a3f4af6b9d740c921a",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_exclusions": [],
+  "upstream_source_changed": false,
+  "source_bindings": [
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "sha256": "80a6c4b17e0dd1c2758c4bc79d159cf22bd74ccedb41f70ed82066f658abfd1c",
+      "bytes": 35059
+    },
+    {
+      "path": "tests/src/lua-string_hash_tests.ads",
+      "sha256": "adbaa7572510244600c165af9c90cd0e58773ccc3b497eb2101c56ddeca04eae",
+      "bytes": 154
+    },
+    {
+      "path": "tests/src/lua-string_hash_tests.adb",
+      "sha256": "35395675883c39cf2a0e5babcc3b33946c7799910c94bef196e7f337354647b0",
+      "bytes": 8128
+    },
+    {
+      "path": "tests/src/test_runner.adb",
+      "sha256": "bc34d494cca9a7010331c5fc3e14c23161805eba3a36426e0487573bebeccd8b",
+      "bytes": 11945
+    },
+    {
+      "path": "tests/lua/string_hash_invariants.lua",
+      "sha256": "19492201c7f4171900cadb9cbbc4ecdf5cba0c590fbbd0fb94e33a0a312126f2",
+      "bytes": 2262
+    }
+  ],
+  "runtime_counterparts": [
+    {
+      "path": "src/lua-engine.ads",
+      "sha256": "0c9512c28952853f142ed36596977872fe0fe98073c181c7685d0329e2a84cfe",
+      "bytes": 68222
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409",
+      "bytes": 115735
+    },
+    {
+      "path": "src/lua-engine-tables.adb",
+      "sha256": "31db4043d6b387c08b61a2ff6f6197d9a5495626200d67cf56cfad66f0821173",
+      "bytes": 18307
+    }
+  ],
+  "native_evidence": [
+    {
+      "path": "references/lua/ltests.c",
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199",
+      "bytes": 59576
+    },
+    {
+      "path": "references/lua/testes/attrib.lua",
+      "sha256": "dd2eb13be29628ac0268cddfafdc6a816edcba6552ae15e8637afc6a79742e52",
+      "bytes": 14029
+    }
+  ],
+  "supported_contract": {
+    "installation": "main-state test adapter",
+    "operation": 40,
+    "arguments": "exactly one actual string",
+    "result": "exactly one integer",
+    "data": "actual cached Object.String_Hash consumed by Tables.Hash",
+    "representation": "all64bits reversibly rendered as signed Integer_Value",
+    "unsupported": "native physical table-mainposition overload",
+    "private_native_difference": "native cast_int cached hash is signed32; no numerical equivalence promised",
+    "inspection_side_effects": "no payload scan, hash recomputation, collection, allocation or provider/budget reset in the Ada leaf",
+    "public_transport": "existing actual C inspection guard; ordinary result/portal allocation semantics retained"
+  },
+  "validation": {
+    "default_aunit_passed": 2612,
+    "instrumented_aunit_passed": 2612,
+    "failed_assertions": 0,
+    "unexpected_errors": 0,
+    "new_named_aunit_cases": 12,
+    "private_probes": [
+      "forced low cached field on retained97-byte noninterned value",
+      "forced high-bit full-width field; exact restore before result inspection/key lookup/Finish/teardown/Cancel"
+    ],
+    "public_boundary_lengths": [
+      0,
+      10,
+      39,
+      40,
+      41,
+      1000
+    ],
+    "public_native_paired_cases": 8,
+    "ada_only_contract_cases": [
+      "cached-field low/high sentinels",
+      "extra-argument rejection",
+      "default absence negative"
+    ],
+    "native_default_fixture": "expected failure; no omitted T credit",
+    "ada_default_fixture": "expected failure; no omitted T credit",
+    "strict_builds": [
+      "default runtime",
+      "default tests corrected after unary-minus visibility diagnostic",
+      "instrumented runtime",
+      "instrumented tests"
+    ],
+    "flags_relaxed": false,
+    "c_consumers_rebuilt": false,
+    "cli_rebuilt": false,
+    "documentation": {
+      "changed_markdown_checks_passed": 6,
+      "full_checker_pass": false,
+      "blocker": "Uninitialized future Busted fixture link; no pin/tree changes"
+    },
+    "aunit_executables": [
+      {
+        "sha256": "58252de47552eca0bffdfca79664d7a92da16d61ece6e9e5fa2bc3111abe6445",
+        "bytes": 36585244,
+        "configuration": "default",
+        "path": "tests/bin/static/test_runner.exe"
+      },
+      {
+        "sha256": "1cd622c3d7a32ae059ef7576b1a38659e4281c111e768636ca406fcd87e1d616",
+        "bytes": 36592412,
+        "configuration": "upstream-test",
+        "path": "tests/bin/upstream-test/static/test_runner.exe"
+      }
+    ]
+  },
+  "binary_crossing": {
+    "index": {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/index.json",
+      "sha256": "7c9f96b95ebfc617a41aa381dc5942362924da990295c6c9e536e266a8a14c5f",
+      "bytes": 17502
+    },
+    "configuration": "upstream-test",
+    "roles": [
+      "Native-to-Native",
+      "Native-to-Ada",
+      "Ada-to-Native",
+      "Ada-to-Ada"
+    ],
+    "stdout_sha256": "e8da16262495dd936c80cf8e82dc6b850457f849e13f8871a75a42ee1ed0f91d",
+    "all_stderr_empty": true,
+    "all_selected_cleanup_zero": true
+  },
+  "approved_attrib_replay": {
+    "index": {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/index.json",
+      "sha256": "e820f71a5bffdb57d793455e38e562bb3fb3a17be1e3acec52aa0f31beb043eb",
+      "bytes": 308599
+    },
+    "source_approval": "independent path-only f15a06e, unchanged",
+    "approved_source_sha256": "a56021013a850cf69feb421e5385ac0e5f8e6b5841d107c9c7a55ed5ea172dca",
+    "original343_and335_to350_unchanged": true,
+    "entry": "unstripped loadfile/dump/load/tail-call and exactly one result27",
+    "roles": [
+      "upstream-test-ReferenceC",
+      "upstream-test-Ada"
+    ],
+    "stdout_sha256": "b5aaea413ec8e08b5611087519dcb1b8aa25f718655fd885f52843f009631cd7",
+    "all_stderr_empty": true,
+    "all_selected_cleanup_zero": true,
+    "same_image_native_module_linkage": [
+      {
+        "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870\\upstream-test-ReferenceC-module-linkage\\linkage.json",
+        "sha256": "55a9713b1fba27fa0459b080d48f414743ca08c9ea1f659161aa5682d1d76316"
+      },
+      {
+        "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870\\upstream-test-Ada-module-linkage\\linkage.json",
+        "sha256": "6e4d2e72bac2cb1e75bd9ba0d833d97fd0aaec57023cec74f3d2b2ac9fb0a32a"
+      }
+    ],
+    "native_module_fallback": false,
+    "timeout_seconds": 900,
+    "allocator_limit_bytes": 2147483648,
+    "final_acceptance": false
+  },
+  "limitations": [
+    "Dated component observations, not final-current-head immutable certification",
+    "New adapter source invalidates previous exact dependency bindings until renewed independent reviews",
+    "No C hash algorithm/width/mainposition compatibility claim",
+    "Main-state installation only; independently created T.loadlib module not widened",
+    "Original default fixture failure is a negative, not T execution credit",
+    "Earlier missing-helper/harness failures remain dated, not retroactively passing"
+  ],
+  "artifacts": [
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/frozen-images.json",
+      "sha256": "c9e752c7daade28c0996c9a7be7cbeb1b903f86a498032f7523d4f761ba80160",
+      "bytes": 2028
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/index.json",
+      "sha256": "e820f71a5bffdb57d793455e38e562bb3fb3a17be1e3acec52aa0f31beb043eb",
+      "bytes": 308599
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/upstream-test-Ada-approved-attrib.allocator.92348.json",
+      "sha256": "c6b181de5c5a380ba3f313677c87c3abdf12f0f7c9e0fc5207446675019d71cc",
+      "bytes": 357
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/upstream-test-Ada-approved-attrib.json",
+      "sha256": "e3316f73d16ce5607d868027e51d44b2e6f3bc18ec9d13bba3048b1feec873a9",
+      "bytes": 114400
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/upstream-test-Ada-approved-attrib.lua",
+      "sha256": "a56021013a850cf69feb421e5385ac0e5f8e6b5841d107c9c7a55ed5ea172dca",
+      "bytes": 14006
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/upstream-test-Ada-approved-attrib.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/upstream-test-Ada-approved-attrib.stdout",
+      "sha256": "b5aaea413ec8e08b5611087519dcb1b8aa25f718655fd885f52843f009631cd7",
+      "bytes": 201
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/upstream-test-Ada-configuration.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/upstream-test-Ada-configuration.stdout",
+      "sha256": "2d100d0743d643c35d225646eb2bd8fe2b28b1c146c19109d0835943f613ca08",
+      "bytes": 547
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/upstream-test-ReferenceC-approved-attrib.allocator.44096.json",
+      "sha256": "e7dd8f5bea4287948ec43bec8e4d72f3f3ea10ac5d05a4f30f2fc75954a211b2",
+      "bytes": 249
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/upstream-test-ReferenceC-approved-attrib.json",
+      "sha256": "86e4b93c0561c21d98e7bf5894a8c5977393192ba50390f0a0cb0f81868b34cc",
+      "bytes": 162438
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/upstream-test-ReferenceC-approved-attrib.lua",
+      "sha256": "a56021013a850cf69feb421e5385ac0e5f8e6b5841d107c9c7a55ed5ea172dca",
+      "bytes": 14006
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/upstream-test-ReferenceC-approved-attrib.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/upstream-test-ReferenceC-approved-attrib.stdout",
+      "sha256": "b5aaea413ec8e08b5611087519dcb1b8aa25f718655fd885f52843f009631cd7",
+      "bytes": 201
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/upstream-test-ReferenceC-configuration.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/attrib-string-hash-b087638779204c2fbcfb9e5b4c50e870/upstream-test-ReferenceC-configuration.stdout",
+      "sha256": "65bc59bb7bd1f68dc6670263547590fc5b3878f7cd7c205ec7aa8a9d9775ebfb",
+      "bytes": 456
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-attrib-campaign.log",
+      "sha256": "3c30e265efd60a6a59379bc837ece974c4a1892034703b900004012930052aa4",
+      "bytes": 641
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Ada-direct.allocator.11776.json",
+      "sha256": "51bfbda61c853a541435549773c815a641cccada40549655a4e5ffc0fb58bc72",
+      "bytes": 356
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Ada-direct.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Ada-direct.stdout",
+      "sha256": "e8da16262495dd936c80cf8e82dc6b850457f849e13f8871a75a42ee1ed0f91d",
+      "bytes": 225
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Ada-producer.allocator.69500.json",
+      "sha256": "3db9e2ce102651f13ac3849088f2fcb198da6920ec6deb45fd5382db3ef1f3ef",
+      "bytes": 356
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Ada-producer.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Ada-producer.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Ada-to-Ada.allocator.58568.json",
+      "sha256": "5b5e5b2275377a77cd485858006f2f34f3aadda3bfe41e1022a855ffc89d0f4a",
+      "bytes": 356
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Ada-to-Ada.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Ada-to-Ada.stdout",
+      "sha256": "e8da16262495dd936c80cf8e82dc6b850457f849e13f8871a75a42ee1ed0f91d",
+      "bytes": 225
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Ada-to-Native.allocator.29656.json",
+      "sha256": "9850448b15901a33533ea546ee377a199cdf76841fde5cb962713e5b9f307ee5",
+      "bytes": 249
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Ada-to-Native.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Ada-to-Native.stdout",
+      "sha256": "e8da16262495dd936c80cf8e82dc6b850457f849e13f8871a75a42ee1ed0f91d",
+      "bytes": 225
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Ada.luac",
+      "sha256": "3a2c603bd560f17c9001d26d2e6cfb59bf29eba18de503530b6812715caf1fae",
+      "bytes": 4768
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/index.json",
+      "sha256": "7c9f96b95ebfc617a41aa381dc5942362924da990295c6c9e536e266a8a14c5f",
+      "bytes": 17502
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Native-producer.allocator.77272.json",
+      "sha256": "c7d8ad0e1cb12445c46172cdd76271e6b52245dcc0f0b49985cad9fdb0afc5d1",
+      "bytes": 249
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Native-producer.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Native-producer.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Native-to-Ada.allocator.14212.json",
+      "sha256": "25aaa166b281358c154f9fb0d555d01d9b4b9ac1ce6ac2237ea4ac98261b4425",
+      "bytes": 356
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Native-to-Ada.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Native-to-Ada.stdout",
+      "sha256": "e8da16262495dd936c80cf8e82dc6b850457f849e13f8871a75a42ee1ed0f91d",
+      "bytes": 225
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Native-to-Native.allocator.75744.json",
+      "sha256": "c3fa92be8b1bdd126a0b6ad1fe7f2040efacc9bd27e29085439e0608412d97e1",
+      "bytes": 249
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Native-to-Native.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Native-to-Native.stdout",
+      "sha256": "e8da16262495dd936c80cf8e82dc6b850457f849e13f8871a75a42ee1ed0f91d",
+      "bytes": 225
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-binary-3084980b06294a6096c1546b7e68533f/Native.luac",
+      "sha256": "92ede21a1478257727d4d735c5b3c4e12cfc7852d3acd48bd9e76188535b9f02",
+      "bytes": 4805
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-default-aunit.log",
+      "sha256": "28cf4289e35fff940499188c940a2629d5acc8b7aa752fa5735927b82a924277",
+      "bytes": 99575
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-default-runtime.log",
+      "sha256": "f8a93da3a2a06344ffb172b88c14e2ea878a3c093e191aae8d7eb9af91205926",
+      "bytes": 20799
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-default-tests-corrected.log",
+      "sha256": "4ee11f13f5314a77c0627d078224f5d2d1db4199f954eae77706392b827f0e56",
+      "bytes": 49180
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-default-tests.log",
+      "sha256": "a8ab1ad3a16ef44ede5f1c326f5ef30ddd41b0538d9c0b42b27d896c596e6d42",
+      "bytes": 51421
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-documentation.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-native-91e87d0f3cea4ad8afe23895d4381413/ada-default-negative.allocator.52252.json",
+      "sha256": "e2927d5455afb1662746cf5d0fe5c996cc5f0b91cfe384a5073f88a0bb052b1a",
+      "bytes": 350
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-native-91e87d0f3cea4ad8afe23895d4381413/ada-default-negative.json",
+      "sha256": "4964cc0c97a4348ff307f5505bc1bc63f77eb586de2706a6c1c5d46b3519d5d4",
+      "bytes": 1512
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-native-91e87d0f3cea4ad8afe23895d4381413/ada-default-negative.stderr",
+      "sha256": "29bbb0ce2f6240aeb4972858de2d71a3a69fafc308be1b4e775a5a91e4c8e5c3",
+      "bytes": 59
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-native-91e87d0f3cea4ad8afe23895d4381413/ada-default-negative.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-native-91e87d0f3cea4ad8afe23895d4381413/default.allocator.77328.json",
+      "sha256": "7bbcbd3ac72cd4d6e8929f414361ddbbe266786f92f4cad6fe04f39eaba65104",
+      "bytes": 211
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-native-91e87d0f3cea4ad8afe23895d4381413/default.stderr",
+      "sha256": "f0035c1ae6510284e16b810b0003061be64db0dc208be83e60b3e6ddb9042432",
+      "bytes": 335
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-native-91e87d0f3cea4ad8afe23895d4381413/default.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-native-91e87d0f3cea4ad8afe23895d4381413/index.json",
+      "sha256": "57de60b9a3dcab36db89194716f5606153e7b37e59aec029928092e036f4a048",
+      "bytes": 3379
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-native-91e87d0f3cea4ad8afe23895d4381413/upstream-test.allocator.85752.json",
+      "sha256": "3128efbe25a70b60d90b4adcf35bcd58408a2f929ed7ed58eef6fd04e5f1c801",
+      "bytes": 249
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-native-91e87d0f3cea4ad8afe23895d4381413/upstream-test.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-native-91e87d0f3cea4ad8afe23895d4381413/upstream-test.stdout",
+      "sha256": "e8da16262495dd936c80cf8e82dc6b850457f849e13f8871a75a42ee1ed0f91d",
+      "bytes": 225
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-t-aunit.log",
+      "sha256": "28cf4289e35fff940499188c940a2629d5acc8b7aa752fa5735927b82a924277",
+      "bytes": 99575
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-t-runtime.log",
+      "sha256": "17ca19520e668d2bce19dfb91a263ea8db98f22c1ef8a8c944698e322f4b871a",
+      "bytes": 20805
+    },
+    {
+      "path": "reports/debug-metadata/string-hash-t-tests.log",
+      "sha256": "0649ce39b51b12d58adcf22fb17badf8855d869acf771e67dfe44ce041527d63",
+      "bytes": 50984
+    }
+  ]
+}

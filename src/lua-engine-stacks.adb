@@ -1,6 +1,7 @@
 with Ada.Containers;
 
 package body Lua.Engine.Stacks is
+   use type Ada.Containers.Count_Type;
    use type Lua.Storage.Owner_Access;
 
    procedure Check_Owner
@@ -16,7 +17,8 @@ package body Lua.Engine.Stacks is
    begin
       if Context.Memory /= Lua.Storage.Reference (State.Memory) or else
         Context.Foreign_Stack.Owner_Of /= Context.Memory or else
-        Context.Stack_Cells.Owner_Of /= Context.Memory
+        Context.Stack_Cells.Owner_Of /= Context.Memory or else
+        Context.C_Close_Links.Owner_Of /= Context.Memory
       then
          raise Program_Error with "scalar arena has another allocator";
       end if;
@@ -28,7 +30,8 @@ package body Lua.Engine.Stacks is
    begin
       Check_Owner (State, Context);
       if Natural (Context.Foreign_Stack.Length) /=
-        Natural (Context.Stack_Cells.Length)
+        Natural (Context.Stack_Cells.Length) or else
+        Context.Foreign_Stack.Length /= Context.C_Close_Links.Length
       then
          raise Program_Error with "mismatched scalar arena lengths";
       elsif Index > Natural (Context.Foreign_Stack.Length) then
@@ -42,8 +45,10 @@ package body Lua.Engine.Stacks is
       if Context.Memory = null or else
         Context.Foreign_Stack.Owner_Of /= Context.Memory or else
         Context.Stack_Cells.Owner_Of /= Context.Memory or else
+        Context.C_Close_Links.Owner_Of /= Context.Memory or else
         Natural (Context.Foreign_Stack.Length) /=
-          Natural (Context.Stack_Cells.Length)
+          Natural (Context.Stack_Cells.Length) or else
+        Context.Foreign_Stack.Length /= Context.C_Close_Links.Length
       then
          raise Program_Error with "invalid parallel scalar arena";
       elsif First <= Last and then
@@ -53,6 +58,31 @@ package body Lua.Engine.Stacks is
          raise Program_Error with "uninitialized scalar arena interval";
       end if;
    end Check_Range;
+
+   function Closing_Predecessor
+     (Activation : not null Frame_Access; Level : Positive) return Natural
+   is
+      Context : constant Context_Access := Activation.Context;
+      Previous : Natural;
+   begin
+      if Context = null or else Level <= Activation.Stack_Base or else
+        Level - Activation.Stack_Base > Activation.Stack_Window_Length
+      then
+         raise Program_Error with "closing link is outside its scalar owner";
+      end if;
+      --  A C borrow grows this physical owner before exposing extra slots.
+      --  Its reserved length survives retirement; the current context top
+      --  can instead belong to another child or a smaller suspended view.
+      --  Strict descent then also keeps every predecessor below this bound.
+      Check_Range (Context, Level, Level);
+      Previous := Context.C_Close_Links.Element (Level).Previous;
+      if Previous >= Level or else
+        (Previous /= 0 and then Previous <= Activation.Stack_Base)
+      then
+         raise Program_Error with "closing links are not strictly descending";
+      end if;
+      return Previous;
+   end Closing_Predecessor;
 
    procedure Reserve
      (State : in out World; Context : not null Context_Access;
@@ -66,19 +96,26 @@ package body Lua.Engine.Stacks is
       Check_Owner (State, Context);
       loop
          begin
-            --  Reserve both buffers before publishing either new length.
-            --  Value/cell elements are scalar and initialize without further
+            --  Reserve every buffer before publishing any new length.
+            --  Value/cell/link rows initialize without further
             --  allocation, so refusal preserves the old logical lengths and
             --  live slots. A successful first reserve may leave spare
-            --  physical capacity if the second fails; no semantic top is
+            --  physical capacity if another fails; no semantic top is
             --  published here. Emergency GC may clear already dead slots.
             Context.Foreign_Stack.Reserve_Capacity
               (Ada.Containers.Count_Type (Needed));
             Context.Stack_Cells.Reserve_Capacity
               (Ada.Containers.Count_Type (Needed));
+            --  Closing predecessors are actual stack metadata, like the
+            --  cell association above. Reserve before publishing lengths;
+            --  marking a C slot and reusing a cached frame allocate nothing.
+            Context.C_Close_Links.Reserve_Capacity
+              (Ada.Containers.Count_Type (Needed));
             Context.Foreign_Stack.Set_Length
               (Ada.Containers.Count_Type (Needed));
             Context.Stack_Cells.Set_Length
+              (Ada.Containers.Count_Type (Needed));
+            Context.C_Close_Links.Set_Length
               (Ada.Containers.Count_Type (Needed));
             return;
          exception
@@ -225,7 +262,8 @@ package body Lua.Engine.Stacks is
          raise Program_Error with "physical stack shrink cannot grow";
       elsif Last = Initialized and then
         Natural (Context.Foreign_Stack.Capacity) = Last and then
-        Natural (Context.Stack_Cells.Capacity) = Last
+        Natural (Context.Stack_Cells.Capacity) = Last and then
+        Natural (Context.C_Close_Links.Capacity) = Last
       then
          return True;
       end if;
@@ -240,9 +278,13 @@ package body Lua.Engine.Stacks is
          New_Cells : Cell_References.Vector := Cell_References.Copy_Prefix
            (Context.Stack_Cells, Ada.Containers.Count_Type (Last),
             Ada.Containers.Count_Type (Last));
+         New_Links : Closing_Links.Vector := Closing_Links.Copy_Prefix
+           (Context.C_Close_Links, Ada.Containers.Count_Type (Last),
+            Ada.Containers.Count_Type (Last));
       begin
          Values.Move (Context.Foreign_Stack, New_Values);
          Cell_References.Move (Context.Stack_Cells, New_Cells);
+         Closing_Links.Move (Context.C_Close_Links, New_Links);
       end;
       return True;
    exception
@@ -264,9 +306,12 @@ package body Lua.Engine.Stacks is
       Mark_Cell : not null access procedure (Item : Object_Access))
    is
       Prefix : constant Natural :=
-        (if Context.Detached_Resume_Window then Context.Resume_Host_Stack_Top
-         elsif Context.Stack.Is_Empty then Context.Foreign_Top
-         else Context.Host_Stack_Top);
+        Natural'Max
+          (Context.Closing_Stack_Prefix,
+           (if Context.Detached_Resume_Window then
+               Context.Resume_Host_Stack_Top
+            elsif Context.Stack.Is_Empty then Context.Foreign_Top
+            else Context.Host_Stack_Top));
       Initialized : constant Natural :=
         Natural (Context.Foreign_Stack.Length);
       Previous_First, Visited : Natural := 0;
@@ -303,6 +348,10 @@ package body Lua.Engine.Stacks is
                Last := Natural'Max (Last, Activation.Stack_Live_Top);
             end if;
          end if;
+         --  A marked local stays live until its handler is selected, even
+         --  when ordinary compiler/debug liveness no longer includes it.
+         --  Trace must preserve this interval before clearing any dead gap.
+         Last := Natural'Max (Last, Activation.C_Closing_Level);
       end Bounds;
 
       procedure Visit (First, Last : Natural) is

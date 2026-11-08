@@ -1,6 +1,184 @@
 # Session Records
 
-Current: [expanded T conformance](2026-11-07-expanded-t-conformance.md).
+Current cut: [interim compatibility checkpoint](2026-11-08-interim-compatibility-checkpoint.md).
+
+Correction: [private frame scalar layout](2026-11-08-private-frame-scalar-layout.md).
+
+Component: [actual C-call argument arena reuse](2026-11-08-c-call-argument-arena.md).
+
+Component: [canonical frame storage reduction](2026-11-08-canonical-frame-footprint.md).
+
+Correction: [lifecycle watchdog evidence](2026-11-08-lifecycle-watchdog-evidence.md).
+
+Component: [native CLI readline and fallback](2026-11-08-cli-native-readline.md).
+
+Observation: [retained Code execution and immutable artifacts](2026-11-08-code-local-execution.md).
+
+Source installation: [exact Code V3 decisions and guarded generation](2026-11-08-code-v3-source-installation.md).
+
+Component: [debug console and actual C calls](2026-11-08-debug-console.md).
+
+Proposal: [exact Nextvar/Sort table source changes](2026-11-08-nextvar-sort-exact-proposal.md).
+
+Component: [bounded Nextvar storage counterparts](2026-11-08-nextvar-storage-counterparts.md).
+
+Component: [typed CLI script arguments](2026-11-08-cli-typed-arguments.md).
+
+Component: [reviewed Verybig Windows replay](2026-11-08-verybig-approved-source.md).
+
+Component: [native allocator loaded image](2026-11-08-allocator-loaded-image.md).
+
+Correction: [Heavy allocator ceilings and observation](2026-11-08-heavy-allocator-observation.md).
+
+Component: [actual cached string hash](2026-11-08-test-string-hash.md).
+
+Component: [fixed external-string T driver](2026-11-08-fixed-external-string-driver.md).
+
+Correction: [native string locales](2026-11-08-native-string-locales.md).
+
+Correction: [table errors and missing iteration arguments](2026-11-08-table-error-arguments.md).
+
+Component: [observable resource eligibility V4](2026-11-08-observable-resource-eligibility.md).
+
+Component: [materialized vararg counterparts](2026-11-08-materialized-vararg-counterparts.md).
+
+Correction: [marked closing-value mutation](2026-11-08-marked-closing-mutation.md).
+
+Observation: [approved Windows-path attrib replay](2026-11-08-attrib-approved-path-replay.md).
+
+Component: [CLI dynamic prompts](2026-11-08-cli-dynamic-prompts.md).
+
+Feature review: [materialized vararg allocation count](2026-11-08-memerr-vararg-feature-review.md).
+
+Source review: [bounded optimizer eligibility](2026-11-08-optimizer-v3-validator-review.md).
+
+Observation: [original main.lua and CLI prompts](2026-11-08-main-cli-native-baseline.md).
+
+Component: [actual IO error caller locations](2026-11-08-io-error-locations.md).
+
+Proposal: [API941 tail and owner source bindings](2026-11-08-api941-tail-owner-bindings.md).
+
+Correction: [scalar closing owner bound](2026-11-08-scalar-closing-owner-bound.md).
+
+Component: [scalar closing links](2026-11-08-scalar-closing-links.md).
+
+Source review: [current target GC mapping](2026-11-08-gc-current-source-review.md).
+
+Source review: [optimizer semantic retention](2026-11-08-optimizer-semantic-review.md).
+
+Source review: [memory-verifier binding refresh](2026-11-08-verifier-binding-refresh.md).
+
+Component: [intern-index refusal and collection](2026-11-08-intern-index-refusal.md).
+
+Observation: [original debug, vararg and Windows package paths](2026-11-08-unreduced-debug-vararg-attrib.md).
+
+Proposal: [exact locals source equivalent](2026-11-08-locals-exact-source-proposal.md).
+
+Proposal: [memory vararg allocation geometry](2026-11-08-memerr-vararg-feature-proposal.md).
+
+Component: [canonical tail argument ownership](2026-11-08-canonical-tail-ownership.md).
+
+Feature review: [private string-table observations](2026-11-08-querystr-feature-review.md).
+
+Correction: [resetCI owning release](2026-11-08-resetci-owning-release.md).
+
+Source review: [fixed-buffer binding refresh](2026-11-08-api18-binding-refresh.md).
+
+Component: [public optimizer semantics witnesses](2026-11-08-code-public-semantics.md).
+
+Component: [actual table-storage inspection](2026-11-08-table-storage-inspection.md).
+
+Component: [reusable C call metadata](2026-11-08-c-call-metadata.md).
+
+Correction: [declaration activation](2026-11-08-declaration-activation-correction.md).
+
+Component: [compiler limit context](2026-11-08-compiler-limit-context.md).
+
+Proposal: [API string-table geometry](2026-11-08-querystr-feature-proposal.md).
+
+Component: [instruction hook-mask transitions](2026-11-08-hook-mask-transitions.md).
+
+Component: [parser stack limits](2026-11-08-parser-stack-limits.md).
+
+Observation: [retained T source replay](2026-11-08-retained-t-source-replay.md).
+
+Source review: [exact API/calls equivalents](2026-11-08-exact-api-calls-equivalents.md).
+
+Component: [assert argument presence](2026-11-08-assert-arguments.md).
+Component: [reader refusal and self-close](2026-11-08-reader-refusal-lifecycle.md).
+
+Component: [runtime failure storage](2026-11-08-runtime-failure-storage.md).
+Component: [public T traceback command](2026-11-08-t-traceback-command.md).
+
+Component: [coroutine result portals](2026-11-08-coroutine-result-portals.md).
+
+Component: [managed diagnostic text](2026-11-08-managed-diagnostic-text.md).
+Component: [linear Lua readers and declaration lines](2026-11-08-linear-lua-readers.md).
+
+Component: [memory-verifier ordering](2026-11-08-memerr-verifier.md).
+
+Component: [actual stack inspection](2026-11-08-stack-inspection.md).
+
+Component: [C API self-valued assignments](2026-11-08-c-api-self-values.md).
+
+Component: [hidden named varargs](2026-11-08-hidden-named-varargs.md).
+Component: [label semantic boundaries](2026-11-08-label-semantic-boundaries.md).
+
+Component: [function definition store sites](2026-11-08-function-store-sites.md).
+
+Component: [base setmetatable arguments](2026-11-08-metatable-argument-phases.md).
+Component: [return windows through closers](2026-11-08-close-return-windows.md).
+
+Correction: [native tail return publication](2026-11-08-native-tail-return-windows.md).
+
+Component: [actual return-hook windows](2026-11-08-return-hook-windows.md).
+
+Component: [sort argument phases](2026-11-08-sort-argument-phases.md).
+
+Component: [binary source display](2026-11-08-binary-source-nul.md).
+
+Component: [owned argument labels](2026-11-08-owned-argument-labels.md).
+
+Component: [selected debug-line baselines](2026-11-08-selected-line-baselines.md).
+
+Component: [string arguments and scalar results](2026-11-08-string-arguments-results.md).
+
+Component: [owned argument details](2026-11-08-owned-argument-detail.md).
+
+Component: [borrowed C stack views](2026-11-08-borrowed-c-stack-views.md).
+
+Component: [public-boundary integration](2026-11-08-public-boundary-integration.md).
+
+Component: [scalar logical negation](2026-11-08-scalar-not-refusal.md).
+
+Component: [panic and provider controls](2026-11-08-panic-provider-controls.md).
+
+Component: [shared traceback rendering](2026-11-08-shared-traceback.md).
+
+Component: [I/O and collector arguments](2026-11-08-io-collector-arguments.md).
+Component: [argument registry continuations](2026-11-08-argument-registry-continuations.md).
+
+Component: [public value identities](2026-11-08-public-value-identities.md).
+
+Component: [public C concat windows](2026-11-08-c-concat-windows.md).
+
+Component: [public file loading](2026-11-08-public-file-loading.md).
+
+Component: [literal auxiliary substitution](2026-11-08-auxiliary-substitution.md).
+
+Component: [public auxiliary allocator](2026-11-08-public-auxiliary-allocator.md).
+
+Current: [remaining upstream compatibility](2026-11-07-remaining-upstream-compatibility.md).
+
+Previous: [expanded T conformance](2026-11-07-expanded-t-conformance.md).
+
+Component: [runtime numeric locale](2026-11-08-runtime-numeric-locale.md).
+
+Component: [CLI process controls](2026-11-08-cli-process-controls.md).
+
+Component: [table length results](2026-11-08-table-length-results.md).
+
+Component: [syntax diagnostic tokens](2026-11-08-syntax-diagnostic-tokens.md).
 
 Previous: [four-file GC/IO conformance](2026-11-07-gc-io-conformance.md).
 
@@ -10,18 +188,52 @@ Previous: [major M3 language lifecycle](2026-11-06-m3-language-lifecycle.md).
 The current delivery follows merged PR #7 and combines all remaining M3 work
 into one major PR. Historical session results retain their original scope.
 
-| Date       | Session                                                      |
-| ---------- | ---------------------------------------------------------    |
-| 2026-11-05 | [Initial foundation](2026-11-05-foundation.md)               |
-| 2026-11-05 | [Initial M1 gates](2026-11-05-m1-gates.md)                   |
-| 2026-11-05 | [M1 interpreter](2026-11-05-m1-interpreter.md)               |
-| 2026-11-06 | [Module fixture setup](2026-11-06-ecosystem-fixtures.md)     |
-| 2026-11-06 | [M2a frontend implementation](2026-11-06-m2a-frontend.md)    |
-| 2026-11-06 | [M2b core libraries](2026-11-06-m2b-core-libraries.md)       |
-| 2026-11-06 | [M3-01 contracts and harness](2026-11-06-m3-01-contracts.md) |
+| Date       | Session                                                                    |
+| ---------- | --------------------------------------------------------------------       |
+| 2026-11-05 | [Initial foundation](2026-11-05-foundation.md)                             |
+| 2026-11-05 | [Initial M1 gates](2026-11-05-m1-gates.md)                                 |
+| 2026-11-05 | [M1 interpreter](2026-11-05-m1-interpreter.md)                             |
+| 2026-11-06 | [Module fixture setup](2026-11-06-ecosystem-fixtures.md)                   |
+| 2026-11-06 | [M2a frontend implementation](2026-11-06-m2a-frontend.md)                  |
+| 2026-11-06 | [M2b core libraries](2026-11-06-m2b-core-libraries.md)                     |
+| 2026-11-06 | [M3-01 contracts and harness](2026-11-06-m3-01-contracts.md)               |
+| 2026-11-07 | [Reader input](2026-11-07-demand-driven-input.md)                          |
+| 2026-11-08 | [Public C debug identity](2026-11-08-c-debug-identity.md)                  |
+| 2026-11-08 | [Callable builtins](2026-11-08-callable-builtins.md)                       |
+| 2026-11-08 | [C varargs formatting](2026-11-08-c-varargs-formatting.md)                 |
+| 2026-11-08 | [Public value and auxiliary](2026-11-08-public-value-auxiliary.md)         |
+| 2026-11-08 | [External string ownership](2026-11-08-external-string-ownership.md)       |
+| 2026-11-08 | [Fixed numeric scratch](2026-11-08-fixed-numeric-scratch.md)               |
+| 2026-11-08 | [C numeric conversion](2026-11-08-c-numeric-conversion.md)                 |
+| 2026-11-08 | [C operator windows](2026-11-08-c-operator-windows.md)                     |
+| 2026-11-08 | [Native module loading](2026-11-08-native-module-loading.md)               |
+| 2026-11-08 | [Host base C closing](2026-11-08-base-c-closing.md)                        |
+| 2026-11-08 | [Closing scalar prefixes](2026-11-08-closing-stack-prefix.md)              |
+| 2026-11-08 | [Auxiliary buffers](2026-11-08-auxiliary-buffer-ownership.md)              |
+| 2026-11-08 | [Protected error closing](2026-11-08-protected-error-closing.md)           |
+| 2026-11-08 | [Concatenation operations](2026-11-08-concat-operation-diagnostics.md)     |
+| 2026-11-08 | [Library argument diagnostics](2026-11-08-library-argument-diagnostics.md) |
+| 2026-11-08 | [Metamethod argument roots](2026-11-08-metamethod-argument-roots.md)       |
+
+| 2026-11-08 | [Concat operations](2026-11-08-concat-operation-diagnostics.md) |
+
+| 2026-11-08 | [Public thread reset](2026-11-08-thread-reset.md)            |
+| 2026-11-08 | [Public API command driver](2026-11-08-public-api-driver.md) |
 
 Add one record per substantive AI session, using `YYYY-MM-DD-topic.md` and
 the user's timezone (currently Asia/Tokyo). Include objective, changes, decisions,
 commands/tool versions, results, limits, and next steps. Use a suffix for multiple
 records on one date. Historical evidence is immutable except for factual fixes;
 current capability belongs in [status](../status.md).
+
+The [native Windows main transport proposal](2026-11-08-windows-main-transport.md)
+records thirteen authored native controls and pending whole-source/platform
+review; it grants no original main.lua coverage.
+
+The [Windows real-signal broker observation](2026-11-08-windows-real-signals.md)
+preserves real native Ctrl-C delivery and the failing abrupt T teardown; its
+complete native-positive gate remains false.
+
+The [Windows signal exit-class correction](2026-11-08-windows-signal-exit-class.md)
+requires the actual control-C exit status and checked OS cleanup while retaining
+the failing abrupt T teardown.

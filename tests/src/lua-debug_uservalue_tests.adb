@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
 with Test_Support;
@@ -20,7 +19,7 @@ package body Lua.Debug_Uservalue_Tests is
               Item);
          End_Operation (State);
          Assert (Execute (State, Source, "debug-uservalues"),
-                 To_String (State.Current.Failure_Text));
+                 Failure_Image (State.Current));
       exception
          when others => Finalize (State); raise;
       end;

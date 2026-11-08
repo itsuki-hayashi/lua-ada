@@ -92,12 +92,15 @@ package body Lua.Engine.Compiler is
       Parse (Unit, Source, Name,
              (State.Bounds.Source_Bytes, State.Bounds.Tokens,
               State.Bounds.Syntax_Nodes, State.Bounds.Syntax_Depth),
-             Memory => Lua.Storage.Reference (State.Memory));
+             Memory => Lua.Storage.Reference (State.Memory),
+             Compatible_Limits => State.Policy = Lua_Compatible);
       if Unit.Result.Status /= Lua.Syntax.Success then
          State.Current.Failure_At :=
            (Offset => 1, Line => Unit.Result.Error.Line,
             Column => Unit.Result.Error.Column);
-         State.Current.Failure_Class := Syntax_Failure;
+         State.Current.Failure_Class :=
+           (if Unit.Result.Stack_Overflow then Language_Failure
+            else Syntax_Failure);
          Fail (State, Lua.Syntax_Trees.Text (Unit, Unit.Result.Error.Message),
                Resource => Unit.Result.Status = Lua.Syntax.Resource_Error);
       end if;
@@ -118,7 +121,7 @@ package body Lua.Engine.Compiler is
               Lua.Canonical_Compiler.Resource_Limit =>
                State.Current.Failure_At := Lowered.Location;
                State.Current.Failure_Class := Syntax_Failure;
-               Fail (State, Lua.Canonical_Compiler.Message (Lowered.Error),
+               Fail (State, Lua.Canonical_Compiler.Message (Lowered),
                  Resource => Lowered.Outcome =
                    Lua.Canonical_Compiler.Resource_Limit);
          end case;
@@ -817,12 +820,15 @@ package body Lua.Engine.Compiler is
       Parse (Unit, Source, Name,
              (State.Bounds.Source_Bytes, State.Bounds.Tokens,
               State.Bounds.Syntax_Nodes, State.Bounds.Syntax_Depth),
-             Memory => Lua.Storage.Reference (State.Memory));
+             Memory => Lua.Storage.Reference (State.Memory),
+             Compatible_Limits => State.Policy = Lua_Compatible);
       if Unit.Result.Status /= Lua.Syntax.Success then
          State.Current.Failure_At :=
            (Offset => 1, Line => Unit.Result.Error.Line,
             Column => Unit.Result.Error.Column);
-         State.Current.Failure_Class := Syntax_Failure;
+         State.Current.Failure_Class :=
+           (if Unit.Result.Stack_Overflow then Language_Failure
+            else Syntax_Failure);
          Fail (State, Lua.Syntax_Trees.Text (Unit, Unit.Result.Error.Message),
                Resource => Unit.Result.Status = Lua.Syntax.Resource_Error);
       end if;

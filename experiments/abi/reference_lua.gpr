@@ -1,4 +1,15 @@
+with "../../config/lua_ada_config.gpr";
+
 library project Reference_Lua is
+   --  The default differential oracle must expose the same native package
+   --  facilities as the pinned platform build. A generic ISO-only POSIX
+   --  compilation disables dlopen and cannot witness package.loadlib errors.
+   Platform := ();
+   case Lua_Ada_Config.Alire_Host_OS is
+      when "linux" => Platform := ("-DLUA_USE_LINUX");
+      when "macos" => Platform := ("-DLUA_USE_MACOSX");
+      when others => null;
+   end case;
    for Languages use ("C");
    for Source_Dirs use ("../../references/lua");
    for Excluded_Source_Files use ("lua.c", "onelua.c", "ltests.c");
@@ -9,6 +20,6 @@ library project Reference_Lua is
    for Create_Missing_Dirs use "True";
 
    package Compiler is
-      for Default_Switches ("C") use ("-std=c99", "-O2");
+      for Default_Switches ("C") use ("-std=c99", "-O2") & Platform;
    end Compiler;
 end Reference_Lua;

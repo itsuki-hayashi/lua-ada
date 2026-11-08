@@ -1,8 +1,9 @@
-with Lua.Engine.Call_Names;
+with Lua.Engine.Diagnostics;
+with Lua.Engine.Hooks;
 with Lua.Engine.Canonical;
 with Lua.Engine.Stacks;
+with Lua.Engine.Tables;
 with Lua.Prototypes;
-with Lua.Engine.Strings;
 with Ada.Strings.Fixed;
 with Interfaces.C;
 with System;
@@ -16,20 +17,24 @@ package body Lua.Engine.Inspection is
 
    function Short_Source (Source : String) return String is
       Newline : constant Natural :=
-        Ada.Strings.Fixed.Index (Source, "" & Character'Val (10));
+        Ada.Strings.Fixed.Index
+          (Source (Source'First ..
+             Natural'Min (Source'Last, Source'First + 44)),
+           "" & Character'Val (10));
       Size : Natural := Source'Length;
       Truncated : Boolean := False;
    begin
       --  A default debug identifier has 59 payload bytes plus its C NUL.
       --  File identifiers retain the tail; snippets retain the first
       --  line with a quoted prefix/suffix. No native record layout is
-      --  involved.
+      --  involved. Only the first 45 snippet bytes can contribute, so an
+      --  arbitrarily long source label never requires a full newline scan.
       if Source'Length > 0 and then Source (Source'First) in '=' | '@' then
          if Source'Length <= 60 or else Source (Source'First) = '=' then
-            return Source (Source'First + 1 ..
-              Natural'Min (Source'Last, Source'First + 59));
+            return C_Option (Source (Source'First + 1 ..
+              Natural'Min (Source'Last, Source'First + 59)));
          end if;
-         return "..." & Source (Source'Last - 55 .. Source'Last);
+         return C_Option ("..." & Source (Source'Last - 55 .. Source'Last));
       end if;
       if Newline /= 0 then
          Size := Newline - Source'First;
@@ -39,14 +44,430 @@ package body Lua.Engine.Inspection is
          Truncated := True;
       end if;
       Size := Natural'Min (45, Size);
-      return "[string """ & Source (Source'First .. Source'First + Size - 1) &
-        (if Truncated then "..." else "") & """]";
+      --  Binary chunks can contain counted source names with embedded NUL.
+      --  Native short_src is consumed as a C string after chunk-id rendering,
+      --  including file-tail selection; truncating the original name first
+      --  would incorrectly change the displayed tail of a long file source.
+      return C_Option
+        ("[string """ & Source (Source'First .. Source'First + Size - 1) &
+         (if Truncated then "..." else "") & """]");
    end Short_Source;
 
-   function Inspect
-     (State : in out World; Activation : Frame_Access) return Values.Vector
+   function Visible_Local_Top
+     (Context : not null Context_Access; Item : not null Frame_Access)
+      return Natural
    is
-      Name : constant String := To_String (Activation.Native_Name);
+      Window : Frame_Access := Context.Stack_Window;
+      Child : Frame_Access;
+      Limit : constant Natural :=
+        (if not Item.Is_Native then
+            (if Item.Warning_Borrow_Depth /= 0 then Natural'Max
+               (Item.Canonical_GC_Top,
+                Item.Stack_Live_Top - Item.Stack_Base)
+             else Item.Canonical_GC_Top)
+         elsif Item.Has_Stack_Window then
+            Item.Stack_Live_Top - Item.Stack_Base
+         else Natural (Item.Native_Arguments.Length));
+   begin
+      --  ldebug.c:luaG_findlocal distinguishes a frame's live top from the
+      --  next function's slot. Our collector must root that slot, but debug
+      --  temporaries cannot expose the child's callee/arguments as the
+      --  parent's locals. Follow the real window links, not opcode guesses
+      --  or a fabricated stack layout. A C hook borrows its interrupted
+      --  frame, so its immutable transport marker contributes no boundary.
+      --  The protected C collector pump likewise creates no public call.
+      while Window /= null and then Window /= Item loop
+         if not Window.Logically_Unwound and then
+           not Window.Is_C_Hook_Transport and then
+           not Window.Is_C_Collector_Transport
+         then
+            Child := Window;
+         end if;
+         Window := Window.Previous_Stack_Window;
+      end loop;
+      if Window = Item and then Child /= null then
+         return (if Child.Call_Base > Item.Stack_Base then
+                   Natural'Min
+                     (Limit, Child.Call_Base - Item.Stack_Base - 1)
+                 else 0);
+      end if;
+      return Limit;
+   end Visible_Local_Top;
+
+   procedure Query_Work (State : in out World);
+   procedure Query_Work (State : in out World) is
+   begin
+      if State.Steps >= State.Bounds.Instructions then
+         Fail (State, "instruction limit exceeded", Resource => True);
+      end if;
+      if State.Policy = Bounded then
+         State.Steps := State.Steps + 1;
+      end if;
+   end Query_Work;
+
+   function Published_Frame (Item : Frame_Access) return Boolean;
+   function Published_Frame (Item : Frame_Access) return Boolean is
+     (not Item.Logically_Unwound and then
+      not Item.Is_C_Hook_Transport and then
+      not Item.Is_C_Collector_Transport and then
+      (not Item.Is_Native or else
+       (Length (Item.Native_Name) > 0 and then
+        Element (Item.Native_Name, 1) /= '@')));
+
+   function Failed_Owner
+     (State : in out World; Context : not null Context_Access;
+      Candidate : Frame_Access) return Boolean;
+   function Failed_Owner
+     (State : in out World; Context : not null Context_Access;
+      Candidate : Frame_Access) return Boolean
+   is
+   begin
+      --  Every @unwind owns a cleanup charge (Start_Unwind/Release_Frame).
+      --  Ordinary inspection therefore avoids an otherwise full-stack scan.
+      if Context.Cleanup_Depth = 0 then return False; end if;
+      for Driver of Context.Stack loop
+         Query_Work (State);
+         if Driver.Is_Native and then Driver.Native_Name = "@unwind" and then
+           Driver.Unwind in Error_Exit | Coroutine_Exit and then
+           Driver.Unwind_Owner = Candidate
+         then
+            return True;
+         end if;
+      end loop;
+      return False;
+   end Failed_Owner;
+
+   function Logical_Frame
+     (State : in out World; Context : not null Context_Access; Level : Natural)
+      return Frame_Access
+   is
+      Remaining : Natural := Level;
+   begin
+      for Item of reverse Context.Stack loop
+         Query_Work (State);
+         if Published_Frame (Item) and then
+           not Failed_Owner (State, Context, Item)
+         then
+            if Remaining = 0 then return Item; end if;
+            Remaining := Remaining - 1;
+         end if;
+      end loop;
+      return null;
+   end Logical_Frame;
+
+   function Caller_Frame
+     (State : in out World; Context : not null Context_Access;
+      Callee : not null Frame_Access) return Frame_Access
+   is
+      Found : Boolean := False;
+   begin
+      --  Error/coroutine-close owners stay alive to close their real cells,
+      --  but their calls have unwound to protection or the coroutine base.
+      --  They must not make a closer look like error() or yield(). Preserve
+      --  actual native protection frames.
+      for Item of reverse Context.Stack loop
+         Query_Work (State);
+         if Item = Callee then
+            Found := True;
+         elsif Found and then Published_Frame (Item) and then
+           not Failed_Owner (State, Context, Item)
+         then
+            return Item;
+         end if;
+      end loop;
+      return null;
+   end Caller_Frame;
+
+   function Call_Identity
+     (State : in out World; Context : not null Context_Access;
+      Callee : Frame_Access) return Call_Names.Borrowed_Identity
+   is
+      Caller : Frame_Access;
+   begin
+      if Callee = null then return (others => <>); end if;
+      --  Match the real debug origin rather than the scheduler phase that
+      --  happens to request an argument diagnostic. A direct C builtin may
+      --  execute in a hidden phase while its original C CI remains public.
+      if Callee.Is_Finalizer_Call and then not Callee.Is_Tail_Call then
+         Caller := Caller_Frame (State, Context, Callee);
+         if Context.Hook_Active and then Caller = Context.Hook_Frame then
+            return (Call_Names.Hook_Name, Call_Names.Hook_Call);
+         end if;
+         return (Call_Names.Finalizer_Name, Call_Names.Metamethod_Call);
+      elsif Length (Callee.Name_Kind) > 0 then
+         return
+           ((Callee.Call_Name_Bytes.Address, Length (Callee.Call_Name_Bytes)),
+            Call_Names.Kind_From_Image (To_String (Callee.Name_Kind)));
+      elsif not Callee.Is_Tail_Call then
+         Caller := Caller_Frame (State, Context, Callee);
+         if Caller /= null and then not Caller.Is_Native and then
+           Caller.Code.Canonical_Node /= null
+         then
+            return Call_Names.View_From_Caller (State, Caller);
+         end if;
+      end if;
+      return (others => <>);
+   end Call_Identity;
+
+   function Traceback
+     (State : in out World; Context : not null Context_Access;
+      Message : Value; Start_Level : Integer_Value) return Value
+   is
+   begin
+      if Message.Kind = String_Kind then
+         return Traceback
+           (State, Context, Message.Reference.Bytes, True, Start_Level);
+      elsif Message.Kind in Integer_Kind | Real_Kind then
+         declare
+            --  Numeric conversion is bounded by the scalar formatter. The
+            --  borrowed local survives the entire synchronous renderer.
+            Text : constant String := Image (State.Current.Memory, Message);
+         begin
+            return Traceback
+              (State, Context, (Text'Address, Text'Length), True, Start_Level);
+         end;
+      end if;
+      return Traceback
+        (State, Context, (System.Null_Address, 0), False, Start_Level);
+   end Traceback;
+
+   function Traceback
+     (State : in out World; Context : not null Context_Access;
+      Message : Byte_String; Has_Message : Boolean;
+      Start_Level : Integer_Value) return Value
+   is
+      Text, Global_Name : Owned_Buffer;
+      Visible_Count : Natural := 0;
+      Walk_Level : Natural := 0;
+      Level : Natural := 0;
+      Shown : Natural := 0;
+      Shortened : Boolean;
+      C_Modulus : constant Integer_Value := 2 ** Interfaces.C.int'Size;
+      Reduced : constant Integer_Value := Start_Level mod C_Modulus;
+      Signed_Level : constant Integer_Value :=
+        (if Reduced >= C_Modulus / 2 then Reduced - C_Modulus else Reduced);
+      type Located_Name is record
+         First, Second : Value := Nil_Value;
+      end record;
+      function Find_Field
+        (Table : Object_Access; Target : Value; Depth : Natural)
+         return Located_Name;
+      procedure Put (Bytes : String);
+      procedure Put_Name (Bytes : Byte_String);
+      procedure Describe (Item : not null Frame_Access);
+      function Source (Item : not null Frame_Access) return String;
+      function Decimal (Number : Natural) return String is
+        (Ada.Strings.Fixed.Trim (Natural'Image (Number), Ada.Strings.Both));
+
+      procedure Put (Bytes : String) is
+      begin
+         --  Output construction is real work even when the same bytes are
+         --  already present in a prototype or module key. Charge before an
+         --  allocator request, without creating an unmanaged text snapshot.
+         if State.Policy = Bounded then
+            if Bytes'Length > State.Bounds.Instructions - State.Steps then
+               Fail (State, "instruction limit exceeded", Resource => True);
+            end if;
+            State.Steps := State.Steps + Bytes'Length;
+         end if;
+         Text.Append (Bytes);
+      end Put;
+
+      procedure Put_Name (Bytes : Byte_String) is
+         View : String (1 .. Bytes.Size)
+           with Import, Address => Bytes.Address;
+         Size : Natural := 0;
+      begin
+         --  Auxiliary diagnostics consume the C prefix. Long text after a
+         --  NUL remains borrowed and is neither scanned nor materialized.
+         for Byte of View loop
+            Query_Work (State);
+            exit when Byte = ASCII.NUL;
+            Size := Size + 1;
+         end loop;
+         Put (View (1 .. Size));
+      end Put_Name;
+
+      function Source (Item : not null Frame_Access) return String is
+      begin
+         if Item.Code.Canonical_Node /= null then
+            declare
+               Bytes : constant Byte_String :=
+                 Canonical.Source_Bytes (Item.Code);
+               View : String (1 .. Bytes.Size)
+                 with Import, Address => Bytes.Address;
+            begin
+               return Short_Source (View);
+            end;
+         end if;
+         return Short_Source (To_String (Item.Code.Name));
+      end Source;
+
+      function Find_Field
+        (Table : Object_Access; Target : Value; Depth : Natural)
+         return Located_Name
+      is
+      begin
+         if Table = null or else Depth = 0 then return (others => <>); end if;
+         --  Borrow at most two real string keys rather than building names
+         --  speculatively for every visited row. No callback or safe point
+         --  runs during traversal; the registry retains these table edges.
+         for Row of Table.Members loop
+            Query_Work (State);
+            if Row.Key.Kind = String_Kind and then
+              Row.Item.Kind /= Nil_Kind
+            then
+               if Equal (Row.Item, Target) then
+                  return (Row.Key, Nil_Value);
+               elsif Row.Item.Kind = Table_Kind and then Depth > 1 then
+                  declare
+                     Suffix : constant Located_Name :=
+                       Find_Field (Row.Item.Reference, Target, Depth - 1);
+                  begin
+                     if Suffix.First.Kind /= Nil_Kind then
+                        return (Row.Key, Suffix.First);
+                     end if;
+                  end;
+               end if;
+            end if;
+         end loop;
+         return (others => <>);
+      end Find_Field;
+
+      procedure Describe (Item : not null Frame_Access) is
+         Identity : constant Call_Names.Borrowed_Identity :=
+           Call_Identity (State, Context, Item);
+         Modules : Value;
+         Global : Located_Name;
+         use type Call_Names.Name_Kind;
+         procedure Add_Key (Key : Value);
+         procedure Add_Key (Key : Value) is
+            View : String (1 .. Key.Reference.Bytes.Size)
+              with Import, Address => Key.Reference.Bytes.Address;
+         begin
+            --  Joining keys preserves embedded NUL bytes until the final C
+            --  prefix is consumed, just as the public concatenation does.
+            for Byte of View loop
+               Query_Work (State);
+               Global_Name.Append (Byte);
+            end loop;
+         end Add_Key;
+      begin
+         if Identity.Kind /= Call_Names.Unknown then
+            Put (Call_Names.Kind_Image (Identity.Kind) & " '");
+            Put_Name (Identity.Item);
+            Put ("'");
+         elsif not Item.Is_Native and then
+           (if Item.Code.Canonical_Node /= null then
+               Item.Code.Canonical_Node.First_Line = 0
+            else Item.Code.Is_Main)
+         then
+            Put ("main chunk");
+         else
+            Modules := Tables.Raw_Field (State.Foreign_Registry, "_LOADED");
+            if Modules.Kind = Table_Kind then
+               Global := Find_Field (Modules.Reference, Item.Callee, 2);
+            end if;
+            if Global.First.Kind /= Nil_Kind then
+               Global_Name.Clear;
+               Add_Key (Global.First);
+               if Global.Second.Kind /= Nil_Kind then
+                  Global_Name.Append ('.');
+                  Add_Key (Global.Second);
+               end if;
+               if Global_Name.Length >= 3 and then
+                 Global_Name.Element (1) = '_' and then
+                 Global_Name.Element (2) = 'G' and then
+                 Global_Name.Element (3) = '.'
+               then
+                  Global_Name.Delete (1, 3);
+               end if;
+               Put ("function '");
+               Put_Name ((Global_Name.Address, Global_Name.Length));
+               Put ("'");
+            elsif Item.Is_Native then
+               Put ("?");
+            else
+               Put ("function <" & Source (Item) & ":" &
+                 Decimal (Item.Code.First_Line) & ">");
+            end if;
+         end if;
+      end Describe;
+   begin
+      Text.Set_Owner (State.Current.Memory);
+      Global_Name.Set_Owner (State.Current.Memory);
+      if Has_Message then
+         Put_Name (Message);
+         Put ("" & ASCII.LF);
+      end if;
+      Put ("stack traceback:");
+      --  The debug wrapper explicitly casts its Lua integer to C int. A
+      --  large accepted Lua integer can therefore wrap to a negative or
+      --  small level; it does not introduce a new range-error class.
+      if Signed_Level < 0 then return New_String (State, Text); end if;
+      Level := Natural (Signed_Level);
+      --  Count borrowed frames, then render in a second forward walk over
+      --  logical levels. A deep-stack error needs no stack-sized snapshot
+      --  allocation just to omit its middle frames. Failed_Owner meters
+      --  every comparison when retained cleanup owners must be excluded.
+      --  No callback or safe point can invalidate either traversal.
+      for Item of reverse Context.Stack loop
+         Query_Work (State);
+         if Published_Frame (Item) and then
+           not Failed_Owner (State, Context, Item)
+         then
+            Visible_Count := Visible_Count + 1;
+         end if;
+      end loop;
+      Shortened := Level < Visible_Count and then
+        Visible_Count - Level > 22;
+      for Item of reverse Context.Stack loop
+         Query_Work (State);
+         if Published_Frame (Item) and then
+           not Failed_Owner (State, Context, Item)
+         then
+            if Walk_Level >= Level and then Shortened and then Shown = 10
+            then
+               Put (ASCII.LF & ASCII.HT & "..." & ASCII.HT & "(skipping " &
+                 Decimal (Visible_Count - Walk_Level - 12) & " levels)");
+               Level := Visible_Count - 11;
+               Shortened := False;
+            end if;
+            if Walk_Level >= Level then
+               declare
+                  PC : constant Natural :=
+                    (if (Context.Hook_Active or else Context.Hook_Suspended)
+                       and then Item = Context.Hook_Frame
+                     then Item.PC - 1 else Natural'Max (1, Item.PC - 1) - 1);
+                  Line : constant Natural :=
+                    (if Item.Is_Native then 0
+                     elsif Item.Code.Canonical_Node /= null then
+                        Canonical.Source_Line (Item, PC)
+                     elsif PC + 1 <= Item.Code.Code.Last_Index then
+                        Item.Code.Code (PC + 1).Location.Line else 0);
+               begin
+                  Put (ASCII.LF & ASCII.HT &
+                    (if Item.Is_Native then "[C]" else Source (Item)));
+                  if Line > 0 then Put (":" & Decimal (Line)); end if;
+                  Put (": in ");
+                  Describe (Item);
+                  if Item.Is_Tail_Call then
+                     Put (ASCII.LF & ASCII.HT & "(...tail calls...)");
+                  end if;
+               end;
+               Shown := Shown + 1;
+            end if;
+            Walk_Level := Walk_Level + 1;
+         end if;
+      end loop;
+      return New_String (State, Text);
+   end Traceback;
+
+   function Inspect
+     (State : in out World; Activation : Frame_Access;
+      Target_Frame : Frame_Access := null) return Values.Vector
+   is
+      Name : constant String := Native_Operation_Name (Activation);
       Args : constant Values.Vector := Activation.Native_Arguments;
       Context : Context_Access := State.Current;
       Base : Positive := 1;
@@ -59,7 +480,10 @@ package body Lua.Engine.Inspection is
         (if Index <= Natural (Args.Length) then Args (Index) else Nil_Value);
       function Integer_Arg (Index : Positive) return Integer_Value;
       function Logical_Frame (Level : Natural) return Frame_Access;
+      function Public_Frame (Item : Frame_Access) return Boolean;
       function Caller_Of (Callee : Frame_Access) return Frame_Access;
+      function Inferred_Name
+        (Item : Frame_Access) return Call_Names.Identity;
       function Symbol_Text
         (Prototype : Prototype_Access; Symbol : Positive) return String;
       procedure Append (Item : Value);
@@ -83,77 +507,63 @@ package body Lua.Engine.Inspection is
 
       procedure Work is
       begin
-         if State.Steps >= State.Bounds.Instructions then
-            Fail (State, "instruction limit exceeded", Resource => True);
-         end if;
-         if State.Policy = Bounded then
-            State.Steps := State.Steps + 1;
-         end if;
+         Query_Work (State);
       end Work;
 
       function Integer_Arg (Index : Positive) return Integer_Value is
       begin
-         return Strings.Integer_Argument (State, Arg (Index));
+         return Diagnostics.Integer_Argument
+           (State, Index, Arg (Index),
+            Present => Index <= Natural (Args.Length));
       end Integer_Arg;
 
+      function Public_Frame (Item : Frame_Access) return Boolean is
+        (Published_Frame (Item));
+
       function Logical_Frame (Level : Natural) return Frame_Access is
-         Remaining : Natural := Level;
-         function Failed_Owner (Candidate : Frame_Access) return Boolean;
-         function Failed_Owner (Candidate : Frame_Access) return Boolean is
-         begin
-            --  An errored Lua activation is retained only to own its closing
-            --  cells. Its logical call has already unwound to protection.
-            for Driver of Context.Stack loop
-               if Driver.Is_Native and then Driver.Native_Name = "@unwind"
-                 and then Driver.Unwind = Error_Exit and then
-                 Driver.Unwind_Owner = Candidate
-               then
-                  return True;
-               end if;
-            end loop;
-            return False;
-         end Failed_Owner;
       begin
-         --  Scheduler helper activations are implementation phases, not Lua
-         --  stack frames. Public native closures retain their logical frame.
-         for Item of reverse Context.Stack loop
-            Work;
-            if not Failed_Owner (Item) and then not
-              (Context.Hook_Active and then
-               Context.Foreign_Hook /= System.Null_Address and then
-               Item.Is_Native and then Item.Callee = Context.Hook) and then
-              (not Item.Is_Native or else
-               (Length (Item.Native_Name) > 0 and then
-                Element (Item.Native_Name, 1) /= '@'))
-            then
-               if Remaining = 0 then
-                  return Item;
-               end if;
-               Remaining := Remaining - 1;
-            end if;
-         end loop;
-         return null;
+         return Inspection.Logical_Frame (State, Context, Level);
       end Logical_Frame;
 
       function Caller_Of (Callee : Frame_Access) return Frame_Access is
-         Found : Boolean := False;
       begin
-         --  Name inference is deliberately lazy: ordinary function calls never
-         --  scan preceding code. Skip explicit scheduler phases when finding
-         --  the logical caller, and preserve real native library boundaries.
-         for Item of reverse Context.Stack loop
-            if Item = Callee then
-               Found := True;
-            elsif Found and then
-              (not Item.Is_Native or else
-               (Length (Item.Native_Name) > 0 and then
-                Element (Item.Native_Name, 1) /= '@'))
-            then
-               return Item;
-            end if;
-         end loop;
-         return null;
+         return Caller_Frame (State, Context, Callee);
       end Caller_Of;
+
+      function Inferred_Name
+        (Item : Frame_Access) return Call_Names.Identity
+      is
+         Caller : Frame_Access;
+      begin
+         --  Both getinfo and traceback derive the name from the actual call
+         --  site. Tail replacement has lost that caller; synthetic calls
+         --  such as hooks and metamethods carry their own explicit origin.
+         if Item /= null and then Length (Item.Name_Kind) = 0 and then
+           not Item.Is_Tail_Call
+         then
+            if Item.Is_Finalizer_Call then
+               Caller := Caller_Of (Item);
+               if Context.Hook_Active and then Caller = Context.Hook_Frame then
+                  --  A direct lua_gc call from a C hook adds no public call
+                  --  frame. Its actual interrupted caller still has the hook
+                  --  origin even after removing the installation; pinned
+                  --  funcnamefromcall gives CIST_HOOKED priority over FIN.
+                  return (New_String (State,
+                    To_String (Call_Names.Hook_Name)), Call_Names.Hook_Call);
+               end if;
+               return (New_String (State,
+                 To_String (Call_Names.Finalizer_Name)),
+                 Call_Names.Metamethod_Call);
+            end if;
+            Caller := Caller_Of (Item);
+            if Caller /= null and then not Caller.Is_Native and then
+              Caller.Code.Canonical_Node /= null
+            then
+               return Call_Names.From_Caller (State, Caller);
+            end if;
+         end if;
+         return (others => <>);
+      end Inferred_Name;
 
       function Symbol_Text
         (Prototype : Prototype_Access; Symbol : Positive) return String
@@ -185,69 +595,83 @@ package body Lua.Engine.Inspection is
          Base := 2;
       end if;
       if Name = "debug.sethook" then
-         --  A Lua hook replaces the actual C hook installed on this same
-         --  coroutine. Keep the public callback identity/mask from surviving
-         --  a replacement or an explicit removal through the debug library.
-         Context.Foreign_Hook := System.Null_Address;
-         Context.Foreign_Hook_Mask := 0;
-         if Arg (Base).Kind = Nil_Kind then
-            Context.Hook := Nil_Value;
-            Context.Hook_Mask := Null_Unbounded_String;
-            Context.Hook_Count := 0;
-            Context.Hook_Reported_Count := 0;
-         else
-            if Arg (Base).Kind not in Closure_Kind | Native_Closure_Kind |
-              Native_Kind_Value | Foreign_Function_Kind
-            then
-               Fail (State, "function expected");
-            end if;
-            if Arg (Base + 1).Kind /= String_Kind then
-               Fail (State, "string expected");
-            end if;
-            if Arg (Base + 2).Kind /= Nil_Kind and then
-              (Integer_Arg (Base + 2) > Integer_Value (Natural'Last) or else
-               Integer_Arg (Base + 2) < Integer_Value (Integer'First))
-            then
-               Fail (State, "hook count out of range");
-            end if;
-            Context.Hook := Arg (Base);
-            Root_Barrier (State, Context.Hook);
-            Context.Hook_Mask := Null_Unbounded_String;
-            for Mask of String'("crl") loop
-               if Ada.Strings.Fixed.Index
-                 (C_Option (Image (State.Current.Memory, Arg (Base + 1))),
-                  "" & Mask) /= 0
+         declare
+            Callback : constant Value := Arg (Base);
+            Mask : Unbounded_String;
+            Flags : constant String := "crl";
+            Reported : Integer_Value := 0;
+            Count : Natural := 0;
+         begin
+            --  Validate first, then publish callback storage, then commit the
+            --  installation controls. A bad argument or failed table growth
+            --  must not remove an existing C/Lua hook. The registry entry is
+            --  retained even for a valid zero-mask installation, as in
+            --  ldblib.c:db_sethook followed by ldebug.c:lua_sethook.
+            if Callback.Kind /= Nil_Kind then
+               if Callback.Kind not in Closure_Kind | Native_Closure_Kind |
+                 Native_Kind_Value | Foreign_Function_Kind
                then
-                  Append (Context.Hook_Mask, Mask);
+                  Fail (State, "function expected");
+               end if;
+               if Arg (Base + 1).Kind /= String_Kind then
+                  Fail (State, "string expected");
+               end if;
+               if Arg (Base + 2).Kind /= Nil_Kind then
+                  Reported := Integer_Arg (Base + 2);
+                  if Reported > Integer_Value (Natural'Last) or else
+                    Reported < Integer_Value (Integer'First)
+                  then
+                     Fail (State, "hook count out of range");
+                  end if;
+                  Count := Natural (Integer_Value'Max (0, Reported));
+               end if;
+               for Flag of Flags loop
+                  if Ada.Strings.Fixed.Index
+                    (C_Option (Image (State.Current.Memory, Arg (Base + 1))),
+                     "" & Flag) /= 0
+                  then
+                     Append (Mask, Flag);
+                  end if;
+               end loop;
+            end if;
+            Hooks.Store_Callback (State, Context, Callback);
+            Context.Foreign_Hook := System.Null_Address;
+            Context.Foreign_Hook_Mask := 0;
+            for Bit in 0 .. 2 loop
+               if Ada.Strings.Fixed.Index
+                 (To_String (Mask), "" & Flags (Bit + 1)) /= 0
+               then
+                  Context.Foreign_Hook_Mask := Context.Foreign_Hook_Mask +
+                    2 ** Bit;
                end if;
             end loop;
+            if Count > 0 then
+               Context.Foreign_Hook_Mask := Context.Foreign_Hook_Mask + 8;
+            end if;
+            Context.Hook := Nil_Value;
+            Context.Hook_Mask := Mask;
+            Context.Lua_Hook_Installed := Callback.Kind /= Nil_Kind and then
+              (Length (Mask) > 0 or else Count > 0);
             --  Reflection preserves a signed requested count, while only a
             --  positive interval enables instruction-count events.
-            Context.Hook_Reported_Count :=
-              (if Arg (Base + 2).Kind = Nil_Kind then 0
-               else Integer_Arg (Base + 2));
-            Context.Hook_Count :=
-              (if Arg (Base + 2).Kind = Nil_Kind then 0 else
-                 Natural (Integer_Value'Max (0, Integer_Arg (Base + 2))));
-            Context.Hook_Remaining := Context.Hook_Count;
-            if Length (Context.Hook_Mask) = 0 and then
-              Context.Hook_Count = 0
-            then
-               Context.Hook := Nil_Value;
-            end if;
-         end if;
+            Context.Hook_Reported_Count := Reported;
+            Context.Hook_Count := Count;
+            Context.Hook_Remaining := Count;
+         end;
       elsif Name = "debug.gethook" then
          --  Pinned debug.gethook reports an externally installed C callback
          --  with this string, rather than exposing an uncallable proxy or
          --  treating the C callback pointer as a Lua hook function.
-         Append
-           ((if Context.Foreign_Hook /= System.Null_Address then
-                 New_String (State, "external hook") else Context.Hook));
          --  With no hook, C Lua returns one nil, not a padded triple. Result
          --  counts remain observable through select, varargs and table.pack.
-         if Context.Hook.Kind = Nil_Kind then
+         if not Hooks.Enabled (Context) then
+            Append (Nil_Value);
             return Result;
          end if;
+         Append
+           ((if Context.Foreign_Hook /= System.Null_Address then
+                 New_String (State, "external hook")
+             else Hooks.Callback (State, Context)));
          if Context.Foreign_Hook /= System.Null_Address then
             declare
                Mask : Unbounded_String;
@@ -282,16 +706,22 @@ package body Lua.Engine.Inspection is
             end if;
             if Setting then
                if Arg (1).Kind /= Userdata_Kind then
-                  Fail (State, "full userdata expected");
+                  Diagnostics.Type_Error
+                    (State, 1, "userdata", Arg (1), Present =>
+                       not Args.Is_Empty);
                elsif Args.Length < 2 then
-                  Fail (State, "value expected");
+                  Diagnostics.Argument_Error (State, 2, "value expected");
                end if;
             end if;
             if Arg (1).Kind /= Userdata_Kind or else Number < 1 or else
               Number > Integer_Value (Arg (1).Reference.Uservalues.Length)
             then
+               if Setting then
+                  Activation.Native_Return_First := 2;
+               end if;
                Append (Nil_Value);
             elsif Setting then
+               Activation.Native_Return_First := 1;
                --  Mutate the actual traced slot, without allocating a proxy
                --  table or changing the userdata's stable C payload address.
                Arg (1).Reference.Uservalues.Replace_Element
@@ -413,8 +843,8 @@ package body Lua.Engine.Inspection is
                Append (Nil_Value);
                return Result;
             end if;
-            Selected := Logical_Frame
-              (Natural (Function_Value.Integer_Data));
+            Selected := (if Target_Frame /= null then Target_Frame else
+              Logical_Frame (Natural (Function_Value.Integer_Data)));
             if Selected = null then
                Append (Nil_Value);
                return Result;
@@ -454,7 +884,13 @@ package body Lua.Engine.Inspection is
                   Fail (State, "invalid option");
                end if;
             end loop;
-            if Selected /= null and then not Selected.Is_Native then
+            if Selected /= null and then not Selected.Is_Native and then
+              (Selected.Code.Canonical_Node = null or else not
+               Selected.Code.Canonical_Node.Lines.Is_Empty)
+            then
+               --  A stripped prototype has no current source line. Its
+               --  decoder's zero sentinel is internal, whereas debug reports
+               --  -1 for unavailable line information, just as for natives.
                Line := Integer_Value
                  (Line_At (Selected, Current_PC (Selected) + 1));
             end if;
@@ -493,21 +929,10 @@ package body Lua.Engine.Inspection is
             end if;
             if Wants ('n') then
                declare
-                  Caller : Frame_Access;
-                  Inferred : Call_Names.Identity;
+                  Inferred : constant Call_Names.Identity :=
+                    Inferred_Name (Selected);
                   use type Call_Names.Name_Kind;
                begin
-                  if Selected /= null and then
-                    Length (Selected.Name_Kind) = 0 and then
-                    not Selected.Is_Tail_Call
-                  then
-                     Caller := Caller_Of (Selected);
-                     if Caller /= null and then not Caller.Is_Native and then
-                       Caller.Code.Canonical_Node /= null
-                     then
-                        Inferred := Call_Names.From_Caller (State, Caller);
-                     end if;
-                  end if;
                   if Inferred.Kind /= Call_Names.Unknown then
                      Field (Info, "namewhat", New_String
                        (State, Call_Names.Kind_Image (Inferred.Kind)));
@@ -529,6 +954,9 @@ package body Lua.Engine.Inspection is
                Field (Info, "istailcall",
                       (Boolean_Kind, Selected /= null and then
                          Selected.Is_Tail_Call));
+               Field (Info, "extraargs", (Integer_Kind,
+                 (if Selected = null then 0 else
+                    Integer_Value (Selected.Call_Metamethod_Count))));
             end if;
             if Wants ('f') then
                Field (Info, "func", Function_Value);
@@ -541,32 +969,37 @@ package body Lua.Engine.Inspection is
                     Selected = Context.Hook_Frame;
                begin
                   Field (Info, "ftransfer", (Integer_Kind,
-                    (if Transferring then 1 else 0)));
+                    (if Transferring then
+                       Integer_Value (Selected.Transfer_First) else 0)));
                   Field (Info, "ntransfer", (Integer_Kind,
                     (if Transferring then
                        Integer_Value (Selected.Transfer_Count) else 0)));
                end;
             end if;
-            if Wants ('L') then
+            if Wants ('L') and then Code /= null then
                declare
                   Lines : constant Value := New_Table (State);
                begin
-                  if Code /= null then
-                     if Code.Canonical_Node /= null then
-                        for PC in 1 .. Code.Canonical_Node.Lines.Last_Index
-                        loop
-                           Set (State, Lines, (Integer_Kind,
-                             Integer_Value (Canonical.Source_Line
-                               (Code, PC - 1))), (Boolean_Kind, True));
-                        end loop;
-                     else
-                        for Instruction of Code.Code loop
-                           Set (State, Lines,
-                                (Integer_Kind,
-                                 Integer_Value (Instruction.Location.Line)),
-                                (Boolean_Kind, True));
-                        end loop;
-                     end if;
+                  --  Native functions have no line table, so their L field
+                  --  remains absent. A stripped Lua function still receives
+                  --  an empty table. For varargs, VARARGPREP is entry setup,
+                  --  not an executable source line: including its definition
+                  --  line would advertise a breakpoint that never fires.
+                  if Code.Canonical_Node /= null then
+                     for PC in (if Code.Vararg then 2 else 1) ..
+                       Code.Canonical_Node.Lines.Last_Index
+                     loop
+                        Set (State, Lines, (Integer_Kind,
+                          Integer_Value (Canonical.Source_Line
+                            (Code, PC - 1))), (Boolean_Kind, True));
+                     end loop;
+                  else
+                     for Instruction of Code.Code loop
+                        Set (State, Lines,
+                             (Integer_Kind,
+                              Integer_Value (Instruction.Location.Line)),
+                              (Boolean_Kind, True));
+                     end loop;
                   end if;
                   Field (Info, "activelines", Lines);
                end;
@@ -621,7 +1054,8 @@ package body Lua.Engine.Inspection is
             if Level < 0 or else Level > Integer_Value (Natural'Last) then
                Fail (State, "level out of range");
             end if;
-            Selected := Logical_Frame (Natural (Level));
+            Selected := (if Target_Frame /= null then Target_Frame else
+              Logical_Frame (Natural (Level)));
             if Selected = null then
                Fail (State, "level out of range");
             end if;
@@ -659,7 +1093,7 @@ package body Lua.Engine.Inspection is
                end if;
                if Selected.Code.Canonical_Node /= null then
                   if Index > 0 and then Index <= Integer_Value
-                    (Selected.Canonical_GC_Top)
+                    (Visible_Local_Top (Context, Selected))
                   then
                      declare
                         Local : Value := Canonical.Local_Name
@@ -708,9 +1142,7 @@ package body Lua.Engine.Inspection is
                end if;
             elsif Index > 0 and then
               Index <= Integer_Value
-                ((if Selected.Has_Stack_Window then
-                     Selected.Stack_Live_Top - Selected.Stack_Base else
-                     Natural (Selected.Native_Arguments.Length)))
+                (Visible_Local_Top (Context, Selected))
             then
                Append (New_String (State, "(C temporary)"));
                if Name = "debug.setlocal" then
@@ -744,56 +1176,17 @@ package body Lua.Engine.Inspection is
             end if;
          end;
       elsif Name = "debug.traceback" then
-         declare
-            Text : Unbounded_String;
-            Level : Natural := (if Context = State.Current then 1 else 0);
-            Item : Frame_Access;
-         begin
-            if Arg (Base).Kind not in Nil_Kind | String_Kind |
-              Integer_Kind | Real_Kind
-            then
-               Append (Arg (Base));
-               return Result;
-            end if;
-            if Arg (Base).Kind /= Nil_Kind then
-               Text := To_Unbounded_String
-                 (Image (State.Current.Memory, Arg (Base)) &
-                 Character'Val (10));
-            end if;
-            if Arg (Base + 1).Kind /= Nil_Kind then
-               if Integer_Arg (Base + 1) > Integer_Value (Natural'Last) then
-                  Fail (State, "level out of range");
-               end if;
-               Level := Natural (Integer_Value'Max
-                 (0, Integer_Arg (Base + 1)));
-            end if;
-            Append (Text, "stack traceback:");
-            loop
-               Item := Logical_Frame (Level);
-               exit when Item = null;
-               Append (Text, Character'Val (10) & Character'Val (9));
-               if Item.Is_Native then
-                  Append (Text, "[C]: in function '" &
-                    To_String (Item.Native_Name) & "'");
-               else
-                  Append (Text, Short_Source
-                    ((if Item.Code.Canonical_Node /= null then
-                       To_String (Canonical.Source_Bytes (Item.Code))
-                      else To_String (Item.Code.Name))) &
-                    ":" &
-                    Ada.Strings.Fixed.Trim
-                      (Natural'Image
-                        (Line_At (Item, Current_PC (Item) + 1)),
-                       Ada.Strings.Both) & ": in " &
-                    (if (if Item.Code.Canonical_Node /= null then
-                           Item.Code.Canonical_Node.First_Line = 0
-                         else Item.Code.Is_Main) then "main chunk"
-                     else "function"));
-               end if;
-               Level := Level + 1;
-            end loop;
-            Append (New_String (State, To_String (Text)));
-         end;
+         if Arg (Base).Kind not in Nil_Kind | String_Kind |
+           Integer_Kind | Real_Kind
+         then
+            Append (Arg (Base));
+         else
+            Append (Traceback
+              (State, Context, Arg (Base),
+               (if Arg (Base + 1).Kind /= Nil_Kind then
+                   Integer_Arg (Base + 1)
+                elsif Context = State.Current then 1 else 0)));
+         end if;
       else
          Fail (State, "debug operation not implemented");
       end if;

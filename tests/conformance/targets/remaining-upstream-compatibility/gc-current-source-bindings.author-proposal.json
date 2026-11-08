@@ -1,0 +1,353 @@
+{
+  "schema_version": 1,
+  "kind": "gc-current-source-binding-author-proposal",
+  "id": "gc-target-counterparts-fce313c",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "review_status": "pending-independent-current-source-review",
+  "independent_reviewer": null,
+  "authority_installation": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_snapshot": {
+    "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+    "path": "tests/src/lua-conformance_adapter_tests.adb",
+    "sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e"
+  },
+  "predecessor_target_manifest": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/gc-ada-equivalence.json",
+    "sha256": "2e2a6cb73b369cf78e3a83fdab1ca250f4aa26de861dd5ac5deb8df48f1606a6"
+  },
+  "predecessor_target_approval": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/gc-ada-equivalence.approval.json",
+    "sha256": "e79257979e8d7e338bd6a6ae80d7663e3b4f9c2e8f500528bc4734777a8cdbd7"
+  },
+  "historical_scope_untouched": true,
+  "baselines": [
+    {
+      "revision": "f535250d4984067a4bca84ad4a280dd745b728ce",
+      "sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "scope": "frozen historical scope; never rewritten",
+      "comparisons": [
+        {
+          "name": "Weak_String_Payloads",
+          "old_body": {
+            "byte_offset": 16311,
+            "byte_length": 976,
+            "sha256": "c3b6c817ca501ac674fc820cc5b731d1c0863dc2451b07069b7e8fd524743427"
+          },
+          "current_body": {
+            "byte_offset": 17060,
+            "byte_length": 976,
+            "sha256": "c3b6c817ca501ac674fc820cc5b731d1c0863dc2451b07069b7e8fd524743427"
+          },
+          "identical_body_bytes": true,
+          "old_registration": {
+            "label": "collector: weak string payload reclamation",
+            "byte_offset": 24384,
+            "byte_length": 124,
+            "sha256": "7f8368e2ff2468a38ceaf3cece448be7dac3194b3ddc667daf03c5d40ffbfcc5"
+          },
+          "current_registration": {
+            "label": "collector: weak string payload reclamation",
+            "byte_offset": 25264,
+            "byte_length": 124,
+            "sha256": "7f8368e2ff2468a38ceaf3cece448be7dac3194b3ddc667daf03c5d40ffbfcc5"
+          },
+          "identical_registration_bytes": true
+        },
+        {
+          "name": "Atomic_Orphan_Cell",
+          "old_body": {
+            "byte_offset": 10966,
+            "byte_length": 956,
+            "sha256": "c3386dea5da4b4c13f3d1f330e3c2c9123c8ece563521697abbfcc30bd395f83"
+          },
+          "current_body": {
+            "byte_offset": 10938,
+            "byte_length": 956,
+            "sha256": "c3386dea5da4b4c13f3d1f330e3c2c9123c8ece563521697abbfcc30bd395f83"
+          },
+          "identical_body_bytes": true,
+          "old_registration": {
+            "label": "collector: orphan cell survives atomic sweep",
+            "byte_offset": 23339,
+            "byte_length": 124,
+            "sha256": "10a700e0a2b5b8cf5b1db47b0de326ce29bf830234127a860af87ea3e8a38a55"
+          },
+          "current_registration": {
+            "label": "collector: orphan cell survives atomic sweep",
+            "byte_offset": 24088,
+            "byte_length": 124,
+            "sha256": "10a700e0a2b5b8cf5b1db47b0de326ce29bf830234127a860af87ea3e8a38a55"
+          },
+          "identical_registration_bytes": true
+        },
+        {
+          "name": "Measured_Emergency_Headroom",
+          "old_body": {
+            "byte_offset": 15743,
+            "byte_length": 567,
+            "sha256": "c12cb21c4c7abb371f69a6efbd1b3f94fdf6305badda30396c84ac645234d58e"
+          },
+          "current_body": {
+            "byte_offset": 16492,
+            "byte_length": 567,
+            "sha256": "c12cb21c4c7abb371f69a6efbd1b3f94fdf6305badda30396c84ac645234d58e"
+          },
+          "identical_body_bytes": true,
+          "old_registration": {
+            "label": "collector: measured emergency table headroom",
+            "byte_offset": 24244,
+            "byte_length": 133,
+            "sha256": "bbdd254b3db3b027bc835afd6bfa461819db59fe4a78cdd1d31ff5aadbe0a1f8"
+          },
+          "current_registration": {
+            "label": "collector: measured emergency table headroom",
+            "byte_offset": 25124,
+            "byte_length": 133,
+            "sha256": "bbdd254b3db3b027bc835afd6bfa461819db59fe4a78cdd1d31ff5aadbe0a1f8"
+          },
+          "identical_registration_bytes": true
+        }
+      ],
+      "check_helper": {
+        "old": {
+          "byte_offset": 392,
+          "byte_length": 723,
+          "sha256": "fc8b65a97ec94580b052a4f6b7f76c743e6467fe68b819ff4c9c3f968fa0d238"
+        },
+        "current": {
+          "byte_offset": 337,
+          "byte_length": 714,
+          "sha256": "a5b3234aa51a20781ee75d83323237d0f43136f997f32624df658b64d929933c"
+        },
+        "identical_bytes": false,
+        "exact_delta": "To_String (State.Current.Failure_Text) -> Failure_Image (State.Current)",
+        "predecessor_reconstructed_in_memory": true,
+        "retained_setup_and_finalize_bytes_identical": true,
+        "requires_new_independent_semantic_review": true
+      },
+      "full_source_diff_sha256": "4e3e98912942f847e0bd86fb337482d0b30ecb38ff85ed4c44c57ce6b1e3e372"
+    },
+    {
+      "revision": "fc6be6bf9cecccb1d4401a7109ca78ea3a78292b",
+      "sha256": "26e26e3c389384ebdf49740e80f6e83608a42b42c5dd0b847a633659a022a0e3",
+      "scope": "accepted target-owned predecessor mapping",
+      "comparisons": [
+        {
+          "name": "Weak_String_Payloads",
+          "old_body": {
+            "byte_offset": 17124,
+            "byte_length": 976,
+            "sha256": "c3b6c817ca501ac674fc820cc5b731d1c0863dc2451b07069b7e8fd524743427"
+          },
+          "current_body": {
+            "byte_offset": 17060,
+            "byte_length": 976,
+            "sha256": "c3b6c817ca501ac674fc820cc5b731d1c0863dc2451b07069b7e8fd524743427"
+          },
+          "identical_body_bytes": true,
+          "old_registration": {
+            "label": "collector: weak string payload reclamation",
+            "byte_offset": 25328,
+            "byte_length": 124,
+            "sha256": "7f8368e2ff2468a38ceaf3cece448be7dac3194b3ddc667daf03c5d40ffbfcc5"
+          },
+          "current_registration": {
+            "label": "collector: weak string payload reclamation",
+            "byte_offset": 25264,
+            "byte_length": 124,
+            "sha256": "7f8368e2ff2468a38ceaf3cece448be7dac3194b3ddc667daf03c5d40ffbfcc5"
+          },
+          "identical_registration_bytes": true
+        },
+        {
+          "name": "Atomic_Orphan_Cell",
+          "old_body": {
+            "byte_offset": 11002,
+            "byte_length": 956,
+            "sha256": "c3386dea5da4b4c13f3d1f330e3c2c9123c8ece563521697abbfcc30bd395f83"
+          },
+          "current_body": {
+            "byte_offset": 10938,
+            "byte_length": 956,
+            "sha256": "c3386dea5da4b4c13f3d1f330e3c2c9123c8ece563521697abbfcc30bd395f83"
+          },
+          "identical_body_bytes": true,
+          "old_registration": {
+            "label": "collector: orphan cell survives atomic sweep",
+            "byte_offset": 24152,
+            "byte_length": 124,
+            "sha256": "10a700e0a2b5b8cf5b1db47b0de326ce29bf830234127a860af87ea3e8a38a55"
+          },
+          "current_registration": {
+            "label": "collector: orphan cell survives atomic sweep",
+            "byte_offset": 24088,
+            "byte_length": 124,
+            "sha256": "10a700e0a2b5b8cf5b1db47b0de326ce29bf830234127a860af87ea3e8a38a55"
+          },
+          "identical_registration_bytes": true
+        },
+        {
+          "name": "Measured_Emergency_Headroom",
+          "old_body": {
+            "byte_offset": 16556,
+            "byte_length": 567,
+            "sha256": "c12cb21c4c7abb371f69a6efbd1b3f94fdf6305badda30396c84ac645234d58e"
+          },
+          "current_body": {
+            "byte_offset": 16492,
+            "byte_length": 567,
+            "sha256": "c12cb21c4c7abb371f69a6efbd1b3f94fdf6305badda30396c84ac645234d58e"
+          },
+          "identical_body_bytes": true,
+          "old_registration": {
+            "label": "collector: measured emergency table headroom",
+            "byte_offset": 25188,
+            "byte_length": 133,
+            "sha256": "bbdd254b3db3b027bc835afd6bfa461819db59fe4a78cdd1d31ff5aadbe0a1f8"
+          },
+          "current_registration": {
+            "label": "collector: measured emergency table headroom",
+            "byte_offset": 25124,
+            "byte_length": 133,
+            "sha256": "bbdd254b3db3b027bc835afd6bfa461819db59fe4a78cdd1d31ff5aadbe0a1f8"
+          },
+          "identical_registration_bytes": true
+        }
+      ],
+      "check_helper": {
+        "old": {
+          "byte_offset": 392,
+          "byte_length": 723,
+          "sha256": "fc8b65a97ec94580b052a4f6b7f76c743e6467fe68b819ff4c9c3f968fa0d238"
+        },
+        "current": {
+          "byte_offset": 337,
+          "byte_length": 714,
+          "sha256": "a5b3234aa51a20781ee75d83323237d0f43136f997f32624df658b64d929933c"
+        },
+        "identical_bytes": false,
+        "exact_delta": "To_String (State.Current.Failure_Text) -> Failure_Image (State.Current)",
+        "predecessor_reconstructed_in_memory": true,
+        "retained_setup_and_finalize_bytes_identical": true,
+        "requires_new_independent_semantic_review": true
+      },
+      "full_source_diff_sha256": "149ced7c151a48e57d5819d53fe1636865c0b6a82d19f6f639864fa03cf75b5d"
+    }
+  ],
+  "retained_transformations": [
+    {
+      "id": "measure-live-payloads",
+      "start_byte": 11479,
+      "length_bytes": 49,
+      "source_sha256": "4bb49bacb1a6d2575ad3abbb475fd83ff2e7ad65102d29c93d02e7bdf43f700e",
+      "invariant": "Measure actual live bytes with both long string payloads retained before collection.",
+      "counterpart_tests": [
+        "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads"
+      ],
+      "replacement": "a[{}] = 14; local ada_live = collectgarbage(\"count\") -- measured payloads",
+      "replacement_sha256": "833abcf9a2278f2a5cb3cd892f26de6e8af7cc426bdb718144234527dcd97d9d"
+    },
+    {
+      "id": "reclaim-payloads",
+      "start_byte": 11963,
+      "length_bytes": 40,
+      "source_sha256": "c520c19e1c58d291af4e63c84b5083a165dd416be4983767261653ccd569cbc6",
+      "invariant": "Both 4 MiB string payloads are released; retained empty Ada table capacity is excluded from the C one-KiB allowance.",
+      "counterpart_tests": [
+        "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads"
+      ],
+      "replacement": "assert(collectgarbage(\"count\") <= ada_live - 2^13)",
+      "replacement_sha256": "0244ab649f62283a93b423e4250bba43ea0c044bcaaf8f87334b520f94378b15"
+    },
+    {
+      "id": "stable-cell-color",
+      "start_byte": 14278,
+      "length_bytes": 31,
+      "source_sha256": "3368876c423554b8967a1fca42de51cf3fc6dc96f2dbe3bc3263b2f14b5aacdf",
+      "invariant": "A black independently owned Ada cell forward-marks its new child; the same cycle must still collect the weak coroutine and preserve the final captured value.",
+      "counterpart_tests": [
+        "tests/src/lua-conformance_adapter_tests.adb#Atomic_Orphan_Cell"
+      ],
+      "replacement": "assert(T.gccolor(a) == \"gray\")",
+      "replacement_sha256": "8962292d95f5a292ba02ad38b282fe93d1f4a072994b8ec38fe55e7c65206ec6"
+    },
+    {
+      "id": "measured-emergency-headroom",
+      "start_byte": 16478,
+      "length_bytes": 80,
+      "source_sha256": "342a5139c4c1d3792c706e27094019af1eb85691e390a7fafbca2ad2d3b75559",
+      "invariant": "200 real Ada table allocations within one measured table of headroom require actual allocator refusals and emergency recovery; the independent host ceiling remains active.",
+      "counterpart_tests": [
+        "tests/src/lua-conformance_adapter_tests.adb#Measured_Emergency_Headroom"
+      ],
+      "replacement": "local r,c,b = T.ada_emergency_tables(200)\n  assert(r >= 199 and c >= 199)\n  assert(b > 0)",
+      "replacement_sha256": "acee89ad1dbc5dc0421b883804eadcb693bdaf5958114b874bf24b37e2b9ba4b"
+    }
+  ],
+  "generated_sha256": "059aaafb1068bc4245b23f56b2e10a75a66301b0bf05eede8ce3e7fd8a56b6dd",
+  "generated_only_in_memory": true,
+  "adapted_file_emitted": false,
+  "required_current_implementation_inputs": [
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409"
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687"
+    },
+    {
+      "path": "src/lua-engine-finalizers.adb",
+      "sha256": "cd29399060bc6f9d045f1d247d76a2419e06e62e9a5ca5055b27213c65c62b62"
+    }
+  ],
+  "review_graph": [
+    {
+      "id": "new-target-gc-source-review",
+      "proposed_path": "tests/conformance/targets/remaining-upstream-compatibility/gc-current-source.independent-review.json",
+      "reviewer": null,
+      "sha256": null,
+      "status": "pending",
+      "questions": [
+        "Independently recompute the three unchanged body/registration comparisons and inspect the changed common Check diagnostic accessor plus unchanged cleanup.",
+        "Read current Store_Cell/barrier, true payload ownership and measured selected-provider emergency-ceiling driver under final pool/frame/root ownership.",
+        "Decide the same4 exact source operations anew with current counterpart bindings; no historical review identity, rationale or runtime result is inherited."
+      ]
+    },
+    {
+      "id": "new-target-gc-approval",
+      "proposed_path": "tests/conformance/targets/remaining-upstream-compatibility/gc-current-source.approval.json",
+      "reviewer": null,
+      "sha256": null,
+      "status": "pending",
+      "dependencies": [
+        "new-target-gc-source-review"
+      ]
+    },
+    {
+      "id": "target-owned-manifest-binding-only",
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/gc-ada-equivalence.json",
+      "reviewer": null,
+      "sha256": null,
+      "status": "pending",
+      "dependencies": [
+        "new-target-gc-approval"
+      ],
+      "preserve": "Frozen tests/conformance/equivalents/reviews/scopes and their243... authority remain untouched. Only target-owned successor review binding changes after independent approval."
+    }
+  ],
+  "runtime_requirements": [
+    "Fresh named source-bound tests and actual whole default/T GC observations on final frozen images.",
+    "Original C baseline remains original applicable source; no Ada-only report discharges C behavior.",
+    "Payload release, weak identity/dead-key safety, real cell barrier/final capture and actual allocation refusal/recovery remain required.",
+    "Every raw report keeps observation flags; no source/API/global/matrix acceptance is inferred."
+  ]
+}

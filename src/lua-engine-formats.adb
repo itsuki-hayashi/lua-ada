@@ -4,6 +4,7 @@ with Interfaces;
 with Interfaces.C;
 with Lua.Big_Naturals;
 with Lua.Engine.Strings;
+with Lua.Engine.Diagnostics;
 with Lua.Platform_Numerics;
 
 package body Lua.Engine.Formats is
@@ -12,6 +13,7 @@ package body Lua.Engine.Formats is
    use type Real_Value;
    use type Interfaces.Unsigned_64;
    use type Interfaces.C.int;
+   use type System.Address;
    package Big renames Lua.Big_Naturals;
    use type Big.Ordering;
    function Bits is new Ada.Unchecked_Conversion
@@ -161,16 +163,17 @@ package body Lua.Engine.Formats is
    end Decimal_Exponent;
 
    procedure Float_Image
-     (State : in out World; Item : Real_Value; Code : Character;
+     (Memory : not null Lua.Storage.Owner_Access;
+      Item : Real_Value; Code : Character;
       Precision : Integer; Alternate : Boolean;
       Output : in out Managed.Buffer);
    procedure Float_Image
-     (State : in out World; Item : Real_Value; Code : Character;
+     (Memory : not null Lua.Storage.Owner_Access;
+      Item : Real_Value; Code : Character;
       Precision : Integer; Alternate : Boolean;
       Output : in out Managed.Buffer)
    is
-      Value : constant Rational :=
-        Exact (Lua.Storage.Reference (State.Memory), Item);
+      Value : constant Rational := Exact (Memory, Item);
       Exponent : Integer := Decimal_Exponent (Value);
       Significant : Natural := (if Precision < 0 then 6 else Precision);
       Rounded_Digits : Managed.Buffer;
@@ -192,8 +195,8 @@ package body Lua.Engine.Formats is
          end loop;
       end Append_Digits;
    begin
-      Rounded_Digits.Set_Owner (Lua.Storage.Reference (State.Memory));
-      Output.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Rounded_Digits.Set_Owner (Memory);
+      Output.Set_Owner (Memory);
       Output.Clear;
       if Code in 'f' | 'F' then
          Rounded (Value, Significant, Rounded_Digits);
@@ -297,6 +300,20 @@ package body Lua.Engine.Formats is
          end if;
       end if;
    end Float_Image;
+
+   procedure Finite_Number_Image
+     (Memory : not null Lua.Storage.Owner_Access; Item : Real_Value;
+      Precision : Positive; Output : in out Managed.Buffer)
+   is
+   begin
+      --  Share the exact quotient/remainder and ties-to-even rounding used
+      --  by string.format. The scalar API changes ownership, not arithmetic
+      --  or notation rules, and introduces no second numeric renderer.
+      Float_Image (Memory, Item, 'g', Precision, False, Output);
+      if (Bits (Item) and 2 ** 63) /= 0 then
+         Output.Insert (1, "-");
+      end if;
+   end Finite_Number_Image;
 
    procedure Hex_Float
      (State : in out World; Item : Real_Value; Precision : Integer;
@@ -537,7 +554,9 @@ package body Lua.Engine.Formats is
             elsif Code in 'a' | 'A' then
                Hex_Float (State, Real, Precision, Alternate, Host, Text);
             else
-               Float_Image (State, Real, Code, Precision, Alternate, Text);
+               Float_Image
+                 (Lua.Storage.Reference (State.Memory), Real, Code,
+                  Precision, Alternate, Text);
             end if;
          when 's' =>
             if Item.Kind = String_Kind then
@@ -643,14 +662,23 @@ package body Lua.Engine.Formats is
                Fail (State, "value has no literal form");
             end if;
          when 'p' =>
-            if Item.Kind in String_Kind | Table_Kind | Closure_Kind |
-              Native_Closure_Kind
-            then
-               Text.Set_Value ("0x" & Unsigned_Image
-                 (Interfaces.Unsigned_64 (Item.Reference.Serial), 16));
-            else
-               Text.Set_Value ("(null)");
-            end if;
+            declare
+               Pointer : constant System.Address := Pointer_Of (State, Item);
+            begin
+               --  lua_topointer identity and native libc spelling are public
+               --  observations. Object serials are collector bookkeeping,
+               --  never an alternative pointer namespace. Null is the
+               --  library's explicit string spelling, unlike raw C %p.
+               if Pointer = System.Null_Address then
+                  Text.Set_Value ("(null)");
+               else
+                  --  Native %p field rules can differ from padding its
+                  --  default pointer token as a string. Delegate the bounded
+                  --  literal-width spelling to the same host C facility.
+                  Text.Set_Value (Pointer_Image (Pointer, Width, Left));
+                  Width := 0;
+               end if;
+            end;
             Zero := False;
          when others => Fail (State, "invalid conversion specification");
       end case;
@@ -744,11 +772,14 @@ package body Lua.Engine.Formats is
       Cursor : Positive := 1;
       First : Positive;
       Argument : Positive := 1;
+      Format_Value, Converted : Value;
    begin
       Output.Set_Owner (Lua.Storage.Reference (State.Memory));
       if Arguments.Is_Empty then
-         Fail (State, "string expected");
+         Diagnostics.Type_Error
+           (State, 1, "string", Nil_Value, Present => False);
       end if;
+      Format_Value := Arguments (1);
       declare
          procedure Apply_Format (Form : String);
          procedure Apply_Format (Form : String) is
@@ -782,9 +813,9 @@ package body Lua.Engine.Formats is
                   if Argument > Natural (Arguments.Length) then
                      Fail (State, "no value");
                   end if;
+                  Converted := Arguments (Argument);
                   Render_Into
-                    (State, Form (First .. Cursor),
-                     Arguments (Argument), Output);
+                    (State, Form (First .. Cursor), Converted, Output);
                   Cursor := Cursor + 1;
                end if;
                if Length (Output) > State.Bounds.String_Bytes then
@@ -793,7 +824,8 @@ package body Lua.Engine.Formats is
             end loop;
          end Apply_Format;
       begin
-         Strings.Query_Argument (State, Arguments (1), Apply_Format'Access);
+         Strings.Query_Argument
+           (State, Format_Value, Apply_Format'Access, Index => 1);
       end;
       Result.Append (New_String (State, Output));
       return Result;

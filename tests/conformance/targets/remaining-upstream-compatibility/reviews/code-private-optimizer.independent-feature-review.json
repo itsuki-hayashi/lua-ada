@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-optimizer-feature-review",
+  "candidate_id": "code-private-optimizer",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "review_date": "2026-11-08",
+  "decision": "accepted-feature-only-with-required-revisions",
+  "permitted_resolution": "reviewed-t-internal-exclusion",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "source": {
+    "path": "references/lua/testes/code.lua",
+    "sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663"
+  },
+  "configuration": "upstream-test",
+  "proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/code-private-optimizer.author-proposal.json",
+    "sha256": "4fa7c8e24da8da67a0d1b11b5dec25235a8591dd60681425c6e64a9a8503ed2c"
+  },
+  "candidates": [
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9001",
+      "byte_offset": 800,
+      "byte_length": 143,
+      "anchor_sha256": "26aad09cfda55023d09d73d23353c892cb5e19ba423488629606efc828ddf3fd",
+      "decision": "accepted-feature-only",
+      "module_observable": true,
+      "module_compatibility_obligation": false,
+      "eligibility_scope": "Only the exact private optimization/representation inspection; no ordinary execution, binary-format validity, numeric type, arity, loading, callback or error obligation is waived."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9002",
+      "byte_offset": 1808,
+      "byte_length": 205,
+      "anchor_sha256": "41b6d2b52bb8f3f0d16dc0cf595c5fd6a4ca1b124b16b1bef028a1dda5f27f6b",
+      "decision": "accepted-feature-only",
+      "module_observable": true,
+      "module_compatibility_obligation": false,
+      "eligibility_scope": "Only the exact private optimization/representation inspection; no ordinary execution, binary-format validity, numeric type, arity, loading, callback or error obligation is waived."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9003",
+      "byte_offset": 2288,
+      "byte_length": 239,
+      "anchor_sha256": "5b3ddc7feef1ddadfa4a18c2526a31ced0495324141bde683ac399700a67e762",
+      "decision": "accepted-feature-only",
+      "module_observable": true,
+      "module_compatibility_obligation": false,
+      "eligibility_scope": "Only the exact private optimization/representation inspection; no ordinary execution, binary-format validity, numeric type, arity, loading, callback or error obligation is waived."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9004",
+      "byte_offset": 13327,
+      "byte_length": 32,
+      "anchor_sha256": "13c9570d19cf580345c831907370413a0a9b7c0c3d39f7b6660459373cd8e8af",
+      "decision": "accepted-feature-only",
+      "module_observable": true,
+      "module_compatibility_obligation": false,
+      "eligibility_scope": "Only the exact private optimization/representation inspection; no ordinary execution, binary-format validity, numeric type, arity, loading, callback or error obligation is waived."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9005",
+      "byte_offset": 13359,
+      "byte_length": 32,
+      "anchor_sha256": "4b1b8301af5f0f06a693bc66df7fa421860fdf06c9821e447ae6d4af791d8907",
+      "decision": "accepted-feature-only",
+      "module_observable": true,
+      "module_compatibility_obligation": false,
+      "eligibility_scope": "Only the exact private optimization/representation inspection; no ordinary execution, binary-format validity, numeric type, arity, loading, callback or error obligation is waived."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9006",
+      "byte_offset": 13587,
+      "byte_length": 10,
+      "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+      "decision": "accepted-feature-only",
+      "module_observable": true,
+      "module_compatibility_obligation": false,
+      "eligibility_scope": "Only the exact private optimization/representation inspection; no ordinary execution, binary-format validity, numeric type, arity, loading, callback or error obligation is waived."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9007",
+      "byte_offset": 13655,
+      "byte_length": 79,
+      "anchor_sha256": "120c5699b24c0b9102eded9963b92049e2d0f8213c5c43d77a64dc7dd3ecdac9",
+      "decision": "accepted-feature-only",
+      "module_observable": true,
+      "module_compatibility_obligation": false,
+      "eligibility_scope": "Only the exact private optimization/representation inspection; no ordinary execution, binary-format validity, numeric type, arity, loading, callback or error obligation is waived."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9008",
+      "byte_offset": 14141,
+      "byte_length": 175,
+      "anchor_sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6",
+      "decision": "accepted-feature-only",
+      "module_observable": true,
+      "module_compatibility_obligation": false,
+      "eligibility_scope": "Only the exact private optimization/representation inspection; no ordinary execution, binary-format validity, numeric type, arity, loading, callback or error obligation is waived."
+    }
+  ],
+  "retained_checkR": {
+    "byte_offset": 2079,
+    "byte_length": 127,
+    "sha256": "324530f639ef49280bcc33a77b56351c3369cdfd13290c63934071985bb880dc",
+    "must_remain_byte_identical": true
+  },
+  "source_bindings": [
+    {
+      "path": "references/lua/manual/manual.of",
+      "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+    },
+    {
+      "path": "references/lua/ltests.c",
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
+    },
+    {
+      "path": "src/lua-canonical_compiler.adb",
+      "sha256": "afd7c271850015208d5f302735ba5a7feb2cb2a6263ff3daecd033c1039f761c"
+    },
+    {
+      "path": "src/lua-canonical_compiler.ads",
+      "sha256": "17df81c04e55822d3b92428087fb190745f182f4c5340faf8554f823da7b139b"
+    },
+    {
+      "path": "src/lua-opcodes.ads",
+      "sha256": "dc84e30ffa75a708ee94d88103be5ae3e6f4e789f908a779c12e79929415f9a1"
+    },
+    {
+      "path": "src/lua-chunks.ads",
+      "sha256": "8b681ec3b245bbcd6ac41d20b2260ff25039111b816c7c50feed140518d9844f"
+    },
+    {
+      "path": "scripts/ConformanceExclusionEligibility.psm1",
+      "sha256": "5b43551fbd7a9ceae58e4fdfd33f76c6ebc9196947b2e62611f3eaf219e4eadc"
+    },
+    {
+      "path": "scripts/ConformanceTransforms.psm1",
+      "sha256": "ec62bd9c0eb6801f5a897edf7b11da28bd88d54c0bad135057e8610274548789"
+    }
+  ],
+  "rationale": "Independently read the actual inspection helpers and callers. Constant-pool ordering/cardinality/placement, exact opcode sequence/equality, physical MOVE numbering and SETLIST instruction count are implementation choices. Public dump bytes make such choices observable, but neither binary interoperability nor the public dump contract mandates this C compiler optimization sequence. The current v1 proposal must not describe them as unobservable. Retain actual compilation of every supplied closure and source, all load boundaries and diagnostic assertions, all checkR executions/types, all checkK/checkI/checkF/checkints values, binary round trips and original final completion. Some opcode-only functions intentionally error or loop indefinitely: do not indiscriminately execute them as invented semantic requirements.",
+  "required_revisions": [
+    "Do not install the current v1 module_observable=false records. Author a narrowly reviewed optimization-structure eligibility shape with module_observable=true and module_compatibility_obligation=false; reject public/mixed/previously accepted obligations and all unreviewed or widened spans.",
+    "No source-only exclusion receives execution evidence. Preserve every original anchor, explicit parent decomposition and already accepted passing scopes; the eight proposed children cannot silently discharge enclosing semantic obligations.",
+    "Keep checkR byte-identical. Preserve successful maximum-register load and oversized-register error, including their actual load calls; remove only the reviewed T.listcode wrapper/physical inspection.",
+    "Before exact approval, add source-linked actual C/Ada witnesses for checkK/checkI/checkF/checkints numeric value, math.type and one-result cardinality; retain their original assertions. A new separately reviewed semantic strengthening is distinct from the source-only private exclusions.",
+    "Retain and witness numeric type/value sequences exposed by the callback and repeated table-assignment functions, plus zero/one/multiple-result and constructor boundaries. Record actual calls and results, never fabricate a private listk/listcode facade.",
+    "Preserve nested constant-return closure execution and dump/load behavior while excluding only private outer/middle constant placement. Preserve the fifty-element constructor successful compilation and add public constructor/arity counterparts.",
+    "Bind exact replacement bytes, current implementation/public-counterpart sources, feature review, configurations and independent exact decisions. Disposable generation and fresh instrumented execution remain separate requirements."
+  ],
+  "limitations": [
+    "This feature decision neither installs the eight exclusions nor approves the existing transform proposal.",
+    "Current exact source-authority schemas need an independently reviewed bounded extension; the review is not a generic exemption for all compiler/debug behavior.",
+    "Full T source, public API, global source-ledger and final matrix acceptance remain pending."
+  ]
+}

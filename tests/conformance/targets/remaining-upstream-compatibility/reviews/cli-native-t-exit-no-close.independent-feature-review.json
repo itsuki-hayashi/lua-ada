@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "kind": "native-t-exit-no-close-independent-feature-review",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "review_date": "2026-11-08",
+  "decision": "accepted-narrow-native-test-diagnostic-direction",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "source_bindings": [
+    {
+      "path": "references/lua/manual/manual.of",
+      "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+    },
+    {
+      "path": "references/lua/ltests.c",
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
+    },
+    {
+      "path": "references/lua/loslib.c",
+      "sha256": "3ed70ea013b0c7a5a758db435f76fe5a99e87f07ea02ed19b2012fb728f8aa13"
+    },
+    {
+      "path": "references/lua/testes/main.lua",
+      "sha256": "844d13f96bdbf03a554b8b466fdf21aeac2bcddb907ad2b971814c994898d457"
+    },
+    {
+      "path": "tests/lua/cli_prompt_controls.lua",
+      "sha256": "bdd753ef728e9d6caa80e40b67894800ba061d655ae066695d6c14b7a9eec20e"
+    },
+    {
+      "path": "scripts/check-cli.ps1",
+      "sha256": "86a847e57b460058d190b4dd4deeda172db7093a743bb39ac456acb5a87ab0ab"
+    }
+  ],
+  "case_identity": {
+    "implementation": "ReferenceC",
+    "configuration": "upstream-test",
+    "mode": "prompt-before-input",
+    "setup_case": "exit-no-close",
+    "public_operation": "os.exit(37,false) from actual prompt callback"
+  },
+  "source_findings": [
+    "Read the pinned os.exit contract: only a truthy second argument requests lua_close. loslib.c calls exit(status) without closing for false. This public distinction stays mandatory in Ada T and native default.",
+    "Read ltests.c checkfinalmem and luaB_opentests: loading T registers an atexit callback asserting zero global allocation blocks/bytes. The deliberately open state necessarily conflicts with that test-only cleanup assertion after the public no-close operation.",
+    "Read original main.lua exit checks: their close argument is true. This direction does not omit, adapt or exclude an original primary assertion or public header entry.",
+    "The measured native T child requested37 and returned37 with exactly the zero-block assertion diagnostic. That observation is a failed native debug teardown diagnostic, not clean process/cleanup acceptance. Other hosts may abort on this assertion; preserve their actual exit/signal and require fresh source-linked applicability before consuming such observations."
+  ],
+  "permitted_resolution": {
+    "disposition": "observed-native-test-teardown-diagnostic",
+    "passing_execution_evidence": false,
+    "preserve_actual_exit_stdout_stderr_stdin_and_hashes": true,
+    "require_same_context_native_default_clean_no_close": true,
+    "require_same_context_ada_instrumented_clean_no_close": true,
+    "require_same_context_native_instrumented_clean_close_true": true,
+    "require_fresh_native_instrumented_observation": true,
+    "reject_any_other_case_configuration_or_implementation": true,
+    "reject_unrelated_diagnostics_timeouts_truncation_or_output_drain_failure": true,
+    "final_reports_separate_clean_passes_and_reviewed_native_diagnostics": true
+  },
+  "stdin_direction": [
+    "Keep attempted stdin bytes/hash and actual write/EOF completion or failure separately from stdout/stderr drain status. Never claim a failed/partial write was delivered.",
+    "Only exact closed prompt-before-input termination cases can treat early pipe closure as expected, because the source exits or errors before Read_Line. Ordinary REPL input cases still require successful delivery. This does not authorize a general pipe failure waiver."
+  ],
+  "observed_diagnostic": {
+    "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+    "exit_code": 37,
+    "stdout_sha256": "a59d516f6c9ad80f156d6dc3f830a42c16408ea019455e08125780133c8dff56",
+    "stderr_sha256": "3502938af48118d9164dd36c60d9d761721edc05c8ac9f3dfecc68ae347a7bff",
+    "stderr_bytes": 122,
+    "stdin_write_completed": true,
+    "stdin_eof_sent": true,
+    "acceptance": false
+  },
+  "remaining_requirements": [
+    "Independently review the final current receipt/replay implementation and exact diagnostic protocol; this source direction supplies no final source/operation acceptance.",
+    "Bind all required actual sibling observations, exact native/runtime/configuration/context identities and complete captures before this diagnostic can reconcile as a reviewed counterpart limitation.",
+    "Do not rename this diagnostic to PASS or infer state cleanup. Preserve complete instrumented Ada public behavior and original primary/runtime obligations."
+  ]
+}

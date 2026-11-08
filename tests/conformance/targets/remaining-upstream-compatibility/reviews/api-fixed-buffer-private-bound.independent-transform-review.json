@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "reviewer": "Codex /root",
+  "decision": "accepted",
+  "transform_id": "api-fixed-buffer-private-bound",
+  "public_assertion_preservation": "Independently checked unchanged source bytes550-605 and recomputed source, exact18-byte removed conjunct and full output hashes. Only the private400-byte bound is removed. The complete m2>m1 assertion remains, as do B-mode loading, X/Y execution, source buffer retention, debug line301 error and every other byte. The original mixed parent stays required and pending. No execution or whole-target acceptance is conferred.",
+  "feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json",
+    "sha256": "e2b2703a870b265b6505e68a7c8b1e52dc81c69f146c9442eb4fd6d1bdd93ab9"
+  },
+  "observed_removed_bytes": " and m2 - m1 < 400",
+  "configuration": "upstream-test",
+  "output_sha256": "51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc"
+}

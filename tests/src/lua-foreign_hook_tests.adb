@@ -24,6 +24,168 @@ package body Lua.Foreign_Hook_Tests is
    procedure C_Explicit_Close;
    procedure C_Refusal_Reuse;
    procedure C_Suspended_Indexing;
+   procedure Hook_Scalar_Cells;
+   procedure Hook_Nested_Call;
+   procedure Hook_Protected_Error;
+   procedure Hook_Unprotected_Error;
+   procedure Hook_Blocks_Nested_Yield;
+   procedure Hook_Direct_Yield;
+   procedure Hook_Argument_Weak_Root;
+   procedure Hook_Upvalue_Weak_Root;
+   procedure External_Release_Lua_View;
+   procedure C_Return_Value_Mutation;
+   procedure C_Return_Weak_Root;
+   procedure C_Close_Return_Mutation;
+   procedure C_Close_Return_Tuple;
+   procedure C_Close_Return_Refusal;
+   procedure Assert_Return_Refusal;
+   procedure Saved_Assert_Return;
+   procedure Saved_Assert_Close;
+   procedure Cold_Hook_Refusal;
+   procedure Refusing_Line_Hook;
+   procedure Refusing_Count_Hook;
+
+   procedure Refusing_Line_Hook is
+   begin
+      --  Actual line callbacks run after the caller freezes all growth.
+      Assert (Contract (32) = 0, "warmed line hooks need no provider growth");
+   end Refusing_Line_Hook;
+
+   procedure Refusing_Count_Hook is
+   begin
+      --  Count callbacks retain the same budget and owned continuation.
+      Assert (Contract (33) = 0, "warmed count hooks need no provider growth");
+   end Refusing_Count_Hook;
+
+   procedure Assert_Return_Refusal is
+   begin
+      --  Freeze only after the actual assert call arguments are published.
+      --  Its C return hook edits real tuple slots without allocator growth.
+      Assert (Contract (30) = 0, "assert tuple/hook under actual refusal");
+   end Assert_Return_Refusal;
+
+   procedure Cold_Hook_Refusal is
+   begin
+      --  Partial cold event publication must unwind its traced holder and
+      --  suppression state at every refused growth, then accept new hooks.
+      Assert (Contract (35) = 0, "cold hook refusal preserves recovery");
+   end Cold_Hook_Refusal;
+
+   procedure Saved_Assert_Close is
+   begin
+      --  The saved builtin preserves the real C caller's marked argument
+      --  until its normal return closes it once, before the return hook.
+      Assert (Contract (34) = 0, "saved assert preserves C close marker");
+   end Saved_Assert_Close;
+
+   procedure Saved_Assert_Return is
+   begin
+      --  Calling a saved real C function pointer borrows its genuine C
+      --  caller. Full tuple count, nils and return-slot mutation survive.
+      Assert (Contract (31) = 0, "saved assert C function tuple/hook");
+   end Saved_Assert_Return;
+
+   procedure C_Close_Return_Mutation is
+   begin
+      --  A marked real C slot closes before result movement. The closer
+      --  edits outgoing slot 2, and the protected caller must receive 37.
+      Assert (Contract (27) = 0, "C closer edits actual outgoing result");
+   end C_Close_Return_Mutation;
+
+   procedure C_Close_Return_Tuple is
+   begin
+      --  Keep all three results, including the middle nil, while a closer
+      --  changes the first and last actual scalar source cells.
+      Assert (Contract (28) = 0, "C closer preserves result count and nils");
+   end C_Close_Return_Tuple;
+
+   procedure C_Close_Return_Refusal is
+   begin
+      --  Warm real guards, freeze growth inside the C body, then close/edit
+      --  and return using retained storage. Require zero attempted growth
+      --  after the freeze and exact provider balance after physical close.
+      Assert (Contract (29) = 0, "C close return needs no warmed growth");
+   end C_Close_Return_Refusal;
+
+   procedure C_Return_Value_Mutation is
+   begin
+      --  A custom C return hook writes the real first transfer slot. The
+      --  protected C caller must receive 37 rather than a stale copy of 11.
+      Assert (Contract (25) = 0, "C return hook edits actual delivered cell");
+   end C_Return_Value_Mutation;
+
+   procedure C_Return_Weak_Root is
+   begin
+      --  The C body returns a table referenced only by its real result and
+      --  a weak entry. Replacing that cell with nil lets hook GC reclaim it.
+      Assert (Contract (26) = 0, "C return hook drops stale result roots");
+   end C_Return_Weak_Root;
+
+   procedure External_Release_Lua_View is
+   begin
+      --  Release an actual external payload during a Lua allocation loop.
+      --  The callback borrows that real CI, concatenates with Lua handlers,
+      --  mutates an earlier pending operand through debug.setlocal, and sees
+      --  each consumed tail disappear at its actual fold boundary.
+      Assert (Contract (24) = 0, "external release borrows actual Lua CI");
+   end External_Release_Lua_View;
+
+   procedure Hook_Argument_Weak_Root is
+   begin
+      --  Replace type's real C argument with nil, then collect in the call
+      --  hook. No copied packet may retain the former weak table value, and
+      --  the resumed builtin must consume nil from its actual edited slot.
+      Assert (Contract (22) = 0, "C hook removes stale argument roots");
+   end Hook_Argument_Weak_Root;
+
+   procedure Hook_Upvalue_Weak_Root is
+   begin
+      --  Address the interrupted C closure's real upvalue pseudo-index.
+      --  Replacing its sole edge must allow collection before body entry.
+      Assert (Contract (23) = 0, "C hook removes stale captured roots");
+   end Hook_Upvalue_Weak_Root;
+
+   procedure Hook_Scalar_Cells is
+   begin
+      --  Raw C indices and debug locals denote the same interrupted cells.
+      --  Replacing local x through lua_replace changes the caller's result.
+      Assert (Contract (16) = 0, "C hook borrows actual Lua scalar cells");
+   end Hook_Scalar_Cells;
+
+   procedure Hook_Nested_Call is
+   begin
+      --  Remove the hook, call Lua, and inspect its hook origin. The borrow
+      --  must survive nested stack growth and restore the original prefix.
+      Assert (Contract (17) = 0, "C hook retains cells through nested Lua");
+   end Hook_Nested_Call;
+
+   procedure Hook_Protected_Error is
+   begin
+      --  A nested protected C error returns its real object above the same
+      --  prefix, allowing the hook to edit a local and return normally.
+      Assert (Contract (18) = 0, "C hook restores view after nested error");
+   end Hook_Protected_Error;
+
+   procedure Hook_Unprotected_Error is
+   begin
+      --  Raising integer 17 abandons the hook guard, releases its borrowed
+      --  view on typed acknowledgement, and leaves the universe reusable.
+      Assert (Contract (19) = 0, "C hook error releases actual view lease");
+   end Hook_Unprotected_Error;
+
+   procedure Hook_Blocks_Nested_Yield is
+   begin
+      --  Lua called synchronously by a C hook cannot yield across that live
+      --  body. Its protected error cannot corrupt the interrupted locals.
+      Assert (Contract (20) = 0, "C hook nested yield retains C boundary");
+   end Hook_Blocks_Nested_Yield;
+
+   procedure Hook_Direct_Yield is
+   begin
+      --  A direct zero-result hook yield returns normally from C, suspends
+      --  once, then resumes the same instruction with original local cells.
+      Assert (Contract (21) = 0, "C hook yield restores interrupted stack");
+   end Hook_Direct_Yield;
 
    procedure Reflection is
    begin
@@ -163,5 +325,45 @@ package body Lua.Foreign_Hook_Tests is
                         C_Refusal_Reuse'Access);
       Test_Support.Add (Suite, "C indexing: suspended thread retains frames",
                         C_Suspended_Indexing'Access);
+      Test_Support.Add (Suite, "C hooks: actual scalar cells and mutation",
+                        Hook_Scalar_Cells'Access);
+      Test_Support.Add (Suite, "C hooks: nested call restores borrowed cells",
+                        Hook_Nested_Call'Access);
+      Test_Support.Add (Suite, "C hooks: protected error restores view",
+                        Hook_Protected_Error'Access);
+      Test_Support.Add (Suite, "C hooks: unprotected error releases view",
+                        Hook_Unprotected_Error'Access);
+      Test_Support.Add (Suite, "C hooks: nested yield is nonyieldable",
+                        Hook_Blocks_Nested_Yield'Access);
+      Test_Support.Add (Suite, "C hooks: direct yield restores instruction",
+                        Hook_Direct_Yield'Access);
+      Test_Support.Add (Suite, "C hooks: replaced argument loses weak root",
+                        Hook_Argument_Weak_Root'Access);
+      Test_Support.Add (Suite, "C hooks: replaced upvalue loses weak root",
+                        Hook_Upvalue_Weak_Root'Access);
+      Test_Support.Add (Suite, "C release: borrowed Lua cells and concat",
+                        External_Release_Lua_View'Access);
+      Test_Support.Add (Suite, "C hooks: return mutation reaches C caller",
+                        C_Return_Value_Mutation'Access);
+      Test_Support.Add (Suite, "C hooks: return replacement drops weak root",
+                        C_Return_Weak_Root'Access);
+      Test_Support.Add (Suite, "C close: actual result mutation reaches C",
+                        C_Close_Return_Mutation'Access);
+      Test_Support.Add (Suite, "C close: result tuple retains nils and count",
+                        C_Close_Return_Tuple'Access);
+      Test_Support.Add (Suite, "C close: warmed result mutation under refusal",
+                        C_Close_Return_Refusal'Access);
+      Test_Support.Add (Suite, "Assert: return-hook edits under refusal",
+                        Assert_Return_Refusal'Access);
+      Test_Support.Add (Suite, "Assert: saved C function tuple and hook",
+                        Saved_Assert_Return'Access);
+      Test_Support.Add
+        (Suite, "hook: refusing line events", Refusing_Line_Hook'Access);
+      Test_Support.Add
+        (Suite, "hook: refusing count events", Refusing_Count_Hook'Access);
+      Test_Support.Add
+        (Suite, "Assert: saved C marked argument", Saved_Assert_Close'Access);
+      Test_Support.Add
+        (Suite, "hook: cold refusal and reinstall", Cold_Hook_Refusal'Access);
    end Register;
 end Lua.Foreign_Hook_Tests;

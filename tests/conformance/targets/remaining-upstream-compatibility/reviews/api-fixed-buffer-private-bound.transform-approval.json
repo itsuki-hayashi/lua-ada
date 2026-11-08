@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-transform-approval",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "decision": "accepted",
+  "transform": {
+    "id": "api-fixed-buffer-private-bound",
+    "target": "remaining-upstream-compatibility",
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+    "source": "references/lua/testes/api.lua",
+    "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+    "configuration": "upstream-test",
+    "exclusion_policy_sha256": "c197e57cb129f0378b6d108c0807423a5577f4fc47cb107272d9caccfbed79ff",
+    "output_sha256": "51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc"
+  },
+  "decisions": [
+    {
+      "id": "fixed-buffer-private-allocation-bound",
+      "exclusion_id": "LUA-API-REVIEWED-BLOCK-9001",
+      "start_byte": 17053,
+      "length_bytes": 18,
+      "source_sha256": "f89400b75cf254feed3cc991449a9e7bc1679e6cd9b5b6be1b6598dfa176bf55",
+      "replacement_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "decision": "accepted",
+      "private_only": true,
+      "preserves_public_assertions": true,
+      "rationale": "Exact allocation footprint is not a pinned public API promise; preserved positive memory growth and behavior remain runtime obligations. Independently inspected unchanged neighboring assertions and recomputed exact output bytes."
+    }
+  ],
+  "review_evidence": {
+    "sha256": "4979c55ef9036249a1817835a71e40bd49f62210d17df6e204b3b8845c86247d",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-transform-review.json"
+  }
+}

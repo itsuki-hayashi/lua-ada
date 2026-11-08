@@ -24,6 +24,10 @@ package body Library_Runtime_Tests is
    procedure Binary_Load_Boundary;
    procedure Nested_Loads;
    procedure Preload_Cache;
+   procedure Binary_Lua_Module;
+   procedure Nested_Literal_Identity;
+   procedure Dynamic_Long_String_Identity;
+   procedure Retained_Literal_Identity;
    procedure Preload_False_Reload;
    procedure Preload_Nil_Default;
    procedure Loaded_Registry_Identity;
@@ -31,6 +35,15 @@ package body Library_Runtime_Tests is
    procedure Custom_Searcher_Data;
    procedure Package_Not_Found;
    procedure Searchpath_Failure;
+   procedure Searchpath_Empty_Templates;
+   procedure Package_Path_Type;
+   procedure Native_Loader_Missing;
+   procedure Require_Searcher_Diagnostics;
+   procedure Package_C_String_Boundaries;
+   procedure Require_C_String_Name;
+   procedure Loadlib_Argument_Name;
+   procedure Loadlib_Method_Self;
+   procedure Loadlib_Custom_Type;
    procedure Loadfile_Failure;
    procedure Resource_Recovery;
    procedure Compilation_Work_Budget;
@@ -259,6 +272,57 @@ package body Library_Runtime_Tests is
              "assert(a==b and n==1 and d==':preload:' and e==nil)");
    end Preload_Cache;
 
+   procedure Binary_Lua_Module is
+      --  Write an actual dumped module to the search path, then require it.
+      --  The searcher must select the binary decoder, preserve loader data
+      --  and cache the result. Remove the file before reporting a failure.
+   begin
+      Check ("local path='lua_ada_binary_module_test.lc'; " &
+             "local f=assert(io.open(path,'wb')); " &
+             "f:write(string.dump(function() return {answer=42} end)); " &
+             "assert(f:close()); package.path=path; " &
+             "local ok,value,data=pcall(require,'binary_fixture'); " &
+             "assert(os.remove(path)); assert(ok,value); " &
+             "assert(value.answer==42 and data==path); " &
+             "assert(require('binary_fixture')==value)");
+   end Binary_Lua_Module;
+
+   procedure Nested_Literal_Identity is
+      --  One compiled graph owns one literal even when its nested function
+      --  independently mentions the same bytes. This regressed when each
+      --  runtime wrapper materialized the interned model entry separately.
+   begin
+      Check ("local s='01234567890123456789012345678901234567890123456789'; " &
+             "local function f() return " &
+             "'01234567890123456789012345678901234567890123456789' end; " &
+             "assert(string.format('%p',s)==string.format('%p',f()))");
+   end Nested_Literal_Identity;
+
+   procedure Dynamic_Long_String_Identity is
+      --  Sharing a compiled literal must not intern newly produced long
+      --  strings by content. The original literal remains independently
+      --  owned while concatenation produces equal bytes at a new address.
+   begin
+      Check ("local s='01234567890123456789012345678901234567890123456789'; " &
+             "local prefix='0123456789'; local t=prefix.." &
+             "'0123456789012345678901234567890123456789'; " &
+             "assert(s==t and string.format('%p',s)~=" &
+             "string.format('%p',t))");
+   end Dynamic_Long_String_Identity;
+
+   procedure Retained_Literal_Identity is
+      --  A retained nested closure roots its canonical owner and sibling
+      --  literals after the compiling chunk dies. Repeated collection must
+      --  preserve both content and identity without the temporary index.
+   begin
+      Check ("local f=assert(load([[return function() return " &
+             "'012345678901234567890123456789" &
+             "01234567890123456789' end]]))(); " &
+             "local s=f(); collectgarbage(); collectgarbage(); " &
+             "assert(s==f() and string.format('%p',s)==" &
+             "string.format('%p',f()))");
+   end Retained_Literal_Identity;
+
    procedure Preload_False_Reload is
       --  False is a legitimate stored module result but does not satisfy
       --  require's truthy-cache test; a second require invokes the loader.
@@ -325,6 +389,102 @@ package body Library_Runtime_Tests is
       Check ("local f,e=package.searchpath('a.b','./missing-m2b/?.lua'); " &
              "assert(f==nil and type(e)=='string')");
    end Searchpath_Failure;
+
+   procedure Searchpath_Empty_Templates is
+      --  Failed searches reproduce all path separators in their error text,
+      --  even though empty templates are never opened as candidate files.
+   begin
+      Check ("local n=string.char(10,9); " &
+             "local f,e=package.searchpath('absent',';?.none;;'); " &
+             "assert(f==nil and e==" &
+             "[[no file '']]..n..[[no file 'absent.none']]..n.." &
+             "[[no file '']]..n..[[no file '']]); " &
+             "f,e=package.searchpath('absent',''); " &
+             "assert(f==nil and e==[[no file '']])");
+   end Searchpath_Empty_Templates;
+
+   procedure Package_Path_Type is
+      --  Both file searchers identify the invalid public package field;
+      --  ordinary protected failures leave the next search usable.
+   begin
+      Check ("package.path={}; local ok,e=pcall(require,'absent'); " &
+             "assert(not ok and e:find('package.path',1,true)); " &
+             "package.path=''; package.cpath={}; " &
+             "ok,e=pcall(require,'absent'); " &
+             "assert(not ok and e:find('package.cpath',1,true))");
+   end Package_Path_Type;
+
+   procedure Native_Loader_Missing is
+      --  An OS-open failure is a three-value result, not a catchable Lua
+      --  exception or a claim that the platform has no dynamic loader.
+   begin
+      Check ("assert(#package.searchers==4); " &
+             "local f,e,s=package.loadlib('absent-lua-ada-fixture','x'); " &
+             "assert(f==nil and type(e)=='string' and s=='open')");
+   end Native_Loader_Missing;
+
+   procedure Require_Searcher_Diagnostics is
+      --  Searcher messages have no prefix themselves; require adds one
+      --  newline/tab per message, including each candidate file.
+   begin
+      Check ("package.path='?.lua;?/?'; package.cpath='?.so;?/init'; " &
+             "local ok,e=pcall(require,'XXX'); " &
+             "local n=string.char(10,9); assert(not ok and e==" &
+             "[[module 'XXX' not found:]]..n.." &
+             """no field package.preload['XXX']""..n.." &
+             "[[no file 'XXX.lua']]..n..[[no file 'XXX/XXX']]..n.." &
+             "[[no file 'XXX.so']]..n..[[no file 'XXX/init']])");
+   end Require_Searcher_Diagnostics;
+
+   procedure Package_C_String_Boundaries is
+      --  Each public path parameter is a C string independently. Embedded
+      --  zero tails must affect neither substitution nor missing-file text.
+   begin
+      Check ("local z=string.char(0); local f,e=package.searchpath(" &
+             "'absent'..z..'tail','?.none'..z..'discard'," &
+             "'.'..z..'tail','/'..z..'tail'); " &
+             "assert(f==nil and e==[[no file 'absent.none']])");
+   end Package_C_String_Boundaries;
+
+   procedure Require_C_String_Name is
+      --  Registry and searchers use a truncated key, but the chosen loader
+      --  receives the original counted name. Neither cache entry aliases it.
+   begin
+      Check ("local name='nul'..string.char(0)..'tail'; " &
+             "package.loaded[name]=17; package.preload.nul=function(n,d) " &
+             "assert(n==name and d==':preload:'); return 9 end; " &
+             "assert(require(name)==9 and package.loaded.nul==9 and " &
+             "package.loaded[name]==17)");
+   end Require_C_String_Name;
+
+   procedure Loadlib_Argument_Name is
+      --  Report an actual lexical alias rather than a fixed builtin label.
+   begin
+      Check ("local ok,e=pcall(function() local alias=package.loadlib; " &
+             "alias(nil,'x') end); assert(not ok and " &
+             "e:find([[bad argument #1 to 'alias' " &
+             "(string expected, got nil)]],1,true))");
+   end Loadlib_Argument_Name;
+
+   procedure Loadlib_Method_Self is
+      --  Colon syntax shifts the argument number and identifies bad self.
+   begin
+      Check ("local t={open=package.loadlib}; " &
+             "local ok,e=pcall(function() t:open('x') end); " &
+             "assert(not ok and e:find([[calling 'open' on bad self " &
+             "(string expected, got table)]],1,true))");
+   end Loadlib_Method_Self;
+
+   procedure Loadlib_Custom_Type is
+      --  A raw metatable name labels the value even when __metatable hides
+      --  that table. This is the public auxiliary type-error convention.
+   begin
+      Check ("local alias=package.loadlib; local value=setmetatable({}," &
+             "{__name='fixture',__metatable=false}); " &
+             "local ok,e=pcall(function() alias('missing',value) end); " &
+             "assert(not ok and e:find([[bad argument #2 to 'alias' " &
+             "(string expected, got fixture)]],1,true))");
+   end Loadlib_Custom_Type;
 
    procedure Loadfile_Failure is
       --  File I/O failures are ordinary loadfile nil/message results, while
@@ -535,18 +695,18 @@ package body Library_Runtime_Tests is
    end Table_Callback_Failure;
 
    procedure Table_Unpack_Explicit_End is
-      --  An explicit end bypasses __len even on a nonempty traversal. Empty
-      --  ranges must additionally bypass receiver indexing/type checks; an
-      --  invalid start is rejected before requesting a default length.
+      --  Pinned Lua 5.5 checks the table and obtains length before optional
+      --  bounds, even with an explicit end or an empty traversal. The older
+      --  regression incorrectly expected a bypass and disagreed with C Lua.
    begin
       Check
         ("local calls=0; local t=setmetatable({1,2},{__len=function() " &
-         "calls=calls+1; error('unexpected length') end}); " &
+         "calls=calls+1; return 2 end}); " &
          "local a,b=table.unpack(t,1,2); assert(a==1 and b==2); " &
          "assert(select('#',table.unpack(t,3,2))==0); " &
-         "assert(select('#',table.unpack(nil,3,2))==0); " &
-         "assert(not pcall(table.unpack,t,{})); assert(calls==0); " &
-         "assert(not pcall(table.unpack,t)); assert(calls==1)");
+         "assert(not pcall(table.unpack,nil,3,2)); " &
+         "assert(not pcall(table.unpack,t,{})); assert(calls==3); " &
+         "local x,y=table.unpack(t); assert(x==1 and y==2 and calls==4)");
    end Table_Unpack_Explicit_End;
 
    procedure Table_Move_Maximum_Destination is
@@ -560,6 +720,83 @@ package body Library_Runtime_Tests is
          "assert(rawequal(table.move(t,m-2,m-1,m-1),t)); " &
          "assert(t[m-1]=='a' and t[m]=='b')");
    end Table_Move_Maximum_Destination;
+
+   procedure Locale_Case (Name : String);
+   procedure Locale_Case (Name : String) is
+      Universe : Session;
+      Result : constant Execution_Result := Universe.Execute
+        ("_LOCALE_STRING_CASE='" & Name &
+         "';dofile('tests/lua/locale_strings.lua')");
+      Output : constant String := To_String (Result.Output);
+      Expected : constant String :=
+        "PASS locale strings " & Name & ASCII.LF;
+      Category : constant String :=
+        (if Name = "NonC_Collation" then "collate" else "ctype");
+      Valid : Boolean := Output = Expected;
+   begin
+      Assert (Result.Status = Succeeded, To_String (Result.Error.Message));
+      if Name in "NonC_Collation" | "NonC_Classes_Case" then
+         --  Availability is an actual recorded native observation. Do not
+         --  hide unexpected diagnostics or certify non-C behavior when the
+         --  optional category is unavailable on this host.
+         Valid := Output = "LOCALE unavailable " & Category & ASCII.LF &
+           Expected or else
+           Output = "LOCALE available " & Category & " ptb" & ASCII.LF &
+           Expected or else
+           Output = "LOCALE available " & Category &
+           " pt_BR.iso88591" & ASCII.LF & Expected or else
+           Output = "LOCALE available " & Category &
+           " ISO-8859-1" & ASCII.LF & Expected;
+      end if;
+      Assert (Valid, "unexpected locale observation: " & Output);
+   end Locale_Case;
+
+   procedure C_Collation;
+   procedure C_Collation is
+   begin
+      --  Whole byte strings retain suffix ordering across embedded NULs;
+      --  ordinary comparisons and default sorting use the same semantics.
+      Locale_Case ("C_Collation");
+   end C_Collation;
+
+   procedure C_Classes;
+   procedure C_Classes is
+   begin
+      --  Every byte, inverted classes, %z and unknown escapes preserve the
+      --  C locale policy without importing that policy into source scanning.
+      Locale_Case ("C_Classes");
+   end C_Classes;
+
+   procedure C_Case;
+   procedure C_Case is
+   begin
+      --  C locale case conversion changes ASCII letters only, including
+      --  correct handling of NUL and every unsigned high-bit byte.
+      Locale_Case ("C_Case");
+   end C_Case;
+
+   procedure Non_C_Collation;
+   procedure Non_C_Collation is
+   begin
+      --  Observe native locale availability explicitly. Where installed,
+      --  accented ordering and NUL suffixes must also govern table sorting.
+      Locale_Case ("NonC_Collation");
+   end Non_C_Collation;
+
+   procedure Non_C_Classes_Case;
+   procedure Non_C_Classes_Case is
+   begin
+      --  An available single-byte Portuguese locale classifies and converts
+      --  accented bytes. The fixture restores the original process category.
+      Locale_Case ("NonC_Classes_Case");
+   end Non_C_Classes_Case;
+
+   procedure Unavailable_Locale_Unchanged;
+   procedure Unavailable_Locale_Unchanged is
+   begin
+      --  Refusing an unknown locale leaves the queried category unchanged.
+      Locale_Case ("Unavailable_Unchanged");
+   end Unavailable_Locale_Unchanged;
 
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
@@ -601,6 +838,14 @@ package body Library_Runtime_Tests is
                         Nested_Loads'Access);
       Test_Support.Add (Suite, "require preload cache",
                         Preload_Cache'Access);
+      Test_Support.Add (Suite, "require native binary Lua module",
+                        Binary_Lua_Module'Access);
+      Test_Support.Add (Suite, "nested compiled literal identity",
+                        Nested_Literal_Identity'Access);
+      Test_Support.Add (Suite, "dynamic long string identity",
+                        Dynamic_Long_String_Identity'Access);
+      Test_Support.Add (Suite, "retained compiled literal identity",
+                        Retained_Literal_Identity'Access);
       Test_Support.Add (Suite, "require false reload",
                         Preload_False_Reload'Access);
       Test_Support.Add (Suite, "require nil default",
@@ -615,6 +860,24 @@ package body Library_Runtime_Tests is
                         Package_Not_Found'Access);
       Test_Support.Add (Suite, "package searchpath failure",
                         Searchpath_Failure'Access);
+      Test_Support.Add (Suite, "package searchpath empty templates",
+                        Searchpath_Empty_Templates'Access);
+      Test_Support.Add (Suite, "package path field type errors",
+                        Package_Path_Type'Access);
+      Test_Support.Add (Suite, "native loader missing image status",
+                        Native_Loader_Missing'Access);
+      Test_Support.Add (Suite, "require ordered searcher diagnostics",
+                        Require_Searcher_Diagnostics'Access);
+      Test_Support.Add (Suite, "package C string boundaries",
+                        Package_C_String_Boundaries'Access);
+      Test_Support.Add (Suite, "require C string registry name",
+                        Require_C_String_Name'Access);
+      Test_Support.Add (Suite, "loadlib argument alias diagnostic",
+                        Loadlib_Argument_Name'Access);
+      Test_Support.Add (Suite, "loadlib bad method self diagnostic",
+                        Loadlib_Method_Self'Access);
+      Test_Support.Add (Suite, "loadlib custom metatable type diagnostic",
+                        Loadlib_Custom_Type'Access);
       Test_Support.Add (Suite, "loadfile I/O failure",
                         Loadfile_Failure'Access);
       Test_Support.Add (Suite, "load reader budget recovery",
@@ -657,9 +920,22 @@ package body Library_Runtime_Tests is
                         Table_Move_Equality_Order'Access);
       Test_Support.Add (Suite, "table metamethod callback failure",
                         Table_Callback_Failure'Access);
-      Test_Support.Add (Suite, "table unpack explicit end bypass",
+      Test_Support.Add (Suite, "table unpack explicit end length order",
                         Table_Unpack_Explicit_End'Access);
       Test_Support.Add (Suite, "table move maximum destination",
                         Table_Move_Maximum_Destination'Access);
+      Test_Support.Add (Suite, "locale strings: C_Collation",
+                        C_Collation'Access);
+      Test_Support.Add (Suite, "locale strings: C_Classes",
+                        C_Classes'Access);
+      Test_Support.Add (Suite, "locale strings: C_Case",
+                        C_Case'Access);
+      Test_Support.Add (Suite, "locale strings: NonC_Collation availability",
+                        Non_C_Collation'Access);
+      Test_Support.Add
+        (Suite, "locale strings: NonC_Classes_Case availability",
+         Non_C_Classes_Case'Access);
+      Test_Support.Add (Suite, "locale strings: Unavailable_Unchanged",
+                        Unavailable_Locale_Unchanged'Access);
    end Register;
 end Library_Runtime_Tests;

@@ -1,4 +1,5 @@
 with Ada.Containers;
+with Lua.Engine.Diagnostics;
 with Lua.Engine.Strings;
 with Interfaces.C;
 
@@ -248,7 +249,9 @@ package body Lua.Engine.Sorting is
             elsif Left.Kind = String_Kind and then Right.Kind = String_Kind
             then
                Save (Compared, (Boolean_Kind,
-                                Left.Reference.Bytes < Right.Reference.Bytes));
+                                Strings.Locale_Less
+                                  (State, Left.Reference.Bytes,
+                                   Right.Reference.Bytes)));
                Resume (Next);
                return False;
             end if;
@@ -273,7 +276,12 @@ package body Lua.Engine.Sorting is
             (Table_Item.Kind /= String_Kind and then
                Metafield (State, Table_Item, "__len").Kind = Nil_Kind))
          then
-            Fail (State, "bad argument to sort (table expected)");
+            --  checktab forces the ordinary auxiliary table check after its
+            --  raw metamethod capability checks fail. Preserve this actual
+            --  call's origin, including a sort used as another comparator.
+            Diagnostics.Type_Error
+              (State, 1, "table", Table_Item,
+               Present => not Activation.Native_Arguments.Is_Empty);
          end if;
       end Check_Receiver;
    begin
@@ -305,13 +313,32 @@ package body Lua.Engine.Sorting is
                if Count <= 1 then
                   return Action;
                elsif Count >= Integer_Value (Interfaces.C.int'Last) then
-                  Fail (State, "array too big");
+                  --  The operation has definitively failed. Its former
+                  --  algorithm captures must not retain operands that a
+                  --  diagnostic callback removes from the actual C slots.
+                  Activation.Native_Captures.Clear;
+                  Diagnostics.Argument_Error (State, 1, "array too big");
                elsif Item (Comparator).Kind not in Nil_Kind | Closure_Kind |
                  Native_Closure_Kind | Native_Kind_Value |
                  Foreign_Function_Kind
                then
-                  Fail (State, "function expected");
+                  declare
+                     Comparator_Item : constant Value := Item (Comparator);
+                  begin
+                     --  A nontrivial interval checks the real second
+                     --  argument after length, before comparisons. End the
+                     --  capture-vector borrow before a diagnostic may retire
+                     --  its failed phase and invoke the registry callback.
+                     Activation.Native_Captures.Clear;
+                     Diagnostics.Type_Error
+                       (State, 2, "function", Comparator_Item);
+                  end;
                end if;
+               --  Pinned sort normalizes the public C stack to receiver and
+               --  comparator only for a nontrivial sequence. Retain this
+               --  actual branch decision for its zero-result return hook;
+               --  querying length again later could repeat a user callback.
+               Activation.Native_Return_First := 3;
                Save_Number (Size, Count);
                Save_Number (Heap_End, Count);
                Save_Number (Build_Index, Count / 2);

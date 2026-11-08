@@ -3,6 +3,20 @@ with "aunit";
 with "config/lua_ada_tests_config.gpr";
 
 project Lua_Ada_Tests is
+   C_Import_Defines := ();
+   case Lua_Ada_Tests_Config.Alire_Host_OS is
+      when "linux" =>
+         C_Import_Defines := ("-DLUA_ADA_CLI_LINUX");
+      when "macos" =>
+         C_Import_Defines := ("-DLUA_ADA_CLI_MACOS");
+      when "windows" =>
+         case Lua_Ada.Library_Mode is
+            when "relocatable" =>
+               C_Import_Defines := ("-DLUA_BUILD_AS_DLL");
+            when others => null;
+         end case;
+      when others => null;
+   end case;
    for Languages use ("Ada", "C");
    for Source_Dirs use ("src", "c", "../cli/shared");
    for Object_Dir use
@@ -27,10 +41,20 @@ project Lua_Ada_Tests is
         ("-std=c99", "-Wall", "-Wextra", "-Werror", "-pedantic",
          "-DLUA_ADA_TEST_BUILD_PROFILE=" & Lua_Ada_Tests_Config.Build_Profile,
          "-DLUA_ADA_TEST_LINK_KIND=" & Lua_Ada.Library_Mode,
-         "-I" & Project'Project_Dir & "../c_api/include/api");
+         "-I" & Project'Project_Dir & "../c_api/include/api") &
+        C_Import_Defines;
       for Default_Switches ("Ada") use
         Lua_Ada_Tests_Config.Ada_Compiler_Switches &
         ("-gnat2022", "-gnatwa", "-gnatwe", "-gnatv", "-gnaty",
          "-gnatVF");
    end Compiler;
+   package Linker is
+      case Lua_Ada_Tests_Config.Alire_Host_OS is
+         when "linux" =>
+            for Default_Switches ("Ada") use ("-ldl");
+         when "macos" =>
+            for Default_Switches ("Ada") use ("-lreadline");
+         when others => null;
+      end case;
+   end Linker;
 end Lua_Ada_Tests;

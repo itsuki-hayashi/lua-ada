@@ -1,0 +1,2495 @@
+{
+  "runtime_acceptance": false,
+  "schema_version": 1,
+  "review_status": "pending",
+  "author": "Codex /root/validation_delivery",
+  "entries": [
+    {
+      "name": "lua_len",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LUA-H-FUNCTION-LUA_LEN-372",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Binary string and table sequence lengths, arbitrary handler results, nonlengthable types, retained error objects and yield refusal.",
+      "named_c_cases": [
+        "c_api/tests/value_api_contract.c#lengths",
+        "c_api/tests/value_api_contract.c#yield_barriers",
+        "c_api/tests/value_api_contract.c#caller_windows"
+      ],
+      "invariant": "Public length preserves string/table results, original metamethod operands and caller frame, exact error identity and nonyieldable C barriers.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "lua_concat",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LUA-H-FUNCTION-LUA_CONCAT-371",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Zero and singleton counts, binary strings, number coercion, ordered handlers collecting during each call, error identity and yield refusal. Successor21cases add actual original caller slots, weak/current-pair lifetime, grouped storage and transient refusal;25registered AUnit names include four host quota cases. Existing value-driver routes remain.",
+      "named_c_cases": [
+        "c_api/tests/concat_api_contract.c#binary-run",
+        "c_api/tests/concat_api_contract.c#caller-mutation",
+        "c_api/tests/concat_api_contract.c#current-pair-roots",
+        "c_api/tests/concat_api_contract.c#empty-handler-result",
+        "c_api/tests/concat_api_contract.c#empty-left-refusal",
+        "c_api/tests/concat_api_contract.c#empty-result",
+        "c_api/tests/concat_api_contract.c#empty-right-refusal",
+        "c_api/tests/concat_api_contract.c#error-location",
+        "c_api/tests/concat_api_contract.c#external-empty-copy",
+        "c_api/tests/concat_api_contract.c#external-empty-left-copy",
+        "c_api/tests/concat_api_contract.c#grouped-storage",
+        "c_api/tests/concat_api_contract.c#handler-error-identity",
+        "c_api/tests/concat_api_contract.c#nonyieldable-handler",
+        "c_api/tests/concat_api_contract.c#number-after-handler",
+        "c_api/tests/concat_api_contract.c#number-before-handler",
+        "c_api/tests/concat_api_contract.c#numeric-primitives",
+        "c_api/tests/concat_api_contract.c#primitive-suffix",
+        "c_api/tests/concat_api_contract.c#retained-prefix",
+        "c_api/tests/concat_api_contract.c#singleton-identity",
+        "c_api/tests/concat_api_contract.c#transient-growth-retry",
+        "c_api/tests/concat_api_contract.c#weak-operand-lifetime",
+        "c_api/tests/value_api_contract.c#concatenation",
+        "c_api/tests/value_api_contract.c#yield_barriers"
+      ],
+      "invariant": "Public concatenation consumes its requested frame values using the pinned right fold and retains metamethod roots, errors and C barriers.",
+      "coverage_authority": false,
+      "named_aunit_cases": [
+        "tests/src/lua-c_concat_tests.adb#Binary_Run",
+        "tests/src/lua-c_concat_tests.adb#Byte_Quota",
+        "tests/src/lua-c_concat_tests.adb#Caller_Mutation",
+        "tests/src/lua-c_concat_tests.adb#Current_Pair_Roots",
+        "tests/src/lua-c_concat_tests.adb#Empty_Handler_Result",
+        "tests/src/lua-c_concat_tests.adb#Empty_Left_Refusal",
+        "tests/src/lua-c_concat_tests.adb#Empty_Result",
+        "tests/src/lua-c_concat_tests.adb#Empty_Right_Refusal",
+        "tests/src/lua-c_concat_tests.adb#Error_Location",
+        "tests/src/lua-c_concat_tests.adb#Extent_Quota",
+        "tests/src/lua-c_concat_tests.adb#External_Empty_Copy",
+        "tests/src/lua-c_concat_tests.adb#External_Empty_Left_Copy",
+        "tests/src/lua-c_concat_tests.adb#Grouped_Storage",
+        "tests/src/lua-c_concat_tests.adb#Handler_Error_Identity",
+        "tests/src/lua-c_concat_tests.adb#Handler_Quota",
+        "tests/src/lua-c_concat_tests.adb#Nonyieldable_Handler",
+        "tests/src/lua-c_concat_tests.adb#Number_After_Handler",
+        "tests/src/lua-c_concat_tests.adb#Number_Before_Handler",
+        "tests/src/lua-c_concat_tests.adb#Numeric_Primitives",
+        "tests/src/lua-c_concat_tests.adb#Primitive_Quota",
+        "tests/src/lua-c_concat_tests.adb#Primitive_Suffix",
+        "tests/src/lua-c_concat_tests.adb#Retained_Prefix",
+        "tests/src/lua-c_concat_tests.adb#Singleton_Identity",
+        "tests/src/lua-c_concat_tests.adb#Transient_Growth_Retry",
+        "tests/src/lua-c_concat_tests.adb#Weak_Operand_Lifetime"
+      ]
+    },
+    {
+      "name": "lua_numbertocstring",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LUA-H-FUNCTION-LUA_NUMBERTOCSTRING-375",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Fifteen indexed edge values including signed zero, extrema, subnormal and NaN, minimum integer, invalid/string slots, growth refusal and 20000 seeded binary64 spellings. Windows sample fingerprint is informative only.",
+      "named_c_cases": [
+        "c_api/tests/value_api_contract.c#number_text",
+        "c_api/tests/value_api_contract.c#refusal_number",
+        "c_api/tests/value_api_contract.c#seeded_number_text"
+      ],
+      "invariant": "Numeric text matches the independently compiled same-host C oracle while preserving input numeric type and making no selected allocator request.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checkversion_",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKVERSION_-46",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Matching version and numeric sizes, version plus one and one-byte layout mismatch through actual protected callbacks.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checkversion_accepts_matching_core",
+        "c_api/tests/auxiliary_api_contract.c#checkversion_rejects_version",
+        "c_api/tests/auxiliary_api_contract.c#checkversion_rejects_numeric_layout"
+      ],
+      "invariant": "The auxiliary version/layout check preserves stack height for matching ABI and raises the pinned protected diagnostic on version or numeric-layout mismatch.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checkversion",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_CHECKVERSION-47",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Actual macro invocation in a registered protected callback with the matching compiled core; direct mismatch boundaries are separate function routes.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checkversion_accepts_matching_core"
+      ],
+      "invariant": "The public checkversion macro passes its compiled version and numeric-layout constants to the actual auxiliary function without changing caller stack height.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_getmetafield",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_GETMETAFIELD-50",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Existing and absent fields, exact stack deltas and an index fallback that must remain unused.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#getmetafield_returns_raw_field",
+        "c_api/tests/auxiliary_api_contract.c#getmetafield_absent_pushes_nothing",
+        "c_api/tests/auxiliary_api_contract.c#getmetafield_ignores_index_fallback"
+      ],
+      "invariant": "Raw metafield lookup returns the original field type/value or absence without consulting index fallback.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_callmeta",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CALLMETA-51",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Present handler, absent metafield and relative stack index with exact stack/value assertions.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#callmeta_calls_metamethod_with_object",
+        "c_api/tests/auxiliary_api_contract.c#callmeta_absent_pushes_nothing",
+        "c_api/tests/auxiliary_api_contract.c#callmeta_resolves_relative_index"
+      ],
+      "invariant": "Auxiliary metamethod calls preserve object argument and result, return false without pushing on absence, and resolve relative object indices.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_tolstring",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_TOLSTRING-52",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Numbers, nil/booleans, embedded NUL strings, tostring results and rejection, name fields and nonstring name fallback. Successor eight actual C pointer cases and35registered identity witnesses extend the retained routes, comparing same-host pointer formatting without fixed addresses.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#tolstring_ignores_nonstring_name",
+        "c_api/tests/auxiliary_api_contract.c#tolstring_keeps_string_bytes",
+        "c_api/tests/auxiliary_api_contract.c#tolstring_rejects_nonstring_tostring",
+        "c_api/tests/auxiliary_api_contract.c#tolstring_renders_nil_and_booleans",
+        "c_api/tests/auxiliary_api_contract.c#tolstring_renders_numbers",
+        "c_api/tests/auxiliary_api_contract.c#tolstring_uses_name_field",
+        "c_api/tests/auxiliary_api_contract.c#tolstring_uses_tostring_metafield",
+        "c_api/tests/pointer_identity_contract.c#captured-closure-identity",
+        "c_api/tests/pointer_identity_contract.c#coroutine-identity",
+        "c_api/tests/pointer_identity_contract.c#full-userdata-identity",
+        "c_api/tests/pointer_identity_contract.c#light-cfunction-identity",
+        "c_api/tests/pointer_identity_contract.c#light-userdata-identity",
+        "c_api/tests/pointer_identity_contract.c#null-light-userdata-identity",
+        "c_api/tests/pointer_identity_contract.c#raw-string-identity",
+        "c_api/tests/pointer_identity_contract.c#table-identity"
+      ],
+      "invariant": "Auxiliary text conversion follows numeric, primitive and metamethod rules and returns exact bytes and lengths.",
+      "coverage_authority": false,
+      "named_aunit_cases": [
+        "tests/src/lua-pointer_identity_tests.adb#Builtin_Function",
+        "tests/src/lua-pointer_identity_tests.adb#C_Captured_Function",
+        "tests/src/lua-pointer_identity_tests.adb#C_Light_Function",
+        "tests/src/lua-pointer_identity_tests.adb#C_Light_Userdata",
+        "tests/src/lua-pointer_identity_tests.adb#C_Null_Pointer",
+        "tests/src/lua-pointer_identity_tests.adb#C_String",
+        "tests/src/lua-pointer_identity_tests.adb#C_Table",
+        "tests/src/lua-pointer_identity_tests.adb#C_Thread",
+        "tests/src/lua-pointer_identity_tests.adb#C_Userdata",
+        "tests/src/lua-pointer_identity_tests.adb#Empty_Name",
+        "tests/src/lua-pointer_identity_tests.adb#Field_Widths",
+        "tests/src/lua-pointer_identity_tests.adb#First_Surface_Refusal",
+        "tests/src/lua-pointer_identity_tests.adb#Handler_Integer",
+        "tests/src/lua-pointer_identity_tests.adb#Handler_Long_String",
+        "tests/src/lua-pointer_identity_tests.adb#Handler_Real",
+        "tests/src/lua-pointer_identity_tests.adb#Handler_Type_Error",
+        "tests/src/lua-pointer_identity_tests.adb#Late_C_Thread",
+        "tests/src/lua-pointer_identity_tests.adb#Leading_Nul_Name",
+        "tests/src/lua-pointer_identity_tests.adb#Long_String",
+        "tests/src/lua-pointer_identity_tests.adb#Lua_Function",
+        "tests/src/lua-pointer_identity_tests.adb#Missing_Value",
+        "tests/src/lua-pointer_identity_tests.adb#Name_Scan_Quota",
+        "tests/src/lua-pointer_identity_tests.adb#Named_Function",
+        "tests/src/lua-pointer_identity_tests.adb#Named_Table",
+        "tests/src/lua-pointer_identity_tests.adb#Nonstring_Name",
+        "tests/src/lua-pointer_identity_tests.adb#Nul_Name",
+        "tests/src/lua-pointer_identity_tests.adb#Null_Format",
+        "tests/src/lua-pointer_identity_tests.adb#Primitive_Name_Ignored",
+        "tests/src/lua-pointer_identity_tests.adb#Primitive_Text",
+        "tests/src/lua-pointer_identity_tests.adb#Raw_Name_Lookup",
+        "tests/src/lua-pointer_identity_tests.adb#Short_C_Prefix",
+        "tests/src/lua-pointer_identity_tests.adb#String_Handler",
+        "tests/src/lua-pointer_identity_tests.adb#Table_Text",
+        "tests/src/lua-pointer_identity_tests.adb#Thread_Identity",
+        "tests/src/lua-pointer_identity_tests.adb#Weak_Thread"
+      ]
+    },
+    {
+      "name": "luaL_argerror",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_ARGERROR-53",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Plain argument, method nonself and bad self, host/global call and unavailable function name.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#argerror_names_plain_argument",
+        "c_api/tests/auxiliary_api_contract.c#argerror_method_adjusts_argument",
+        "c_api/tests/auxiliary_api_contract.c#argerror_method_bad_self",
+        "c_api/tests/auxiliary_api_contract.c#argerror_global_name_when_called_from_host",
+        "c_api/tests/auxiliary_api_contract.c#argerror_unknown_name_uses_question_mark"
+      ],
+      "invariant": "Protected argument diagnostics identify the actual Lua/C call and adjust method argument numbering without crossing the C guard.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_typeerror",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_TYPEERROR-54",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Name field, light userdata, absent slot and explicit nil with asserted diagnostic text.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#typeerror_uses_name_field",
+        "c_api/tests/auxiliary_api_contract.c#typeerror_light_userdata",
+        "c_api/tests/auxiliary_api_contract.c#typeerror_absent_and_nil"
+      ],
+      "invariant": "Protected type diagnostics use public type/name rules for the actual argument value.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checklstring",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKLSTRING-55",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Numeric conversion, embedded NUL length and rejected table.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checklstring_converts_numbers_and_keeps_length",
+        "c_api/tests/auxiliary_api_contract.c#checklstring_rejects_table"
+      ],
+      "invariant": "Checked strings preserve counted bytes and lengths, perform numeric conversion and raise protected errors for incompatible values.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_optlstring",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_OPTLSTRING-57",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Absent and nil arguments, real strings, numeric values and NULL default.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#optlstring_default_and_value",
+        "c_api/tests/auxiliary_api_contract.c#optlstring_null_default"
+      ],
+      "invariant": "Optional counted strings select defaults for nil/absence and preserve explicit values and NULL-default length semantics.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checknumber",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKNUMBER-59",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Numeric string, numeric value and nonnumeric argument.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checknumber_converts_numeric_string",
+        "c_api/tests/auxiliary_api_contract.c#checknumber_rejects_nonnumber"
+      ],
+      "invariant": "Checked numbers accept the pinned numeric-string conversion and reject incompatible values through protected diagnostics.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_optnumber",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_OPTNUMBER-60",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Absent/nil defaults, supplied number/numeric string and nonnumber failure.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#optnumber_default_and_value",
+        "c_api/tests/auxiliary_api_contract.c#optnumber_rejects_nonnumber"
+      ],
+      "invariant": "Optional numbers preserve defaults and explicit numeric values and reject incompatible provided arguments.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checkinteger",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKINTEGER-62",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Integer, integral real, numeric string, fractional value and nonnumber.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checkinteger_accepts_integral_values",
+        "c_api/tests/auxiliary_api_contract.c#checkinteger_rejects_fraction",
+        "c_api/tests/auxiliary_api_contract.c#checkinteger_rejects_nonnumber"
+      ],
+      "invariant": "Checked integers accept integral numeric values and preserve the distinction between missing conversion and fractional rejection.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_optinteger",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_OPTINTEGER-63",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Absent/nil defaults, supplied integral value and fractional rejection.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#optinteger_default_and_value",
+        "c_api/tests/auxiliary_api_contract.c#optinteger_rejects_fraction"
+      ],
+      "invariant": "Optional integers preserve default/explicit integral values and reject a provided fraction.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checkstack",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKSTACK-66",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Successful reserve, oversized request with caller message and oversized request without one.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checkstack_reserves_requested_slots",
+        "c_api/tests/auxiliary_api_contract.c#checkstack_overflow_names_message",
+        "c_api/tests/auxiliary_api_contract.c#checkstack_overflow_without_message"
+      ],
+      "invariant": "Auxiliary stack reservation preserves requested capacity or raises the pinned protected overflow diagnostic.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checktype",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKTYPE-67",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Matching string and incompatible value with asserted error text.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checktype_accepts_matching_type",
+        "c_api/tests/auxiliary_api_contract.c#checktype_rejects_other_type"
+      ],
+      "invariant": "Exact type checking accepts the matching public type and raises a protected argument diagnostic for another type.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checkany",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKANY-68",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Explicit nil success and absent-slot protected diagnostic.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checkany_accepts_nil",
+        "c_api/tests/auxiliary_api_contract.c#checkany_rejects_absent"
+      ],
+      "invariant": "Any-value checking accepts a present nil while distinguishing a missing argument.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_newmetatable",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_NEWMETATABLE-70",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "First registration and existing registry entries with exact identity/return flag.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#newmetatable_registers_once",
+        "c_api/tests/auxiliary_api_contract.c#newmetatable_returns_existing_value"
+      ],
+      "invariant": "Named metatables register once, set public name metadata and return the exact preexisting registry value on subsequent lookup.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_setmetatable",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_SETMETATABLE-71",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Exact registry identity and observed object metatable.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#setmetatable_attaches_registry_metatable"
+      ],
+      "invariant": "Named metatable assignment attaches the registry-owned metatable to the actual object.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_testudata",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_TESTUDATA-72",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Matching and other metatables, light userdata and nonuserdata without raising.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#testudata_matches_only_tagged_userdata"
+      ],
+      "invariant": "Userdata testing returns the real payload only for correctly tagged full userdata.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checkudata",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKUDATA-73",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Matching payload and a distinct metatable with asserted diagnostic.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checkudata_returns_payload",
+        "c_api/tests/auxiliary_api_contract.c#checkudata_rejects_other_metatable"
+      ],
+      "invariant": "Checked userdata returns its real payload or raises a protected named-type error.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_where",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_WHERE-75",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Lua caller line, level zero and unavailable stack level.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#where_reports_caller_line",
+        "c_api/tests/auxiliary_api_contract.c#where_level_zero_is_empty",
+        "c_api/tests/auxiliary_api_contract.c#where_missing_level_is_empty"
+      ],
+      "invariant": "Auxiliary position text reflects the selected actual caller source/line and is empty when no position exists.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_error",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_ERROR-76",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Lua caller prefix and protected host invocation without a source location.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#error_prefixes_caller_line",
+        "c_api/tests/auxiliary_api_contract.c#error_from_host_has_no_position"
+      ],
+      "invariant": "Formatted auxiliary errors include the actual Lua caller position and preserve the no-position host-call form.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checkoption",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKOPTION-78",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Known alternatives, default, missing required argument and unknown name.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checkoption_matches_and_defaults",
+        "c_api/tests/auxiliary_api_contract.c#checkoption_requires_argument_without_default",
+        "c_api/tests/auxiliary_api_contract.c#checkoption_rejects_unknown_name"
+      ],
+      "invariant": "Option lookup selects exact named entries/defaults and emits the pinned protected argument error when required or unknown.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_fileresult",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_FILERESULT-81",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Success, errno failure with/without filename and zero errno message behavior.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#fileresult_success_pushes_true",
+        "c_api/tests/auxiliary_api_contract.c#fileresult_failure_with_name",
+        "c_api/tests/auxiliary_api_contract.c#fileresult_failure_without_name",
+        "c_api/tests/auxiliary_api_contract.c#fileresult_zero_errno_message"
+      ],
+      "invariant": "File result tuples preserve success or actual errno-derived failure values and optional filename text.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_execresult",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_EXECRESULT-82",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Clean exit, errno-derived file error, nonzero exit status and signal status under matched platform compiler defines.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#execresult_clean_exit",
+        "c_api/tests/auxiliary_api_contract.c#execresult_errno_is_file_error",
+        "c_api/tests/auxiliary_api_contract.c#execresult_exit_status_platform",
+        "c_api/tests/auxiliary_api_contract.c#execresult_signal_platform"
+      ],
+      "invariant": "Execution result tuples match the native platform wait-status interpretation and errno failure precedence.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_ref",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_REF-92",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Nil sentinel, nonnil reference with exact stack pop and a released reference reused by an actual subsequent allocation.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#ref_nil_returns_refnil",
+        "c_api/tests/auxiliary_api_contract.c#ref_stores_value_and_pops",
+        "c_api/tests/auxiliary_api_contract.c#unref_reuses_released_reference"
+      ],
+      "invariant": "Registry references preserve nil sentinel behavior, stored value identity and released-slot reuse.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_unref",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_UNREF-93",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Released-slot reuse, LUA_NOREF and LUA_REFNIL.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#unref_reuses_released_reference",
+        "c_api/tests/auxiliary_api_contract.c#unref_ignores_sentinels"
+      ],
+      "invariant": "Releasing references recycles actual occupied slots while ignoring the public nonreference sentinels.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_len",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_LEN-108",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Binary strings and tables, public len handler and noninteger error.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#len_string_and_table",
+        "c_api/tests/auxiliary_api_contract.c#len_uses_len_metamethod",
+        "c_api/tests/auxiliary_api_contract.c#len_rejects_non_integer"
+      ],
+      "invariant": "Auxiliary length returns an integer for primitive/handler results and rejects nonintegral handler results through protection.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_setfuncs",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_SETFUNCS-115",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Two shared upvalues and mutation, NULL function placeholders, zero upvalues, exact pop and oversized-upvalue protected error.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#setfuncs_captures_upvalues_and_placeholders",
+        "c_api/tests/auxiliary_api_contract.c#setfuncs_zero_upvalues",
+        "c_api/tests/auxiliary_api_contract.c#setfuncs_rejects_excess_upvalues"
+      ],
+      "invariant": "Function registration creates real closures with retained upvalues and false placeholders and rejects excess upvalues.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Stack and upvalue copies preserve values and cell identity without changing stack height.",
+      "boundaries": "Positive/negative stack indices, movement around copied slots and an actually invoked C closure updating its captured upvalue.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_COPY-182",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_copy",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_stack_rotation_copy_and_bounds"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Integer classification distinguishes actual integer and real numeric values.",
+      "boundaries": "Integer-tagged and real-tagged values under the actual public conversion protocol.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_ISINTEGER-195",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_isinteger",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_numeric_conversions"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public numeric classification accepts the actual pinned numeric-string form.",
+      "boundaries": "Hexadecimal numeric string in a named actual C conversion case; nonnumeric failures have separate auxiliary/conversion witnesses.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_ISNUMBER-192",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_isnumber",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_numeric_conversions"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Pointer identity remains stable for actual tables, userdata and protected error objects across public API operations.",
+      "boundaries": "Registry-owned globals, raw table identity, aligned full userdata and exact error object recovery. Successor eight actual C pointer cases and35registered identity witnesses extend the retained routes, comparing same-host pointer formatting without fixed addresses.",
+      "named_aunit_cases": [
+        "tests/src/lua-pointer_identity_tests.adb#Builtin_Function",
+        "tests/src/lua-pointer_identity_tests.adb#C_Captured_Function",
+        "tests/src/lua-pointer_identity_tests.adb#C_Light_Function",
+        "tests/src/lua-pointer_identity_tests.adb#C_Light_Userdata",
+        "tests/src/lua-pointer_identity_tests.adb#C_Null_Pointer",
+        "tests/src/lua-pointer_identity_tests.adb#C_String",
+        "tests/src/lua-pointer_identity_tests.adb#C_Table",
+        "tests/src/lua-pointer_identity_tests.adb#C_Thread",
+        "tests/src/lua-pointer_identity_tests.adb#C_Userdata",
+        "tests/src/lua-pointer_identity_tests.adb#Empty_Name",
+        "tests/src/lua-pointer_identity_tests.adb#Field_Widths",
+        "tests/src/lua-pointer_identity_tests.adb#First_Surface_Refusal",
+        "tests/src/lua-pointer_identity_tests.adb#Handler_Integer",
+        "tests/src/lua-pointer_identity_tests.adb#Handler_Long_String",
+        "tests/src/lua-pointer_identity_tests.adb#Handler_Real",
+        "tests/src/lua-pointer_identity_tests.adb#Handler_Type_Error",
+        "tests/src/lua-pointer_identity_tests.adb#Late_C_Thread",
+        "tests/src/lua-pointer_identity_tests.adb#Leading_Nul_Name",
+        "tests/src/lua-pointer_identity_tests.adb#Long_String",
+        "tests/src/lua-pointer_identity_tests.adb#Lua_Function",
+        "tests/src/lua-pointer_identity_tests.adb#Missing_Value",
+        "tests/src/lua-pointer_identity_tests.adb#Name_Scan_Quota",
+        "tests/src/lua-pointer_identity_tests.adb#Named_Function",
+        "tests/src/lua-pointer_identity_tests.adb#Named_Table",
+        "tests/src/lua-pointer_identity_tests.adb#Nonstring_Name",
+        "tests/src/lua-pointer_identity_tests.adb#Nul_Name",
+        "tests/src/lua-pointer_identity_tests.adb#Null_Format",
+        "tests/src/lua-pointer_identity_tests.adb#Primitive_Name_Ignored",
+        "tests/src/lua-pointer_identity_tests.adb#Primitive_Text",
+        "tests/src/lua-pointer_identity_tests.adb#Raw_Name_Lookup",
+        "tests/src/lua-pointer_identity_tests.adb#Short_C_Prefix",
+        "tests/src/lua-pointer_identity_tests.adb#String_Handler",
+        "tests/src/lua-pointer_identity_tests.adb#Table_Text",
+        "tests/src/lua-pointer_identity_tests.adb#Thread_Identity",
+        "tests/src/lua-pointer_identity_tests.adb#Weak_Thread"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_TOPOINTER-208",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_topointer",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_global_table_macro",
+        "c_api/tests/c_api_consumer.c#test_protected_c_error_identity",
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_payload_alignment",
+        "c_api/tests/c_api_consumer.c#test_warning_error_boundary",
+        "c_api/tests/pointer_identity_contract.c#captured-closure-identity",
+        "c_api/tests/pointer_identity_contract.c#coroutine-identity",
+        "c_api/tests/pointer_identity_contract.c#full-userdata-identity",
+        "c_api/tests/pointer_identity_contract.c#light-cfunction-identity",
+        "c_api/tests/pointer_identity_contract.c#light-userdata-identity",
+        "c_api/tests/pointer_identity_contract.c#null-light-userdata-identity",
+        "c_api/tests/pointer_identity_contract.c#raw-string-identity",
+        "c_api/tests/pointer_identity_contract.c#table-identity"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Raw pointer-key lookup retrieves the exact stored value without handler dispatch.",
+      "boundaries": "Present light-pointer key and actual raw table identity/traversal in the named C frame.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_RAWGETP-268",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_rawgetp",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public table traversal advances the real key/value iterator without inventing a stable order.",
+      "boundaries": "All three stored raw keys counted exactly once with frame height/identity assertions.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_NEXT-369",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_next",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Pushing the real secondary thread preserves object identity and reports nonmain status.",
+      "boundaries": "Registry-sharing secondary state, actual stack moves and copied extra-space data; no fabricated main-thread return claim.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHTHREAD-256",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_pushthread",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "C-function classification distinguishes an actual light C function from a Lua closure.",
+      "boundaries": "True C-function and false Lua message-handler classifications through public stack values.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_ISCFUNCTION-194",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_iscfunction",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_light_c_function_identity",
+        "c_api/tests/c_api_consumer.c#test_lua_message_handler"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public C-function conversion returns the actual callable identity for light and captured C functions.",
+      "boundaries": "Light C function and C closure pointers, invoked captured-cell mutations.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_TOCFUNCTION-205",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_tocfunction",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_light_c_function_identity"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "An installed panic handler runs after the public unprotected-call failure and the state recovers through the actual C guard.",
+      "boundaries": "Panic after Ada return, exact error object, restored handler and usable state; no unasserted previous-handler return claim.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_ATPANIC-168",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_atpanic",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_panic_after_ada_returns"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Variadic formatting returns exact counted output and propagates actual protected memory error classes.",
+      "boundaries": "Scalar/binary/extended UTF8 formatting and refusal/rethrow recovery in separately named cases.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHFSTRING-252",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_pushfstring",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/format_api_contract.c#error_class",
+        "c_api/tests/format_api_contract.c#scalars"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "The va_list formatting entry preserves actual result bytes, native pointer spelling and measured growth refusal behavior.",
+      "boundaries": "Forwarded va_list, binary and scalar formats, platform pointer spelling and full growth refusal sweep; its measured NULL-on-refusal behavior remains distinct from variadic error propagation.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHVFSTRING-250",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_pushvfstring",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/format_api_contract.c#allocation_sweep",
+        "c_api/tests/format_api_contract.c#pointers",
+        "c_api/tests/format_api_contract.c#scalars"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public local inspection addresses the actual active/suspended function frame and its valid caller temporary extent.",
+      "boundaries": "Inactive parameter names, Lua/C slots, captured/suspended locals, temporary extent and stripped metadata.",
+      "named_aunit_cases": [
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETLOCAL-472",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_getlocal",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/debug_api_contract.c#active_c_locals",
+        "c_api/tests/debug_api_contract.c#active_lua_locals",
+        "c_api/tests/debug_api_contract.c#caller_temporary_extent",
+        "c_api/tests/debug_api_contract.c#inactive_parameter_names",
+        "c_api/tests/debug_api_contract.c#stripped_metadata",
+        "c_api/tests/debug_api_contract.c#suspended_capture_local",
+        "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-29"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public local mutation consumes its value and updates the actual selected active or suspended frame.",
+      "boundaries": "C/Lua locals, captures and suspended pending temporary slots with exact restored execution results.",
+      "named_aunit_cases": [
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETLOCAL-473",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_setlocal",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/debug_api_contract.c#active_c_locals",
+        "c_api/tests/debug_api_contract.c#active_lua_locals",
+        "c_api/tests/debug_api_contract.c#caller_temporary_extent",
+        "c_api/tests/debug_api_contract.c#suspended_capture_local",
+        "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-29"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Upvalue reads return actual captured values and the appropriate Lua/C naming protocol.",
+      "boundaries": "Lua and C captures, invalid index behavior and stripped-function metadata.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETUPVALUE-474",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_getupvalue",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/debug_api_contract.c#c_upvalue_identity",
+        "c_api/tests/debug_api_contract.c#stripped_metadata",
+        "c_api/tests/debug_api_contract.c#upvalue_values"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Upvalue writes consume their replacement and update actual shared Lua/C captures.",
+      "boundaries": "Lua/C captured values, joined-cell visibility and exact function results.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETUPVALUE-475",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_setupvalue",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/debug_api_contract.c#c_upvalue_identity",
+        "c_api/tests/debug_api_contract.c#joined_upvalue_identity",
+        "c_api/tests/debug_api_contract.c#upvalue_values"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public capture identity reflects actual shared and distinct Lua/C upvalue cells.",
+      "boundaries": "Before/after Lua joins, distinct values and C closure cell identity.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_UPVALUEID-477",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_upvalueid",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/debug_api_contract.c#c_upvalue_identity",
+        "c_api/tests/debug_api_contract.c#joined_upvalue_identity",
+        "c_api/tests/debug_api_contract.c#upvalue_values"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Joining Lua upvalues replaces actual cell identity and shares subsequent mutation.",
+      "boundaries": "Two independently created Lua closures, post-join pointer identity and changed observed closure result.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_UPVALUEJOIN-478",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_upvaluejoin",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/debug_api_contract.c#joined_upvalue_identity"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public reader loading retains streamed owners, stack/error policy and exact incremental callback consumption.",
+      "boundaries": "24 actual reader-loading cases: piece lifetime and EOF, recursive readers, syntax/mode errors, message/yield barriers, allocation refusal, binary splits/fixed pieces and linear piece accumulation. Writer-only cases remain separate dump witnesses.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_LOAD-301",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_load",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/load_dump_contract.h#test_binary_reader_every_split",
+        "c_api/tests/load_dump_contract.h#test_binary_reader_failure_boundaries",
+        "c_api/tests/load_dump_contract.h#test_dump_round_trip",
+        "c_api/tests/load_dump_contract.h#test_fixed_binary_piece_requirements",
+        "c_api/tests/load_dump_contract.h#test_fixed_binary_reader_count",
+        "c_api/tests/load_dump_contract.h#test_partial_binary_reader_error_cleanup",
+        "c_api/tests/load_dump_contract.h#test_reader_allocation_refusal",
+        "c_api/tests/load_dump_contract.h#test_reader_avoids_prefix_reconstruction",
+        "c_api/tests/load_dump_contract.h#test_reader_delimiter_boundaries",
+        "c_api/tests/load_dump_contract.h#test_reader_end_conditions",
+        "c_api/tests/load_dump_contract.h#test_reader_error_identity",
+        "c_api/tests/load_dump_contract.h#test_reader_escape_boundaries",
+        "c_api/tests/load_dump_contract.h#test_reader_inherits_message_handler",
+        "c_api/tests/load_dump_contract.h#test_reader_keyword_boundaries",
+        "c_api/tests/load_dump_contract.h#test_reader_nested_guarded_sources",
+        "c_api/tests/load_dump_contract.h#test_reader_number_boundaries",
+        "c_api/tests/load_dump_contract.h#test_reader_piece_lifetime",
+        "c_api/tests/load_dump_contract.h#test_reader_preserves_stack",
+        "c_api/tests/load_dump_contract.h#test_reader_punctuation_prefetch",
+        "c_api/tests/load_dump_contract.h#test_reader_recursive_api_reentry",
+        "c_api/tests/load_dump_contract.h#test_reader_stops_at_definitive_syntax",
+        "c_api/tests/load_dump_contract.h#test_reader_stops_at_invalid_escape",
+        "c_api/tests/load_dump_contract.h#test_reader_syntax_and_mode_errors",
+        "c_api/tests/load_dump_contract.h#test_reader_yield_barrier"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public dumping emits the actual canonical subtree through the real writer and preserves callback status/error protocol.",
+      "boundaries": "Executable binary round trip, writer stack and terminal calls, nonzero status/error identity, every split and fixed/truncated/malformed binary boundaries.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_DUMP-304",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_dump",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/load_dump_contract.h#test_binary_reader_every_split",
+        "c_api/tests/load_dump_contract.h#test_binary_reader_failure_boundaries",
+        "c_api/tests/load_dump_contract.h#test_dump_round_trip",
+        "c_api/tests/load_dump_contract.h#test_dump_terminal_status",
+        "c_api/tests/load_dump_contract.h#test_dump_writer_error_identity",
+        "c_api/tests/load_dump_contract.h#test_dump_writer_stack_and_terminal",
+        "c_api/tests/load_dump_contract.h#test_dump_writer_stops_on_status",
+        "c_api/tests/load_dump_contract.h#test_fixed_binary_piece_requirements",
+        "c_api/tests/load_dump_contract.h#test_fixed_binary_reader_count",
+        "c_api/tests/load_dump_contract.h#test_partial_binary_reader_error_cleanup"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "External string creation preserves byte identity, ownership, normalization, retention and actual release/refusal lifetimes.",
+      "boundaries": "Empty/short/long and embeddedNUL buffers, borrowed storage, string keys, weak values, allocation failure and state close. Default release-reentry cases remain checked in the full paired process; instrumented C lock omission stays explicit.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHEXTERNALSTRING-247",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_pushexternalstring",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/external_string_contract.c#allocation_refusal",
+        "c_api/tests/external_string_contract.c#borrowed_external",
+        "c_api/tests/external_string_contract.c#embedded_zero",
+        "c_api/tests/external_string_contract.c#empty_external",
+        "c_api/tests/external_string_contract.c#existing_key_update",
+        "c_api/tests/external_string_contract.c#long_external",
+        "c_api/tests/external_string_contract.c#long_key_retention",
+        "c_api/tests/external_string_contract.c#short_external",
+        "c_api/tests/external_string_contract.c#short_key_normalization",
+        "c_api/tests/external_string_contract.c#state_close_lifetime",
+        "c_api/tests/external_string_contract.c#weak_value_string"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public C-string numeric conversion matches exact original C values, consumed lengths, integer/real tags and failure stack preservation.",
+      "boundaries": "Decimal/hex integers, floating/extreme/long cancellation and remote midpoint forms, invalid strings, NUL extent, no-growth conversion and seeded round trips.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_STRINGTONUMBER-376",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_stringtonumber",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/conversion_api_contract.c#c_string_extent",
+        "c_api/tests/conversion_api_contract.c#decimal_integers",
+        "c_api/tests/conversion_api_contract.c#extreme_floats",
+        "c_api/tests/conversion_api_contract.c#failure_preserves_stack",
+        "c_api/tests/conversion_api_contract.c#floating_syntax",
+        "c_api/tests/conversion_api_contract.c#hexadecimal_integers",
+        "c_api/tests/conversion_api_contract.c#long_cancellation",
+        "c_api/tests/conversion_api_contract.c#refusal_no_growth",
+        "c_api/tests/conversion_api_contract.c#remote_midpoint",
+        "c_api/tests/conversion_api_contract.c#seeded_roundtrips"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public C arithmetic preserves primitive numeric types/wrap, original metamethod operands and the actual caller/error/yield boundary.",
+      "boundaries": "All binary/unary arithmetic and bitwise operations, coercions, handlers and diagnostics, C temporary mutation and nonyieldable recovery.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_ARITH-230",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_arith",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/operator_api_contract.c#arbitrary_handler_error",
+        "c_api/tests/operator_api_contract.c#arithmetic_caller_window",
+        "c_api/tests/operator_api_contract.c#arithmetic_diagnostics",
+        "c_api/tests/operator_api_contract.c#bare_string_no_handler",
+        "c_api/tests/operator_api_contract.c#handler_cannot_yield",
+        "c_api/tests/operator_api_contract.c#metamethod_arithmetic",
+        "c_api/tests/operator_api_contract.c#numeric_bitwise_handler",
+        "c_api/tests/operator_api_contract.c#primitive_arithmetic",
+        "c_api/tests/operator_api_contract.c#primitive_refusal",
+        "c_api/tests/operator_api_contract.c#string_handlers",
+        "c_api/tests/operator_api_contract.c#unary_and_wrap",
+        "c_api/tests/operator_api_contract.c#unary_caller_fake_operand"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public comparison preserves exact primitive ordering, handler/fallback operands, caller mutation and error identity.",
+      "boundaries": "Absent values, unequal integer/real precision, binary strings, comparison handlers/fallback, C caller windows, incompatible types and yield refusal.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_COMPARE-237",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_compare",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/operator_api_contract.c#comparison_caller_mutation",
+        "c_api/tests/operator_api_contract.c#comparison_error_identity",
+        "c_api/tests/operator_api_contract.c#comparison_handlers",
+        "c_api/tests/operator_api_contract.c#comparison_type_errors",
+        "c_api/tests/operator_api_contract.c#handler_cannot_yield",
+        "c_api/tests/operator_api_contract.c#primitive_comparison"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Type naming preserves all valid public tag labels and distinguishes absent from nil without consulting object name metadata.",
+      "boundaries": "All valid tag constants, borrowed-name stability, acceptable absent stack slot and userdata __name; out-of-range invalid enums are outside the pinned API precondition.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_TYPENAME-198",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_typename",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/index_type_api_contract.c#absent_slot_type_name",
+        "c_api/tests/index_type_api_contract.c#builtin_type_names",
+        "c_api/tests/index_type_api_contract.c#type_name_ignores_metatable_label"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Version queries return the compiled numeric version without consulting or allocating through a Lua state.",
+      "boundaries": "ExplicitNULL state and live state, unchanged stack and selected allocator call count.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_VERSION-171",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_version",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/index_type_api_contract.c#version_live_state",
+        "c_api/tests/index_type_api_contract.c#version_null_state"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Ordinary integer lookup preserves numeric key identity, return type/stack growth and real index-handler/error/yield semantics.",
+      "boundaries": "Absent/existing values, real/integer versus string keys, signed64 extremes, relative indices, handler/table chains and raw bypass, exact error objects and nonyieldable C callbacks.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETI-265",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_geti",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/index_type_api_contract.c#get_absent_integer_value",
+        "c_api/tests/index_type_api_contract.c#get_error_identity_and_recovery",
+        "c_api/tests/index_type_api_contract.c#get_existing_integer_value",
+        "c_api/tests/index_type_api_contract.c#get_existing_key_bypasses_handler",
+        "c_api/tests/index_type_api_contract.c#get_index_handler_operands",
+        "c_api/tests/index_type_api_contract.c#get_index_table_chain",
+        "c_api/tests/index_type_api_contract.c#get_nonindexable_error",
+        "c_api/tests/index_type_api_contract.c#get_nonyieldable_handler",
+        "c_api/tests/index_type_api_contract.c#get_numeric_key_identity",
+        "c_api/tests/index_type_api_contract.c#get_raw_bypasses_handler",
+        "c_api/tests/index_type_api_contract.c#get_relative_index_before_push",
+        "c_api/tests/index_type_api_contract.c#get_signed_integer_extremes"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Ordinary integer assignment consumes its value using the original table index and preserves actual newindex dispatch and barriers.",
+      "boundaries": "Exact pop, signed64 and relative indices, newindex operands/table chains, existing/raw bypass, error identity/recovery and nonyieldable/nonindexable cases.",
+      "named_aunit_cases": [
+        "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+        "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETI-282",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_seti",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
+        "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
+        "c_api/tests/index_type_api_contract.c#set_integer_value_and_pop",
+        "c_api/tests/index_type_api_contract.c#set_newindex_handler_operands",
+        "c_api/tests/index_type_api_contract.c#set_newindex_table_chain",
+        "c_api/tests/index_type_api_contract.c#set_nonindexable_error",
+        "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
+        "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
+        "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
+        "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+        "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+        "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "The exported public identity data contains the exact compiled Lua copyright/authors byte sequence.",
+      "boundaries": "An actual linked data-symbol read compared with the public header string literals; this is not a fabricated call to a preprocessor constant.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-DATA-LUA_IDENT-157",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_ident",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/conversion_api_contract.c#identity_data"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "The public pointer-arithmetic macro addresses real owned state extra-space bytes and preserves inherited child data.",
+      "boundaries": "Main/secondary state storage and a copied pointer-sized payload through actual public thread creation.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-MACRO-LUA_GETEXTRASPACE-391",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_getextraspace",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "The public function-classification macro identifies the actual Lua message handler while the C classifier remains false.",
+      "boundaries": "Lua closure classifier through a real protected message-handler setup.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-MACRO-LUA_ISFUNCTION-404",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_isfunction",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_lua_message_handler"
+      ]
+    },
+    {
+      "execution_evidence": [],
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_BUFFINIT-209",
+      "boundaries": "Empty scratch initialization and closing placeholder; zero-length append; the provider/data captured for a later owned payload.",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "name": "luaL_buffinit",
+      "coverage_authority": false,
+      "invariant": "luaL_buffinit executes its documented buffer operation with exact bytes, logical extent, stack placement and live provider ownership.",
+      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/buffer_api_contract.c#empty-result",
+        "c_api/tests/buffer_api_contract.c#zero-null-add",
+        "c_api/tests/buffer_api_contract.c#captured-deallocator-pair"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_PREPBUFFSIZE-210",
+      "boundaries": "Writable current-end space followed by explicit size commitment; repeated heap growth preserving every byte prefix; actual fresh-state allocation failures and recovery.",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "name": "luaL_prepbuffsize",
+      "coverage_authority": false,
+      "invariant": "luaL_prepbuffsize executes its documented buffer operation with exact bytes, logical extent, stack placement and live provider ownership.",
+      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/buffer_api_contract.c#direct-prep-addsize",
+        "c_api/tests/buffer_api_contract.c#large-growth-prefix",
+        "c_api/tests/buffer_api_contract.c#fault-sweep-growth"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_ADDLSTRING-211",
+      "boundaries": "Counted embedded-NUL bytes, null pointer with zero count, growing counted prefixes and real allocation refusal/recovery.",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "name": "luaL_addlstring",
+      "coverage_authority": false,
+      "invariant": "luaL_addlstring executes its documented buffer operation with exact bytes, logical extent, stack placement and live provider ownership.",
+      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/buffer_api_contract.c#fixed-binary-nul",
+        "c_api/tests/buffer_api_contract.c#zero-null-add",
+        "c_api/tests/buffer_api_contract.c#large-growth-prefix",
+        "c_api/tests/buffer_api_contract.c#fault-sweep-growth"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_ADDSTRING-212",
+      "boundaries": "C terminator truncation, empty C string and ordered text concatenation; the separately named Ada bounded-scan case checks shared host quota charging.",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "name": "luaL_addstring",
+      "coverage_authority": false,
+      "invariant": "luaL_addstring executes its documented buffer operation with exact bytes, logical extent, stack placement and live provider ownership.",
+      "named_aunit_cases": [
+        "tests/src/lua-c_buffer_tests.adb#Scan_Quota"
+      ],
+      "named_c_cases": [
+        "c_api/tests/buffer_api_contract.c#addstring-terminator"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_ADDVALUE-213",
+      "boundaries": "String value and sentinel placement across growth/collection, integer/float conversion, value pop semantics, nested buffers and callback result windows.",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "name": "luaL_addvalue",
+      "coverage_authority": false,
+      "invariant": "luaL_addvalue executes its documented buffer operation with exact bytes, logical extent, stack placement and live provider ownership.",
+      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/buffer_api_contract.c#addvalue-growth-gc",
+        "c_api/tests/buffer_api_contract.c#nested-buffers",
+        "c_api/tests/buffer_api_contract.c#callback-result"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_PUSHRESULT-214",
+      "boundaries": "Empty and binary publication, publication allocation refusal and retained provider/data ownership after allocator replacement; closing is checked by each selected case.",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "name": "luaL_pushresult",
+      "coverage_authority": false,
+      "invariant": "luaL_pushresult executes its documented buffer operation with exact bytes, logical extent, stack placement and live provider ownership.",
+      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/buffer_api_contract.c#empty-result",
+        "c_api/tests/buffer_api_contract.c#fixed-binary-nul",
+        "c_api/tests/buffer_api_contract.c#pushresult-header-refusal",
+        "c_api/tests/buffer_api_contract.c#captured-deallocator-pair"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_PUSHRESULTSIZE-215",
+      "boundaries": "Explicit written lengths for scratch and heap results, exact published bytes and result-only stack extent.",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "name": "luaL_pushresultsize",
+      "coverage_authority": false,
+      "invariant": "luaL_pushresultsize executes its documented buffer operation with exact bytes, logical extent, stack placement and live provider ownership.",
+      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/buffer_api_contract.c#buffinitsize-small",
+        "c_api/tests/buffer_api_contract.c#buffinitsize-heap"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_BUFFINITSIZE-216",
+      "boundaries": "Returned writable storage for small scratch and larger heap requests, followed by counted publication and exact content checks.",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "name": "luaL_buffinitsize",
+      "coverage_authority": false,
+      "invariant": "luaL_buffinitsize executes its documented buffer operation with exact bytes, logical extent, stack placement and live provider ownership.",
+      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/buffer_api_contract.c#buffinitsize-small",
+        "c_api/tests/buffer_api_contract.c#buffinitsize-heap"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_BUFFLEN-197",
+      "boundaries": "Zero and counted binary extents and each growing prefix; does not certify a runtime C API call for this direct field macro.",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "name": "luaL_bufflen",
+      "coverage_authority": false,
+      "invariant": "luaL_bufflen executes its documented buffer operation with exact bytes, logical extent, stack placement and live provider ownership.",
+      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/buffer_api_contract.c#empty-result",
+        "c_api/tests/buffer_api_contract.c#fixed-binary-nul",
+        "c_api/tests/buffer_api_contract.c#large-growth-prefix"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_BUFFADDR-198",
+      "boundaries": "Actual scratch and heap addresses, writable content and retained bytes through growth and collection.",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "name": "luaL_buffaddr",
+      "coverage_authority": false,
+      "invariant": "luaL_buffaddr executes its documented buffer operation with exact bytes, logical extent, stack placement and live provider ownership.",
+      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/buffer_api_contract.c#fixed-binary-nul",
+        "c_api/tests/buffer_api_contract.c#buffinitsize-heap",
+        "c_api/tests/buffer_api_contract.c#addvalue-growth-gc",
+        "c_api/tests/buffer_api_contract.c#large-growth-prefix"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_ADDCHAR-201",
+      "boundaries": "Repeated single-byte growth, shrink, ordinary characters and embedded NUL after heap allocation.",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "name": "luaL_addchar",
+      "coverage_authority": false,
+      "invariant": "luaL_addchar executes its documented buffer operation with exact bytes, logical extent, stack placement and live provider ownership.",
+      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/buffer_api_contract.c#buffsub-addchar"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_ADDSIZE-205",
+      "boundaries": "Committing two separately prepared writable areas advances the logical length and publishes direct! exactly.",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "name": "luaL_addsize",
+      "coverage_authority": false,
+      "invariant": "luaL_addsize executes its documented buffer operation with exact bytes, logical extent, stack placement and live provider ownership.",
+      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/buffer_api_contract.c#direct-prep-addsize"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_BUFFSUB-207",
+      "boundaries": "Logical shrink after heap growth followed by ordinary and NUL character appends.",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "name": "luaL_buffsub",
+      "coverage_authority": false,
+      "invariant": "luaL_buffsub executes its documented buffer operation with exact bytes, logical extent, stack placement and live provider ownership.",
+      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/buffer_api_contract.c#buffsub-addchar"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_PREPBUFFER-218",
+      "boundaries": "The fixed prepared extent is directly written and committed before a further explicit preparation.",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "name": "luaL_prepbuffer",
+      "coverage_authority": false,
+      "invariant": "luaL_prepbuffer executes its documented buffer operation with exact bytes, logical extent, stack placement and live provider ownership.",
+      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/buffer_api_contract.c#direct-prep-addsize"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_ALLOC-84",
+      "name": "luaL_alloc",
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual exported allocator handles malloc/realloc/free, preserves prefixes and refuses oversized requests without losing the previous block.",
+      "boundaries": "Null block ignores old size; zero frees; growth/shrink/fresh allocation, alignment, actual refusal and balanced state cleanup; no exact allocation-count or OOM-size assumption.",
+      "named_c_cases": [
+        "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+        "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+        "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+        "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+        "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+        "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+        "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+        "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+        "tests/src/lua-c_allocator_tests.adb#Free_Null",
+        "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+        "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+        "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+        "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+        "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+        "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+        "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+        "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+      ],
+      "review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_MAKESEED-106",
+      "name": "luaL_makeseed",
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual seed helper accepts live and null state arguments without touching stack or allocation ownership.",
+      "boundaries": "Seed value and uniqueness are intentionally unspecified; live-state stack, allocator count and bytes remain inert.",
+      "named_c_cases": [
+        "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+        "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+        "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+      ],
+      "review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_NEWSTATE-104",
+      "name": "luaL_newstate",
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual default constructor installs the public auxiliary allocator and a nonnull native-matched panic callback.",
+      "boundaries": "Two separately invoked installed-panic children preserve stack height/type, return zero and emit exact paired stderr; no deliberate process abort or foreign jump.",
+      "named_c_cases": [
+        "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+        "c_api/tests/allocator_api_contract.c#installed-panic-string",
+        "c_api/tests/allocator_api_contract.c#installed-panic-number"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+      ],
+      "review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_ADDGSUB-110",
+      "name": "luaL_addgsub",
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual exported helper appends literal nonoverlapping substitutions into an existing buffer which is reused between operations.",
+      "boundaries": "Literal metacharacters and replacements are not pattern expansions; completed append preserves prefix/suffix and exact stack placement.",
+      "named_c_cases": [
+        "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+      ],
+      "review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_GSUB-112",
+      "name": "luaL_gsub",
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual exported string substitution pushes one exact string result with native-matched literal, nonoverlap, NUL-terminated C-string, growth and protected-error semantics.",
+      "boundaries": "Sixteen shared-source scenarios remain separately observed; empty-pattern nonprogress and comparison quota are Ada bounded-policy witnesses only, not fabricated native terminating cases.",
+      "named_c_cases": [
+        "c_api/tests/substitution_api_contract.c#literal-metachars",
+        "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+        "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+        "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+        "c_api/tests/substitution_api_contract.c#growing-replacement",
+        "c_api/tests/substitution_api_contract.c#empty-replacement",
+        "c_api/tests/substitution_api_contract.c#no-match",
+        "c_api/tests/substitution_api_contract.c#empty-subject",
+        "c_api/tests/substitution_api_contract.c#prefix-suffix",
+        "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+        "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+        "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+        "c_api/tests/substitution_api_contract.c#callback-result",
+        "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+        "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+        "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+        "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+        "tests/src/lua-c_substitution_tests.adb#Shrink",
+        "tests/src/lua-c_substitution_tests.adb#Grow",
+        "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+        "tests/src/lua-c_substitution_tests.adb#No_Match",
+        "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+        "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+        "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+        "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+        "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+        "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+        "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+        "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+        "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+        "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+        "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+      ],
+      "review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_LOADFILEX-95",
+      "name": "luaL_loadfilex",
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual exported file loading preserves native text/binary preprocessing, source and error metadata, stack effects, allocation ownership and stdin results across both real binary producers and all four reader paths.",
+      "boundaries": "Twenty-one same-source file cases, two actual text readers, both actual dump producers and four binary paths; two host quotas and two pure preamble checks supplement the C operations without claiming native bounded-policy equivalence.",
+      "named_c_cases": [
+        "c_api/tests/loadfile_api_contract.c#empty-file-no-results",
+        "c_api/tests/loadfile_api_contract.c#bom-skipped",
+        "c_api/tests/loadfile_api_contract.c#shebang-line-numbers",
+        "c_api/tests/loadfile_api_contract.c#crlf-line-numbers",
+        "c_api/tests/loadfile_api_contract.c#incomplete-bom-syntax",
+        "c_api/tests/loadfile_api_contract.c#syntax-error-class",
+        "c_api/tests/loadfile_api_contract.c#text-mode-rejects-binary",
+        "c_api/tests/loadfile_api_contract.c#binary-mode-rejects-text",
+        "c_api/tests/loadfile_api_contract.c#dump-file-loads-runs",
+        "c_api/tests/loadfile_api_contract.c#stripped-dump-no-source",
+        "c_api/tests/loadfile_api_contract.c#source-info-matches-file",
+        "c_api/tests/loadfile_api_contract.c#missing-file-errno",
+        "c_api/tests/loadfile_api_contract.c#filename-nul-suffix",
+        "c_api/tests/loadfile_api_contract.c#success-keeps-stack",
+        "c_api/tests/loadfile_api_contract.c#missing-keeps-stack",
+        "c_api/tests/loadfile_api_contract.c#syntax-failure-keeps-stack",
+        "c_api/tests/loadfile_api_contract.c#protected-callback",
+        "c_api/tests/loadfile_api_contract.c#persistent-refusal-recovers",
+        "c_api/tests/loadfile_api_contract.c#prefixed-binary-alignment",
+        "c_api/tests/loadfile_api_contract.c#actual-file-growth-sweep",
+        "c_api/tests/loadfile_api_contract.c#shebang-lone-CR",
+        "c_api/tests/loadfile_api_contract.c#stdin-text",
+        "c_api/tests/loadfile_api_contract.c#stdin-binary-cross-runtime"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-c_loadfile_tests.adb#Empty_File",
+        "tests/src/lua-c_loadfile_tests.adb#Bom",
+        "tests/src/lua-c_loadfile_tests.adb#Shebang",
+        "tests/src/lua-c_loadfile_tests.adb#CrLf",
+        "tests/src/lua-c_loadfile_tests.adb#Incomplete_Bom",
+        "tests/src/lua-c_loadfile_tests.adb#Syntax_Class",
+        "tests/src/lua-c_loadfile_tests.adb#Text_Mode",
+        "tests/src/lua-c_loadfile_tests.adb#Binary_Mode",
+        "tests/src/lua-c_loadfile_tests.adb#Dump_Load",
+        "tests/src/lua-c_loadfile_tests.adb#Stripped_Dump",
+        "tests/src/lua-c_loadfile_tests.adb#Source_Info",
+        "tests/src/lua-c_loadfile_tests.adb#Missing_Errno",
+        "tests/src/lua-c_loadfile_tests.adb#Nul_Filename",
+        "tests/src/lua-c_loadfile_tests.adb#Success_Stack",
+        "tests/src/lua-c_loadfile_tests.adb#Missing_Stack",
+        "tests/src/lua-c_loadfile_tests.adb#Syntax_Stack",
+        "tests/src/lua-c_loadfile_tests.adb#Protected_Call",
+        "tests/src/lua-c_loadfile_tests.adb#Refusal_Recovery",
+        "tests/src/lua-c_loadfile_tests.adb#Prefixed_Binary",
+        "tests/src/lua-c_loadfile_tests.adb#Growth_Sweep",
+        "tests/src/lua-c_loadfile_tests.adb#Shebang_CR",
+        "tests/src/lua-c_loadfile_tests.adb#Source_Quota",
+        "tests/src/lua-c_loadfile_tests.adb#Work_Quota",
+        "tests/src/source_tests.adb#Lone_CR_Ignored",
+        "tests/src/source_tests.adb#Interior_CR_With_CRLF"
+      ],
+      "review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_LOADFILE-98",
+      "name": "luaL_loadfile",
+      "proposed_classification": "runtime-behavior",
+      "invariant": "The actual exported convenience macro loads and executes an empty real file with no results.",
+      "boundaries": "The empty-file case calls luaL_loadfile itself; its expansion executes luaL_loadfilex with NULL mode. Compilation alone is not evidence.",
+      "named_c_cases": [
+        "c_api/tests/loadfile_api_contract.c#empty-file-no-results"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-c_loadfile_tests.adb#Empty_File"
+      ],
+      "review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_CLOSETHREAD-166",
+      "name": "lua_closethread",
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual public thread close/reset preserves statuses, incoming/closing errors, retained roots, refusal recovery and real self-transfer without resuming abandoned C bodies.",
+      "boundaries": "Default pairs24native/Ada cases; T pairs23and records the actual native warning-lock skip, never a pass or exclusion. The default-only C warning witness has explicit receiver contexts. Additional Ada borrowed-reader cleanup and host quotas make no native-balanced-parser or native-quota equivalence claim.",
+      "named_c_cases": [
+        "c_api/tests/thread_reset_api_contract.c#fresh-values",
+        "c_api/tests/thread_reset_api_contract.c#suspended-lua",
+        "c_api/tests/thread_reset_api_contract.c#suspended-c",
+        "c_api/tests/thread_reset_api_contract.c#original-error",
+        "c_api/tests/thread_reset_api_contract.c#closing-error",
+        "c_api/tests/thread_reset_api_contract.c#reinitialize-thread",
+        "c_api/tests/thread_reset_api_contract.c#weak-prefix-lifetime",
+        "c_api/tests/thread_reset_api_contract.c#no-closer-refusal",
+        "c_api/tests/thread_reset_api_contract.c#self-close-direct",
+        "c_api/tests/thread_reset_api_contract.c#self-close-nested",
+        "c_api/tests/thread_reset_api_contract.c#self-close-lua-resume",
+        "c_api/tests/thread_reset_api_contract.c#base-c-settop",
+        "c_api/tests/thread_reset_api_contract.c#base-c-closeslot",
+        "c_api/tests/thread_reset_api_contract.c#base-c-reset",
+        "c_api/tests/thread_reset_api_contract.c#self-reader",
+        "c_api/tests/thread_reset_api_contract.c#self-writer",
+        "c_api/tests/thread_reset_api_contract.c#self-warning",
+        "c_api/tests/thread_reset_api_contract.c#self-hook",
+        "c_api/tests/thread_reset_api_contract.c#self-close-error",
+        "c_api/tests/thread_reset_api_contract.c#c-closer-refusal",
+        "c_api/tests/thread_reset_api_contract.c#multiple-closers-refusal",
+        "c_api/tests/thread_reset_api_contract.c#closer-error-refusal",
+        "c_api/tests/thread_reset_api_contract.c#recursive-self-close",
+        "c_api/tests/thread_reset_api_contract.c#reset-memory-recovery"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-c_thread_reset_tests.adb#Suspended_Lua",
+        "tests/src/lua-c_thread_reset_tests.adb#Original_Error",
+        "tests/src/lua-c_thread_reset_tests.adb#Close_Error",
+        "tests/src/lua-c_thread_reset_tests.adb#Weak_Prefix",
+        "tests/src/lua-c_thread_reset_tests.adb#Self_Nested",
+        "tests/src/lua-c_thread_reset_tests.adb#Self_Reader",
+        "tests/src/lua-c_thread_reset_tests.adb#Self_Warning",
+        "tests/src/lua-c_thread_reset_tests.adb#Refused_C_Closer",
+        "tests/src/lua-c_thread_reset_tests.adb#Refused_Multiple_Closers",
+        "tests/src/lua-c_thread_reset_tests.adb#Refused_Closer_Error",
+        "tests/src/lua-c_thread_reset_tests.adb#Recursive_Self_Close",
+        "tests/src/lua-c_thread_reset_tests.adb#Reset_Memory_Recovery",
+        "tests/src/lua-c_thread_reset_tests.adb#Borrowed_Reader",
+        "tests/src/lua-c_thread_reset_tests.adb#Borrowed_Warning",
+        "tests/src/lua-c_thread_reset_tests.adb#Shared_Close_Quota"
+      ],
+      "review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_RESETTHREAD-440",
+      "name": "lua_resetthread",
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual public thread close/reset preserves statuses, incoming/closing errors, retained roots, refusal recovery and real self-transfer without resuming abandoned C bodies.",
+      "boundaries": "Default pairs24native/Ada cases; T pairs23and records the actual native warning-lock skip, never a pass or exclusion. The default-only C warning witness has explicit receiver contexts. Additional Ada borrowed-reader cleanup and host quotas make no native-balanced-parser or native-quota equivalence claim.",
+      "named_c_cases": [
+        "c_api/tests/thread_reset_api_contract.c#fresh-values",
+        "c_api/tests/thread_reset_api_contract.c#suspended-lua",
+        "c_api/tests/thread_reset_api_contract.c#suspended-c",
+        "c_api/tests/thread_reset_api_contract.c#original-error",
+        "c_api/tests/thread_reset_api_contract.c#closing-error",
+        "c_api/tests/thread_reset_api_contract.c#reinitialize-thread",
+        "c_api/tests/thread_reset_api_contract.c#weak-prefix-lifetime",
+        "c_api/tests/thread_reset_api_contract.c#no-closer-refusal",
+        "c_api/tests/thread_reset_api_contract.c#self-close-direct",
+        "c_api/tests/thread_reset_api_contract.c#self-close-nested",
+        "c_api/tests/thread_reset_api_contract.c#self-close-lua-resume",
+        "c_api/tests/thread_reset_api_contract.c#base-c-settop",
+        "c_api/tests/thread_reset_api_contract.c#base-c-closeslot",
+        "c_api/tests/thread_reset_api_contract.c#base-c-reset",
+        "c_api/tests/thread_reset_api_contract.c#self-reader",
+        "c_api/tests/thread_reset_api_contract.c#self-writer",
+        "c_api/tests/thread_reset_api_contract.c#self-warning",
+        "c_api/tests/thread_reset_api_contract.c#self-hook",
+        "c_api/tests/thread_reset_api_contract.c#self-close-error",
+        "c_api/tests/thread_reset_api_contract.c#c-closer-refusal",
+        "c_api/tests/thread_reset_api_contract.c#multiple-closers-refusal",
+        "c_api/tests/thread_reset_api_contract.c#closer-error-refusal",
+        "c_api/tests/thread_reset_api_contract.c#recursive-self-close",
+        "c_api/tests/thread_reset_api_contract.c#reset-memory-recovery"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-c_thread_reset_tests.adb#Suspended_Lua",
+        "tests/src/lua-c_thread_reset_tests.adb#Original_Error",
+        "tests/src/lua-c_thread_reset_tests.adb#Close_Error",
+        "tests/src/lua-c_thread_reset_tests.adb#Weak_Prefix",
+        "tests/src/lua-c_thread_reset_tests.adb#Self_Nested",
+        "tests/src/lua-c_thread_reset_tests.adb#Self_Reader",
+        "tests/src/lua-c_thread_reset_tests.adb#Self_Warning",
+        "tests/src/lua-c_thread_reset_tests.adb#Refused_C_Closer",
+        "tests/src/lua-c_thread_reset_tests.adb#Refused_Multiple_Closers",
+        "tests/src/lua-c_thread_reset_tests.adb#Refused_Closer_Error",
+        "tests/src/lua-c_thread_reset_tests.adb#Recursive_Self_Close",
+        "tests/src/lua-c_thread_reset_tests.adb#Reset_Memory_Recovery",
+        "tests/src/lua-c_thread_reset_tests.adb#Borrowed_Reader",
+        "tests/src/lua-c_thread_reset_tests.adb#Borrowed_Warning",
+        "tests/src/lua-c_thread_reset_tests.adb#Shared_Close_Quota"
+      ],
+      "review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#register-cfunction"
+      ],
+      "name": "lua_register",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_REGISTER-400",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_register with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#islightuserdata"
+      ],
+      "name": "lua_islightuserdata",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_ISLIGHTUSERDATA-406",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_islightuserdata with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#isboolean"
+      ],
+      "name": "lua_isboolean",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_ISBOOLEAN-408",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_isboolean with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#isnone"
+      ],
+      "name": "lua_isnone",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_ISNONE-410",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_isnone with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#insert-suffix"
+      ],
+      "name": "lua_insert",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_INSERT-421",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_insert with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#replace-pop"
+      ],
+      "name": "lua_replace",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_REPLACE-425",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_replace with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#newuserdata-one-uservalue"
+      ],
+      "name": "lua_newuserdata",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_NEWUSERDATA-436",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_newuserdata with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#getuservalue-alias"
+      ],
+      "name": "lua_getuservalue",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_GETUSERVALUE-437",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_getuservalue with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#setuservalue-alias"
+      ],
+      "name": "lua_setuservalue",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_SETUSERVALUE-438",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_setuservalue with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#newlibtable-empty"
+      ],
+      "name": "luaL_newlibtable",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_NEWLIBTABLE-132",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_newlibtable with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#newlib-calls"
+      ],
+      "name": "luaL_newlib",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_NEWLIB-135",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_newlib with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#argcheck-short-circuit",
+        "c_api/tests/macro_api_contract.c#argcheck-protected-error"
+      ],
+      "name": "luaL_argcheck",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_ARGCHECK-138",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_argcheck with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#argexpected-short-circuit",
+        "c_api/tests/macro_api_contract.c#argexpected-protected-error"
+      ],
+      "name": "luaL_argexpected",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_ARGEXPECTED-141",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_argexpected with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#checkstring-binary",
+        "c_api/tests/macro_api_contract.c#checkstring-number",
+        "c_api/tests/macro_api_contract.c#checkstring-protected-error"
+      ],
+      "name": "luaL_checkstring",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_CHECKSTRING-144",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_checkstring with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#optstring-default",
+        "c_api/tests/macro_api_contract.c#optstring-present"
+      ],
+      "name": "luaL_optstring",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_OPTSTRING-145",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_optstring with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#typename-alias"
+      ],
+      "name": "luaL_typename",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_TYPENAME-147",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_typename with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#dofile-results",
+        "c_api/tests/macro_api_contract.c#dofile-syntax",
+        "c_api/tests/macro_api_contract.c#dofile-runtime"
+      ],
+      "name": "luaL_dofile",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_DOFILE-149",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_dofile with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#dostring-results",
+        "c_api/tests/macro_api_contract.c#dostring-syntax",
+        "c_api/tests/macro_api_contract.c#dostring-runtime"
+      ],
+      "name": "luaL_dostring",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_DOSTRING-152",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_dostring with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#getmetatable-registry"
+      ],
+      "name": "luaL_getmetatable",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_GETMETATABLE-155",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_getmetatable with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#opt-short-circuit"
+      ],
+      "name": "luaL_opt",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_OPT-157",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_opt with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#loadbuffer-extent"
+      ],
+      "name": "luaL_loadbuffer",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_LOADBUFFER-159",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_loadbuffer with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#intop-wrap"
+      ],
+      "name": "luaL_intop",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_INTOP-166",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_intop with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original false branch selected only by the separately compiled LUA_FAILISFALSE client. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_compat_api_contract.c#pushfail-selected"
+      ],
+      "name": "luaL_pushfail",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_PUSHFAIL-172",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_pushfail with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original nil branch selected by the ordinary SDK receiver, including the ordinary caller of a T runtime. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#pushfail-selected"
+      ],
+      "name": "luaL_pushfail",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_PUSHFAIL-174",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_pushfail with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original alias is absent in an ordinary receiver; a separate actual client defines LUA_COMPAT_APIINTCASTS before including the unchanged SDK. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_compat_api_contract.c#compat-checkunsigned"
+      ],
+      "name": "luaL_checkunsigned",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_CHECKUNSIGNED-254",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_checkunsigned with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original alias is absent in an ordinary receiver; a separate actual client defines LUA_COMPAT_APIINTCASTS before including the unchanged SDK. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_compat_api_contract.c#compat-optunsigned"
+      ],
+      "name": "luaL_optunsigned",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_OPTUNSIGNED-255",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_optunsigned with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original alias is absent in an ordinary receiver; a separate actual client defines LUA_COMPAT_APIINTCASTS before including the unchanged SDK. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_compat_api_contract.c#compat-checkint"
+      ],
+      "name": "luaL_checkint",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_CHECKINT-258",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_checkint with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original alias is absent in an ordinary receiver; a separate actual client defines LUA_COMPAT_APIINTCASTS before including the unchanged SDK. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_compat_api_contract.c#compat-optint"
+      ],
+      "name": "luaL_optint",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_OPTINT-259",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_optint with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original alias is absent in an ordinary receiver; a separate actual client defines LUA_COMPAT_APIINTCASTS before including the unchanged SDK. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_compat_api_contract.c#compat-checklong"
+      ],
+      "name": "luaL_checklong",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_CHECKLONG-261",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_checklong with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original alias is absent in an ordinary receiver; a separate actual client defines LUA_COMPAT_APIINTCASTS before including the unchanged SDK. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_compat_api_contract.c#compat-optlong"
+      ],
+      "name": "luaL_optlong",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_OPTLONG-262",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_optlong with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#legacy-strlen"
+      ],
+      "name": "lua_strlen",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUACONF-H-MACRO-LUA_STRLEN-365",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_strlen with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#legacy-objlen"
+      ],
+      "name": "lua_objlen",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUACONF-H-MACRO-LUA_OBJLEN-367",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_objlen with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#legacy-equal-metamethod"
+      ],
+      "name": "lua_equal",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUACONF-H-MACRO-LUA_EQUAL-369",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_equal with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#legacy-lessthan-metamethod"
+      ],
+      "name": "lua_lessthan",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUACONF-H-MACRO-LUA_LESSTHAN-370",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_lessthan with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#floor-helper"
+      ],
+      "name": "l_floor",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUACONF-H-MACRO-L_FLOOR-405",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes l_floor with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#integer-format"
+      ],
+      "name": "lua_integer2str",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUACONF-H-MACRO-LUA_INTEGER2STR-486",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_integer2str with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#pointer-format"
+      ],
+      "name": "lua_pointer2str",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUACONF-H-MACRO-LUA_POINTER2STR-591",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_pointer2str with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_TRACEBACK-119",
+      "name": "luaL_traceback",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/traceback_api_contract.c#no-message",
+        "c_api/tests/traceback_api_contract.c#host-message",
+        "c_api/tests/traceback_api_contract.c#empty-message",
+        "c_api/tests/traceback_api_contract.c#nul-message",
+        "c_api/tests/traceback_api_contract.c#negative-level",
+        "c_api/tests/traceback_api_contract.c#nested-frames",
+        "c_api/tests/traceback_api_contract.c#skip-current",
+        "c_api/tests/traceback_api_contract.c#out-of-stack",
+        "c_api/tests/traceback_api_contract.c#stack-prefix",
+        "c_api/tests/traceback_api_contract.c#inactive-thread",
+        "c_api/tests/traceback_api_contract.c#suspended-thread",
+        "c_api/tests/traceback_api_contract.c#independent-destination",
+        "c_api/tests/traceback_api_contract.c#shared-lua-renderer",
+        "c_api/tests/traceback_api_contract.c#refusal-and-retry",
+        "c_api/tests/traceback_api_contract.c#lua-nul-message",
+        "c_api/tests/traceback_api_contract.c#lua-numeric-message",
+        "c_api/tests/traceback_api_contract.c#lua-message-identity",
+        "c_api/tests/traceback_api_contract.c#lua-level-cast",
+        "c_api/tests/traceback_api_contract.c#deep-stack",
+        "c_api/tests/traceback_api_contract.c#shortening-boundary",
+        "c_api/tests/traceback_api_contract.c#hook-origin",
+        "c_api/tests/traceback_api_contract.c#closed-thread"
+      ],
+      "named_aunit_cases": [
+        "tests/src/traceback_api_tests.adb#No_Message",
+        "tests/src/traceback_api_tests.adb#Host_Message",
+        "tests/src/traceback_api_tests.adb#Empty_Message",
+        "tests/src/traceback_api_tests.adb#Nul_Message",
+        "tests/src/traceback_api_tests.adb#Negative_Level",
+        "tests/src/traceback_api_tests.adb#Nested_Frames",
+        "tests/src/traceback_api_tests.adb#Skip_Current",
+        "tests/src/traceback_api_tests.adb#Out_Of_Stack",
+        "tests/src/traceback_api_tests.adb#Stack_Prefix",
+        "tests/src/traceback_api_tests.adb#Inactive_Thread",
+        "tests/src/traceback_api_tests.adb#Suspended_Thread",
+        "tests/src/traceback_api_tests.adb#Independent_Destination",
+        "tests/src/traceback_api_tests.adb#Shared_Lua_Renderer",
+        "tests/src/traceback_api_tests.adb#Refusal_And_Retry",
+        "tests/src/traceback_api_tests.adb#Lua_Nul_Message",
+        "tests/src/traceback_api_tests.adb#Lua_Numeric_Message",
+        "tests/src/traceback_api_tests.adb#Lua_Message_Identity",
+        "tests/src/traceback_api_tests.adb#Lua_Level_Cast",
+        "tests/src/traceback_api_tests.adb#Deep_Stack",
+        "tests/src/traceback_api_tests.adb#Shortening_Boundary",
+        "tests/src/traceback_api_tests.adb#Hook_Origin",
+        "tests/src/traceback_api_tests.adb#Closed_Thread",
+        "tests/src/traceback_api_tests.adb#Message_Work_Quota",
+        "tests/src/traceback_api_tests.adb#Result_Extent_Quota"
+      ],
+      "invariant": "Public traceback preserves the actual source thread and destination stack, C message extent and C-int level conversion, shared Lua/C frame rendering, shortening boundary and callback/closed-thread lifetime.",
+      "boundaries": "Twenty-two actual same-source C operations plus24 separately registered AUnit cases (22paired behaviors and2owning-host quotas). Includes negative/deep/hook levels, binary/numeric message handling, borrowed threads, refusal/retry and bounded work/result cleanup. Source review and fresh same-image observations remain mandatory.",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETFIELD-281",
+      "name": "lua_setfield",
+      "proposed_classification": "runtime-behavior",
+      "invariant": "A table used as both the target and value remains the same rooted identity through the public field write.",
+      "boundaries": "Named self-value regression supplements every retained field/newindex route; source registration alone grants no runtime acceptance.",
+      "named_c_cases": [
+        "c_api/tests/index_type_api_contract.c#set_field_self_value"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+      ],
+      "review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETHOOK-481",
+      "name": "lua_sethook",
+      "proposed_classification": "runtime-behavior",
+      "invariant": "A real return hook edits the actual outgoing C result cell, and replacing its value retires the obsolete weak root.",
+      "boundaries": "Actual return-event transfer extent, one callback, caller-visible scalar/nil result and weak collection; all retained mask/count/line/yield cases remain required.",
+      "named_c_cases": [
+        "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+        "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+      ],
+      "review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    }
+  ],
+  "kind": "additional-target-api-author-routes",
+  "coverage_authority": false
+}

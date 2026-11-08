@@ -2,7 +2,10 @@ param(
     [ValidateSet('static', 'static-pic', 'relocatable')]
     [string] $LibraryType = 'static',
     [ValidateSet('development', 'validation', 'release')]
-    [string] $Profile = 'validation'
+    [string] $Profile = 'validation',
+    [ValidateSet('','remaining-upstream-compatibility')][string] $TargetPolicy = '',
+    [string] $TargetWitnessPolicy = '',
+    [switch] $TargetDevelopmentObservation
 )
 
 $ErrorActionPreference = 'Stop'
@@ -19,6 +22,13 @@ Import-Module (Join-Path $PSScriptRoot 'RuntimeSupport.psm1') -Force
 $scenario = '-XLUA_ADA_LIBRARY_TYPE=' + $LibraryType
 $profileArgument = '--' + $Profile
 $suffix = if ($IsWindows) { '.exe' } else { '' }
+$targetWitnesses = $null; $previousTargetReports = @()
+if ($TargetPolicy -ne '') {
+    if ($TargetWitnessPolicy -eq '') { throw 'Target build mode requires its explicit successor witness policy' }
+    Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
+    $targetWitnesses = Read-TargetWitnessPolicy -Root $projectRoot -Path $TargetWitnessPolicy -RequireReview:(-not $TargetDevelopmentObservation)
+    $previousTargetReports = @(Get-ChildItem (Join-Path $projectRoot 'reports/core-image') -Filter result.json -File -Recurse -ErrorAction SilentlyContinue | ForEach-Object FullName)
+} elseif ($TargetWitnessPolicy -ne '' -or $TargetDevelopmentObservation) { throw 'Target witness/development flags require TargetPolicy' }
 
 function Invoke-Alire {
     param([string[]] $Arguments)
@@ -43,10 +53,16 @@ try {
     }
     & (Join-Path $PSScriptRoot 'check-documentation.ps1')
     & (Join-Path $PSScriptRoot 'test-pe-unwind.ps1')
+    & (Join-Path $PSScriptRoot 'test-aunit-launch.ps1')
+    & (Join-Path $PSScriptRoot 'test-aunit-evidence.ps1')
+    & (Join-Path $PSScriptRoot 'test-foreign-contract-evidence.ps1')
+    & (Join-Path $PSScriptRoot 'test-configured-fixture-selection.ps1')
     Invoke-Alire -Arguments @('-n', 'build', $profileArgument, '--', $scenario, '-XLUA_ADA_PREBUILT=false')
-    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+    $coreArguments=@('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-core-image.ps1'),
         '-LibraryType', $LibraryType, '-Profile', $Profile, '-UseExistingRuntime')
+    if($TargetPolicy -ne ''){$coreArguments+=@('-TargetPolicy',$TargetPolicy)}
+    Invoke-Alire -Arguments $coreArguments
     foreach ($crateName in @('cli', 'tests')) {
         Set-Location (Join-Path $projectRoot $crateName)
         Invoke-Alire -Arguments @('-n', 'build', $profileArgument,
@@ -79,8 +95,10 @@ try {
         (Join-Path $PSScriptRoot 'check-output-policy.ps1'),
         '-Consumer', (Join-Path $projectRoot "tests/bin/$LibraryType/output_consumer$suffix"),
         '-Interpreter', $absoluteCli)
+    $cliAdaReport=Join-Path $projectRoot ('reports/core-image/cli-'+[guid]::NewGuid().ToString('N')+'/ada.json')
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
-        (Join-Path $PSScriptRoot 'check-cli.ps1'), '-Interpreter', $absoluteCli)
+        (Join-Path $PSScriptRoot 'check-cli.ps1'), '-Interpreter', $absoluteCli,
+        '-Configuration','default','-Profile',$Profile,'-LibraryType',$LibraryType,'-Report',$cliAdaReport,'-RuntimeDirectory',$runtimePath)
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-lifecycle.ps1'),
         '-Interpreter', $absoluteCli)
@@ -88,6 +106,32 @@ try {
     Invoke-Alire -Arguments @('exec', '--', 'gprbuild', '-P',
         'experiments/conformance/oracle.gpr',
         '-XLUA_CONFORMANCE_CONFIGURATION=default')
+    $consoleDirectory=Join-Path $projectRoot ('reports/core-image/'+[guid]::NewGuid().ToString('N'))
+    Invoke-Alire -Arguments @('exec','--','pwsh','-NoProfile','-File',
+        (Join-Path $PSScriptRoot 'check-debug-console.ps1'),'-Interpreter',$absoluteCli,
+        '-ReferenceInterpreter',(Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
+        '-ReferenceLibraryDirectory',(Join-Path $projectRoot 'build/conformance/default/lib'),
+        '-RuntimeDirectory',$runtimePath,'-Configuration','default',
+        '-OutputDirectory',(Join-Path $consoleDirectory 'lua'))
+    Invoke-Alire -Arguments @('exec','--','pwsh','-NoProfile','-File',
+        (Join-Path $PSScriptRoot 'check-cli-readline.ps1'),'-Interpreter',$absoluteCli,
+        '-ReferenceInterpreter',(Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
+        '-ReferenceLibraryDirectory',(Join-Path $projectRoot 'build/conformance/default/lib'),
+        '-RuntimeDirectory',$runtimePath,'-Configuration','default',
+        '-OutputDirectory',(Join-Path $projectRoot ('reports/core-image/readline-'+[guid]::NewGuid().ToString('N'))))
+    $consoleCompilerOutput=& alr exec -- pwsh -NoProfile -Command '(Get-Command gcc -ErrorAction Stop).Source'
+    if($LASTEXITCODE -ne 0){throw 'Cannot identify selected console C compiler'}
+    $consoleCompiler=($consoleCompilerOutput -join '').Trim()
+    Invoke-Alire -Arguments @('exec','--','pwsh','-NoProfile','-File',
+        (Join-Path $PSScriptRoot 'test-cli-readline-portability.ps1'),
+        '-Compiler',$consoleCompiler)
+    Invoke-Alire -Arguments @('exec','--','pwsh','-NoProfile','-File',
+        (Join-Path $PSScriptRoot 'check-debug-console-c.ps1'),
+        '-Interpreter',(Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
+        '-AdaConsumer',(Join-Path $projectRoot "build/c-api/bin/$Profile/$LibraryType/builtin_api_contract$suffix"),
+        '-Compiler',$consoleCompiler,'-ReferenceLibrary',(Join-Path $projectRoot 'build/conformance/default/lib'),
+        '-AdaRuntimeDirectory',$runtimePath,'-Configuration','default',
+        '-OutputDirectory',(Join-Path $consoleDirectory 'c'))
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-binary-cli.ps1'),
         '-Interpreter', $absoluteCli,
@@ -109,8 +153,30 @@ try {
         throw 'CLI must fail for unsupported execution requests'
     }
     Set-Location $projectRoot
+    $configuredRunner=Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"
+    $configuredReport=Join-Path $projectRoot ('reports/core-image/configured-'+[guid]::NewGuid().ToString('N')+'/result.json')
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
-        (Join-Path $PSScriptRoot 'compare.ps1'), '-Interpreter', $absoluteCli)
+        (Join-Path $PSScriptRoot 'check-configured-fixtures.ps1'),
+        '-Interpreter',$configuredRunner,'-ReferenceInterpreter',
+        (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
+        '-Configuration','default','-RuntimeDirectory',$runtimePath,
+        '-ReferenceLibraryDirectory',(Join-Path $projectRoot 'build/conformance/default/lib'),
+        '-Profile',$Profile,'-LibraryType',$LibraryType,'-Report',$configuredReport)
+    $cliPairReport=Join-Path (Split-Path -Parent $cliAdaReport) 'pair.json'
+    $cliObservationArguments=if($TargetDevelopmentObservation){@('-DevelopmentObservation')}else{@()}
+    Invoke-Alire -Arguments (@('exec','--','pwsh','-NoProfile','-File',
+        (Join-Path $PSScriptRoot 'check-configured-cli.ps1'),'-Interpreter',$absoluteCli,
+        '-ReferenceInterpreter',(Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
+        '-ReferenceLibraryDirectory',(Join-Path $projectRoot 'build/conformance/default/lib'),
+        '-Configuration','default','-Profile',$Profile,'-LibraryType',$LibraryType,
+        '-AdaReport',$cliAdaReport,'-Report',$cliPairReport)+$cliObservationArguments)
+    & (Join-Path $PSScriptRoot 'test-cli-fixtures.ps1') -Report $cliPairReport
+    & (Join-Path $PSScriptRoot 'test-cli-fixture-transport.ps1') `
+        -Interpreter (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix") `
+        -RuntimeDirectory (Join-Path $projectRoot 'build/conformance/default/lib')
+    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+        (Join-Path $PSScriptRoot 'compare.ps1'), '-Interpreter', $absoluteCli,
+        '-ConfiguredWitnessReport',$configuredReport,'-ConfiguredInterpreter',$configuredRunner,'-HostCliReport',$cliPairReport)
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-conformance-telemetry.ps1'),
         '-Interpreter', (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"),
@@ -136,12 +202,20 @@ try {
         '-Interpreter', (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"),
         '-ReferenceInterpreter', (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
         '-ReferenceLibraryDirectory', (Join-Path $projectRoot 'build/conformance/default/lib'))
+    if ($TargetPolicy -eq '') {
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-expanded-conformance.ps1'),
         '-Interpreter', (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"),
         '-ReferenceInterpreter', (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
         '-RuntimeDirectory', $runtimePath, '-Configuration', 'default',
         '-Profile', $Profile, '-LibraryType', $LibraryType)
+    } else {
+        $platform = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
+        $link = if ($LibraryType -ceq 'relocatable') { 'shared' } else { $LibraryType }
+        $null = Write-TargetBuildWitnesses -Root $projectRoot -Policy $targetWitnesses `
+            -Context "default/$platform/$Profile/$link" -PreviousReports $previousTargetReports -ConfiguredReport $configuredReport -CliReport $cliPairReport
+        Write-Output 'Target build phase completed; File/Aggregate/Heavy executions belong to immutable-image partition jobs; target acceptance=False'
+    }
 
     Write-Output "PASS: $Profile / $LibraryType (AUnit and CLI contracts)"
 }

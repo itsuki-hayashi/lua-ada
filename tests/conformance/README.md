@@ -5,6 +5,59 @@ for [M3](../../docs/milestones/m3.md), including accepted bounded scopes and
 unresolved obligations. It contains no second Lua implementation or altered
 upstream source. A completed scope does not establish full M3 acceptance.
 
+The user's early checkpoint ends the current full-target advancement. Automatic
+push/PR CI runs the bounded twelve validation contexts: Windows, Linux and
+macOS, default and instrumented configurations, static and shared libraries.
+`check-checkpoint.ps1` retains strict builds, full AUnit/C consumers, frontend
+and opcode checks, canonical/binary protocols, output policy and actual paired
+readline/console campaigns. Its explicit BatchProtocol executes 79 unchanged
+noninteractive CLI controls plus two package-path probes. The 31 interactive
+CLI definitions remain in the unchanged full 112-process gate, whose complete
+native-backend protocol remains deferred. Batch evidence cannot discharge it.
+The original 26-context target and diagnostic workflows remain manual; target
+validators still refuse incomplete acceptance. A checkpoint CI pass is never
+a full-upstream, original-source, global API or LuaRocks acceptance certificate.
+
+The test launcher reads the canonical LUA_ADA_CONFORMANCE_ALLOCATOR selection:
+67108864 for Heavy and 2147483648 for ordinary/aggregate execution. Missing
+selection defaults to 2 GiB; other spellings reject configuration. The live
+owner receives that ceiling before provider attachment, and post-close
+telemetry uses the stored host limit. Real owner refusal may precede the
+provider callback; report those counters separately. The native T observer
+similarly separates all actual debug allocator NULL returns from the narrower
+backing-malloc refusals. See the [validation record](../../docs/sessions/2026-11-08-heavy-allocator-observation.md).
+
+The [independent fixed-buffer feature review](targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json)
+accepts only the exact eighteen-byte private allocation-bound conjunct as
+eligible for an instrumented exclusion. The original mixed assertion remains
+required. The separately installed exclusion policy and exact transformation
+now bind that child to its original bytes and independent approval. The
+[exact lifecycle and calls reviews](../../docs/sessions/2026-11-08-exact-api-calls-equivalents.md)
+approve source equivalents without excluding their original parents; the API
+composition retains the eighteen-byte exclusion as a separate disposition.
+Source approvals supply no passing runtime or whole-target evidence. Fresh
+execution and final reconciliation remain required.
+
+The [Code V3 source installation](../../docs/sessions/2026-11-08-code-v3-source-installation.md)
+adds exactly eight independently reviewed private optimizer children. All 51
+original identities remain; eighteen source references link their private
+child and pending public obligations. The original input ledger is frozen
+before classification. Exact Code8 and API18 successor transforms bind the
+same final policy, with acyclic independent approval hashes. These decisions
+and guarded source generation supply no runtime pass or API941/composition
+renewal; current native/Ada execution and final reconciliation remain required.
+
+The [parser-status binding refresh](../../docs/sessions/2026-11-08-api18-binding-refresh.md)
+renews the same eighteen-byte policy/transform against the preserved public C
+witness header. Earlier review files remain dated evidence. API941/composition
+and memory-verifier implementation bindings require separate review after
+hook/pool/adapter changes; they acquire no renewed authority through this edit.
+
+The separately authorized [remaining upstream compatibility target](targets/README.md)
+can resolve reviewed T-only private checks as explicit exclusions. Its overlay
+never changes the strict upstream completion rule or counts an exclusion as a
+pass. Existing scopes and source/API anchors retain their historical meaning.
+
 The baseline is Lua 5.5.1 commit
 `7579fc9d7ed90240487251dfb69168f8e64e9294`. The unchanged reference source is
 under `references/lua`; all offsets and hashes identify that checkout's bytes.
@@ -46,6 +99,246 @@ and luaconf.h: 156 exported function declarations, 298 macro definitions,
 conditional definitions remain separate entries. The raw inventory is not an
 export-symbol pass or proof that a conditional branch is active on every host.
 
+The target-owned
+[public SDK macro audit](targets/remaining-upstream-compatibility/public-sdk-macros.author-audit.json)
+keeps the original spans for 59 remaining function-like macro anchors and
+proposes separately named operations in the installed C consumer source.
+The ordinary SDK program and the client opt-in program are separate mains;
+the latter selects `LUA_COMPAT_APIINTCASTS` and `LUA_FAILISFALSE` before header
+inclusion. Both retain an ordinary public header role when calling a T runtime.
+The protocol records the real C89 selection, ordered operations and actual
+stringification bytes. On Windows the pinned SDK selects `LUA_USE_C89` even
+when the client compiler uses `-std=c99`.
+
+Conditional alternatives retain separate source anchors. Inactive float,
+long-double and non-GNU alternatives, later replacement definitions, and pure
+stringification eligibility still require independent semantic/applicability
+decisions. The audit does not classify them as declaration-only or grant pass
+evidence. Its C rows and all 473 global classifications remain pending until
+review and fresh paired observations in the required immutable contexts.
+
+The successor author inputs preserve the historical 100 C and 94 AUnit
+identities and currently regenerate 608 C and 870 AUnit witnesses. The checked-in
+catalogue records its own dated source snapshot and needs regeneration before
+reviewing new inputs. Additional return/closing, reader, self-value and diagnostic
+cases are named source candidates with empty execution evidence. All 473 global
+classifications remain pending semantic review. Regenerating source hashes or
+compiled declaration proposals does not renew any independent approval.
+
+The current builtin protocol requires all thirty operations, including actual
+injected reader refusal and recovery. Both parser-depth status paths are named
+source candidates. External-string observations preserve an explicit argument
+array even for a no-argument process, all thirteen ordered ownership/refusal
+operations and the five default release-reentry cases. Instrumented native C
+instead records its exact ownership-only argument and five-case lock omission;
+equal summary counts cannot replace or reorder an operation.
+
+Actual File completion approval requires explicit non-synthetic manifest,
+approval and narrative labels, source-only authority flags and empty execution
+evidence. Binding regressions may opt into labelled synthetic reviews through
+an explicit test-only parameter. The target runner and final matrix never
+select that parameter, and raw report fields cannot enable it.
+
+The locals completion proposal binds the independent literal-progress
+direction, pinned tracker/source/manual, original wrapper and actual current
+validator. It accepts one or more raw ASCII dot bytes, preserves their hash
+and count and rejects every other byte. Its replay requires a typed recorded
+progress receipt; dots cannot replace the actual integer5/function two-result
+return or original completion marker. This observer protocol grants no final
+source authority: accepted File reconciliation still requires fresh independent
+per-file review and the current source-bound context/compiled image.
+
+The full twelve-case scalar-closing fixture is a mandatory unfiltered T pair.
+Its five T-free public upvalue, mutable-local, weak-root, suspension and jump
+bodies also remain byte-identical in an ordinary default companion. Source
+classification preserves both routes; it supplies no fresh runtime receipt or
+whole locals-source equivalence evidence. Materialized-vararg refusal also
+requires its complete four-case count/byte/release/recovery T pair; its separate
+four-case public companion remains ordinary. All four fixed external-string
+operations require the actual instrumented C wrapper and reject a case filter
+or T-absent return. Ordinary scalar mutation, table-error and locale fixtures
+remain in generic comparison. The newly registered source candidates, including
+the twenty-nine prompt/history unit cases, have empty execution evidence. The host CLI
+prompt setup chunk requires its separate invocation contract and cannot serve
+as a standalone ordinary script.
+
+The current source audit classifies108 Lua fixtures. The complete eight-case
+string-hash fixture requires real T in both interpreters. It exercises string
+content/key/GC invariants without equating private numeric hash values, widths
+or physical table positions. The twelve named Ada source candidates include
+two actual cached-field probes and an explicitly negative default-absence
+control; that control does not discharge any omitted hash operation. Their
+source candidacy supplies no runtime or global-ledger acceptance.
+
+The nextvar helper requires explicit public and Ada-storage modes. All eleven
+public bodies and its single integer29 result remain mandatory in the default
+and T native/Ada pair; a separate Ada-only T operation checks actual storage.
+The three ordinary length-result selectors also run in both configurations;
+the two allocation-refusal helpers require full real-T pairs. The CLI argument
+setup has 29 explicit selectors and 28 named Ada source counterparts. Its
+existing 21+8 author process drivers retain dated component evidence, while
+portable frozen-context reconciliation remains pending. Generic comparison and
+final named-context reconciliation reject that pending delegation explicitly;
+the setup chunk cannot acquire a standalone or T-absent pass.
+
+The closed host CLI route
+requires all112 actual Ada CLI operations, the nineteen native prompt operations
+and twenty-nine source-linked named AUnit controls. `check-cli.ps1` records raw
+input/output/error captures, exact argument order, selected runtime libraries
+and native T-presence measurements. Execution and replay share the original
+case contracts in `CliFixtureCases.psm1`; default comparison delegates the setup
+chunk only after validating a fresh host CLI pair receipt. The instrumented
+build runs the full CLI campaign too. Context images freeze the selected CLI,
+all generated setup/input captures and a sixth mandatory build witness.
+The allocator-aware collector adds a seventh base witness in every context:
+the actual thirteen-process Ada ceiling campaign, including the protected
+80 MiB request under the measured 64 MiB ceiling, recovery, and the same
+request succeeding under 2 GiB. Every instrumented context also needs an
+eighth witness: the strict seven-case native allocator observer, with its
+actual OS-mapped shared runtime path and hash. Native oracle linkage remains
+shared when the Ada context is static or static-pic.
+
+`run-target-allocator-witnesses.ps1` invokes these existing producers and records
+their parent and child process identities, exact operations, PID/run-bound
+sidecars, source/configuration bindings, runtime files and compiler identity.
+`build-target-context.ps1` collects these reports before freezing the image;
+the final reader requires all their raw artifacts in that same image. The Ada
+ceiling report binds its selected launcher, measured configuration and runtime
+artifacts; it does not claim an OS module-mapping observation for Ada. Source
+and synthetic validator checks do not supply execution or acceptance evidence.
+The collector's explicit `-ExternalInputs` development mode accepts a separate
+hash-bound snapshot of copied products and records unverified source-build
+provenance. It preserves existing generated outputs. The final context reader
+rejects these external observations even when every physical operation passes;
+they cannot replace a fresh context build.
+The seven/eight base witnesses still leave dedicated console Lua/C, typed CLI
+argument and readline report reconciliation pending. The final receiver
+explicitly rejects a context until those receivers exist. The four C console modes are
+separate actual invocations; the ordinary 608 C source candidates cannot borrow
+their evidence or count them as no-argument consumer operations.
+
+The Windows native T no-close event is separately labelled
+`observed-native-test-teardown-diagnostic`, with passing execution evidence
+false. Its private `atexit(checkfinalmem)` assertion cannot replace the clean
+native-default no-close, Ada T no-close or native T close-true counterparts.
+Only the independently reviewed original-source direction permits collecting
+this diagnostic; final image reconciliation requires an additional independent
+review of all twenty-three current protocol sources. The pending author packet
+grants none. Other hosts require fresh diagnostic applicability review. Raw
+failed input writes remain failed pipe observations, with separate write,
+close and output-drain fields; the closed prompt-before-input terminal cases
+can observe an early input close without claiming delivery or complete EOF.
+The generic process outcome continues to reject failed input pipes.
+
+Locals counterpart binding version1 keeps its original22 paths and its
+independently reviewed dated76 tuple. Current source drift does not renew that
+authority. Explicit binding schema2 requires exactly39 counterpart paths,
+adding the actual memory checker, allocator controls, declaration interfaces,
+both scalar-closing fixtures and closing test sources. The graph stops at the
+shared compiler, general storage and AUnit baseline; final compiled-image
+evidence still binds that infrastructure. It retains the same two exact operations, original anchors and
+output54481; a pending definition returns only source hashes, never adapted
+bytes or runtime authority. New independent exact review and fresh runtime
+observations remain required before selecting the successor.
+
+T target contexts also require a separate private-header buffer executable.
+It includes the actual pinned `ltests.h`, reports its 23-byte scratch and actual
+`luaL_Buffer` layout (56 or 64 bytes on the measured 64-bit hosts), and executes the same 17 ownership,
+growth/refusal and cleanup cases as the ordinary SDK client. The default
+configuration never builds or executes this smaller receiver. The final
+consumer requires the private C/Ada pair even if no individual global API
+route selects it. Its declared extraspace value describes the header role;
+the buffer witness does not access or certify native T lock storage.
+
+`coroutine_result_portal.lua` is a configured witness: its dedicated native/Ada
+campaign measures both executable handshakes and supplies the matching semantic
+stack limit (1,000,000 default or 68,000 instrumented). `stack_inspection.lua`
+is mandatory in that instrumented campaign with a real T table and all four
+ordered operation markers. `primitive_not_refusal.lua` also requires real T;
+its six actual scalar/operator cases run through the native and Ada allocator
+controls. None of these configured files becomes a default T-absent pass.
+The complete T campaign also requires all 22 public API commands, all 14
+panic/provider cases, all four reader and four string refusal phases, and all
+five actual C-hook transitions.
+Optional per-case filters must be absent, and each refusal phase has its own
+terminal marker after its unchanged assertions and allocator reset. All seven
+T-only files require real T for every operation; no mixed ordinary Lua
+assertions are dropped from default execution. The
+`targets/configured-fixture-classification.json` source hashes and rationales
+bind that classification. Changes require a fresh mixed/default/T source
+review. The complete lexical fixture audit fails closed on new T-bearing
+files and records every ordinary source as well. Generic fixture selection
+derives this classification from the dedicated definitions rather than a
+second list of omitted filenames.
+`check.ps1` records the default pair before `compare.ps1` consumes its receipt;
+`check-instrumented.ps1` records both instrumented pairs. The generic default
+comparison requires the dedicated report and its Ada runner explicitly. Raw
+reports preserve sources, executables, libraries, arguments, configuration
+captures and balanced allocator telemetry. Rejection regressions mutate copies
+of actual observations; they do not execute or certify their fabricated data.
+Full-target build receipts must reference this separate report. The immutable
+image captures it and its raw sidecars as a fifth mandatory build witness;
+final replay checks its revision/context and every executable, runtime library
+and capture against the frozen file identities. A build log or matching final
+marker cannot replace the configured process set.
+
+`table_storage_private.lua` is a separate mandatory **Ada-only** instrumented
+counterpart. It calls the actual Ada owned-storage inspector and records all
+three initial-live/deleted-key/same-table-reuse phases. No native T facade or
+default T-absent result can substitute for that process. Its classification
+links the current inspector/probe implementation and22 named AUnit cases as
+source identities only; these links contain no execution evidence. The target
+build receipt and final frozen-image consumer also require all22 actual named
+AUnit observations from the source-bound same-context suite report.
+`table_storage_public.lua` retains its three ordinary object-key/liveness
+cases in the generic comparison on both configurations.
+
+The full21 `call_metadata_windows.lua` cases are mandatory in the paired T
+campaign with real allocator/C controls and no `_CALL_METADATA_CASE` filter.
+The two independently ordinary case bodies also execute in
+`call_metadata_public.lua` through the generic default comparison. Exact span
+hashes and byte equality bind both copies to the full provider fixture, so its
+T requirement cannot hide those default public assertions.
+`code_public_semantics.lua` also remains an ordinary source comparison; its29
+source-linked semantic cases grant no private optimizer exclusion authority.
+Every configured context additionally records an actual paired public-code
+process and requires all29 actual named AUnit counterparts from its bound
+suite report. The generic default comparison still executes this ordinary
+file even after validating that separate receipt.
+
+The full10 `canonical_tail_ownership.lua` cases likewise require paired realT
+with no `_TAIL_OWNERSHIP_CASE` filter. Its five independently ordinary weak-
+argument, hook mutation/error, yield and closing bodies remain byte-identical
+in `canonical_tail_public.lua` and execute in the generic default comparison.
+Both companions' correspondence checks reject stale, changed or omitted
+public bodies; complete T protocols remain mandatory separately.
+
+Eligibility version3 implements only the eight exact pinned `code.lua` private
+structure candidates. It requires truthful observable=true, no public/mixed/
+module compatibility obligation, exact original-anchor links, fixed semantic
+contracts, current independent feature and public-retention decisions, and the
+unchanged127-byte `checkR`. All51 original records remain required. V1/V2 and
+historical scopes retain their previous meaning. No optimizer exclusion is
+installed merely because its shape is supported. The V3 security tests use
+labelled synthetic, non-execution reviews through a direct test-only switch;
+ordinary inventory and final consumers never enable that switch.
+
+`debug_iterator_counts.lua` also runs in both configured campaigns. Its source
+explicitly requires one C-compiled graph when comparing exact hook counts.
+The measured native interpreter loads that exact text file and dumps its
+complete graph to a binary-mode file. Both interpreters then execute
+those same captured bytes, with the complete two-count protocol required.
+Producer arguments, executable/configuration, binary bytes, input identity,
+raw captures and provider cleanup remain bound in the report and frozen image.
+The generic source-compiler comparison consumes this dedicated receipt before
+selecting the fixture through this route.
+
+The image transport permits source-shaped evidence only at the exact generated
+native-module fixture C paths and stdin source fixture path under a unique
+`reports/core-image/` run. Their native-fixture and file-IO consumers retain
+independent source/hash/operation checks. Implementation/reference trees and
+all other source-shaped image destinations remain forbidden.
+
 ## Candidate anchors and manual coverage
 
 The 34 `coverage/*.jsonl` partitions currently contain 4,490 pending anchors.
@@ -71,6 +364,102 @@ Manual review may append `reviewed-block` units with IDs such as
 line/end-line citations within that same source file. Regenerated lexical
 anchors cannot be deleted or changed. A manual-audit unit remains pending
 until all generated/dynamic obligations have been inventoried and reviewed.
+
+A mixed assertion retains its original anchor and its required public runtime
+behavior. An independently reviewed private subexpression can be represented
+by an additional exact-span `reviewed-block`, with an exclusion targeting only
+that child. The original assertion still requires actual evidence as a reviewed
+equivalent; the child decision cannot supply that evidence or complete the
+parent. An exact empty replacement may remove the private conjunct while the
+public assertion and surrounding calls remain byte-identical. Author proposal
+files supply no authority. The separate API fixed-buffer feature decision now
+authorizes only the exact 18-byte private upper-bound child: a pending derived
+record and source-only exclusion preserve the pending original mixed assertion.
+Its exact-byte transform manifest binds the installed policy hash but remains
+blocked pending independent transformation review. Feature approval supplies no
+original-parent execution, whole-file result or final matrix acceptance.
+
+Exclusion eligibility version 1 retains its original interpretation and rejects
+module-observable decisions. An explicit `eligibility_schema_version: 2`
+distinguishes the factual `module_observable` annotation from
+`module_compatibility_obligation`. The latter must be a real false boolean;
+public API behavior, mixed obligations, ordinary configurations, previous passes
+and accepted source partitions remain protected. Version 2 currently permits
+only a derived pure numeric comparison conjunct inside a hashed original
+assertion. Calls, statements, another Boolean branch and widening to the parent
+are rejected. This is an eligibility subset, not a Lua parser or runtime change.
+
+[Eligibility V4](../../docs/decisions/0040-observable-private-resource-eligibility.md)
+separately handles one observable private positive allocation comparison:
+pinned memerr.lua133's whole19-byte assert. It preserves the original6-byte
+anchor, required real materialization child, and optimized254-byte zero-count
+workload. Independent current feature/retention and exact approval remain
+mandatory; synthetic tests never authorize actual target data. Run
+scripts/test-resource-exclusion-v4.ps1 for its60 bounded source-binding cases.
+No V4 policy row or source adaptation is installed by this implementation.
+The imported helper also belongs to V3's verifier graph, which now requires10
+current bindings and independent renewal; the eight optimizer candidates do
+not change.
+
+Version 2 requires an approval with schema version 2 and a separate independent
+feature decision. That decision binds the observation/compatibility flags, the
+retained parent, exact pinned manual bytes, retained counterpart source hashes,
+the reason no public bound is promised, and explicit retained behavior. A generic
+private-label rationale cannot replace it. A completed original assertion needs
+its own `ada-internal-equivalent` evidence and `source_exclusion_ids` linkage;
+alternatively, a reviewed reference must retain an unexcluded runtime child
+outside the private span. These rules keep visible implementation measurements
+from waiving application failure, cleanup or execution requirements.
+
+The pending `memerr-verifier-allocation.equivalent.author-proposal.json` uses
+a separate bounded `t-verifier-equivalent` schema. Its one allowed operation
+inserts the literal `T.alloccount()` reset after the original helper's protected
+application call and before its unchanged false-status/error-text assertion.
+It preserves both application calls, the existing following reset and every
+later failure campaign byte. This is a source-equivalent proposal with an
+explicit empty exclusion set. Its pinned whole-source hash, exact insertion,
+retained source spans and native/first-party configuration counterparts all
+bind a separate independent exact review. Pending or labelled synthetic review
+artifacts cannot authorize actual replay. The separately approved
+`memerr-verifier-allocation.equivalent.json` binds the independently reviewed
+17-byte insertion and all seven current counterpart hashes.
+`scripts/New-ConformanceVerifierEquivalent.ps1` reconstructs approved bytes
+only under disposable `reports/` paths, with a source-only receipt. It exposes
+no diagnostic or synthetic approval switch. Global acceptance runners still
+require explicit integration and operation evidence; generation supplies no
+passing source/file evidence and excludes no obligation. Its focused security
+regressions execute no Lua. The current component campaign progresses beyond
+the original verifier but fails during the later allocation sweep; see the
+[session record](../../docs/sessions/2026-11-08-memerr-verifier.md).
+
+The API941 and calls586 source-equivalent manifests have separate independent
+exact source approvals. They use the existing equivalent approval contract,
+with the accepted feature decision and actual public-counterpart sources
+required for every patch. Original assertions remain required pending
+obligations. Source review supplies no passing runtime or ledger evidence.
+
+API also needs the already reviewed18-byte private allocation edit. The bounded
+API composite binds both manifests to the same original1601 source
+hash, validates each accepted inner review separately, rejects overlapping
+spans and applies the original-coordinate union once. It retains exclusion9001
+and required original assertions0125/0195, and requires an additional independent
+composition approval, now recorded separately from its inner approvals.
+Its source-only reader rejects default/native selection,
+pending inner approvals, changed replacements, stale policy/counterparts and
+fabricated or labelled synthetic authority. Explicit synthetic unit fixtures
+remain diagnostic. File selection uses the explicit `ReviewedSourceManifest`
+parameter and a separately hashed `reviewed_source` observation identity.
+Aggregate selection uses a `reviewed-source` member under its independently
+reviewed complete 34-source selection. Both replay the same bounded inner
+decisions. The execution contract and post-observation envelope must bind
+the exact selected manifest, output bytes, policy and exclusion set. A generic
+equivalent selection cannot bypass this route. The bounded
+`New-ConformanceReviewedSource.ps1` generator recognizes only this composite,
+the decoded-string equivalent and the memory-verifier equivalent. It
+revalidates their independent exact decisions and emits new disposable
+`reports/` artifacts with source-only receipts; it exposes no synthetic or
+unreviewed mode and cannot overwrite prior artifacts. Ordinary C baselines
+continue to use original source. Generation supplies no runtime acceptance.
 
 ## Resolution and evidence contract
 
@@ -319,6 +708,26 @@ git notes --ref=expanded-t-conformance show <tested-pr-head>
 ```
 
 Full M3 completion remains false even after this bounded scope is accepted.
+
+The foreign C consumer's native T allocator lock restricts public reentry from
+the payload allocator in hook case24. Paired T processes explicitly select
+`--without-release-reentry` and record that native case as omitted, with no
+passing claim for it. A separate complete Ada process in the same executable
+is mandatory in T contexts. Default native/Ada captures retain the full case.
+The verifier reads the hook maximum from the source-bound driver, so later
+cases after24 remain required in both paired and complete processes. This
+operation protocol is separate from any source-exclusion decision.
+
+Current AUnit collection selects `tests/alire.toml` by running `alr exec` from
+the nested test directory. Its inherited-environment child launches the actual
+test runner and sibling configuration probe from the repository root, matching
+the documented repository-relative fixture paths. Version 2 raw reports bind
+both process launch receipts, the selected and observed environment directory,
+actual execution directory, executable hashes and the launcher source hashes.
+Full-target replay requires those receipts; historical scoped replay retains
+its original report contract. The launch regressions run real PowerShell child
+processes against a repository-relative fixture and inherited environment
+sentinel, without invoking Alire or claiming Ada test execution.
 
 Run from the repository root in PowerShell 7:
 

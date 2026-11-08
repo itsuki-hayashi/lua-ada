@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "kind": "calls-undump-constant-pool-author-proposal",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "configuration": "upstream-test",
+  "source": {
+    "path": "references/lua/testes/calls.lua",
+    "sha256": "e0331ba5557c09ba844c11a54810ca7cc01998638316d5192e252a2ab0a2d407"
+  },
+  "original_anchor": {
+    "id": "LUA-CALLS-ASSERT-CALL-0097",
+    "kind": "assert-call",
+    "byte_offset": 14425,
+    "byte_length": 6,
+    "line": 586,
+    "end_line": 586,
+    "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+    "status": "pending",
+    "disposition": "pending",
+    "invariant": null,
+    "configurations": [],
+    "evidence": [],
+    "review": null
+  },
+  "original_assertion": {
+    "original_bytes": "assert(string.format(\"%p\", T.listk(funcs[1])[1]) ==\n           string.format(\"%p\", T.listk(funcs[3])[1]))",
+    "byte_length": 105,
+    "anchor_sha256": "d350bbaa91f6e9d428a04e5507d4eb0cfb3596e882bffdbf5c30655054063c8e",
+    "byte_offset": 14425
+  },
+  "private_T_block": {
+    "original_bytes": "  if T then  -- check reuse of strings in undump\n    local funcs = load(dump)()\n    assert(string.format(\"%p\", T.listk(funcs[1])[1]) ==\n           string.format(\"%p\", T.listk(funcs[3])[1]))\n  end\n",
+    "byte_length": 196,
+    "anchor_sha256": "b80779d0434bb1508132f1afda1505dc83fb16fbf2057f7d3e0e48feaa02f8a3",
+    "byte_offset": 14341
+  },
+  "retained_dump_count": {
+    "original_bytes": "assert(count == 2)",
+    "byte_length": 18,
+    "anchor_sha256": "ea76cc99fc1d22d2666244ba9ad506ad18c78d2d77acf6207a16a5776b5d8c39",
+    "byte_offset": 14321
+  },
+  "author_feature_assessment": {
+    "private_sharing_guarantee": "Author inference awaiting independent review: no public contract mandates one shared long-string allocation across sibling prototype constant entries after undump.",
+    "module_observable": true,
+    "public_obligations": [
+      "Preserve actual binary load and execution returning the three original functions.",
+      "Execute all three functions and check exactly one string result, the full52-byte value and string datatype.",
+      "Preserve source string construction, string.dump and the unchanged count==2 serialization assertion.",
+      "Retain public percent-p formatting and stable identity for each actually held string value through collection.",
+      "Retain preceding malformed-header/truncated-chunk rejection and all following calls.lua obligations."
+    ],
+    "evidence_limit": "The equal-value distinct-pointer component observation demonstrates that value equality alone does not require sharing. It does not independently classify every constant-pool or pointer operation.",
+    "private_inspection": "T.listk reads native Proto.k storage and the assertion requires identical allocation identity for two decoded prototype constant slots."
+  },
+  "candidate_resolution": {
+    "transformation_status": "No exact patch authored or installed; no adapted calls.lua written or executed",
+    "proposed_source_plan": [
+      "Keep the original ifT guard and localfuncs=load(dump)() operation.",
+      "Replace only the private pool-sharing inspection with source-linked actual return-value/cardinality/type checks for all three functions; public percent-p operations remain separately required.",
+      "Bind exact replacement bytes, parent assertion, retained surrounding spans and independently reviewed public counterpart before any adapted execution."
+    ],
+    "reason": "The assertion combines private constant-pool access with public pointer formatting. Current numeric-bound exclusion and memerr-reset schemas do not authorize changing it.",
+    "source_exclusion_proposed": false,
+    "original_assertion": "pending reviewed-equivalent candidate"
+  },
+  "public_contract_sources": [
+    {
+      "span": {
+        "original_bytes": "The specifier @id{p} formats the pointer\nreturned by @Lid{lua_topointer}.\nThat gives a unique string identifier for tables, userdata,\nthreads, strings, and functions.\nFor other values (numbers, nil, booleans),\nthis specifier results in a string representing\nthe pointer @id{NULL}.",
+        "byte_length": 280,
+        "anchor_sha256": "12650f109a909895f8e9d6d3adc7f9fef99d85f51ec0718d6b136c56227bea2d",
+        "byte_offset": 237986
+      },
+      "source_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+      "interpretation": "Percent-p uses lua_topointer and provides an identifier. This operation remains required; the documentation does not prescribe an undumper constant-pool layout.",
+      "path": "references/lua/manual/manual.of"
+    },
+    {
+      "span": {
+        "original_bytes": "Although strings are subject to garbage collection,\nthey do not have an explicit construction and\ntheir equality is by value;\nthey behave more like values than like objects.\nTherefore, they are not removed from weak tables.",
+        "byte_length": 223,
+        "anchor_sha256": "f571737096bb74de33d6360f158746d3402f80862df5de27c96c53b1793fc5e5",
+        "byte_offset": 34145
+      },
+      "source_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+      "interpretation": "Strings compare by value and have no explicit construction. Allocation sharing is distinct from returned bytes, datatype and held-value identifier behavior.",
+      "path": "references/lua/manual/manual.of"
+    }
+  ],
+  "native_private_source": {
+    "line": 815,
+    "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199",
+    "function": "listk",
+    "interpretation": "Directgetproto/sizek/k access enumerates the C VM private constant vector. No inspector implementation or fabricated C-pool identity is proposed.",
+    "path": "references/lua/ltests.c"
+  },
+  "public_counterpart": {
+    "required_behavior": "Actual dumpcount2, three function returns with arity1/string52/fullvalue, retained pointeridentifier for each held value acrossGC, and independent re-dump/load of every function.",
+    "T_dependency": false,
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/calls-undump-string-values.author.lua",
+    "source_review_status": "pending",
+    "sha256": "d1ef08edca513407c8906b7f2542a274e00d6e3c46b1091de04620f34ada8795",
+    "expected_stdout": "CALLS UNDUMP STRING VALUES OK"
+  },
+  "public_pointer_C_counterpart": {
+    "status": "retain independently reviewed fresh runtime evidence; this source binding supplies no pass",
+    "sha256": "818f9704798b6983887ba0b50a6e114b2770c1026ae6a4453b8a09e51f106c14",
+    "path": "c_api/tests/pointer_identity_contract.c"
+  },
+  "author_observations": {
+    "pointer_diagnostic": "All four configurations report distinct pointer identifiers for separately held equal52-byte string values. This observation is not imposed as an invariant on future implementations.",
+    "runtime_image_revision_verified": false,
+    "scope": "Eight first-party existing-executable component observations, not original calls.lua, final matrix or source approval",
+    "path": "reports/calls-undump-author/fdc6a5985e88423b96843bdb703b9a42/observations.json",
+    "value_runs": "All native/Ada default/T value runs exit0 with identical stdout and empty stderr.",
+    "sha256": "ee2294923285653f0db9d25303a7c3c66adc80673c118c8db0b390aec9f181a8",
+    "value_stdout_sha256": "4b4a6d6288806646640dd0681092e62d5068e7345368028fb89f8c43f51464e6"
+  },
+  "required_next_actions": [
+    "Root independent source/manual/native-evidence feature review; inherit no other private-test approval.",
+    "Preserve original pending source anchors and all public binary/pointer/value obligations.",
+    "Propose an exact reviewed-equivalent patch only after feature review, then obtain separate exact approval before adapted execution.",
+    "Fresh original C and approved Ada whole-file/final-context evidence remain required."
+  ]
+}

@@ -5,7 +5,8 @@ param(
     [string] $Profile = 'validation',
     [ValidateSet('default', 'upstream-test')]
     [string] $Configuration = 'default',
-    [switch] $UseExistingRuntime
+    [switch] $UseExistingRuntime,
+    [ValidateSet('','remaining-upstream-compatibility')][string] $TargetPolicy = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -25,15 +26,53 @@ $scenarios = @("-XLUA_ADA_LIBRARY_TYPE=$LibraryType",
     "-XLUA_ADA_CONFIGURATION=$Configuration")
 Import-Module (Join-Path $PSScriptRoot 'RuntimeSupport.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'PEUnwind.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtures.psm1')
+Import-Module (Join-Path $PSScriptRoot 'FileConsumerIO.psm1')
+Import-Module (Join-Path $PSScriptRoot 'SdkMacroEvidence.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ForeignContractEvidence.psm1')
+$referenceCompilerDefines=if($IsWindows){@('-DLUA_BUILD_AS_DLL')}else{@()}
+$foreignHookMaximum=Get-ForeignContractHookMaximum -Root $projectRoot
+$foreignPrivateLockMode=$Configuration -ceq 'upstream-test'
+$foreignArguments=@()
+if($foreignPrivateLockMode){$foreignArguments=@('--without-release-reentry')}
+
+function Invoke-NativeModuleConsumer {
+    param([string] $Name,[string] $Executable,[string] $Implementation,[string] $RuntimePath,[string] $Compiler)
+    $native=Build-NativeLuaFixtures -Root $projectRoot -HostPath $Executable -RuntimeDirectory $RuntimePath -Compiler $Compiler `
+        -Implementation $Implementation -LibraryType $(if($Implementation -ceq 'Ada'){$LibraryType}else{'shared'}) `
+        -Platform $(if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'}) -Configuration $Configuration `
+        -FixtureDirectory (Join-Path $reportDirectory ($Name+'-fixtures')) -RecordDirectory (Join-Path $reportDirectory ($Name+'-linkage'))
+    $variables=@('PATH','LD_LIBRARY_PATH','DYLD_LIBRARY_PATH');$before=@{}
+    foreach($variable in $variables){
+        $before[$variable]=[Environment]::GetEnvironmentVariable($variable)
+        [Environment]::SetEnvironmentVariable($variable,$native.library_directory+[IO.Path]::PathSeparator+$before[$variable])
+    }
+    try{
+        # This is the last of nine separately named actual lifetime cases.
+        # The evidence consumer below checks their complete ordered set;
+        # this marker only rejects a failed/incomplete child immediately.
+        Invoke-Consumer $Name $Executable 'PASS: native-module-explicit-lib2-newstr-external' @($native.library_directory) |
+            ForEach-Object { Write-Host $_ }
+    }finally{foreach($variable in $variables){[Environment]::SetEnvironmentVariable($variable,$before[$variable])}}
+    return $native
+}
 
 function Invoke-Build {
     param([string[]] $Arguments)
+    if($IsWindows -and $Arguments.Count -ge 3 -and $Arguments[0] -ceq 'exec' -and $Arguments[1] -ceq '--' -and
+        $Arguments[2] -ceq 'gcc' -and '-lconformance_lua' -cin $Arguments -and '-DLUA_BUILD_AS_DLL' -cnotin $Arguments){
+        # Public function/data identity must refer to the actual oracle DLL.
+        # Plain extern declarations can create local import thunks whose
+        # address differs even though the call reaches the correct function.
+        $Arguments=@($Arguments[0..2])+$referenceCompilerDefines+@($Arguments|Select-Object -Skip 3)
+    }
     & alr @Arguments
     if ($LASTEXITCODE -ne 0) { throw "Core-image build failed: $($Arguments -join ' ')" }
 }
 
 function Invoke-Consumer {
-    param([string] $Name, [string] $Executable, [string] $Marker)
+    param([string] $Name, [string] $Executable, [string] $Marker,
+        [string[]] $ConsumerArguments = @(), [string] $ExpectedStandardError = '')
     $unwind = $null
     if ($IsWindows) {
         # The final image, rather than an intermediate object or successful
@@ -45,7 +84,9 @@ function Invoke-Consumer {
         Write-Output "PASS: $Name PE unwind table ($($unwind.Entries) entries)"
     }
     # Redirect both pipes before waiting so even an unexpected diagnostic flood
-    # cannot deadlock the driver. Empty stderr is part of this consumer contract.
+    # cannot deadlock the driver. Only the two explicitly named default-panic
+    # operations have a nonempty stderr protocol; all other consumers retain
+    # their empty-stderr requirement and actual stdout completion marker.
     $start = [Diagnostics.ProcessStartInfo]::new('alr')
     $start.WorkingDirectory = $projectRoot
     $start.UseShellExecute = $false
@@ -54,6 +95,7 @@ function Invoke-Consumer {
     foreach ($argument in @('exec', '--', $Executable)) {
         $start.ArgumentList.Add($argument)
     }
+    foreach ($argument in $ConsumerArguments) { $start.ArgumentList.Add($argument) }
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $start
     if (-not $process.Start()) { throw "Cannot start $Name consumer" }
@@ -66,6 +108,7 @@ function Invoke-Consumer {
     [IO.File]::WriteAllText((Join-Path $reportDirectory "$Name.stdout"), $stdout)
     [IO.File]::WriteAllText((Join-Path $reportDirectory "$Name.stderr"), $stderr)
     $record = [ordered]@{ name = $Name; executable = $Executable;
+        arguments = $ConsumerArguments;
         executable_sha256 = (Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash.ToLowerInvariant();
         stdout = (Join-Path $reportDirectory "$Name.stdout");
         stdout_sha256 = (Get-FileHash -LiteralPath (Join-Path $reportDirectory "$Name.stdout") -Algorithm SHA256).Hash.ToLowerInvariant();
@@ -76,8 +119,13 @@ function Invoke-Consumer {
         configuration = $Configuration;
         pe_unwind_entries = $(if ($null -eq $unwind) { $null } else { $unwind.Entries }) }
     $records.Add($record)
-    if ($timedOut -or $process.ExitCode -ne 0 -or $stderr.Length -ne 0 -or
-        -not $stdout.Contains($Marker)) {
+    $protocolMatches=if($ExpectedStandardError -eq ''){
+        $stderr.Length -eq 0 -and $Marker -ne '' -and $stdout.Contains($Marker)
+    }else{
+        $Name -cmatch '^allocator-panic-(string|number)-(api|oracle)$' -and $Marker -eq '' -and
+            $stdout.Length -eq 0 -and $stderr.Replace("`r`n","`n") -ceq $ExpectedStandardError
+    }
+    if ($timedOut -or $process.ExitCode -ne 0 -or -not $protocolMatches) {
         # Captures must also be visible in the job log when a build fails
         # before later campaigns. Do not hide the actual loader/assertion
         # diagnostic behind a report path that CI may not yet have uploaded.
@@ -154,7 +202,70 @@ try {
     Invoke-Consumer 'c-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/c_api_consumer$suffix") 'PASS: real Ada C API bootstrap consumer'
     Invoke-Consumer 'gc-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/gc_api_contract$suffix") 'PASS: public GC contract'
     Invoke-Consumer 'io-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/io_api_contract$suffix") 'PASS: public IO/OS contract'
-    Invoke-Consumer 'foreign-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/foreign_api_contract$suffix") 'PASS: public foreign contract'
+    $foreignConsumer=Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/foreign_api_contract$suffix"
+    Invoke-Consumer 'foreign-api' $foreignConsumer 'PASS: public foreign contract' $foreignArguments
+    if($foreignPrivateLockMode){
+        # The native T provider's private lock forbids allocator API reentry.
+        # Pair that explicit mode separately, then require the complete Ada
+        # public operation sequence in the same executable, including case24
+        # and every subsequently registered operation after that case.
+        Invoke-Consumer 'foreign-full-api' $foreignConsumer 'PASS: public foreign contract'
+    }
+    Invoke-Consumer 'load-dump-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/load_dump_api_contract$suffix") 'PASS: public reader/writer contract'
+    Invoke-Consumer 'debug-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/debug_api_contract$suffix") 'PASS: public debug contract'
+    Invoke-Consumer 'traceback-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/traceback_api_contract$suffix") 'PASS: public traceback contract'
+    Invoke-Consumer 'builtin-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/builtin_api_contract$suffix") 'PASS: public builtin contract'
+    # The pinned T lock instrumentation itself aborts deallocator API reentry.
+    # Keep that observed native limit explicit: ownership/refusal still run in
+    # both configurations; ordinary C/Ada reentry is paired in default only.
+    # Capture the same explicit vector sent to ProcessStartInfo below. A
+    # subexpression around an empty array emits no pipeline object and would
+    # serialize as null, losing the distinction between an observed no-argument
+    # invocation and missing argument evidence in the named consumer report.
+    [string[]]$externalArguments = @(if ($Configuration -eq 'upstream-test') {
+        '--ownership-only'
+    })
+    Invoke-Consumer 'external-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/external_string_contract$suffix") 'PASS: public external string contract' $externalArguments
+    Invoke-Consumer 'conversion-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/conversion_api_contract$suffix") 'PASS: public numeric conversion contract'
+    if($TargetPolicy -ne ''){
+        Invoke-Consumer 'format-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/format_api_contract$suffix") 'PASS: public formatting contract'
+        Invoke-Consumer 'value-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/value_api_contract$suffix") 'PASS: public value operation contract'
+        Invoke-Consumer 'auxiliary-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/auxiliary_api_contract$suffix") 'PASS: public auxiliary contract'
+    }
+    Invoke-Consumer 'operator-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/operator_api_contract$suffix") 'PASS: public C operator contract'
+    Invoke-Consumer 'index-type-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/index_type_api_contract$suffix") 'PASS: public integer-index and type contract'
+    Invoke-Consumer 'base-closing-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/base_closing_api_contract$suffix") 'PASS: public host base C closing contract'
+    Invoke-Consumer 'buffer-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/buffer_api_contract$suffix") 'PASS: public luaL_Buffer contract'
+    if($Configuration -ceq 'upstream-test'){
+        Invoke-Consumer 'buffer-private-t-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/buffer_private_t_contract$suffix") 'PASS: public luaL_Buffer contract'
+    }
+    $allocatorConsumer=Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/allocator_api_contract$suffix"
+    Invoke-Consumer 'allocator-api' $allocatorConsumer 'PASS: public allocator contract'
+    foreach($mode in @('string','number')){
+        $message=if($mode -ceq 'string'){'allocator panic witness'}else{'error object is not a string'}
+        Invoke-Consumer "allocator-panic-$mode-api" $allocatorConsumer '' @("--panic-$mode") `
+            ("PANIC: unprotected error in call to Lua API ($message)`n")
+    }
+    Invoke-Consumer 'substitution-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/substitution_api_contract$suffix") 'PASS: public luaL_addgsub and luaL_gsub contract'
+    $loadfileConsumer=Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/loadfile_api_contract$suffix"
+    Invoke-Consumer 'loadfile-api' $loadfileConsumer 'PASS: public luaL_loadfilex contract'
+    Invoke-Consumer 'pointer-identity-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/pointer_identity_contract$suffix") 'PASS: public pointer identity contract'
+    Invoke-Consumer 'concat-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/concat_api_contract$suffix") 'PASS: public lua_concat contract'
+    Invoke-Consumer 'macro-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/macro_api_contract$suffix") 'PASS: public SDK macro contract'
+    Invoke-Consumer 'macro-compat-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/macro_compat_api_contract$suffix") 'PASS: public SDK macro contract'
+    $compilerOutput=& alr exec -- pwsh -NoProfile -Command '(Get-Command gcc -ErrorAction Stop).Source'
+    if($LASTEXITCODE -ne 0){throw 'Cannot identify selected native module fixture compiler'}
+    $fixtureCompiler=($compilerOutput -join '').Trim()
+    $nativeModuleAda=Invoke-NativeModuleConsumer -Name native-module-api `
+        -Executable (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/native_module_contract$suffix") `
+        -Implementation Ada -RuntimePath $runtimeDirectory -Compiler $fixtureCompiler
+    # Native T keeps its warning callback under the test lock and rejects API
+    # reentry there. Default pairs that public callback case; T records its
+    # single instrumentation skip in both outputs and in the receipt below.
+    $resetArguments = $(if ($Configuration -eq 'upstream-test') {
+        @('--without-warning-reentry')
+    } else { @() })
+    Invoke-Consumer 'thread-reset-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/thread_reset_api_contract$suffix") 'PASS: public thread reset/base closing contract' $resetArguments
     # Compile the identical public-header contract against the isolated pinned
     # C library. No reference object is linked into either Ada consumer.
     Invoke-Build @('exec', '--', 'gprbuild', '-P', 'experiments/conformance/reference.gpr', '-p', "-XLUA_CONFORMANCE_CONFIGURATION=$Configuration")
@@ -179,15 +290,173 @@ try {
         (Join-Path $projectRoot 'tests/c/math_reopen_contract.c'),
         (Join-Path $projectRoot 'tests/c/library_opener_contract.c'),
         '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceForeignConsumer)
+    $referenceLoadDumpConsumer = Join-Path $reportDirectory "load-dump-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/load_dump_api_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceLoadDumpConsumer)
     $adaExecutionLdPath = $env:LD_LIBRARY_PATH
+    $referenceDebugConsumer = Join-Path $reportDirectory "debug-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/debug_api_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceDebugConsumer)
+    $referenceTracebackConsumer=Join-Path $reportDirectory "traceback-oracle$suffix"
+    Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/traceback_api_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceTracebackConsumer)
     $adaExecutionDyldPath = $env:DYLD_LIBRARY_PATH
+    $referenceBuiltinConsumer = Join-Path $reportDirectory "builtin-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/builtin_api_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceBuiltinConsumer)
+    $referenceExternalConsumer = Join-Path $reportDirectory "external-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/external_string_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceExternalConsumer)
+    $referenceConversionConsumer = Join-Path $reportDirectory "conversion-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/conversion_api_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceConversionConsumer)
+    $referenceFormatConsumer=$null
+    if($TargetPolicy -ne ''){
+        $referenceFormatConsumer=Join-Path $reportDirectory "format-oracle$suffix"
+        Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+            '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/format_api_contract.c'),
+            '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceFormatConsumer)
+        $referenceValueConsumer=Join-Path $reportDirectory "value-oracle$suffix"
+        Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+            '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/value_api_contract.c'),
+            '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceValueConsumer)
+        $referenceAuxiliaryConsumer=Join-Path $reportDirectory "auxiliary-oracle$suffix"
+        # The auxiliary contract asserts the public platform wait-status
+        # behavior. Compile it with the same platform selection as the root
+        # Ada/consumer projects and the independent C reference library.
+        $platformDefines=if($IsLinux){@('-DLUA_USE_LINUX')}elseif($IsMacOS){@('-DLUA_USE_MACOSX')}else{@()}
+        Invoke-Build (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic')+$platformDefines+@(
+            '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/auxiliary_api_contract.c'),
+            '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceAuxiliaryConsumer))
+    }
+    $referenceOperatorConsumer = Join-Path $reportDirectory "operator-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/operator_api_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceOperatorConsumer)
+    $referenceIndexTypeConsumer = Join-Path $reportDirectory "index-type-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/index_type_api_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceIndexTypeConsumer)
+    $referenceBaseClosingConsumer = Join-Path $reportDirectory "base-closing-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/base_closing_api_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceBaseClosingConsumer)
+    $referenceNativeModuleConsumer=Join-Path $reportDirectory "native-module-oracle$suffix"
+    $referenceBufferConsumer=Join-Path $reportDirectory "buffer-oracle$suffix"
+    Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/buffer_api_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceBufferConsumer)
+    $referencePrivateBufferConsumer=$null
+    if($Configuration -ceq 'upstream-test'){
+        $referencePrivateBufferConsumer=Join-Path $reportDirectory "buffer-private-t-oracle$suffix"
+        $privatePlatform=if($IsLinux){@('-DLUA_USE_LINUX')}elseif($IsMacOS){@('-DLUA_USE_MACOSX')}else{@()}
+        Invoke-Build (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic')+$privatePlatform+@(
+            '-I',(Join-Path $projectRoot 'c_api/include/api'),'-I',(Join-Path $projectRoot 'references/lua'),
+            (Join-Path $projectRoot 'c_api/tests/buffer_private_t_contract.c'),
+            '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referencePrivateBufferConsumer))
+    }
+    $referenceAllocatorConsumer=Join-Path $reportDirectory "allocator-oracle$suffix"
+    Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/allocator_api_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceAllocatorConsumer)
+    $referenceSubstitutionConsumer=Join-Path $reportDirectory "substitution-oracle$suffix"
+    Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/substitution_api_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceSubstitutionConsumer)
+    $referenceLoadfileConsumer=Join-Path $reportDirectory "loadfile-oracle$suffix"
+    Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/loadfile_api_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceLoadfileConsumer)
+    $referencePointerConsumer=Join-Path $reportDirectory "pointer-identity-oracle$suffix"
+    Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/pointer_identity_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referencePointerConsumer)
+    $referenceConcatConsumer=Join-Path $reportDirectory "concat-oracle$suffix"
+    Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/concat_api_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceConcatConsumer)
+    $macroPlatformDefines=if($IsLinux){@('-DLUA_USE_LINUX')}elseif($IsMacOS){@('-DLUA_USE_MACOSX')}else{@()}
+    $referenceMacroConsumer=Join-Path $reportDirectory "macro-oracle$suffix"
+    $referenceMacroCompatConsumer=Join-Path $reportDirectory "macro-compat-oracle$suffix"
+    foreach($selection in @(@{source='macro_api_contract.c';output=$referenceMacroConsumer},
+        @{source='macro_compat_api_contract.c';output=$referenceMacroCompatConsumer})){
+        Invoke-Build (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic')+$macroPlatformDefines+@(
+            '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot ('c_api/tests/'+$selection.source)),
+            '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$selection.output))
+    }
+    $nativeSystemLibraries=if($IsLinux){@('-ldl')}else{@()}
+    Invoke-Build (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/native_module_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceNativeModuleConsumer)+$nativeSystemLibraries)
+    $referenceThreadResetConsumer = Join-Path $reportDirectory "thread-reset-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/thread_reset_api_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceThreadResetConsumer)
     try {
         $env:PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:PATH
         $env:LD_LIBRARY_PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:LD_LIBRARY_PATH
         $env:DYLD_LIBRARY_PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:DYLD_LIBRARY_PATH
         Invoke-Consumer 'gc-oracle' $referenceConsumer 'PASS: public GC contract'
         Invoke-Consumer 'io-oracle' $referenceIOConsumer 'PASS: public IO/OS contract'
-        Invoke-Consumer 'foreign-oracle' $referenceForeignConsumer 'PASS: public foreign contract'
+        Invoke-Consumer 'foreign-oracle' $referenceForeignConsumer 'PASS: public foreign contract' $foreignArguments
+        Invoke-Consumer 'load-dump-oracle' $referenceLoadDumpConsumer 'PASS: public reader/writer contract'
+        Invoke-Consumer 'debug-oracle' $referenceDebugConsumer 'PASS: public debug contract'
+        Invoke-Consumer 'traceback-oracle' $referenceTracebackConsumer 'PASS: public traceback contract'
+        Invoke-Consumer 'builtin-oracle' $referenceBuiltinConsumer 'PASS: public builtin contract'
+        Invoke-Consumer 'external-oracle' $referenceExternalConsumer 'PASS: public external string contract' $externalArguments
+        Invoke-Consumer 'conversion-oracle' $referenceConversionConsumer 'PASS: public numeric conversion contract'
+        Invoke-Consumer 'operator-oracle' $referenceOperatorConsumer 'PASS: public C operator contract'
+        Invoke-Consumer 'index-type-oracle' $referenceIndexTypeConsumer 'PASS: public integer-index and type contract'
+        Invoke-Consumer 'base-closing-oracle' $referenceBaseClosingConsumer 'PASS: public host base C closing contract'
+        Invoke-Consumer 'buffer-oracle' $referenceBufferConsumer 'PASS: public luaL_Buffer contract'
+        if($Configuration -ceq 'upstream-test'){
+            Invoke-Consumer 'buffer-private-t-oracle' $referencePrivateBufferConsumer 'PASS: public luaL_Buffer contract'
+        }
+        Invoke-Consumer 'allocator-oracle' $referenceAllocatorConsumer 'PASS: public allocator contract'
+        foreach($mode in @('string','number')){
+            $message=if($mode -ceq 'string'){'allocator panic witness'}else{'error object is not a string'}
+            Invoke-Consumer "allocator-panic-$mode-oracle" $referenceAllocatorConsumer '' @("--panic-$mode") `
+                ("PANIC: unprotected error in call to Lua API ($message)`n")
+        }
+        Invoke-Consumer 'substitution-oracle' $referenceSubstitutionConsumer 'PASS: public luaL_addgsub and luaL_gsub contract'
+        Invoke-Consumer 'loadfile-oracle' $referenceLoadfileConsumer 'PASS: public luaL_loadfilex contract'
+        Invoke-Consumer 'pointer-identity-oracle' $referencePointerConsumer 'PASS: public pointer identity contract'
+        Invoke-Consumer 'concat-oracle' $referenceConcatConsumer 'PASS: public lua_concat contract'
+        Invoke-Consumer 'macro-oracle' $referenceMacroConsumer 'PASS: public SDK macro contract'
+        Invoke-Consumer 'macro-compat-oracle' $referenceMacroCompatConsumer 'PASS: public SDK macro contract'
+        $fileContext=$Configuration+'/'+$(if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'})+'/'+$Profile+'/'+$(if($LibraryType -ceq 'relocatable'){'shared'}else{$LibraryType})
+        $fileIO=Invoke-FileConsumerIO -Root $projectRoot -Context $fileContext -AdaExecutable $loadfileConsumer `
+            -ReferenceExecutable $referenceLoadfileConsumer -RecordDirectory (Join-Path $reportDirectory 'file-stdin')
+        $fileCaptureResolver={param($path,$sha)
+            if((Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant() -cne $sha){throw 'Actual file stdin capture bytes differ'}
+            return $path
+        }
+        $null=Test-FileConsumerIO -Observation $fileIO -Context $fileContext -ResolveCapture $fileCaptureResolver `
+            -DriverHashes @{Ada=(Get-FileHash $loadfileConsumer).Hash.ToLowerInvariant();ReferenceC=(Get-FileHash $referenceLoadfileConsumer).Hash.ToLowerInvariant()}
+        Write-Output 'PASS: exact text stdin and both binary producers across all four C/Ada input paths'
+        $nativeModuleC=Invoke-NativeModuleConsumer -Name native-module-oracle -Executable $referenceNativeModuleConsumer `
+            -Implementation ReferenceC -RuntimePath $referenceDirectory -Compiler $fixtureCompiler
+        Invoke-Consumer 'thread-reset-oracle' $referenceThreadResetConsumer 'PASS: public thread reset/base closing contract' $resetArguments
+        if($TargetPolicy -ne ''){
+            Invoke-Consumer 'format-oracle' $referenceFormatConsumer 'PASS: public formatting contract'
+            Invoke-Consumer 'value-oracle' $referenceValueConsumer 'PASS: public value operation contract'
+            Invoke-Consumer 'auxiliary-oracle' $referenceAuxiliaryConsumer 'PASS: public auxiliary contract'
+        }
     } finally {
         $env:PATH = $adaExecutionPath
         $env:LD_LIBRARY_PATH = $adaExecutionLdPath
@@ -208,6 +477,97 @@ try {
         throw 'C/Ada public foreign contract output differs'
     }
     Write-Output 'PASS: identical public foreign contract against C and Ada'
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'load-dump-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'load-dump-oracle.stdout'))) {
+        throw 'C/Ada public reader/writer contract output differs'
+    }
+    Write-Output 'PASS: identical public reader/writer contract against C and Ada'
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'debug-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'debug-oracle.stdout'))) {
+        throw 'C/Ada public debug contract output differs'
+    }
+    Write-Output 'PASS: identical public debug contract against C and Ada'
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'builtin-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'builtin-oracle.stdout'))) {
+        throw 'C/Ada public builtin contract output differs'
+    }
+    Write-Output 'PASS: identical public builtin contract against C and Ada'
+    foreach($stream in @('stdout','stderr')){
+        if((Get-FileHash (Join-Path $reportDirectory "traceback-api.$stream")).Hash -cne
+            (Get-FileHash (Join-Path $reportDirectory "traceback-oracle.$stream")).Hash){throw "C/Ada public traceback $stream differs"}
+    }
+    Write-Output 'PASS: identical public traceback contract against C and Ada'
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'external-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'external-oracle.stdout'))) {
+        throw 'C/Ada public external string contract output differs'
+    }
+    Write-Output 'PASS: identical scoped external string contract against C and Ada'
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'conversion-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'conversion-oracle.stdout'))) {
+        throw 'C/Ada public numeric conversion contract output differs'
+    }
+    Write-Output 'PASS: identical public numeric conversion contract against C and Ada'
+    if($TargetPolicy -ne ''){
+        if([IO.File]::ReadAllText((Join-Path $reportDirectory 'format-api.stdout')) -cne
+            [IO.File]::ReadAllText((Join-Path $reportDirectory 'format-oracle.stdout'))){throw 'C/Ada public formatting contract output differs'}
+        Write-Output 'PASS: identical public formatting contract against C and Ada'
+        foreach($kind in @('value','auxiliary')){
+            if([IO.File]::ReadAllText((Join-Path $reportDirectory "$kind-api.stdout")) -cne
+                [IO.File]::ReadAllText((Join-Path $reportDirectory "$kind-oracle.stdout"))){throw "C/Ada public $kind contract output differs"}
+            Write-Output "PASS: identical public $kind contract against C and Ada"
+        }
+    }
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'operator-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'operator-oracle.stdout'))) {
+        throw 'C/Ada public operator contract output differs'
+    }
+    Write-Output 'PASS: identical public C operator contract against C and Ada'
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'index-type-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'index-type-oracle.stdout'))) {
+        throw 'C/Ada public integer-index and type contract output differs'
+    }
+    Write-Output 'PASS: identical public integer-index and type contract against C and Ada'
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'base-closing-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'base-closing-oracle.stdout'))) {
+        throw 'C/Ada public host base closing contract output differs'
+    }
+    Write-Output 'PASS: identical public host base closing contract against C and Ada'
+    if([IO.File]::ReadAllText((Join-Path $reportDirectory 'native-module-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'native-module-oracle.stdout'))){throw 'C/Ada native module lifetime output differs'}
+    Write-Output 'PASS: identical native module lifetime contract against C and Ada'
+    if([IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-oracle.stdout'))){throw 'C/Ada public buffer contract output differs'}
+    Write-Output 'PASS: identical public luaL_Buffer contract against C and Ada'
+    if($Configuration -ceq 'upstream-test'){
+        foreach($stream in @('stdout','stderr')){
+            if((Get-FileHash (Join-Path $reportDirectory "buffer-private-t-api.$stream")).Hash -cne
+                (Get-FileHash (Join-Path $reportDirectory "buffer-private-t-oracle.$stream")).Hash){throw "C/Ada private T buffer receiver $stream differs"}
+        }
+        Write-Output 'PASS: identical private T23 caller buffer operations against C and Ada'
+    }
+    foreach($kind in @('allocator','substitution','loadfile','pointer-identity','concat','macro','macro-compat')){
+        foreach($stream in @('stdout','stderr')){
+            if((Get-FileHash (Join-Path $reportDirectory "$kind-api.$stream")).Hash -cne
+                (Get-FileHash (Join-Path $reportDirectory "$kind-oracle.$stream")).Hash){throw "C/Ada public $kind contract $stream differs"}
+        }
+        Write-Output "PASS: identical public $kind contract against C and Ada"
+    }
+    $macroCounts=@{}
+    foreach($kind in @('macro','macro-compat')){
+        $role=if($kind -ceq 'macro'){'ordinary'}else{'client-opt-ins'}
+        $text=[IO.File]::ReadAllText((Join-Path $reportDirectory "$kind-api.stdout"))
+        $macroCounts[$kind]=[regex]::Matches($text,'(?m)^PASS: macro-').Count
+        $null=Test-SdkMacroProtocol -Text $text -Role $role -Platform $(if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'}) -ReportedCases $macroCounts[$kind]
+    }
+    foreach($mode in @('string','number')){foreach($stream in @('stdout','stderr')){
+        if((Get-FileHash (Join-Path $reportDirectory "allocator-panic-$mode-api.$stream")).Hash -cne
+            (Get-FileHash (Join-Path $reportDirectory "allocator-panic-$mode-oracle.$stream")).Hash){throw "C/Ada installed panic $mode $stream differs"}
+    }}
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'thread-reset-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'thread-reset-oracle.stdout'))) {
+        throw 'C/Ada public thread reset contract output differs'
+    }
+    Write-Output 'PASS: identical public thread reset contract against C and Ada'
     $referenceLibraries = @(Get-ChildItem -LiteralPath $referenceDirectory -File |
         Where-Object { $_.Name -match '^libconformance_lua\.(dll|so(\.[0-9.]+)?|dylib)$' } |
         ForEach-Object { [ordered]@{ file=$_.Name;
@@ -227,6 +587,91 @@ try {
         [ordered]@{ file=$name;
             sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot $name) -Algorithm SHA256).Hash.ToLowerInvariant() }
     })
+    $loadDumpContractSources = @(foreach ($name in @('load_dump_api_contract.c',
+        'load_dump_contract.h', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
+    $debugContractSources = @(foreach ($name in @('debug_api_contract.c', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
+    $builtinContractSources = @(foreach ($name in @('builtin_api_contract.c', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
+    $builtinContractSources+=@{file='tests/c/argument_registry_callbacks.h';sha256=(Get-FileHash (Join-Path $projectRoot 'tests/c/argument_registry_callbacks.h')).Hash.ToLowerInvariant()}
+    $tracebackContractSources=@(foreach($name in @('traceback_api_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
+    $externalContractSources = @(foreach ($name in @('external_string_contract.c', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
+    $conversionContractSources = @(foreach ($name in @('conversion_api_contract.c', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
+    $formatSources=@();$valueSources=@();$auxiliarySources=@()
+    if($TargetPolicy -ne ''){
+        $formatSources=@(foreach($name in @('format_api_contract.c','consumer_allocator.h')){
+            @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+        })
+        $valueSources=@(foreach($name in @('value_api_contract.c','consumer_allocator.h')){
+            @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+        })
+        $auxiliarySources=@(foreach($name in @('auxiliary_api_contract.c','consumer_allocator.h')){
+            @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+        })
+    }
+    $operatorContractSources = @(foreach ($name in @('operator_api_contract.c', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
+    $indexTypeContractSources = @(foreach ($name in @('index_type_api_contract.c', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
+    $baseClosingContractSources = @(foreach ($name in @('base_closing_api_contract.c', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
+    $nativeModuleContractSources=@(foreach($name in @('native_module_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
+    $bufferContractSources=@(foreach($name in @('buffer_api_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
+    $privateBufferContract=$null;$privateBufferSources=@()
+    if($Configuration -ceq 'upstream-test'){
+        $privateBufferSources=@(foreach($path in @('c_api/tests/buffer_private_t_contract.c','references/lua/ltests.h',
+            'c_api/include/lua_ada_runtime_configuration.h')){
+            @{file=$path;sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot $path)).Hash.ToLowerInvariant()}
+        })
+        $privateBufferContract=@{matching_output=$true;sources=(@($bufferContractSources)+$privateBufferSources);
+            matched_cases=17;reference_library_files=$referenceLibraries;header_role='native-private-T-caller-header-role'}
+    }
+    $allocatorContractSources=@(@{file='c_api/tests/allocator_api_contract.c';sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot 'c_api/tests/allocator_api_contract.c')).Hash.ToLowerInvariant()})
+    $substitutionContractSources=@(foreach($name in @('substitution_api_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
+    $loadfileContractSources=@(foreach($name in @('loadfile_api_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
+    $pointerContractSources=@(foreach($name in @('pointer_identity_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
+    $concatContractSources=@(foreach($name in @('concat_api_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
+    $macroContractSources=@(foreach($name in @('macro_api_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
+    $macroCompatSource=@{file='c_api/tests/macro_compat_api_contract.c';sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot 'c_api/tests/macro_compat_api_contract.c')).Hash.ToLowerInvariant()}
+    $threadResetContractSources = @(foreach ($name in @('thread_reset_api_contract.c', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
     Invoke-Consumer 'mixed' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/lua-core_image_check$suffix") 'CORE IMAGE ADA+C OK'
     Invoke-Consumer 'c-startup' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/c_image_client$suffix") 'CORE IMAGE C STARTUP OK'
     # Old ignored products can remain after the library rename. Hash only the
@@ -240,24 +685,77 @@ try {
     if ((Get-FileHash -LiteralPath $imagePath).Hash -cne $inputHash) {
         throw 'Consumer execution changed the selected runtime image'
     }
+    $consumerSourceNames=@('c_api_consumer.c', 'gc_contract.h', 'io_contract.h', 'load_dump_contract.h', 'consumer_allocator.h')
+    if($TargetPolicy -ne ''){$consumerSourceNames+=@('format_api_contract.c','value_api_contract.c','auxiliary_api_contract.c')}
     [ordered]@{ profile = $Profile; library_type = $LibraryType;
         repository_revision = $repositoryRevision;
         repository_dirty = ($repositoryChanges.Count -ne 0);
         platform = $(if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' });
         reference_revision = $referenceRevision;
-        consumer_sources = @(@(foreach ($name in @('c_api_consumer.c', 'gc_contract.h', 'io_contract.h', 'consumer_allocator.h')) {
+        consumer_sources = @(@(foreach ($name in $consumerSourceNames) {
             [ordered]@{ file="c_api/tests/$name";
                 sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
-        }) + $foreignContractSources);
+        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $tracebackContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources + $privateBufferSources + $threadResetContractSources + $allocatorContractSources + $substitutionContractSources + $loadfileContractSources + $pointerContractSources + $concatContractSources + $macroContractSources + @($macroCompatSource));
         configuration = $Configuration; consumers = $records.ToArray();
+        reference_compiler_defines=$referenceCompilerDefines;
         library_files = $libraries;
         gc_contract = [ordered]@{ matching_output=$true; sources=$contractSources;
             reference_library_files=$referenceLibraries };
         io_contract = [ordered]@{ matching_output=$true; sources=$ioContractSources;
             reference_library_files=$referenceLibraries };
         foreign_contract = [ordered]@{ matching_output=$true; sources=$foreignContractSources;
-            reference_library_files=$referenceLibraries } } | ConvertTo-Json -Depth 6 |
+            hook_case_maximum=$foreignHookMaximum;matched_cases=(25+$foreignHookMaximum-1+5+4-$(if($foreignPrivateLockMode){1}else{0}));
+            skipped_native_lock_cases=$(if($foreignPrivateLockMode){1}else{0});
+            native_omitted_cases=@(if($foreignPrivateLockMode){'foreign-hook-24'});
+            ada_full_consumer=$(if($foreignPrivateLockMode){'foreign-full-api'}else{'foreign-api'});
+            reference_library_files=$referenceLibraries };
+        load_dump_contract = [ordered]@{ matching_output=$true; sources=$loadDumpContractSources;
+            reference_library_files=$referenceLibraries };
+        debug_contract = [ordered]@{ matching_output=$true; sources=$debugContractSources;
+            reference_library_files=$referenceLibraries };
+        builtin_contract = [ordered]@{ matching_output=$true; sources=$builtinContractSources;
+            matched_cases=30;reference_library_files=$referenceLibraries };
+        traceback_contract=@{matching_output=$true;sources=$tracebackContractSources;matched_cases=22;reference_library_files=$referenceLibraries};
+        external_contract = [ordered]@{ matching_output=$true; sources=$externalContractSources;
+            matched_cases=$(if ($Configuration -eq 'upstream-test') { 13 } else { 18 });
+            skipped_reentry_cases=$(if ($Configuration -eq 'upstream-test') { 5 } else { 0 });
+            reference_library_files=$referenceLibraries };
+        conversion_contract = [ordered]@{ matching_output=$true; sources=$conversionContractSources;
+            reference_library_files=$referenceLibraries };
+        format_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$formatSources;reference_library_files=$referenceLibraries}}else{$null});
+        operator_contract = [ordered]@{ matching_output=$true; sources=$operatorContractSources;
+            reference_library_files=$referenceLibraries };
+        index_type_contract = [ordered]@{ matching_output=$true; sources=$indexTypeContractSources;
+            reference_library_files=$referenceLibraries };
+        base_closing_contract = [ordered]@{ matching_output=$true; sources=$baseClosingContractSources;
+            reference_library_files=$referenceLibraries };
+        native_module_contract = @{matching_output=$true;sources=$nativeModuleContractSources;matched_cases=9;
+            reference_library_files=$referenceLibraries;ada_linkage=$nativeModuleAda.identity;c_linkage=$nativeModuleC.identity;
+            ada_fixture_directory=$nativeModuleAda.library_directory;c_fixture_directory=$nativeModuleC.library_directory;
+            ada_fixture_records=$nativeModuleAda.records;c_fixture_records=$nativeModuleC.records};
+        buffer_contract=@{matching_output=$true;sources=$bufferContractSources;matched_cases=17;reference_library_files=$referenceLibraries};
+        buffer_private_t_contract=$privateBufferContract;
+        allocator_contract=@{matching_output=$true;sources=$allocatorContractSources;matched_cases=13;panic_modes=@('string','number');reference_library_files=$referenceLibraries};
+        substitution_contract=@{matching_output=$true;sources=$substitutionContractSources;matched_cases=16;reference_library_files=$referenceLibraries};
+        loadfile_contract=@{matching_output=$true;sources=$loadfileContractSources;matched_cases=21;stdin_io=$fileIO;reference_library_files=$referenceLibraries};
+        pointer_identity_contract=@{matching_output=$true;sources=$pointerContractSources;matched_cases=8;reference_library_files=$referenceLibraries};
+        concat_contract=@{matching_output=$true;sources=$concatContractSources;matched_cases=21;reference_library_files=$referenceLibraries};
+        macro_contract=@{matching_output=$true;sources=$macroContractSources;matched_cases=$macroCounts.macro;platform_defines=$macroPlatformDefines;reference_library_files=$referenceLibraries};
+        macro_compat_contract=@{matching_output=$true;sources=(@($macroContractSources)+@($macroCompatSource));matched_cases=$macroCounts['macro-compat'];platform_defines=$macroPlatformDefines;reference_library_files=$referenceLibraries};
+        thread_reset_contract = [ordered]@{ matching_output=$true; sources=$threadResetContractSources;
+            matched_cases=$(if ($Configuration -eq 'upstream-test') { 23 } else { 24 });
+            skipped_warning_reentry_cases=$(if ($Configuration -eq 'upstream-test') { 1 } else { 0 });
+            reference_library_files=$referenceLibraries };
+        value_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$valueSources;reference_library_files=$referenceLibraries}}else{$null});
+        auxiliary_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$auxiliarySources;platform_defines=$platformDefines;reference_library_files=$referenceLibraries}}else{$null}) } | ConvertTo-Json -Depth 32 |
         Set-Content -LiteralPath (Join-Path $reportDirectory 'result.json') -Encoding utf8
+    $foreignReport=Get-Content -LiteralPath (Join-Path $reportDirectory 'result.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 32
+    $foreignCapture={param($path,$hash)
+        if((Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant() -cne $hash){throw 'Foreign actual capture hash differs'}
+        return $path
+    }
+    $foreignContext="$Configuration/$(if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'})/$Profile/$(if($LibraryType -ceq 'relocatable'){'shared'}else{$LibraryType})"
+    Assert-ForeignContractEvidence -Report $foreignReport -Context $foreignContext -HookMaximum $foreignHookMaximum -ResolveCapture $foreignCapture
     Write-Output 'PASS: one production interpreter image; Ada/C state, pool, allocator and startup checks'
 }
 finally {

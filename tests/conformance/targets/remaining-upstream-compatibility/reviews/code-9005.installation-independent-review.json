@@ -1,0 +1,57 @@
+{
+  "schema_version": 3,
+  "kind": "t-private-optimizer-exclusion-review",
+  "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9005",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root/remaining_suite",
+  "review_date": "2026-11-08",
+  "decision": "accepted",
+  "t_dominance": "I verified the unchanged exact top-level T==nil return at byte83/length104 dominates this source span; no T omission or fake helper is introduced.",
+  "private_invariant": "I independently checked the second 32-byte assertion against f2. Its empty outer pool is a private constant-placement choice. The same exact string, nested calls and actual return/dump/load obligations in node 9017 stay pending and required; no synthetic pool facade is introduced.",
+  "third_party_irrelevance": "These exact constant/opcode/physical-register choices remain observable through dumping/debugging, but the public binary/load/value/callback/lifetime contracts do not require the C optimization sequence. Required nonexcluded public nodes remain pending; no ordinary executable assertion or public interface is waived.",
+  "feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-ten-source-feature-review.json",
+    "sha256": "a0a24b7ee5b8b8cecbe327afced993b44942c0bd93ee85601e09a3083e724635"
+  },
+  "semantic_retention_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+    "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+  },
+  "original_anchor_links": [
+    {
+      "id": "LUA-CODE-ASSERT-CALL-0015",
+      "kind": "assert-call",
+      "byte_offset": 13361,
+      "byte_length": 6,
+      "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-CODE-INTERNAL-REFERENCE-0007",
+      "kind": "internal-reference",
+      "byte_offset": 13368,
+      "byte_length": 7,
+      "anchor_sha256": "0f4f8500d5e3005e1445ef305004182f31d0c376f6be5b439dee17437d6e5d90"
+    }
+  ],
+  "required_semantic_contract_ids": [
+    "nested-constant-lifetimes"
+  ],
+  "author_input_narrative": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9005.independent-review.draft.json",
+    "sha256": "c7d9ce1a465476c4e4d52ee465331d814fcdd485d51fb7343aa7f0fe0c205720"
+  },
+  "author_input_approval": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9005.exclusion-approval.draft.json",
+    "sha256": "9cf7a533eb3b25e5beff3638c03cae304b835aea2647eb73c5a33458e6fe5ad6"
+  },
+  "installation_source_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3-installation.independent-review.json",
+    "sha256": "faffcd7c683bbcf96ec235e92ec34be85f33f7cc5335df56c548a25e07502bf2"
+  },
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": []
+}

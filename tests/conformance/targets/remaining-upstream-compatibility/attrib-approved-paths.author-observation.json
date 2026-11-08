@@ -1,0 +1,501 @@
+{
+  "schema_version": 1,
+  "kind": "author-component-observation",
+  "id": "attrib-approved-windows-paths",
+  "date": "2026-11-08",
+  "author": "Codex /root/remaining_suite",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_exclusions": [],
+  "source_emission_review": "Independent accepted source-only ten-literal Windows path decision f15a06e; no runtime authority",
+  "source": {
+    "path": "references/lua/testes/attrib.lua",
+    "sha256": "dd2eb13be29628ac0268cddfafdc6a816edcba6552ae15e8637afc6a79742e52",
+    "bytes": 14029
+  },
+  "approved_source_sha256": "a56021013a850cf69feb421e5385ac0e5f8e6b5841d107c9c7a55ed5ea172dca",
+  "entry": "all.lua148-156 unstripped loadfile/dump/load/tail-call; one-result27 assertion",
+  "timeout_seconds": 900,
+  "allocator_limit_bytes": 2147483648,
+  "records": [
+    {
+      "role": "default-ReferenceC",
+      "configuration": "default",
+      "implementation": "ReferenceC",
+      "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-250a3c3dd978432c9980fcf8b588d1ec\\default-ReferenceC-image\\lua.exe",
+      "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+      "ada_component_revision": null,
+      "configuration_probe": {
+        "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/default-ReferenceC-configuration.stdout",
+        "sha256": "6c63f956109c778efd508539cfdb94eabe3d06a41a56c2a6a1fae68983e20295",
+        "bytes": 451
+      },
+      "wrapper": {
+        "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/default-ReferenceC-fixtures/attrib-entry.lua",
+        "sha256": "a29d8528d347347875bf1784e352c69764e80f0329bbac711b88b55cce4bfa7f",
+        "bytes": 357
+      },
+      "process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-250a3c3dd978432c9980fcf8b588d1ec\\default-ReferenceC-image\\lua.exe",
+        "process_id": 56264,
+        "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+        "arguments": [
+          "-E",
+          "attrib-entry.lua",
+          "default"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\default-ReferenceC-fixtures",
+        "started_utc": "2026-11-08T07:42:50.41015Z",
+        "elapsed_milliseconds": 54,
+        "timeout_seconds": 900,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 67108864,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\default-ReferenceC-approved-attrib.stdout",
+        "stdout_bytes": 201,
+        "stdout_sha256": "b5aaea413ec8e08b5611087519dcb1b8aa25f718655fd885f52843f009631cd7",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\default-ReferenceC-approved-attrib.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/default-ReferenceC-approved-attrib.allocator.56264.json",
+        "sha256": "7b299b7e978ea02bc05caab956b3ded2015b6eec391f658fb11993eb155e4f17",
+        "bytes": 211
+      },
+      "outstanding_bytes": 0,
+      "outstanding_blocks": 0,
+      "shutdown_complete": null,
+      "accounting_fault": null,
+      "return_protocol_observed": true,
+      "native_module_fallback_reported": false,
+      "native_linkage": {
+        "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\default-ReferenceC-module-linkage\\linkage.json",
+        "sha256": "b40aa3e3d12eb49d05603e4057bb175b0fce88a7f0f0bd2146d4f255451b3ccf"
+      },
+      "source_fixture_changes": [
+        "attrib.lua"
+      ],
+      "source_replacement_is_approved": true,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "role": "default-Ada",
+      "configuration": "default",
+      "implementation": "Ada",
+      "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-250a3c3dd978432c9980fcf8b588d1ec\\default-Ada-image\\lua.exe",
+      "executable_sha256": "dfb64802a9cb0ef6d599af07b115c1283bafc2401416e9f6d2c8cc348af68edf",
+      "ada_component_revision": "8daf1a7b2ddf92695fe41bdffc191787ced3c730",
+      "configuration_probe": {
+        "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/default-Ada-configuration.stdout",
+        "sha256": "52da7c70140c7c215757ad88bbbbd1db7f61f946569cd89206b1f5f164b142b4",
+        "bytes": 548
+      },
+      "wrapper": {
+        "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/default-Ada-fixtures/attrib-entry.lua",
+        "sha256": "a29d8528d347347875bf1784e352c69764e80f0329bbac711b88b55cce4bfa7f",
+        "bytes": 357
+      },
+      "process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-250a3c3dd978432c9980fcf8b588d1ec\\default-Ada-image\\lua.exe",
+        "process_id": 55148,
+        "executable_sha256": "dfb64802a9cb0ef6d599af07b115c1283bafc2401416e9f6d2c8cc348af68edf",
+        "arguments": [
+          "-E",
+          "attrib-entry.lua",
+          "default"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\default-Ada-fixtures",
+        "started_utc": "2026-11-08T07:42:53.2195601Z",
+        "elapsed_milliseconds": 622,
+        "timeout_seconds": 900,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 67108864,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\default-Ada-approved-attrib.stdout",
+        "stdout_bytes": 201,
+        "stdout_sha256": "b5aaea413ec8e08b5611087519dcb1b8aa25f718655fd885f52843f009631cd7",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\default-Ada-approved-attrib.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/default-Ada-approved-attrib.allocator.55148.json",
+        "sha256": "c56e0dee777a8589c998003edc5a4854f5dcf0102fc220c26d98858a611fba9d",
+        "bytes": 351
+      },
+      "outstanding_bytes": 0,
+      "outstanding_blocks": 0,
+      "shutdown_complete": true,
+      "accounting_fault": false,
+      "return_protocol_observed": true,
+      "native_module_fallback_reported": false,
+      "native_linkage": {
+        "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\default-Ada-module-linkage\\linkage.json",
+        "sha256": "5384b5efd7d8e5491a40e763f76f9bb8ddb37e4b15bb10344876e6e15b8388af"
+      },
+      "source_fixture_changes": [
+        "attrib.lua"
+      ],
+      "source_replacement_is_approved": true,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "role": "upstream-test-ReferenceC",
+      "configuration": "upstream-test",
+      "implementation": "ReferenceC",
+      "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-250a3c3dd978432c9980fcf8b588d1ec\\upstream-test-ReferenceC-image\\lua.exe",
+      "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+      "ada_component_revision": null,
+      "configuration_probe": {
+        "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/upstream-test-ReferenceC-configuration.stdout",
+        "sha256": "65bc59bb7bd1f68dc6670263547590fc5b3878f7cd7c205ec7aa8a9d9775ebfb",
+        "bytes": 456
+      },
+      "wrapper": {
+        "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/upstream-test-ReferenceC-fixtures/attrib-entry.lua",
+        "sha256": "a29d8528d347347875bf1784e352c69764e80f0329bbac711b88b55cce4bfa7f",
+        "bytes": 357
+      },
+      "process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-250a3c3dd978432c9980fcf8b588d1ec\\upstream-test-ReferenceC-image\\lua.exe",
+        "process_id": 36836,
+        "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+        "arguments": [
+          "-E",
+          "attrib-entry.lua",
+          "upstream-test"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\upstream-test-ReferenceC-fixtures",
+        "started_utc": "2026-11-08T07:42:56.832679Z",
+        "elapsed_milliseconds": 54,
+        "timeout_seconds": 900,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 67108864,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\upstream-test-ReferenceC-approved-attrib.stdout",
+        "stdout_bytes": 201,
+        "stdout_sha256": "b5aaea413ec8e08b5611087519dcb1b8aa25f718655fd885f52843f009631cd7",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\upstream-test-ReferenceC-approved-attrib.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/upstream-test-ReferenceC-approved-attrib.allocator.36836.json",
+        "sha256": "055ec13917c78dbb9374f7397eaa5713c9381b885c2682caa576a256b9ee837b",
+        "bytes": 249
+      },
+      "outstanding_bytes": 0,
+      "outstanding_blocks": 0,
+      "shutdown_complete": null,
+      "accounting_fault": null,
+      "return_protocol_observed": true,
+      "native_module_fallback_reported": false,
+      "native_linkage": {
+        "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\upstream-test-ReferenceC-module-linkage\\linkage.json",
+        "sha256": "7ca0dd8e060371f549e8aff7786b6011c4c233279b1db0f80cabd59df4472eaf"
+      },
+      "source_fixture_changes": [
+        "attrib.lua"
+      ],
+      "source_replacement_is_approved": true,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "role": "upstream-test-Ada",
+      "configuration": "upstream-test",
+      "implementation": "Ada",
+      "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-250a3c3dd978432c9980fcf8b588d1ec\\upstream-test-Ada-image\\lua.exe",
+      "executable_sha256": "444419952ee44f5005ff2adec8d245200aa498ad5f42440c6856b21ff4358e0f",
+      "ada_component_revision": "8daf1a7b2ddf92695fe41bdffc191787ced3c730",
+      "configuration_probe": {
+        "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/upstream-test-Ada-configuration.stdout",
+        "sha256": "2d100d0743d643c35d225646eb2bd8fe2b28b1c146c19109d0835943f613ca08",
+        "bytes": 547
+      },
+      "wrapper": {
+        "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/upstream-test-Ada-fixtures/attrib-entry.lua",
+        "sha256": "a29d8528d347347875bf1784e352c69764e80f0329bbac711b88b55cce4bfa7f",
+        "bytes": 357
+      },
+      "process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-250a3c3dd978432c9980fcf8b588d1ec\\upstream-test-Ada-image\\lua.exe",
+        "process_id": 45524,
+        "executable_sha256": "444419952ee44f5005ff2adec8d245200aa498ad5f42440c6856b21ff4358e0f",
+        "arguments": [
+          "-E",
+          "attrib-entry.lua",
+          "upstream-test"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\upstream-test-Ada-fixtures",
+        "started_utc": "2026-11-08T07:42:59.7437241Z",
+        "elapsed_milliseconds": 358,
+        "timeout_seconds": 900,
+        "exit_code": 1,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 67108864,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\upstream-test-Ada-approved-attrib.stdout",
+        "stdout_bytes": 101,
+        "stdout_sha256": "b1ed8192a7138c4b55db82d16fbac74028ed9f130b77808e849e714e0dfc2fa7",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\upstream-test-Ada-approved-attrib.stderr",
+        "stderr_bytes": 82,
+        "stderr_sha256": "9c4472b3aafcb355d879d0c47e4fc0faccd51a8e9356daba44a524c79dea04a9"
+      },
+      "telemetry": {
+        "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/upstream-test-Ada-approved-attrib.allocator.45524.json",
+        "sha256": "0db1880b5bcb7bd2c3fe0a98074742f37a31f8a8fb87ba5d6c58308120e09f56",
+        "bytes": 357
+      },
+      "outstanding_bytes": 0,
+      "outstanding_blocks": 0,
+      "shutdown_complete": true,
+      "accounting_fault": false,
+      "return_protocol_observed": false,
+      "native_module_fallback_reported": false,
+      "native_linkage": {
+        "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed\\upstream-test-Ada-module-linkage\\linkage.json",
+        "sha256": "f2523f7658faeb8c40fb6b8b82edc44b86a7b28435c5446b03f3f5ce0af7f944"
+      },
+      "source_fixture_changes": [
+        "attrib.lua"
+      ],
+      "source_replacement_is_approved": true,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    }
+  ],
+  "initial_harness_failure": {
+    "index": {
+      "path": "reports/debug-metadata/attrib-approved-250a3c3dd978432c9980fcf8b588d1ec/index.json",
+      "sha256": "a4800302d85b939898206901852829c74b9ae9a736e2a5fc55355929c053ee31",
+      "bytes": 610000
+    },
+    "classification": "post-source marker io.write on intentionally closed default output",
+    "passing_claim": false,
+    "fix": "fresh fixture replay uses print/C stdout as all.lua reporting does",
+    "source_failure_hidden": false
+  },
+  "remaining_t_failure": {
+    "path": "references/lua/testes/attrib.lua",
+    "line": 343,
+    "message": "attempt to call a nil value (field 'hash')",
+    "original_anchors": [
+      {
+        "id": "LUA-ATTRIB-ASSERT-CALL-0076",
+        "kind": "assert-call",
+        "byte_offset": 9002,
+        "byte_length": 6,
+        "line": 343,
+        "end_line": 343,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-ATTRIB-INTERNAL-REFERENCE-0001",
+        "kind": "internal-reference",
+        "byte_offset": 9018,
+        "byte_length": 6,
+        "line": 343,
+        "end_line": 343,
+        "anchor_sha256": "f37bee13ffa900363a2af2762d89b540c5ed39d3c6ced083a19b6e250cecae5f",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-ATTRIB-INTERNAL-REFERENCE-0002",
+        "kind": "internal-reference",
+        "byte_offset": 9033,
+        "byte_length": 6,
+        "line": 343,
+        "end_line": 343,
+        "anchor_sha256": "f37bee13ffa900363a2af2762d89b540c5ed39d3c6ced083a19b6e250cecae5f",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      }
+    ],
+    "mixed_block": {
+      "path": "references/lua/testes/attrib.lua",
+      "start_line": 335,
+      "end_line": 350,
+      "start_byte": 8743,
+      "length_bytes": 610,
+      "sha256": "4c205065eb12f5dc719916134802e3258ca4b1b80b5c2f4e86fbc9b309438413",
+      "original_text": "do  print(\"testing external strings\")\n  package.cpath = DC\"?\"\n  local lib2 = require\"lib2-v2\"\n  local t = {}\n  for _, len in ipairs{0, 10, 39, 40, 41, 1000} do\n    local str = string.rep(\"a\", len)\n    local str1 = lib2.newstr(str)\n    assert(str == str1)\n    assert(not T or T.hash(str) == T.hash(str1))\n    t[str1] = 20; assert(t[str] == 20 and t[str1] == 20)\n    t[str] = 10; assert(t[str1] == 10)\n    local tt = {[str1] = str1}\n    assert(next(tt) == str1 and next(tt, str1) == nil)\n    assert(tt[str] == str)\n    local str2 = lib2.newstr(str1)\n    assert(str == str2 and t[str2] == 10 and tt[str2] == str)\n"
+    },
+    "native_helper": {
+      "path": "references/lua/ltests.c",
+      "start_line": 1078,
+      "end_line": 1095,
+      "start_byte": 29158,
+      "length_bytes": 548,
+      "sha256": "cd0f8df677a292a425549330a77190f9567ef80227587b44dcd04431d4ef550c",
+      "original_text": "static int hash_query (lua_State *L) {\n  if (lua_isnone(L, 2)) {\n    TString *ts;\n    luaL_argcheck(L, lua_type(L, 1) == LUA_TSTRING, 1, \"string expected\");\n    ts = tsvalue(obj_at(L, 1));\n    if (ts->tt == LUA_VLNGSTR)\n      luaS_hashlongstr(ts);  /* make sure long string has a hash */\n    lua_pushinteger(L, cast_int(ts->hash));\n  }\n  else {\n    TValue *o = obj_at(L, 1);\n    Table *t;\n    luaL_checktype(L, 2, LUA_TTABLE);\n    t = hvalue(obj_at(L, 2));\n    lua_pushinteger(L, cast_Integer(luaH_mainposition(t, o) - t->node));\n  }\n  return 1;\n}\n"
+    },
+    "all_direct_suite_calls": [
+      {
+        "line": 343,
+        "call": "T.hash(str)",
+        "input": "owned string"
+      },
+      {
+        "line": 343,
+        "call": "T.hash(str1)",
+        "input": "actual lib2 external string"
+      }
+    ],
+    "other_direct_or_bracket_suite_hash_calls_found": 0,
+    "native_modes": {
+      "omitted_second_argument": "strict string, lazy long-string hash, signed C int cached-hash result",
+      "present_second_argument": "physical table main-position node index; no suite callsite"
+    },
+    "required_retention": [
+      "original343assertion",
+      "all lengths0,10,39,40,41,1000",
+      "owned/external byte equality",
+      "real external-string callbacks and same-image module bindings",
+      "same table key lookup and update",
+      "next key identity",
+      "duplicate external-string equality",
+      "selected provider close balance"
+    ],
+    "proposed_ada_invariant": "read actual Object.String_Hash consumed by Tables.Hash; preserve all64bits through reversible signed Integer_Value rendering",
+    "private_differences": "No promise of native signed32-bit numeric hash or C bucket geometry",
+    "implementation_authority_in_this_packet": false
+  },
+  "limits": [
+    "Dated8daf component images, not immutable final-current-head images",
+    "No full-target or all.lua aggregate acceptance",
+    "AdaTdoes not reach post343 key-lookup assertions until missing actual hash invariant is implemented",
+    "Native-image unload timing not independently monitored by this raw-file campaign",
+    "Only approved attrib.lua source differs from original fixture hashes; other reference bytes and pins preserved"
+  ],
+  "artifacts": [
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/index.json",
+      "sha256": "60cd51507b3328d97e9c6ca6c09130de9c858bc07d616f87679db8bdda44a9d6",
+      "bytes": 609986
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-250a3c3dd978432c9980fcf8b588d1ec/index.json",
+      "sha256": "a4800302d85b939898206901852829c74b9ae9a736e2a5fc55355929c053ee31",
+      "bytes": 610000
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/default-ReferenceC-approved-attrib.stdout",
+      "sha256": "b5aaea413ec8e08b5611087519dcb1b8aa25f718655fd885f52843f009631cd7",
+      "bytes": 201
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/default-ReferenceC-approved-attrib.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/default-ReferenceC-approved-attrib.allocator.56264.json",
+      "sha256": "7b299b7e978ea02bc05caab956b3ded2015b6eec391f658fb11993eb155e4f17",
+      "bytes": 211
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/default-ReferenceC-module-linkage/linkage.json",
+      "sha256": "b40aa3e3d12eb49d05603e4057bb175b0fce88a7f0f0bd2146d4f255451b3ccf",
+      "bytes": 126253
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/default-Ada-approved-attrib.stdout",
+      "sha256": "b5aaea413ec8e08b5611087519dcb1b8aa25f718655fd885f52843f009631cd7",
+      "bytes": 201
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/default-Ada-approved-attrib.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/default-Ada-approved-attrib.allocator.55148.json",
+      "sha256": "c56e0dee777a8589c998003edc5a4854f5dcf0102fc220c26d98858a611fba9d",
+      "bytes": 351
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/default-Ada-module-linkage/linkage.json",
+      "sha256": "5384b5efd7d8e5491a40e763f76f9bb8ddb37e4b15bb10344876e6e15b8388af",
+      "bytes": 88617
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/upstream-test-ReferenceC-approved-attrib.stdout",
+      "sha256": "b5aaea413ec8e08b5611087519dcb1b8aa25f718655fd885f52843f009631cd7",
+      "bytes": 201
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/upstream-test-ReferenceC-approved-attrib.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/upstream-test-ReferenceC-approved-attrib.allocator.36836.json",
+      "sha256": "055ec13917c78dbb9374f7397eaa5713c9381b885c2682caa576a256b9ee837b",
+      "bytes": 249
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/upstream-test-ReferenceC-module-linkage/linkage.json",
+      "sha256": "7ca0dd8e060371f549e8aff7786b6011c4c233279b1db0f80cabd59df4472eaf",
+      "bytes": 130450
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/upstream-test-Ada-approved-attrib.stdout",
+      "sha256": "b1ed8192a7138c4b55db82d16fbac74028ed9f130b77808e849e714e0dfc2fa7",
+      "bytes": 101
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/upstream-test-Ada-approved-attrib.stderr",
+      "sha256": "9c4472b3aafcb355d879d0c47e4fc0faccd51a8e9356daba44a524c79dea04a9",
+      "bytes": 82
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/upstream-test-Ada-approved-attrib.allocator.45524.json",
+      "sha256": "0db1880b5bcb7bd2c3fe0a98074742f37a31f8a8fb87ba5d6c58308120e09f56",
+      "bytes": 357
+    },
+    {
+      "path": "reports/debug-metadata/attrib-approved-cd58ff4a3d8c4293af2b9f9883a00eed/upstream-test-Ada-module-linkage/linkage.json",
+      "sha256": "f2523f7658faeb8c40fb6b8b82edc44b86a7b28435c5446b03f3f5ce0af7f944",
+      "bytes": 89172
+    }
+  ],
+  "source_mode_flags": [],
+  "cli_options": [
+    "-E"
+  ]
+}

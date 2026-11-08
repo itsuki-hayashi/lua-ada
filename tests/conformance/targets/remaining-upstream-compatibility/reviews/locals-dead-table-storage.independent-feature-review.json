@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "kind": "t-equivalent-feature-review",
+  "candidate_id": "locals-dead-table-storage",
+  "author": "Codex /root",
+  "reviewer": "Codex /root/validation_delivery",
+  "decision": "accepted-feature-only",
+  "review_date": "2026-11-08",
+  "permitted_resolution": "ada-internal-equivalent",
+  "configuration": "upstream-test",
+  "source": {
+    "path": "references/lua/testes/locals.lua",
+    "sha256": "56b5126c40f48bb1a701f041af28cd72a3a7d50b3db9b05da5659f2485f740c1"
+  },
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "original_anchors": [
+    {
+      "id": "LUA-LOCALS-INTERNAL-REFERENCE-0001",
+      "kind": "internal-reference",
+      "byte_offset": 2367,
+      "byte_length": 10,
+      "line": 120,
+      "end_line": 120,
+      "anchor_sha256": "85a7feb78cbcd09da43e8e0bcdcc4894d236ac4f886fac9806a595ea873261d9",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": null,
+      "configurations": [],
+      "evidence": [],
+      "review": null
+    },
+    {
+      "id": "LUA-LOCALS-ASSERT-CALL-0023",
+      "kind": "assert-call",
+      "byte_offset": 2540,
+      "byte_length": 6,
+      "line": 126,
+      "end_line": 126,
+      "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": null,
+      "configurations": [],
+      "evidence": [],
+      "review": null
+    }
+  ],
+  "relevant_block": {
+    "byte_offset": 2163,
+    "byte_length": 438,
+    "sha256": "58cb6759c23bb48299fd1bbc9b451d996dc6f52f7f31d050aad1ad3e7998f1bf",
+    "original_bytes": "  -- testing clearing of dead elements from tables\n  collectgarbage(\"stop\")   -- stop GC\n  local a = {[{}] = 4, [3] = 0, alo = 1,\n             a1234567890123456789012345678901234567890 = 10}\n\n  local t = T.querytab(a)\n\n  for k,_ in pairs(a) do a[k] = undef end\n  collectgarbage()   -- restore GC and collect dead fields in 'a'\n  for i=0,t-1 do\n    local k = querytab(a, i)\n    assert(k == nil or type(k) == 'number' or k == 'alo')\n  end\n\n"
+  },
+  "candidate_spans": [
+    {
+      "byte_offset": 2355,
+      "byte_length": 26,
+      "sha256": "04035d9ee038af9e7f37506bbf2f8c5ae6917c7ecd8de5a99c5205551cd00bc6",
+      "original_bytes": "  local t = T.querytab(a)\n"
+    },
+    {
+      "byte_offset": 2490,
+      "byte_length": 110,
+      "sha256": "00b85ae4732a06e844c82cd987ba31de93c22d726a4cbd18f3914cf8fde5f628",
+      "original_bytes": "  for i=0,t-1 do\n    local k = querytab(a, i)\n    assert(k == nil or type(k) == 'number' or k == 'alo')\n  end\n"
+    }
+  ],
+  "source_exclusions": [],
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "authorizes_exact_source_transform": false,
+  "authorizes_runtime_equivalence": false,
+  "authorizes_ledger_resolution": false,
+  "author_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/locals-dead-table-storage.author-proposal.json",
+    "sha256": "15d071617b27c664c98c41720e66ded28a593f28be3f1378ef09d0fbe051604b",
+    "commit": "91eaa4a236f4b1654f0192838a18b89855325891"
+  },
+  "reviewed_source_snapshot": {
+    "repository_revision": "bfd761531c70a32c16bab802fa6be4a18ea758fd",
+    "proposal_bindings_match": true,
+    "runtime_pool_wip_included": false
+  },
+  "rationale": "Independently read the pinned locals T block and later insertion refusal sweep, native table_query, the owned collector marking/Clear_Weak phases and Tables.Rebuild/Remember_Free. The first native query result is private array capacity, not logical table membership or total hash storage. The retained native diagnostic reports0,4,0 for this construction, so its subsequent0..t-1 loop executes zero iterations and establishes no hash-node safety coverage in that captured run. Private C array/hash geometry and dead-node representation can be replaced by actual Ada storage safety checks, while public membership, collection/liveness and allocation-refusal behavior remain mandatory. No fabricated C geometry, zero-loop shortcut or removal of public GC/recovery obligations is accepted.",
+  "reviewed_source_spans": [
+    {
+      "path": "references/lua/ltests.c",
+      "source_sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199",
+      "byte_offset": 30407,
+      "byte_length": 1091,
+      "anchor_sha256": "4ee0a97eb97a2cb985e27b23924dcdf3605de0ac5bc5b5365e4a22a1b5217863"
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "source_sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687",
+      "byte_offset": 13143,
+      "byte_length": 1593,
+      "anchor_sha256": "ead2957e0011e476bec66df6d36756d7bc733c869e57cdc8cf2dd40c678811df"
+    },
+    {
+      "path": "src/lua-engine-tables.adb",
+      "source_sha256": "31db4043d6b387c08b61a2ff6f6197d9a5495626200d67cf56cfad66f0821173",
+      "byte_offset": 8244,
+      "byte_length": 1565,
+      "anchor_sha256": "a7105b3120963eb00eec34e081274943b0871d7ab8c046eeb90974eac1ecb1ca"
+    },
+    {
+      "path": "src/lua-engine-tables.adb",
+      "source_sha256": "31db4043d6b387c08b61a2ff6f6197d9a5495626200d67cf56cfad66f0821173",
+      "byte_offset": 7636,
+      "byte_length": 606,
+      "anchor_sha256": "be1105543df7ecd56fcc12b7dbdbc3bc04d1d497ecb7e6e497b5c7c58fd954ac"
+    },
+    {
+      "path": "references/lua/manual/manual.of",
+      "source_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+      "byte_offset": 32467,
+      "byte_length": 1903,
+      "anchor_sha256": "7a8cd18a709f1d67521a52e9f58449862e93a55936f2f0d46b29813b043dc931"
+    }
+  ],
+  "source_bindings": [
+    {
+      "path": "references/lua/ltests.c",
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687"
+    },
+    {
+      "path": "src/lua-engine-tables.adb",
+      "sha256": "31db4043d6b387c08b61a2ff6f6197d9a5495626200d67cf56cfad66f0821173"
+    },
+    {
+      "path": "src/lua-engine.ads",
+      "sha256": "dc25ffbb543cf19bac085bed357aa967f912b35d50e5facdcac41f1b934e5f8f"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0"
+    },
+    {
+      "path": "references/lua/manual/manual.of",
+      "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+    }
+  ],
+  "source_findings": [
+    "table_query returns asize, allocsizenode and lenhint in size mode; its indexed branch exposes actual private C array/hash nodes.",
+    "The original numeric loop uses only the first size result. A zero bound does not inspect any hash node, regardless of the unqualified querytab call inside the body.",
+    "Collector propagation ignores keys of nil-valued entries. Clear_Weak clears unreachable collectable keys from nil-valued rows, then calls Rebuild before sweep frees those objects.",
+    "Rebuild clears dense/hash indices and rebuilds them from actual rows. Nil keys are not linked; nonnil tombstone keys can remain indexed, and nil-valued rows are queued for reuse.",
+    "Remember_Free deliberately permits a revived row to remain in the free list until a later insertion pops it. Free-list/index overlap and a live revived row are not automatically corruption.",
+    "The manual requires collection when the only references to an explicitly constructed object are weak. Tracking the original anonymous table key in a weak-value table is a relevant public liveness witness; strings/numbers must not be substituted for that collectable object."
+  ],
+  "retained_requirements": [
+    "Retain original if rawget(_G,T) guard, explicit collector stop, exact original four-entry construction, pairs deletion, original full collection and later original insertion-refusal sweep byte-for-byte.",
+    "Keep both original anchors required and pending. Permit only an exact independently reviewed equivalent; do not add a source exclusion.",
+    "Derive the four-before/zero-after count from actual nonnil table values or public iteration, never Members.Length, array capacity, hash capacity or a hardcoded C representation.",
+    "Root no extra strong reference to the original anonymous key across the collection. The public weak-value witness must clear after that key is otherwise unreachable.",
+    "Inspect actual Ada member/index/free-list structures. Validate collectable reference membership and tag/object-kind consistency before any pointer dereference or hash operation.",
+    "Require index bounds, finite acyclic chains, valid row/link/free-list consistency and unlinked nil-key rows; allow legitimate indexed tombstones and revived free-listed rows.",
+    "The checker must observe rather than repair storage, rebuild indices, clear keys, alter GC state, reset the allocator or weaken the following fault campaign.",
+    "Focused actual counterparts must exercise live-key survival, deleted-key reclamation and same-table dead-row reuse. The later original refusal sweep uses a new shadowing table and alone does not establish reuse of the first table.",
+    "Retain all insertion failure/retry positions, partial-table iteration and final five-entry success. Preserve real public errors, ownership cleanup and allocator balance."
+  ],
+  "required_next_steps": [
+    "Implement a test-only actual Ada storage checker and separately named positive/negative safety/liveness/reuse cases.",
+    "Bind the exact checker and public weak witness sources to a concrete exact replacement manifest and obtain distinct independent exact-source approval.",
+    "Verify unchanged native C baseline and relevant public counterpart behavior; select equivalent bytes only for Ada/upstream-test.",
+    "Capture fresh same-head raw execution/type/arity/warning/allocator evidence, then obtain the required contract/envelope/matrix reviews.",
+    "Recheck source hashes after any Engine/Foreign pool or test-adapter changes; this feature decision cannot renew different source bytes."
+  ],
+  "observation_inputs": [
+    {
+      "name": "default-native",
+      "process_report_path": "reports/combined-reader-failure/locals-d69ae37f0cb24da590856cae20afb4e3/default-native-process.json",
+      "process_report_sha256": "9e28cb985b4bca300a089f0a8679175bcbfe4db9e1043150035310311f156311",
+      "exit_code": 0,
+      "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+      "stdout_sha256": "1092e05e70a6dba1afdecae3a03ced806d4db5a1804ef1c5dd6d1e183ab6483b",
+      "stderr_sha256": "5ec1f7e700f37c3d0b2981d04855fc34b94aaa15457b05ca571817442d228f81",
+      "observation_scope": "existing component diagnostic only; not final-head or matrix acceptance"
+    },
+    {
+      "name": "default-ada",
+      "process_report_path": "reports/combined-reader-failure/locals-d69ae37f0cb24da590856cae20afb4e3/default-ada-process.json",
+      "process_report_sha256": "4461a1d370eeb715cec82b0363b38499a8e278c30188a867b7811a583084e06f",
+      "exit_code": 0,
+      "executable_sha256": "4b57fc85e4d7bbae3f64067bb19264c8d54f1e0b5c99e4d3b5124b3520b925a5",
+      "stdout_sha256": "1092e05e70a6dba1afdecae3a03ced806d4db5a1804ef1c5dd6d1e183ab6483b",
+      "stderr_sha256": "5ec1f7e700f37c3d0b2981d04855fc34b94aaa15457b05ca571817442d228f81",
+      "observation_scope": "existing component diagnostic only; not final-head or matrix acceptance"
+    },
+    {
+      "name": "upstream-test-native",
+      "process_report_path": "reports/combined-reader-failure/locals-d69ae37f0cb24da590856cae20afb4e3/upstream-test-native-process.json",
+      "process_report_sha256": "fc293ab8cef502084109a1ff4206ddca1774ebfa4401e887ad2c95502724391c",
+      "exit_code": 0,
+      "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+      "stdout_sha256": "cc97aea501e1bfc238d8391aba7fb8daaeb3f7d729f10dd43117ba26e13f01b6",
+      "stderr_sha256": "a350e9f897688140366f5f21456c728387e13fa74fa673a445a759bfb6a16747",
+      "observation_scope": "existing component diagnostic only; not final-head or matrix acceptance"
+    },
+    {
+      "name": "upstream-test-ada",
+      "process_report_path": "reports/combined-reader-failure/locals-d69ae37f0cb24da590856cae20afb4e3/upstream-test-ada-process.json",
+      "process_report_sha256": "b8882b17bd139e9d4dff659eb100e5d3c16d4abfe3cf530fe4c2bce495c321f3",
+      "exit_code": 1,
+      "executable_sha256": "9350dffb9644933fde570d5dea18a9949df4d4a3a0a15de93dd0869365fa6f43",
+      "stdout_sha256": "eeec40fdb26ed52cda776375b7bd8e385de952e44a5613752e0c1742ea78dca8",
+      "stderr_sha256": "d57187b63beacc2567e1509545a2256ffc4c82571dd36bab12305b0e93484546",
+      "observation_scope": "existing component diagnostic only; not final-head or matrix acceptance"
+    }
+  ],
+  "private_geometry_diagnostic": {
+    "stdout_path": "reports/combined-reader-failure/locals-d69ae37f0cb24da590856cae20afb4e3/query-diagnostic.stdout",
+    "stdout_sha256": "a43707dc0010a20508152cf71560b07ed26b8b74db1895050e95d367f1662614",
+    "observed_results": [
+      0,
+      4,
+      0
+    ],
+    "scope": "existing Windows native-T component diagnostic; no portable geometry guarantee or final runtime authority",
+    "global_querytab_alias_required_for_zero_loop_conclusion": false
+  },
+  "limits": "The private checker and replacement source are planned, not implemented or approved here. Existing captures explain feature relevance only. This decision neither runs adapted locals.lua nor resolves a source/API/file/platform obligation."
+}

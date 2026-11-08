@@ -1,4 +1,5 @@
-param([string] $Probe, [string] $OpcodeProbe)
+param([string] $Probe, [string] $OpcodeProbe,
+    [ValidateSet('default','upstream-test')][string] $Configuration='default')
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $originalLocation = Get-Location
@@ -55,17 +56,19 @@ try {
         $pin -ne '7579fc9d7ed90240487251dfb69168f8e64e9294') {
         throw 'Frontend oracle requires the pinned Lua 5.5.1 checkout'
     }
+    $configurationPart=if($Configuration -ceq 'upstream-test'){'upstream-test/'}else{''}
     if (-not $Probe) {
-        $Probe = Join-Path $projectRoot "tests/bin/static/lexer_probe$suffix"
+        $Probe = Join-Path $projectRoot "tests/bin/${configurationPart}static/lexer_probe$suffix"
     }
     if (-not $OpcodeProbe) {
-        $OpcodeProbe = Join-Path $projectRoot "tests/bin/static/lua-opcode_probe$suffix"
+        $OpcodeProbe = Join-Path $projectRoot "tests/bin/${configurationPart}static/lua-opcode_probe$suffix"
     }
     foreach ($project in @('frontend_oracle', 'opcode_oracle')) {
-        Invoke-Checked gprbuild @('-P', "experiments/frontend/$project.gpr")
+        Invoke-Checked gprbuild @('-P', "experiments/frontend/$project.gpr",
+            "-XLUA_FRONTEND_CONFIGURATION=$Configuration")
     }
-    $oracle = Join-Path $projectRoot "build/frontend/frontend_oracle$suffix"
-    $opcodeOracle = Join-Path $projectRoot "build/frontend/opcode_oracle$suffix"
+    $oracle = Join-Path $projectRoot "build/frontend/$Configuration/frontend_oracle$suffix"
+    $opcodeOracle = Join-Path $projectRoot "build/frontend/$Configuration/opcode_oracle$suffix"
     Compare-Records (Invoke-Checked $opcodeOracle @()) (Invoke-Checked $OpcodeProbe @()) '85 opcodes and 4096 words'
 
     # Arbitrary bytes are independent of grammar. Malformed literals and
@@ -130,7 +133,13 @@ try {
     $expected = @(Invoke-Checked $oracle @('parse-batch', $path))
     $actual = @(Invoke-Checked $Probe @('--parse-batch', $path))
     for ($trial = 0; $trial -lt 2000; $trial++) {
-        if ($expected[2 * $trial] -ne 'ACCEPT') {
+        # ltests.h disables LUA_COMPAT_GLOBAL: the unchanged template that
+        # declares a local named global is then deliberately invalid. Keep
+        # it and every mutation in both roles, with the native T parser as
+        # oracle, instead of comparing the T probe to a default C parser.
+        $originalStatus=if($Configuration -ceq 'upstream-test' -and
+            $trial % $templates.Count -eq 9){'ERROR 1'}else{'ACCEPT'}
+        if ($expected[2 * $trial] -cne $originalStatus) {
             throw "Invalid generated grammar case $trial"
         }
     }

@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "kind": "native-T-private-exit-check-author-proposal",
+  "author": "Codex /root/validation_delivery",
+  "independent_review_status": "pending",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "original_source_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_bindings": [
+    {
+      "path": "references/lua/ltests.c",
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
+    },
+    {
+      "path": "references/lua/loslib.c",
+      "sha256": "3ed70ea013b0c7a5a758db435f76fe5a99e87f07ea02ed19b2012fb728f8aa13"
+    },
+    {
+      "path": "references/lua/manual/manual.of",
+      "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+    },
+    {
+      "path": "tests/lua/cli_prompt_controls.lua",
+      "sha256": "bdd753ef728e9d6caa80e40b67894800ba061d655ae066695d6c14b7a9eec20e"
+    },
+    {
+      "path": "scripts/CliFixtureCases.psm1",
+      "sha256": "7666810b0873d71ac4e2d16760705694d14256bc98babda97ea8cdd061ad80f0"
+    }
+  ],
+  "operation": "REPL prompt typed exit without close retains status",
+  "observed_scope": "Windows validation/static component observations only; no Linux/macOS applicability or source-build provenance claim",
+  "rationale": "The actual public os.exit(37,false) deliberately does not close the state. Instrumented native C registers atexit(checkfinalmem), whose private l_memcontrol.numblocks==0 assertion conflicts with that deliberate process-lifetime choice. Original loslib.c closes only when the second argument is true. Native default and Ada T retain actual status37, exact banner and empty stderr. Native T retains status37/banner but emits the private assertion at2226. No Lua prompt source or C oracle bytes were adapted.",
+  "proposed_disposition": "Independent review required: record the exact native-T-only private allocator diagnostic separately from public prompt parity; keep full Ada T and ordinary native counterpart mandatory. No operation may be silently omitted or called passing native T from this proposal.",
+  "author_observations": [
+    {
+      "role": "native-instrumented-diagnostic",
+      "raw_report": "reports/cli-configured-current/96214708a14646688d6b5cd878dec5d3/upstream-test/native.json",
+      "raw_report_sha256": "c5d3b6007abb590406a721ef05e700bf2dc757b602e940faece4fcf941b04290",
+      "source_revision": "82d34af3a306c937e5656003d50326c257aaf596",
+      "source_dirty": true,
+      "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+      "process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\cli-configured-current\\96214708a14646688d6b5cd878dec5d3\\images\\upstream-test\\ReferenceC\\lua.exe",
+        "process_id": 56600,
+        "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+        "arguments": [
+          "-e",
+          "assert(loadfile('prompt-controls.lua'))('exit-no-close')",
+          "-i"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\08233ecfc71d49bda3d1abca1e84de09\\cli-fixtures",
+        "started_utc": "2026-11-08T07:53:48.0478807Z",
+        "elapsed_milliseconds": 429,
+        "timeout_seconds": 30,
+        "exit_code": 37,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 67108864,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\08233ecfc71d49bda3d1abca1e84de09\\cli-fixtures\\captures\\19.stdout",
+        "stdout_bytes": 53,
+        "stdout_sha256": "a59d516f6c9ad80f156d6dc3f830a42c16408ea019455e08125780133c8dff56",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\08233ecfc71d49bda3d1abca1e84de09\\cli-fixtures\\captures\\19.stderr",
+        "stderr_bytes": 122,
+        "stderr_sha256": "3502938af48118d9164dd36c60d9d761721edc05c8ac9f3dfecc68ae347a7bff",
+        "standard_input": {
+          "source_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\08233ecfc71d49bda3d1abca1e84de09\\cli-fixtures\\captures\\19.input",
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\08233ecfc71d49bda3d1abca1e84de09\\cli-fixtures\\captures\\19.stdin",
+          "bytes": 19,
+          "sha256": "dcdb8e07ae67d7874463f70c247ae45c071d93075f6b5abaff7b3b16a35ad216",
+          "byte_limit": 67108864,
+          "write_completed": true,
+          "eof_sent": true
+        }
+      },
+      "coverage_authority": false
+    },
+    {
+      "role": "ada-instrumented-public-operation",
+      "raw_report": "reports/cli-configured-current/96214708a14646688d6b5cd878dec5d3/upstream-test/ada.json",
+      "raw_report_sha256": "c7f28f40dbfc430b3a5443b88cb5dccf9f4c81274a0cf25adc29b10cb3726ecf",
+      "source_revision": "82d34af3a306c937e5656003d50326c257aaf596",
+      "source_dirty": true,
+      "executable_sha256": "b6d43685341aa49db5d07c51ad0f1f368da425d8e19860ffbf444114515a590a",
+      "process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\cli-configured-current\\96214708a14646688d6b5cd878dec5d3\\images\\upstream-test\\AdaCLI\\lua_ada.exe",
+        "process_id": 50408,
+        "executable_sha256": "b6d43685341aa49db5d07c51ad0f1f368da425d8e19860ffbf444114515a590a",
+        "arguments": [
+          "-e",
+          "assert(loadfile('prompt-controls.lua'))('exit-no-close')",
+          "-i"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\4e90eeefaad544a88d0f88a609ba29e7\\cli-fixtures",
+        "started_utc": "2026-11-08T07:53:46.6829622Z",
+        "elapsed_milliseconds": 10,
+        "timeout_seconds": 30,
+        "exit_code": 37,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 67108864,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\4e90eeefaad544a88d0f88a609ba29e7\\cli-fixtures\\captures\\110.stdout",
+        "stdout_bytes": 53,
+        "stdout_sha256": "a59d516f6c9ad80f156d6dc3f830a42c16408ea019455e08125780133c8dff56",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\4e90eeefaad544a88d0f88a609ba29e7\\cli-fixtures\\captures\\110.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "standard_input": {
+          "source_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\4e90eeefaad544a88d0f88a609ba29e7\\cli-fixtures\\captures\\110.input",
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\4e90eeefaad544a88d0f88a609ba29e7\\cli-fixtures\\captures\\110.stdin",
+          "bytes": 19,
+          "sha256": "dcdb8e07ae67d7874463f70c247ae45c071d93075f6b5abaff7b3b16a35ad216",
+          "byte_limit": 67108864,
+          "write_completed": true,
+          "eof_sent": true
+        }
+      },
+      "coverage_authority": false
+    },
+    {
+      "role": "native-default-public-counterpart",
+      "raw_report": "reports/cli-configured-current/96214708a14646688d6b5cd878dec5d3/default/pair.json",
+      "raw_report_sha256": "b5abdf857526e8a6b4a6577f5ef0358db29941a3c350cfc08961f48482ce5923",
+      "source_revision": "82d34af3a306c937e5656003d50326c257aaf596",
+      "source_dirty": true,
+      "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+      "process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\cli-configured-current\\96214708a14646688d6b5cd878dec5d3\\images\\default\\ReferenceC\\lua.exe",
+        "process_id": 78920,
+        "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+        "arguments": [
+          "-e",
+          "assert(loadfile('prompt-controls.lua'))('exit-no-close')",
+          "-i"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\4e65ea691a244260a6db166dda283a9c\\cli-fixtures",
+        "started_utc": "2026-11-08T07:53:48.1346198Z",
+        "elapsed_milliseconds": 8,
+        "timeout_seconds": 30,
+        "exit_code": 37,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 67108864,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\4e65ea691a244260a6db166dda283a9c\\cli-fixtures\\captures\\19.stdout",
+        "stdout_bytes": 53,
+        "stdout_sha256": "a59d516f6c9ad80f156d6dc3f830a42c16408ea019455e08125780133c8dff56",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\4e65ea691a244260a6db166dda283a9c\\cli-fixtures\\captures\\19.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "standard_input": {
+          "source_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\4e65ea691a244260a6db166dda283a9c\\cli-fixtures\\captures\\19.input",
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\core-image\\4e65ea691a244260a6db166dda283a9c\\cli-fixtures\\captures\\19.stdin",
+          "bytes": 19,
+          "sha256": "dcdb8e07ae67d7874463f70c247ae45c071d93075f6b5abaff7b3b16a35ad216",
+          "byte_limit": 67108864,
+          "write_completed": true,
+          "eof_sent": true
+        }
+      },
+      "coverage_authority": false
+    }
+  ],
+  "review_questions": [
+    "Independently verify ltests.c2225-27 and2239 against original os_exit396-406 and the manual close argument.",
+    "Approve only a source-bound native T allocator-at-exit applicability contract, or require a separate native-default counterpart binding; neither grants runtime/file/global acceptance.",
+    "Determine platform-specific native T abort/diagnostic behavior from fresh captures before applying this decision outside the measured Windows context."
+  ]
+}

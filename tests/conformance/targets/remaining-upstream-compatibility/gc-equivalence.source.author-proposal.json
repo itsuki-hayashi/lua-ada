@@ -1,0 +1,139 @@
+{
+  "runtime_acceptance": false,
+  "counterpart_procedure_comparisons": [
+    {
+      "name": "Check",
+      "current_sha256": "fa85aa8433e1e796f532cd9c381ee1355fdea8d5d1d5c5b1b3279d409f0308da",
+      "baseline_byte_length": 722,
+      "current_byte_offset": 392,
+      "current_line": 13,
+      "baseline_sha256": "fa85aa8433e1e796f532cd9c381ee1355fdea8d5d1d5c5b1b3279d409f0308da",
+      "identical_bytes": true,
+      "baseline_line": 13,
+      "current_byte_length": 722,
+      "baseline_byte_offset": 392
+    },
+    {
+      "name": "Weak_String_Payloads",
+      "current_sha256": "b8cf05d4b65ce66c2829bc088af096bb112f8b380f348b473b0f21c4a1643ca3",
+      "baseline_byte_length": 975,
+      "current_byte_offset": 17124,
+      "current_line": 405,
+      "baseline_sha256": "b8cf05d4b65ce66c2829bc088af096bb112f8b380f348b473b0f21c4a1643ca3",
+      "identical_bytes": true,
+      "baseline_line": 389,
+      "current_byte_length": 975,
+      "baseline_byte_offset": 16311
+    },
+    {
+      "name": "Atomic_Orphan_Cell",
+      "current_sha256": "8627daeed9bb82dcda82ccf5c229acf651ef682c5f144d1602d90905127900af",
+      "baseline_byte_length": 955,
+      "current_byte_offset": 11002,
+      "current_line": 280,
+      "baseline_sha256": "8627daeed9bb82dcda82ccf5c229acf651ef682c5f144d1602d90905127900af",
+      "identical_bytes": true,
+      "baseline_line": 279,
+      "current_byte_length": 955,
+      "baseline_byte_offset": 10966
+    },
+    {
+      "name": "Measured_Emergency_Headroom",
+      "current_sha256": "d94da6e72b100b1a0fc655a6fc8bd62477a00af997ad79296ca83bfaeb1f3405",
+      "baseline_byte_length": 566,
+      "current_byte_offset": 16556,
+      "current_line": 394,
+      "baseline_sha256": "d94da6e72b100b1a0fc655a6fc8bd62477a00af997ad79296ca83bfaeb1f3405",
+      "identical_bytes": true,
+      "baseline_line": 378,
+      "current_byte_length": 566,
+      "baseline_byte_offset": 15743
+    }
+  ],
+  "unchanged_transformations": [
+    {
+      "id": "measure-live-payloads",
+      "start_byte": 11479,
+      "source_sha256": "4bb49bacb1a6d2575ad3abbb475fd83ff2e7ad65102d29c93d02e7bdf43f700e",
+      "length_bytes": 49,
+      "replacement_sha256": "833abcf9a2278f2a5cb3cd892f26de6e8af7cc426bdb718144234527dcd97d9d"
+    },
+    {
+      "id": "reclaim-payloads",
+      "start_byte": 11963,
+      "source_sha256": "c520c19e1c58d291af4e63c84b5083a165dd416be4983767261653ccd569cbc6",
+      "length_bytes": 40,
+      "replacement_sha256": "0244ab649f62283a93b423e4250bba43ea0c044bcaaf8f87334b520f94378b15"
+    },
+    {
+      "id": "stable-cell-color",
+      "start_byte": 14278,
+      "source_sha256": "3368876c423554b8967a1fca42de51cf3fc6dc96f2dbe3bc3263b2f14b5aacdf",
+      "length_bytes": 31,
+      "replacement_sha256": "8962292d95f5a292ba02ad38b282fe93d1f4a072994b8ec38fe55e7c65206ec6"
+    },
+    {
+      "id": "measured-emergency-headroom",
+      "start_byte": 16478,
+      "source_sha256": "342a5139c4c1d3792c706e27094019af1eb85691e390a7fafbca2ad2d3b75559",
+      "length_bytes": 80,
+      "replacement_sha256": "acee89ad1dbc5dc0421b883804eadcb693bdaf5958114b874bf24b37e2b9ba4b"
+    }
+  ],
+  "source_sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99",
+  "reference_source": "references/lua/testes/gc.lua",
+  "observed_main_revision": "236402b2c197c76450f6ca61aa6b9de51a13fe2c",
+  "independent_review_status": "pending",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "required_review": [
+    "Independently inspect all named test bodies, their shared Check procedure and registrations against the predecessor.",
+    "Inspect the actual collector/storage implementation applicability at the final runtime revision; identical tests alone prove no runtime result.",
+    "Approve a separately named successor mapping/approval under target ownership, preserving historical bytes.",
+    "Run fresh actual GC, named AUnit/C and final context observations after runtime consolidation."
+  ],
+  "support_implementation": {
+    "path": "tests/src/lua-conformance_adapter.adb",
+    "current_sha256": "a296cdcae29d6540cc7849c2010bdab9780aa36b91f07be8c6b8ab5166c08634",
+    "baseline_sha256": "a296cdcae29d6540cc7849c2010bdab9780aa36b91f07be8c6b8ab5166c08634"
+  },
+  "kind": "gc-equivalence-successor-author-observation",
+  "predecessor": {
+    "manifest": "tests/conformance/equivalents/gc-ada-instrumented.json",
+    "approval_sha256": "bf1668acb83299a3dc9107df9c54ecfd25e58dc1dbe524a02fff307b368547c6",
+    "manifest_sha256": "8029452181a82c149b37730fdcc9ba7564c2553f40ebefa2f0f0e3622dc59f5e",
+    "approval": "tests/conformance/reviews/gc-ada.equivalent-approval.json"
+  },
+  "author": "Codex /root/validation_delivery",
+  "counterpart_source": {
+    "path": "tests/src/lua-conformance_adapter_tests.adb",
+    "current_sha256": "26e26e3c389384ebdf49740e80f6e83608a42b42c5dd0b847a633659a022a0e3",
+    "baseline_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"
+  },
+  "coverage_authority": false,
+  "schema_version": 1,
+  "generated_sha256": "059aaafb1068bc4245b23f56b2e10a75a66301b0bf05eede8ce3e7fd8a56b6dd",
+  "registration_comparisons": [
+    {
+      "label": "collector: weak string payload reclamation",
+      "baseline_sha256": "5e06fcb9e7522de0ef03f02cd77ecc35205f4a12d3b07e4beac511063026a8e3",
+      "name": "Weak_String_Payloads",
+      "current_sha256": "5e06fcb9e7522de0ef03f02cd77ecc35205f4a12d3b07e4beac511063026a8e3",
+      "identical_bytes": true
+    },
+    {
+      "label": "collector: orphan cell survives atomic sweep",
+      "baseline_sha256": "4b07454c597ad9466e11779e04274b76433dfc5f09ed3b03abc8db1e31c9a91c",
+      "name": "Atomic_Orphan_Cell",
+      "current_sha256": "4b07454c597ad9466e11779e04274b76433dfc5f09ed3b03abc8db1e31c9a91c",
+      "identical_bytes": true
+    },
+    {
+      "label": "collector: measured emergency table headroom",
+      "baseline_sha256": "90fac98e3e289615b805d295a0716b6634cdc484ca77c80faa7e51dd96c0e346",
+      "name": "Measured_Emergency_Headroom",
+      "current_sha256": "90fac98e3e289615b805d295a0716b6634cdc484ca77c80faa7e51dd96c0e346",
+      "identical_bytes": true
+    }
+  ],
+  "execution_evidence": []
+}

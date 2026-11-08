@@ -52,10 +52,16 @@ package body Lua.Lexer_Core is
      (Source : String; Self : in out Scanner_State;
       Texts : in out Lua.Frontend_Text.Arena) return Scan_Result
    is
-      Input : constant String (1 .. Source'Length)
-        with Import, Address => Source'Address;
-      --  Normalize only the view's bounds. Parsing borrows its caller's
-      --  bytes; the arena, rather than this descriptor, owns retained text.
+      Input : Lua.Inputs.Source;
+   begin
+      Input.Borrow (Source'Address, Source'Length);
+      return Next (Input, Self, Texts);
+   end Next;
+
+   function Next
+     (Source : in out Lua.Inputs.Source; Self : in out Scanner_State;
+      Texts : in out Lua.Frontend_Text.Arena) return Scan_Result
+   is
       Result : Scan_Result;
       Cursor : Source_Location renames Self.Cursor;
       Failed : exception;
@@ -64,36 +70,51 @@ package body Lua.Lexer_Core is
 
       procedure Advance;
       procedure Fail
-        (Message : String; Status : Scan_Status := Syntax_Error);
+        (Message : String; Status : Scan_Status := Syntax_Error;
+         Near : String := ""; Incomplete : Boolean := False);
       procedure Emit
         (Kind : Token_Kind; Start : Source_Location; Text : String;
          Value : Lua.Numbers.Number := (Kind => Lua.Numbers.Invalid));
       procedure Emit_Buffer (Kind : Token_Kind; Start : Source_Location);
+      procedure Emit_Source (Kind : Token_Kind; Start : Source_Location);
       function Long_Level return Integer;
       procedure Long_String
         (Level : Natural; Text : out Buffer; Keep : Boolean := True);
       procedure Append_UTF8
         (Text : in out Buffer; Value : Natural);
       procedure Quoted_String (Text : out Buffer);
+      function Peek (Ahead : Natural := 0) return Character;
 
       function Peek (Ahead : Natural := 0) return Character is
-        (if Ahead < Input'Length and then
-            Cursor.Offset <= Input'Last - Ahead
-         then Input (Cursor.Offset + Ahead) else Latin.NUL);
+      begin
+         if Ahead <= Natural'Last - Cursor.Offset and then
+           Source.Ensure (Cursor.Offset + Ahead)
+         then
+            return Source.Element (Cursor.Offset + Ahead);
+         end if;
+         return Latin.NUL;
+      end Peek;
       --  NUL is only a lookahead sentinel. End-of-input decisions must use
       --  the offset, because actual NUL bytes are legal inside Lua strings.
 
       procedure Advance is
          Old : constant Character := Peek;
+         Present : Boolean;
+         pragma Unreferenced (Present);
       begin
          --  CRLF and LFCR each count as one Lua newline. The same cursor
          --  operation serves whitespace, comments, and escaped line endings.
          Cursor.Offset := Cursor.Offset + 1;
+         --  Pinned llex keeps one current byte beyond the token it returns.
+         --  Demand that byte even for a single punctuation token or closing
+         --  quote: its refill side effects/errors precede token delivery.
+         Present := Source.Ensure (Cursor.Offset);
          if Old in Latin.CR | Latin.LF then
-            if Cursor.Offset <= Input'Last and then
+            if Source.Ensure (Cursor.Offset) and then
               Peek in Latin.CR | Latin.LF and then Peek /= Old
             then
                Cursor.Offset := Cursor.Offset + 1;
+               Present := Source.Ensure (Cursor.Offset);
             end if;
             Cursor.Line := Cursor.Line + 1;
             Cursor.Column := 1;
@@ -103,12 +124,27 @@ package body Lua.Lexer_Core is
       end Advance;
 
       procedure Fail
-        (Message : String; Status : Scan_Status := Syntax_Error)
+        (Message : String; Status : Scan_Status := Syntax_Error;
+         Near : String := ""; Incomplete : Boolean := False)
       is
+         Diagnostic : Buffer;
       begin
          Result.Status := Status;
          Result.Location := Cursor;
-         Result.Message := Lua.Frontend_Text.Store (Texts, Message);
+         Result.Incomplete_Input := Incomplete and then Status = Syntax_Error;
+         if Near'Length = 0 then
+            Result.Message := Lua.Frontend_Text.Store (Texts, Message);
+         else
+            --  The offending numeric token is an input-sized borrowed view.
+            --  Build its quoted context through the scanner's allocator,
+            --  without constructing a concatenated host String temporary.
+            Diagnostic.Set_Owner (Lua.Frontend_Text.Owner_Of (Texts));
+            Diagnostic.Append (Message);
+            Diagnostic.Append (" near '");
+            Diagnostic.Append (Near);
+            Diagnostic.Append (''');
+            Result.Message := Lua.Frontend_Text.Store (Texts, Diagnostic);
+         end if;
          raise Failed;
       end Fail;
 
@@ -138,6 +174,19 @@ package body Lua.Lexer_Core is
          Text.Query (Save'Access);
       end Emit_Buffer;
 
+      procedure Emit_Source (Kind : Token_Kind; Start : Source_Location) is
+         procedure Save (Bytes : String);
+         procedure Save (Bytes : String) is
+         begin
+            Emit (Kind, Start, Bytes);
+         end Save;
+      begin
+         --  Source may have grown while scanning this token. Borrow only its
+         --  completed span, after all lookahead/refill calls have returned.
+         Source.Query
+           (Start.Offset, Cursor.Offset - Start.Offset, Save'Access);
+      end Emit_Source;
+
       function Long_Level return Integer is
          Ahead : Natural := 1;
       begin
@@ -155,6 +204,7 @@ package body Lua.Lexer_Core is
       procedure Long_String
         (Level : Natural; Text : out Buffer; Keep : Boolean := True)
       is
+         Initial_Line : constant String := Cursor.Line'Image;
       begin
          --  Comments and long strings share delimiter/newline rules. Drop
          --  one initial line break, then preserve all bytes except newline
@@ -167,8 +217,11 @@ package body Lua.Lexer_Core is
             Advance;
          end if;
          loop
-            if Cursor.Offset > Input'Last then
-               Fail ("unfinished long string or comment");
+            if not Source.Ensure (Cursor.Offset) then
+               Fail ("unfinished long " &
+                 (if Keep then "string" else "comment") &
+                 " (starting at line" & Initial_Line & ") near <eof>",
+                 Incomplete => True);
             end if;
             if Peek = ']' then
                declare
@@ -226,6 +279,52 @@ package body Lua.Lexer_Core is
          Value : Natural;
          Count : Natural;
          Code  : Character;
+         Escape_Start : Natural := 0;
+
+         procedure String_Error
+           (Message : String; Include_Current : Boolean := True);
+
+         procedure String_Error
+           (Message : String; Include_Current : Boolean := True)
+         is
+            Diagnostic : Buffer;
+            Present : Boolean;
+            pragma Unreferenced (Present);
+            procedure Escape_Text (Bytes : String);
+            procedure Escape_Text (Bytes : String) is
+            begin
+               Diagnostic.Append (Bytes);
+            end Escape_Text;
+         begin
+            if Escape_Start > 0 and then Include_Current and then
+              Source.Ensure (Cursor.Offset)
+            then
+               --  llex's esccheck saves/advances past a failing current byte
+               --  before issuing its token diagnostic. Preserve the same
+               --  reader demand without changing the recorded token span.
+               Present := Source.Ensure (Cursor.Offset + 1);
+            end if;
+            --  Lua reports the partially decoded token, including its opening
+            --  delimiter and the failing escape's current byte. Keep this
+            --  builder with the scanner's owner: malformed input must not
+            --  allocate an unmanaged source-sized diagnostic temporary.
+            Diagnostic.Set_Owner (Lua.Frontend_Text.Owner_Of (Texts));
+            Diagnostic.Append (Message);
+            Diagnostic.Append (" near '");
+            Diagnostic.Append (Quote);
+            Diagnostic.Append (Text);
+            if Escape_Start > 0 then
+               Source.Query
+                 (Escape_Start, Natural'Min (Source.Available,
+                    Cursor.Offset - (if Include_Current then 0 else 1)) -
+                    Escape_Start + 1, Escape_Text'Access);
+            end if;
+            Diagnostic.Append (''');
+            Result.Status := Syntax_Error;
+            Result.Location := Cursor;
+            Result.Message := Lua.Frontend_Text.Store (Texts, Diagnostic);
+            raise Failed;
+         end String_Error;
       begin
          --  Decode escapes as bytes during scanning. Decimal/hex escapes
          --  are bounded before Character conversion; Unicode escapes use
@@ -233,16 +332,21 @@ package body Lua.Lexer_Core is
          Text.Clear;
          Advance;
          while Peek /= Quote loop
-            if Cursor.Offset > Input'Last or else
-              Peek in Latin.CR | Latin.LF
-            then
-               Fail ("unfinished string");
+            if not Source.Ensure (Cursor.Offset) then
+               Fail ("unfinished string near <eof>", Incomplete => True);
+            elsif Peek in Latin.CR | Latin.LF then
+               Escape_Start := 0;
+               String_Error ("unfinished string");
             end if;
             if Peek /= '\' then
                Append (Text, Peek);
                Advance;
             else
+               Escape_Start := Cursor.Offset;
                Advance;
+               if not Source.Ensure (Cursor.Offset) then
+                  Fail ("unfinished string near <eof>", Incomplete => True);
+               end if;
                Code := Peek;
                case Code is
                   when 'a' => Append (Text, Latin.BEL); Advance;
@@ -266,7 +370,7 @@ package body Lua.Lexer_Core is
                      Value := 0;
                      for Index in 1 .. 2 loop
                         if Hex_Value (Peek) < 0 then
-                           Fail ("hexadecimal digit expected");
+                           String_Error ("hexadecimal digit expected");
                         end if;
                         Value := Value * 16 + Hex_Value (Peek);
                         Advance;
@@ -275,23 +379,26 @@ package body Lua.Lexer_Core is
                   when 'u' =>
                      Advance;
                      if Peek /= '{' then
-                        Fail ("missing '{' in Unicode escape");
+                        String_Error ("missing '{'");
                      end if;
                      Advance;
                      Value := 0;
                      Count := 0;
+                     if Hex_Value (Peek) < 0 then
+                        String_Error ("hexadecimal digit expected");
+                     end if;
                      while Hex_Value (Peek) >= 0 loop
                         if Value > (16#7FFF_FFFF# -
                           Hex_Value (Peek)) / 16
                         then
-                           Fail ("Unicode escape is too large");
+                           String_Error ("UTF-8 value too large");
                         end if;
                         Value := Value * 16 + Hex_Value (Peek);
                         Count := Count + 1;
                         Advance;
                      end loop;
                      if Count = 0 or else Peek /= '}' then
-                        Fail ("invalid Unicode escape");
+                        String_Error ("missing '}'");
                      end if;
                      Advance;
                      Append_UTF8 (Text, Value);
@@ -305,10 +412,10 @@ package body Lua.Lexer_Core is
                         Advance;
                      end loop;
                      if Value > 255 then
-                        Fail ("decimal escape is too large");
+                        String_Error ("decimal escape too large");
                      end if;
                      Append (Text, Character'Val (Value));
-                  when others => Fail ("invalid escape sequence");
+                  when others => String_Error ("invalid escape sequence");
                end case;
             end if;
          end loop;
@@ -323,11 +430,11 @@ package body Lua.Lexer_Core is
       if Self.Finished then
          return Self.Terminal;
       end if;
-      if Source'Length = Positive'Last then
+      if Source.Available = Positive'Last then
          Fail ("source exceeds scanner representation", Resource_Error);
       end if;
       Text.Set_Owner (Lua.Frontend_Text.Owner_Of (Texts));
-      while Cursor.Offset <= Input'Last loop
+      while Source.Ensure (Cursor.Offset) loop
          Start := Cursor;
          if Is_Space (Peek) then
             Advance;
@@ -338,7 +445,7 @@ package body Lua.Lexer_Core is
             if Level >= 0 then
                Long_String (Level, Text, Keep => False);
             else
-               while Cursor.Offset <= Input'Last and then
+               while Source.Ensure (Cursor.Offset) and then
                  Peek not in Latin.CR | Latin.LF
                loop
                   Advance;
@@ -349,10 +456,14 @@ package body Lua.Lexer_Core is
                Advance;
             end loop;
             declare
-               Name : String renames
-                 Input (Start.Offset .. Cursor.Offset - 1);
+               procedure Save (Name : String);
+               procedure Save (Name : String) is
+               begin
+                  Emit (Keyword (Name, Self.Compatible_Global), Start, Name);
+               end Save;
             begin
-               Emit (Keyword (Name, Self.Compatible_Global), Start, Name);
+               Source.Query
+                 (Start.Offset, Cursor.Offset - Start.Offset, Save'Access);
             end;
          elsif Is_Digit (Peek) or else
            (Peek = '.' and then Is_Digit (Peek (1)))
@@ -383,18 +494,22 @@ package body Lua.Lexer_Core is
                   Advance;  --  Force rejection of a touching identifier.
                end if;
                declare
-                  Spelling : String renames
-                    Input (Start.Offset .. Cursor.Offset - 1);
-                  Value : constant Lua.Numbers.Number :=
-                    Lua.Number_Parsing.Read
-                      (Spelling, Lua.Frontend_Text.Owner_Of (Texts));
+                  procedure Save (Spelling : String);
+                  procedure Save (Spelling : String) is
+                     Value : constant Lua.Numbers.Number :=
+                       Lua.Number_Parsing.Read
+                         (Spelling, Lua.Frontend_Text.Owner_Of (Texts));
+                  begin
+                     if Value.Kind = Lua.Numbers.Invalid then
+                        Fail ("malformed number", Near => Spelling);
+                     end if;
+                     Emit ((if Value.Kind = Lua.Numbers.Integer_Number
+                            then Integer_Literal else Float_Literal),
+                           Start, Spelling, Value);
+                  end Save;
                begin
-                  if Value.Kind = Lua.Numbers.Invalid then
-                     Fail ("malformed number");
-                  end if;
-                  Emit ((if Value.Kind = Lua.Numbers.Integer_Number
-                         then Integer_Literal else Float_Literal),
-                        Start, Spelling, Value);
+                  Source.Query
+                    (Start.Offset, Cursor.Offset - Start.Offset, Save'Access);
                end;
             end;
          elsif Peek in '"' | ''' then
@@ -464,7 +579,7 @@ package body Lua.Lexer_Core is
                   end if;
                when others => null;
             end case;
-            Emit (Kind, Start, Input (Start.Offset .. Cursor.Offset - 1));
+            Emit_Source (Kind, Start);
          end if;
          if Emitted then
             return Result;

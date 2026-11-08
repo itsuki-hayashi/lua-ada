@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "kind": "t-exclusion-approval",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "protected_scopes": [
+    {
+      "id": "gc-io-events",
+      "path": "tests/conformance/scopes/gc-io-events.json",
+      "sha256": "79fa732f60f380c93be190f43640acf0b2ac595bdf9196d2fc8fd0a7ee62eae7"
+    },
+    {
+      "id": "expanded-t-conformance",
+      "path": "tests/conformance/scopes/expanded-t-conformance.json",
+      "sha256": "9df8642d10238abaa48c97184ed2345be7106d4c2c74668954e43bc0cb6ecdc1"
+    }
+  ],
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "decision": "accepted",
+  "exclusion": {
+    "id": "LUA-API-REVIEWED-BLOCK-9001",
+    "source": "api.lua",
+    "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+    "byte_offset": 17053,
+    "byte_length": 18,
+    "anchor_sha256": "f89400b75cf254feed3cc991449a9e7bc1679e6cd9b5b6be1b6598dfa176bf55",
+    "status": "excluded",
+    "disposition": "reviewed-t-internal-exclusion",
+    "configurations": [
+      "upstream-test"
+    ],
+    "eligibility": "t-only-private-invariant",
+    "public_api": false,
+    "mixed_obligation": false,
+    "module_observable": true,
+    "invariant": "Only the exact 18-byte upper allocation-delta conjunct at byte17053 is private; the original mixed assertion is retained and required.",
+    "third_party_irrelevance": "The pinned lua_load contract permits avoiding internal copies but promises no400-byte allocation delta. Memory use is observable; its exact implementation allocation footprint is not a public compatibility obligation.",
+    "t_guard": {
+      "byte_length": 101,
+      "sha256": "6f5f4b60db25bfae9020333e97d5aaa7b3b807e4086af05ea36003dd45f81c90",
+      "byte_offset": 64,
+      "mode": "absent-return"
+    },
+    "evidence": [],
+    "eligibility_schema_version": 2,
+    "module_compatibility_obligation": false,
+    "observation_kind": "private-resource-bound",
+    "retained_parent": {
+      "id": "LUA-API-ASSERT-CALL-0125",
+      "byte_offset": 17039,
+      "byte_length": 33,
+      "anchor_sha256": "9c64cb79308eea2b302880a35a479936b515b820ed8c610d1d23f5158593b3d2"
+    }
+  },
+  "review_evidence": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json",
+    "sha256": "e2b2703a870b265b6505e68a7c8b1e52dc81c69f146c9442eb4fd6d1bdd93ab9"
+  }
+}

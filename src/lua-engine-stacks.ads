@@ -58,6 +58,12 @@ package Lua.Engine.Stacks is
    --  Actual provider refusal is optional-shrink failure, preserving original
    --  arenas/tops and acknowledging its witness. No semantic top is invented.
 
+   function Closing_Predecessor
+     (Activation : not null Frame_Access; Level : Positive) return Natural;
+   --  Read an existing scalar closing link without allocation. Validate the
+   --  owning frame's initialized interval and strict descending order before
+   --  a collector or unwind traversal follows it. Zero terminates the chain.
+
    procedure Trace
      (Context : not null Context_Access;
       Mark_Value : not null access procedure (Item : Value);

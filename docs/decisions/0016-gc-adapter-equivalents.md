@@ -22,6 +22,19 @@ heap/code edges, active stack windows and finalizer queues. The allocator header
 type is shared through the private storage specification; the inspector exists
 only in the test crate. No copied private C layout is interpreted as Ada data.
 
+The test-only ada_check_table_storage operation inspects actual member rows,
+dense/hash indices and the free list. It finds a collectable pointer in the
+owned heap before reading its tag or hashing/comparing a key. First validate
+all retained references and bounded chains; only then call the real Tables.Find
+through a test-directory Engine child. Repeated bounded walks require no
+input-sized scratch vector. Counts describe retained member rows and nonnil
+values, never private C geometry. Nil-valued indexed tombstones and revived
+live free-listed rows are valid. Inspection does not rebuild, repair, collect
+or alter allocation controls. The production source directories and interfaces
+do not depend on the helper. Implementing this inspector grants no exact
+locals.lua transformation or original-anchor acceptance; independent source
+review and actual equivalent/final-context evidence remain required.
+
 Running-thread roots are rescanned at atomic, and already traversed reachable
 suspended threads remain revisitable through gray-again. Uncaptured scalar
 writes defer marking to that snapshot; callers publish the live interval before

@@ -55,6 +55,7 @@ package body Lua.Chunks is
       return (case Error is
          when No_Error => "",
          when Truncated => "truncated chunk",
+         when Truncated_Fixed_Buffer => "truncated fixed buffer",
          when Signature_Mismatch => "not a binary chunk",
          when Version_Mismatch => "version mismatch",
          when Format_Mismatch => "format mismatch",
@@ -374,6 +375,18 @@ package body Lua.Chunks is
      (Source : String; Memory : not null Lua.Storage.Owner_Access;
       Bounds : Limits := (others => <>)) return Decode_Result
    is
+      Input : Lua.Inputs.Source;
+   begin
+      Input.Borrow (Source'Address, Source'Length);
+      return Decode (Input, Memory, Bounds);
+   end Decode;
+
+   function Decode
+     (Source : in out Lua.Inputs.Source;
+      Memory : not null Lua.Storage.Owner_Access;
+      Bounds : Limits := (others => <>); Fixed_Buffer : Boolean := False)
+      return Decode_Result
+   is
    begin
       return Result : Decode_Result do
          Set_Owner (Result.Code, Memory);
@@ -402,12 +415,39 @@ package body Lua.Chunks is
                if Added > Maximum - Total then Reject (Error); end if;
                Total := Total + Added;
             end Charge;
+            procedure Require_Bytes
+              (Count : Natural; Fixed_Block : Boolean := False);
+            procedure Require_Bytes
+              (Count : Natural; Fixed_Block : Boolean := False) is
+            begin
+               if Count > Natural'Last - Position then
+                  Reject (Integer_Overflow);
+               elsif Fixed_Block and then Fixed_Buffer then
+                  if not Source.Ensure_Block (Position + 1, Count) then
+                     Reject (Truncated_Fixed_Buffer);
+                  end if;
+               elsif not Source.Ensure (Position + Count) then
+                  Reject (Truncated);
+               end if;
+            end Require_Bytes;
+            procedure Require_Array (Count : Natural; Width : Positive);
+            procedure Require_Array (Count : Natural; Width : Positive) is
+            begin
+               if not Source.Streaming and then not Fixed_Buffer and then
+                 Count > (Source.Available - Position) / Width
+               then
+                  Reject (Truncated);
+               elsif Count > Natural'Last / Width then
+                  Reject (Integer_Overflow);
+               end if;
+               Require_Bytes (Count * Width, Fixed_Block => True);
+            end Require_Array;
             function Read_Byte return Byte;
             function Read_Byte return Byte is
                Item : Byte;
             begin
-               if Position >= Source'Length then Reject (Truncated); end if;
-               Item := Character'Pos (Source (Source'First + Position));
+               Require_Bytes (1);
+               Item := Character'Pos (Source.Element (Position + 1));
                Position := Position + 1;
                return Item;
             end Read_Byte;
@@ -484,19 +524,29 @@ package body Lua.Chunks is
                   end if;
                   return Saved (Positive (Index));
                end if;
-               if Size > Word (Source'Length - Position) then
+               if Size > Word (Natural'Last - Position) then
                   Reject (Truncated);
                end if;
                Length := Natural (Size - 1);
+               --  Pinned lundump copies short strings (up to 40 bytes), even
+               --  in B mode. Only long strings require a single fixed block;
+               --  the managed Ada model copies either form after acquisition.
+               Require_Bytes (Natural (Size), Fixed_Block => Length > 40);
                Charge (String_Total, 1, Bounds.Strings, String_Limit);
                Charge (String_Bytes, Length, Bounds.String_Bytes,
                  String_Limit);
                if Length = 0 then
                   Id := Intern (Result.Code, "");
                else
-                  Id := Intern (Result.Code, Source
-                    (Source'First + Position ..
-                     Source'First + (Position + Length - 1)));
+                  declare
+                     procedure Save (Bytes : String);
+                     procedure Save (Bytes : String) is
+                     begin
+                        Id := Intern (Result.Code, Bytes);
+                     end Save;
+                  begin
+                     Source.Query (Position + 1, Length, Save'Access);
+                  end;
                end if;
                Position := Position + Length;
                if Read_Byte /= 0 then Reject (Invalid_String); end if;
@@ -529,9 +579,7 @@ package body Lua.Chunks is
                --  prototype. Each array word is decoded arithmetically; native
                --  Ada record layout never determines the serialized format.
                Align (4);
-               if N > (Source'Length - Position) / 4 then
-                  Reject (Truncated);
-               end if;
+               Require_Array (N, 4);
                Node.Code.Reserve_Capacity (Ada.Containers.Count_Type (N));
                for Index in 1 .. N loop
                   declare
@@ -549,7 +597,11 @@ package body Lua.Chunks is
                --  Constants preserve integer classification and raw binary64
                --  bits. Reinterpreting through Real arithmetic would destroy
                --  signed zero or NaN payloads before the encoder sees them.
-               if N > Source'Length - Position then Reject (Truncated); end if;
+               if not Source.Streaming and then
+                 N > Source.Available - Position
+               then
+                  Reject (Truncated);
+               end if;
                for Index in 1 .. N loop
                   Tag := Read_Byte;
                   case Tag is
@@ -595,7 +647,11 @@ package body Lua.Chunks is
                if N > Bounds.Prototypes - Node_Total then
                   Reject (Prototype_Limit);
                end if;
-               if N > Source'Length - Position then Reject (Truncated); end if;
+               if not Source.Streaming and then
+                 N > Source.Available - Position
+               then
+                  Reject (Truncated);
+               end if;
                for Index in 1 .. N loop
                   Node.Children.Append (Load (Depth + 1));
                end loop;
@@ -604,6 +660,9 @@ package body Lua.Chunks is
                --  PC offsets describe canonical words, never private packets.
                N := Count;
                Charge (Debug_Total, N, Bounds.Debug_Entries, Debug_Limit);
+               if Source.Streaming or else Fixed_Buffer then
+                  Require_Array (N, 1);
+               end if;
                for Index in 1 .. N loop
                   Node.Lines.Append (Signed_Byte (Read_Byte));
                end loop;
@@ -611,6 +670,9 @@ package body Lua.Chunks is
                Charge (Debug_Total, N, Bounds.Debug_Entries, Debug_Limit);
                if N > 0 then
                   Align (C_Int_Bytes);
+                  if Source.Streaming or else Fixed_Buffer then
+                     Require_Array (N, C_Int_Bytes * 2);
+                  end if;
                   for Index in 1 .. N loop
                      declare
                         PC : constant Word := Read_Fixed (C_Int_Bytes);
@@ -666,7 +728,7 @@ package body Lua.Chunks is
          begin
             Saved.Set_Owner (Memory);
             Seen.Set_Owner (Memory);
-            if Source'Length > Bounds.Input_Bytes then
+            if Source.Available > Bounds.Input_Bytes then
                Reject (Input_Limit);
             end if;
             Literal (Signature, Signature_Mismatch);
@@ -720,6 +782,11 @@ package body Lua.Chunks is
                Result.Outcome := (if Result.Error in Input_Limit .. Debug_Limit
                                   then Resource_Limit else Bad_Format);
                Close (Result.Code);
+            when Lua.Inputs.Input_Limit =>
+               Result.Outcome := Resource_Limit;
+               Result.Error := Input_Limit;
+               Result.Offset := Position;
+               Close (Result.Code);
             when Lua.Storage.Allocation_Error =>
                Result.Outcome := Memory_Failure;
                Result.Error := Allocation_Refused;
@@ -732,8 +799,15 @@ package body Lua.Chunks is
                   Result.Offset := Position;
                   Close (Result.Code);
                else
+                  Close (Result.Code);
                   raise;
                end if;
+            when others =>
+               --  Guarded reader failure is returned through Ada, so every
+               --  partial graph can be released before the outer C boundary
+               --  receives its real callback status and error stack object.
+               Close (Result.Code);
+               raise;
          end;
       end return;
    end Decode;

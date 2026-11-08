@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "kind": "equivalent-approval",
+  "author": "Codex /root/runtime_gaps",
+  "reviewer": "Codex /root/remaining_suite",
+  "decision": "accepted",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "equivalent": {
+    "id": "verybig-windows-tempfile",
+    "source": "references/lua/testes/verybig.lua",
+    "source_sha256": "2b6d30c69cbe6974068881108eae297bdedd275b429be8ec614bf5f8ee89707e",
+    "configuration": "default-and-upstream-test",
+    "disposition": "native-platform-equivalent",
+    "platform": "windows",
+    "generated_sha256": "d973c7a66fd1f4d50ec48c7d2bc49ad2bf8aa3e0df9cadf7033c52f1e3ce00dc"
+  },
+  "decisions": [
+    {
+      "id": "windows-verybig-tempfile-cwd",
+      "start_byte": 3491,
+      "length_bytes": 12,
+      "source_sha256": "5877a423400935af8288a4a9d58c43ba23153277ed30fdd2f7448ff190911e7a",
+      "replacement_sha256": "6c2b35bd3de16c41bc02710f4cb2c8d9a2cfc0c5f711f752e3636cdbf60ce609",
+      "decision": "accepted",
+      "author": "Codex /root/runtime_gaps",
+      "reviewer": "Codex /root/remaining_suite",
+      "rationale": "Install the exact independent source-only decision from the linked narrative. Retain one actual native os.tmpname call and its leaf bytes, translating only the Windows current-drive rooted result into a fresh disposable CWD path. Keep every generated-program, I/O, loader, assertion, removal and return byte unchanged. Require observed flat-rooted native name and fresh disposable CWD; actual native applicability and complete whole-file execution remain separate.",
+      "review_evidence": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/verybig-windows.independent-source-review.json",
+        "sha256": "2649fd44dee604fd8c0f6dcda8b8234d6fff28a673a8fd72602c7fa24ff479d5"
+      },
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/windows-verybig-tempfile.lua#rooted-name",
+          "sha256": "25e94daeaa1b5529a57659f624657ef298fdde9e60549de5edc806f027ca9379"
+        },
+        {
+          "path": "tests/conformance/platform/windows-verybig-tempfile.lua#fresh-cwd-name",
+          "sha256": "25e94daeaa1b5529a57659f624657ef298fdde9e60549de5edc806f027ca9379"
+        },
+        {
+          "path": "tests/conformance/platform/windows-verybig-tempfile.lua#write-read",
+          "sha256": "25e94daeaa1b5529a57659f624657ef298fdde9e60549de5edc806f027ca9379"
+        },
+        {
+          "path": "tests/conformance/platform/windows-verybig-tempfile.lua#text-loadfile",
+          "sha256": "25e94daeaa1b5529a57659f624657ef298fdde9e60549de5edc806f027ca9379"
+        },
+        {
+          "path": "tests/conformance/platform/windows-verybig-tempfile.lua#dofile",
+          "sha256": "25e94daeaa1b5529a57659f624657ef298fdde9e60549de5edc806f027ca9379"
+        },
+        {
+          "path": "tests/conformance/platform/windows-verybig-tempfile.lua#binary-load",
+          "sha256": "25e94daeaa1b5529a57659f624657ef298fdde9e60549de5edc806f027ca9379"
+        },
+        {
+          "path": "tests/conformance/platform/windows-verybig-tempfile.lua#remove",
+          "sha256": "25e94daeaa1b5529a57659f624657ef298fdde9e60549de5edc806f027ca9379"
+        }
+      ]
+    }
+  ]
+}

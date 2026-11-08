@@ -13,12 +13,36 @@ package Lua.Engine.Machine is
    --  helpers never dispatch metamethods; callers must select primitive
    --  applicability before bypassing a canonical metamethod instruction.
 
+   type For_Failure_Kind is
+     (Initial_Not_Number, Limit_Not_Number, Step_Not_Number, Zero_Step);
+   procedure For_Error
+     (State : in out World; Kind : For_Failure_Kind;
+      Item : Value := Nil_Value);
+   --  Raise the pinned numeric-for diagnostic at its actual Lua source.
+   --  Conversion failures use Item's table/userdata diagnostic type; zero
+   --  step has no offending type and ignores the default nil Item.
+
+   procedure Concatenate_Primitives
+     (State : in out World; First : Positive; Last : in out Natural);
+   --  Fold the convertible suffix of an actual C operand interval. Publish
+   --  each run in its first slot and consume its other slots. Stop at the
+   --  first handler-requiring pair; First=Last means a complete result.
+   --  The current addressed C/borrowed window owns all input/result roots.
+
    function Ensure_Stack
      (State : in out World; Context : not null Context_Access;
       Last : Natural; Raise_Error : Boolean := True) return Boolean;
    --  Last is inclusive; native top pointers name Last+1. Physical storage
    --  includes five hidden extra rows. First overflow installs the pinned
    --  200-row error stack; another growth request there becomes ERRERR.
+
+   procedure Prepare_C_Call_Storage
+     (State : in out World; Context : not null Context_Access;
+      Window_Last : Natural);
+   --  Before publishing a Lua window, prepare backing for its actual end
+   --  plus the public minimum C-call space, using the normal capped growth
+   --  rule. This changes no semantic bound, top or window. Allocation refusal
+   --  preserves those fields; physical buffer capacity may remain larger.
 
    procedure Shrink_Error_Stack
      (State : in out World; Context : not null Context_Access);
@@ -31,6 +55,18 @@ package Lua.Engine.Machine is
    --  storage, then publish this real frame's current window. Hidden holders
    --  never call this helper and consume no invented Lua slots. A noncurrent
    --  parent may grow its reservation without overwriting a child's ci.top.
+
+   procedure Begin_Hook_View
+     (State : in out World; Context : not null Context_Access;
+      Token : Callback_Identity);
+   procedure End_Hook_View
+     (State : in out World; Context : not null Context_Access;
+      Token : Callback_Identity);
+   --  Called only by the actual C hook transport's guarded entry. The
+   --  private argument window retires before borrowing interrupted cells;
+   --  the real callback guard/serial retains continuation/error ownership.
+   --  End is also performed by typed completion/abandonment if C cannot
+   --  return normally. Neither procedure executes callbacks or another VM.
 
    function Reserve_Native_Results
      (State : in out World; Activation : not null Frame_Access;
@@ -50,6 +86,13 @@ package Lua.Engine.Machine is
       Item : Value);
    --  Append one rooted scalar through the same reservation/publication
    --  path. The native activation must be the current real stack window.
+
+   procedure Prepare_Argument_Diagnostic
+     (State : in out World; Owner : not null Frame_Access);
+   --  A directly called builtin can fail while a hidden phase still owns
+   --  its working scalar prefix. Transfer that actual prefix to the original
+   --  public C owner and retire the failed phase's window/request. The failed
+   --  operation must never resume; no callback or executor is invoked here.
 
    type Driver is limited private;
    type Driver_Access is access Driver;
@@ -119,7 +162,16 @@ package Lua.Engine.Machine is
       Callee : Value; Arguments : Values.Vector;
       Message_Handler : Value := Nil_Value;
       Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
-      Retained_Depth : Natural := 0);
+      Retained_Depth : Natural := 0; Direct_Builtin : Boolean := False);
+   procedure Start_Foreign
+     (Self : in out Driver; State : in out World;
+      Callee : Value; Arguments : Values.Vector;
+      Message_Handler : Value := Nil_Value;
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
+      Retained_Depth : Natural := 0; Direct_Builtin : Boolean := False);
+   --  Both forms borrow one real world until Finish/Cancel. The in-out form
+   --  also supports C calls on another context of an Ada-owned session; it
+   --  never transfers universe ownership or resets the existing work budget.
    --  Start a C-entry call behind an owned protected holder. Its handler runs
    --  above intact failed frames; the terminal packet has a success boolean.
 
@@ -132,6 +184,28 @@ package Lua.Engine.Machine is
    --  The limited world is passed by reference and must outlive this drive.
    --  Its terminal packet is the actual return/yield/error sequence without
    --  an invented protected-call boolean.
+
+   function Has_Thread_Closers (Context : not null Context_Access)
+                                return Boolean;
+   --  Inspect actual pending Lua/C closing owners without allocating.
+
+   procedure Reset_Without_Closers
+     (State : in out World; Native_Base : Natural)
+     with Pre => not Has_Thread_Closers (State.Current);
+   --  Reset an addressed idle/suspended thread without a callback or drive.
+   --  Existing failure ownership stays rooted for C status publication.
+
+   procedure Start_Close_Thread
+     (Self : in out Driver; State : in out World; Native_Base : Natural;
+      Self_Close : Boolean := False);
+   --  Start a real reset/closing walk after every target C body has been
+   --  abandoned. A self-close reuses the current driver/resumer relationship;
+   --  other closes borrow an idle driver and restore their caller in C.
+
+   procedure Acknowledge_Self_Close
+     (Self : Driver; Token : Callback_Identity);
+   --  Validate one exact actual callback and relinquish its live C window.
+   --  This never executes or physically releases any pending close owner.
 
    function Needs_Foreign_Call (Self : Driver) return Boolean;
    function Foreign_Handler (Self : Driver) return System.Address;
@@ -154,13 +228,29 @@ package Lua.Engine.Machine is
    --  Token is the exact identity returned with this callback request; a
    --  stale/null/other activation identity is rejected before state mutation.
 
+   procedure Adopt_Deferred_Error_Scopes
+     (State : in out World; Token : Callback_Identity;
+      Owner : out Frame_Access; Prefix_Floor : out Natural;
+      Retained_Traceback : out Boolean);
+   --  After the exact regular C guard has returned, remove its held error
+   --  view and restore the context-owned scope chain without allocation or
+   --  executing an old PC. The token is the real completed callback identity;
+   --  all inner borrowed guards must have acknowledged first. Reject a stale
+   --  owner or a noncurrent error view before mutation. The caller chooses
+   --  protected recovery or genuine thread reset and retires execution there.
+
    procedure Start_Foreign_Boundary
      (Self : Driver; Callee : Value; Arguments : Values.Vector;
       Message_Handler : Value := Nil_Value;
       Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
       Yieldable : Boolean := False; Wanted : Integer := 0;
-      Protected_Call : Boolean := False);
+      Protected_Call : Boolean := False; Direct_Builtin : Boolean := False;
+      Error_Token : Callback_Identity := (others => <>));
    function Has_Foreign_Result (Self : Driver) return Boolean;
+   function Pending_Foreign_Error_Transfer (Self : Driver) return Boolean;
+   --  A regular unprotected C guard still owns this error. Its actual
+   --  temporary C view is already published; the pump must not overwrite
+   --  preserved closing slots before the matching callback acknowledges it.
    procedure Take_Foreign_Result
      (Self : Driver; Packet : in out Values.Vector; Error_Status : out Natural;
       Handler_Called : out Boolean);
@@ -172,9 +262,64 @@ package Lua.Engine.Machine is
    procedure Run (State : in out World; Code : Prototype_Access);
    --  Synchronous Ada convenience wrapper over Start, Step and Finish.
 
+   procedure Run_Retaining (State : in out World; Code : Prototype_Access);
+   --  Run Code exactly like Run, but on normal completion move the chunk's
+   --  result packet into State.Current.Arguments. That vector is a traced
+   --  root, so the values survive every later allocation and collection
+   --  until the caller consumes or clears it. A typed process exit, which
+   --  produces no displayable packet, leaves the vector empty. Failure
+   --  propagates as in Run and retains nothing.
+
+   procedure Run_Display (State : in out World);
+   --  Start a sequential drive to resolve the current global print through
+   --  ordinary lookup and call it with State.Current.Arguments. Hidden host
+   --  phases add no Lua helper frame. Never call from an active drive.
+
+   procedure Run_Warning_Control (State : in out World; Enabled : Boolean);
+   --  Deliver a host warning control through the actual warning handler,
+   --  independently of replaceable Lua globals. Custom C callbacks use the
+   --  ordinary borrowed portal and complete before this host call returns.
+
+   procedure Run_Package_Environment
+     (State : in out World; Ignore_Environment : Boolean);
+   --  Configure native package paths and the real LUA_NOENV registry marker
+   --  through an idle borrowed driver, including deferred release callbacks.
+
    procedure Close_Lua_State (State : in out World);
    --  Drive an idle main thread's TBC/finalizer close protocol, leaving
    --  physical ownership with the caller. Never call from an active drive.
+   procedure Drain_External_Releases (State : in out World);
+   --  Borrow an idle driver to release queued external payloads before
+   --  physical teardown. No executor step spans a C allocator callback.
+
+   procedure Retire_Frame_Execution
+     (State : in out World; Item : not null Frame_Access)
+     with Pre => Item.Context = State.Current and then
+       (not Item.Has_Stack_Window or else
+        Item.Context.Stack_Window = Item);
+   --  Retire genuinely abandoned execution ownership exactly once, visiting
+   --  physical windows from top to bottom. The caller establishes the active
+   --  native-depth accounting and preserves any scalar prefix needed during
+   --  closing before this call. Closed cells/frozen closers/code stay rooted
+   --  until physical release; pending result/argument temporaries do not.
+   --  Never call across a live foreign body: acknowledge its typed C transfer
+   --  first. An already retired activation is harmless; reuse resets it.
+
+   function Pending_Closing_Level
+     (Item : not null Frame_Access) return Natural;
+   --  Highest actual C/Lua closing slot retained by this frame. The private
+   --  packet backend has no scalar level and continues owning its cells.
+   --  This reads pending metadata in linear time without allocation.
+
+   procedure Set_Closing_Stack_Prefix
+     (State : in out World; Level : Natural)
+     with Pre => State.Current /= null and then
+       Level <= Natural (State.Current.Foreign_Stack.Length);
+   --  Publish an actual scalar prefix and recompute its physical/public
+   --  high-water marks without allocation. Callers save/restore the previous
+   --  floor and never lower below another active cleanup owner's prefix.
+   --  No blind range clear occurs: union tracing preserves real surviving
+   --  closer windows while discarding abandoned gaps at the next collection.
 
    procedure Clear_Frames
      (State : in out World; Retained_Depth : Natural := 0);

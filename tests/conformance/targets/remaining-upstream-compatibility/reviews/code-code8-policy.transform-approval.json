@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-transform-approval",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root/remaining_suite",
+  "decision": "accepted",
+  "transform": {
+    "id": "code-private-optimizer-v3",
+    "target": "remaining-upstream-compatibility",
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+    "source": "references/lua/testes/code.lua",
+    "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+    "configuration": "upstream-test",
+    "exclusion_policy_sha256": "a7ae9b40b57dc48ce5742a7a3baefd2ddc79696a1c028eb8287c0efe5623a5ec",
+    "output_sha256": "676304c019ee3afe8796da7ddfaf8f14cba43c2c49332d96f19b3f4c84211fe0"
+  },
+  "decisions": [
+    {
+      "id": "constant-table-inspection",
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9001",
+      "start_byte": 800,
+      "length_bytes": 143,
+      "source_sha256": "26aad09cfda55023d09d73d23353c892cb5e19ba423488629606efc828ddf3fd",
+      "replacement_sha256": "f0b9262500d4b2519659051b93436965001ff36a2610af02f189088e8c5ce90d",
+      "decision": "accepted",
+      "rationale": "I read the five-line listk body and all three callers. This span compares constant-pool cardinality/order and numeric tags of pool entries. Those dump-visible representation choices are observable but do not promise the same C pool. The original argument closures and literals remain compiled. Exact numeric values/kinds/one-result cardinality, the eight actual callbacks and fourteen actual assignments remain required through nodes 9011-9014 and the separately reviewed public witnesses. I checked the replacement-byte hash: this patch introduces no executable bypass and retains the specified public source.",
+      "private_only": true,
+      "preserves_public_assertions": true
+    },
+    {
+      "id": "opcode-sequence-inspection",
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9002",
+      "start_byte": 1808,
+      "length_bytes": 205,
+      "source_sha256": "41b6d2b52bb8f3f0d16dc0cf595c5fd6a4ca1b124b16b1bef028a1dda5f27f6b",
+      "replacement_sha256": "ebfc2be2034d9f194927cdebcf2179bf30c79f37d5e5d8fcb80d9c2ea954704b",
+      "decision": "accepted",
+      "rationale": "I read the listcode matcher and every original check/checkR call. It materializes expected opcode strings and compares exact C instruction count/order only. Removing this body leaves function arguments compiled and checkR 2079/127 byte-identical, including actual f(p), value and numeric-kind assertions. Safe zero/nil/multiple return controls remain required. Intentionally invalid or infinite opcode-only functions must not be indiscriminately invoked. I checked the replacement-byte hash: this patch introduces no executable bypass and retains the specified public source.",
+      "private_only": true,
+      "preserves_public_assertions": true
+    },
+    {
+      "id": "opcode-equality-inspection",
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9003",
+      "start_byte": 2288,
+      "length_bytes": 239,
+      "source_sha256": "5b3ddc7feef1ddadfa4a18c2526a31ced0495324141bde683ac399700a67e762",
+      "replacement_sha256": "1da5f73cab420d1ea42ea17d202e1b9e647e74aeef15730139d0126d0fbca1e6",
+      "decision": "accepted",
+      "rationale": "I read both listcode conversions, line-number stripping and equality loop. They compare private optimized streams rather than execute either supplied closure. The exact 239-byte body may be omitted while every original closure/call remains compiled and checkR/public numeric execution stays required under nodes 9011/9015. No callable behavior, binary validity or ordinary assertion outside this body is waived. I checked the replacement-byte hash: this patch introduces no executable bypass and retains the specified public source.",
+      "private_only": true,
+      "preserves_public_assertions": true
+    },
+    {
+      "id": "outer-constant-storage",
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9004",
+      "start_byte": 13327,
+      "length_bytes": 32,
+      "source_sha256": "13c9570d19cf580345c831907370413a0a9b7c0c3d39f7b6660459373cd8e8af",
+      "replacement_sha256": "d4e332da242db81c1d87dcc6715c963d7efea8b004e8c3f1d70b48b2f769eaf8",
+      "decision": "accepted",
+      "rationale": "I read the nested f1/f2/f3 block and fifty-byte constant. Only assert(T.listk(f1)[1]==nil) is private placement/minimality. Actual nested calls, f3 value comparison and checkK execution remain; node 9017 additionally requires all three layers, one-result cardinality and stripped/unstripped dump/load. This excludes neither string lifetime nor binary interoperability. I checked the replacement-byte hash: this patch introduces no executable bypass and retains the specified public source.",
+      "private_only": true,
+      "preserves_public_assertions": true
+    },
+    {
+      "id": "middle-constant-storage",
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9005",
+      "start_byte": 13359,
+      "length_bytes": 32,
+      "source_sha256": "4b1b8301af5f0f06a693bc66df7fa421860fdf06c9821e447ae6d4af791d8907",
+      "replacement_sha256": "b45c29656afcaedf26da1f64fc9cda4d55f4b938f54589017396bb08a4ca2057",
+      "decision": "accepted",
+      "rationale": "I independently checked the second 32-byte assertion against f2. Its empty outer pool is a private constant-placement choice. The same exact string, nested calls and actual return/dump/load obligations in node 9017 stay pending and required; no synthetic pool facade is introduced. I checked the replacement-byte hash: this patch introduces no executable bypass and retains the specified public source.",
+      "private_only": true,
+      "preserves_public_assertions": true
+    },
+    {
+      "id": "register-inspection-wrapper",
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9006",
+      "start_byte": 13587,
+      "length_bytes": 10,
+      "source_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+      "replacement_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "decision": "accepted",
+      "rationale": "I checked the exact ten bytes T.listcode and its parentheses. Removing that identifier leaves (assert(load(source))) intact, so the valid maximum-register source still loads. The following physical-register loop is a separately bounded candidate. The oversized load and too-many-registers diagnostic remain unchanged. Node 9018 must run those public load boundaries without calling the deliberately nil callee. I checked the replacement-byte hash: this patch introduces no executable bypass and retains the specified public source.",
+      "private_only": true,
+      "preserves_public_assertions": true
+    },
+    {
+      "id": "physical-move-registers",
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9007",
+      "start_byte": 13655,
+      "length_bytes": 79,
+      "source_sha256": "120c5699b24c0b9102eded9963b92049e2d0f8213c5c43d77a64dc7dd3ecdac9",
+      "replacement_sha256": "2a6df3b0c57d2d6760c2b9c4f2e3d8d4536893101570242b6469939e500869ed",
+      "decision": "accepted",
+      "rationale": "I read the 79-byte MOVE-number loop and both surrounding loads. Only exact physical register numbering is removed. The maximum valid load and one-more-argument error/diagnostic are retained byte-for-byte and remain required under node 9018. Neither stack admission nor actual argument/closure semantics is excluded. I checked the replacement-byte hash: this patch introduces no executable bypass and retains the specified public source.",
+      "private_only": true,
+      "preserves_public_assertions": true
+    },
+    {
+      "id": "setlist-instruction-count",
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9008",
+      "start_byte": 14141,
+      "length_bytes": 175,
+      "source_sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6",
+      "replacement_sha256": "aa2c9fb9e66a366a0ebfb0e00dec3a355d21649a703fabaad41e85efdc34a923",
+      "decision": "accepted",
+      "rationale": "I read the full SETLIST block. The 175 bytes concatenate private listing text, count SETLIST occurrences and assert exactly one instruction. The original generated fifty-element source and assert(load(source)) remain. Node 9019 requires real 49/50/51 constructors, nil holes, integer/float values, final vararg expansion, iteration and one-table cardinality. No allocation/refusal or executable constructor behavior is waived. I checked the replacement-byte hash: this patch introduces no executable bypass and retains the specified public source.",
+      "private_only": true,
+      "preserves_public_assertions": true
+    }
+  ],
+  "review_evidence": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-code8-policy.transform-independent-review.json",
+    "sha256": "ef8fcfefe8800b09dc9c2e89e37e8b618af9a1a8c7ce420d56bcca7102e82ff3"
+  },
+  "author_input_manifest": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.transform.draft.json",
+    "sha256": "6c781957b2726c862bb620887529829b7f43a3aa9c1b5296342d76a84ecac1f2"
+  },
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "review_date": "2026-11-08"
+}

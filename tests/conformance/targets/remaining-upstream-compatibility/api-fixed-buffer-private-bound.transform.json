@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-transform",
+  "id": "api-fixed-buffer-private-bound",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": "references/lua/testes/api.lua",
+  "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+  "configuration": "upstream-test",
+  "exclusion_policy_sha256": "a7ae9b40b57dc48ce5742a7a3baefd2ddc79696a1c028eb8287c0efe5623a5ec",
+  "replacements": [
+    {
+      "id": "fixed-buffer-private-allocation-bound",
+      "exclusion_id": "LUA-API-REVIEWED-BLOCK-9001",
+      "start_byte": 17053,
+      "length_bytes": 18,
+      "source_sha256": "f89400b75cf254feed3cc991449a9e7bc1679e6cd9b5b6be1b6598dfa176bf55",
+      "replacement": ""
+    }
+  ],
+  "output_sha256": "51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc",
+  "author_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.author-proposal.json",
+    "sha256": "6cd1e2c1e912d22c4bcdbaee0c9587d47be903c27668fa7a5fd22f199574cab8"
+  },
+  "policy_binding_status": "Exact source-only successor binds the final installed policy hash. Runtime, API941/composition and original-parent completion remain separate.",
+  "independent_review_status": "accepted-source-only",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "review": {
+    "author": "Codex /root/validation_delivery",
+    "reviewer": "Codex /root/remaining_suite",
+    "status": "accepted",
+    "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api18-code8-policy.transform-approval.json",
+    "artifact_sha256": "aecad42a49caff2e28aa1dcfbaf4ee8c948ab70f3c67624f20b4ff496d244492"
+  },
+  "source_feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json",
+    "sha256": "e2b2703a870b265b6505e68a7c8b1e52dc81c69f146c9442eb4fd6d1bdd93ab9"
+  },
+  "supersedes": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3-installation-inputs/api18.pre-code-policy.transform.json",
+    "sha256": "2438260413355164328518f67572e33ee1fc27c859e024cf3aa7534b1636a2f2",
+    "change": "Same exact18-byte operation/output; new independent approval binds the final Code8 policy hash."
+  },
+  "original_parents": [
+    {
+      "id": "LUA-API-ASSERT-CALL-0125",
+      "byte_offset": 17039,
+      "byte_length": 33,
+      "anchor_sha256": "9c64cb79308eea2b302880a35a479936b515b820ed8c610d1d23f5158593b3d2",
+      "status": "pending",
+      "required": true
+    },
+    {
+      "id": "LUA-API-ASSERT-CALL-0195",
+      "byte_offset": 26638,
+      "byte_length": 6,
+      "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+      "status": "pending",
+      "required": true
+    }
+  ],
+  "installed": true,
+  "source_adaptation_authority": true,
+  "execution_evidence": [],
+  "excluded_from_this_successor": [
+    "API941 equivalent source binding renewal",
+    "API18/API941 composition approval renewal",
+    "original parent runtime acceptance"
+  ],
+  "installation_source_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3-installation.independent-review.json",
+    "sha256": "faffcd7c683bbcf96ec235e92ec34be85f33f7cc5335df56c548a25e07502bf2"
+  },
+  "author_input_manifest": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/api18.transform.successor.draft.json",
+    "sha256": "44ebdbdb432e95c0899c815bceb253e0dbf1a41155086e4c90b797841aebdb34"
+  }
+}

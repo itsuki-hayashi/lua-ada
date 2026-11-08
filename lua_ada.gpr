@@ -28,6 +28,14 @@ library project Lua_Ada is
       when others => null;
    end case;
    C_ABI_Defines := ();
+   C_Runtime_Defines := ();
+   case Runtime_Configuration.Configuration is
+      when "default" => null;
+      when "upstream-test" =>
+         C_Runtime_Defines := ("-DLUA_ADA_AUXILIARY_BUFFER_BYTES=23");
+   end case;
+   C_Platform_Defines := ();
+   Module_Link_Options := ();
    C_Unwind_Options := ();
    case Lua_Ada_Config.Alire_Host_OS is
       when "windows" =>
@@ -40,11 +48,25 @@ library project Lua_Ada is
                C_Unwind_Options := ("-ffunction-sections");
             when others => null;
          end case;
+         --  Static Windows hosts also export the actual public C surface.
+         --  Native modules import that executable's one runtime image via
+         --  a host-name-bound import library, never a second static archive.
+         C_ABI_Defines :=
+           ("-DLUA_BUILD_AS_DLL", "-DLUA_CORE", "-DLUA_LIB");
+      when "linux" =>
+         C_Platform_Defines := ("-DLUA_USE_LINUX");
+         Module_Link_Options := ("-ldl");
          case Library_Mode is
-            when "relocatable" =>
-               C_ABI_Defines :=
-                 ("-DLUA_BUILD_AS_DLL", "-DLUA_CORE", "-DLUA_LIB");
-            when others => null;
+            when "relocatable" => null;
+            when others =>
+               Module_Link_Options := Module_Link_Options &
+                 ("-Wl,--export-dynamic");
+         end case;
+      when "macos" =>
+         C_Platform_Defines := ("-DLUA_USE_MACOSX");
+         case Library_Mode is
+            when "relocatable" => null;
+            when others => Module_Link_Options := ("-Wl,-export_dynamic");
          end case;
       when others => null;
    end case;
@@ -77,13 +99,24 @@ library project Lua_Ada is
       "lua_ada_boundary.c",
       "lua_ada_libraries.c",
       "lua_ada_debug.c",
+      "lua_ada_builtins.c",
+      "lua_ada_format.c",
+      "lua_ada_auxiliary.c",
+      "lua_ada_buffer.c",
+      "lua_ada_allocator.c",
+      "lua_ada_substitution.c",
+      "lua_ada_modules.c",
       "lua_ada_host_numerics.c",
       "lua_ada_streams.c",
       "lua_ada_os.c",
       "lua_ada_locales.c",
+      "lua-engine-external_releases.ads",
+      "lua-engine-file_inputs.ads",
+      "lua-engine-c_operators.ads",
       "lua_ada_config.ads",
       "lua-c_api.ads",
       "lua-big_naturals.ads",
+      "lua-builtin_registry.ads",
       "lua-canonical_compiler.ads",
       "lua-chunks.ads",
       "lua-diagnostics.ads",
@@ -102,6 +135,7 @@ library project Lua_Ada is
       "lua-engine-io_libraries.ads",
       "lua-engine-library_openers.ads",
       "lua-engine-loaders.ads",
+      "lua-engine-native_modules.ads",
       "lua-engine-machine.ads",
       "lua-engine-mathematics.ads",
       "lua-engine-operating_system.ads",
@@ -118,7 +152,9 @@ library project Lua_Ada is
       "lua-engine-warnings.ads",
       "lua-engine.ads",
       "lua-frontend_text.ads",
+      "lua-diagnostic_text.ads",
       "lua-integers.ads",
+      "lua-inputs.ads",
       "lua-lexer_core.ads",
       "lua-lexers.ads",
       "lua-numbers.ads",
@@ -127,6 +163,7 @@ library project Lua_Ada is
       "lua-platform_mathematics.ads",
       "lua-platform_locales.ads",
       "lua-platform_os.ads",
+      "lua-platform_modules.ads",
       "lua-platform_numerics.ads",
       "lua-platform_streams.ads",
       "lua-prototypes.ads",
@@ -134,6 +171,7 @@ library project Lua_Ada is
       "lua-sessions.ads",
       "lua-sources.ads",
       "lua-storage-buffers.ads",
+      "lua-storage-fixed_arenas.ads",
       "lua-storage-vectors.ads",
       "lua-storage.ads",
       "lua-syntax_trees.ads",
@@ -152,7 +190,7 @@ library project Lua_Ada is
                --  compiler runtime location in the actual shared image too.
                for Library_Options use ("-lm") & Runtime_Search_Options;
             when others =>
-               for Library_Options use ("-lm");
+               for Library_Options use ("-lm") & Module_Link_Options;
          end case;
       when others =>
          --  Static Library_Options are archive members, not final-link flags.
@@ -171,7 +209,8 @@ library project Lua_Ada is
         ("-std=c99", "-Wall", "-Wextra", "-Werror", "-pedantic",
          "-I" & Project'Project_Dir & "c_api/include",
          "-I" & Project'Project_Dir & "c_api/include/api") &
-        C_ABI_Defines & C_Unwind_Options;
+        C_Platform_Defines & C_ABI_Defines & C_Runtime_Defines &
+        C_Unwind_Options;
    end Compiler;
 
    package Binder is
@@ -189,11 +228,14 @@ library project Lua_Ada is
             case Tasking_Runtime_Archive is
                when "" =>
                   for Linker_Options use
-                    ("-lgnarl") & Runtime_Search_Options;
+                    ("-lgnarl") & Runtime_Search_Options & Module_Link_Options;
                when others =>
                   for Linker_Options use
-                    (Tasking_Runtime_Archive) & Runtime_Search_Options;
+                    (Tasking_Runtime_Archive) & Runtime_Search_Options &
+                    Module_Link_Options;
             end case;
+         when "linux" =>
+            for Linker_Options use Module_Link_Options;
          when others => null;
       end case;
    end Linker;

@@ -1,0 +1,740 @@
+{
+  "schema_version": 1,
+  "kind": "windows-main-transport-author-proposal",
+  "author": "Codex /root/runtime_gaps",
+  "date": "2026-11-08",
+  "base_revision": "2d956c25db0fc77dd096ebbae35a2ed3cedba6fb",
+  "platform": "windows",
+  "author_only": true,
+  "source_approval": false,
+  "adaptation_approval": false,
+  "native_applicability_approval": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "policy_installation": false,
+  "transformed_source_emitted": false,
+  "original_main_executed": false,
+  "actual_new_builds": 0,
+  "source_mappings": [],
+  "source_exclusions": [],
+  "mode_flags": [],
+  "review": {
+    "reviewer": null,
+    "artifact": null,
+    "status": "pending-independent-review"
+  },
+  "source_bindings": [
+    {
+      "sha256": "f513be936ac1470fb0f12b6af2f48c223272cc504a654cdc588e98f3a2c00201",
+      "path": "tests/conformance/platform/windows-main-cli-transport.lua"
+    },
+    {
+      "sha256": "50f119a62cf40aa4e45063f682d8f641935ba80771ddedfdd63d1e53a39254f7",
+      "path": "scripts/observe-windows-main-transport.ps1"
+    },
+    {
+      "sha256": "0f31e38c246c3fd7552674d54f5ddd4f683f04372295fa3b4b6d5875721707cf",
+      "path": "scripts/ConformanceRunner.psm1"
+    },
+    {
+      "sha256": "844d13f96bdbf03a554b8b466fdf21aeac2bcddb907ad2b971814c994898d457",
+      "path": "references/lua/testes/main.lua"
+    },
+    {
+      "sha256": "17ce8e73dd3586b84076ceaad9d638887723a1c60945c6ee086d723a6e61453f",
+      "path": "references/lua/lua.c"
+    },
+    {
+      "sha256": "3ed70ea013b0c7a5a758db435f76fe5a99e87f07ea02ed19b2012fb728f8aa13",
+      "path": "references/lua/loslib.c"
+    },
+    {
+      "sha256": "7e941581f34a8443e4ffbe690e9ee68332c7431a3a27e1d35b2312437459241c",
+      "path": "references/lua/liolib.c"
+    },
+    {
+      "sha256": "234e1f3495fe86344ad9e3014b05f4f5a7b9e57370062c01c6b415add7efd9e9",
+      "path": "references/lua/loadlib.c"
+    }
+  ],
+  "source_anchors": [
+    {
+      "byte_length": 82,
+      "id": "temporary-names",
+      "last_line": 20,
+      "byte_offset": 406,
+      "sha256": "8dedb9244e120d8d1f84fb670e68e160a8e4bfbdc690c91f278e1cbb5e0301d7",
+      "note": "Retain three actual tmpname calls; mapped fresh native leaf removes the root slash and dots.",
+      "first_line": 18
+    },
+    {
+      "byte_length": 446,
+      "id": "shell-helpers",
+      "last_line": 77,
+      "byte_offset": 1345,
+      "sha256": "339b9a0f9dac387366ba6ca205a3e17aaf074ffb93fded006a923a87ec5dfe97",
+      "note": "Standalone quoted executable needs an outer quote pair; pipe/SET tails use direct quoted executable. No POSIX parser.",
+      "first_line": 64
+    },
+    {
+      "byte_length": 249,
+      "id": "stdin",
+      "last_line": 102,
+      "byte_offset": 1977,
+      "sha256": "83382ef9aa8e6ceaf9a33a6f4a2a77a33fb229533e18705657930708526ba6bc",
+      "note": "Real empty/multiple-line redirection and native TYPE pipe.",
+      "first_line": 86
+    },
+    {
+      "byte_length": 1061,
+      "id": "environment",
+      "last_line": 173,
+      "byte_offset": 2874,
+      "sha256": "67589801e513162bfb277b92d04edd8442d383b9d8c30f50c376bdb746dee8b0",
+      "note": "SET counterparts preserve each variable spelling/order and actual child; the small positive does not certify every assignment.",
+      "first_line": 134
+    },
+    {
+      "byte_length": 219,
+      "id": "empty-environment",
+      "last_line": 190,
+      "byte_offset": 4271,
+      "sha256": "8a8527d409d9198a6a65891b5d2c809310889882a0301824e6056cfddd232616",
+      "note": "Assertions compare earlier output, not local out. No env -i equivalent authored.",
+      "first_line": 186
+    },
+    {
+      "byte_length": 637,
+      "id": "readline",
+      "last_line": 213,
+      "byte_offset": 4700,
+      "sha256": "7cf05dd3231c77c0b24f46702e853351f2f6796dd45653027510b976c064fb1a",
+      "note": "Independent native build applicability and positive warning/fallback remain required.",
+      "first_line": 200
+    },
+    {
+      "byte_length": 444,
+      "id": "library-path-literal",
+      "last_line": 246,
+      "byte_offset": 5933,
+      "sha256": "265fc5bb005212aa77da44c854e03a6d34f1224d94e7f5bf0b09144770f82b4e",
+      "note": "Use %q for Lua path values; require gets a generated module leaf without dots.",
+      "first_line": 238
+    },
+    {
+      "byte_length": 426,
+      "id": "executable-literal",
+      "last_line": 267,
+      "byte_offset": 6575,
+      "sha256": "668cfb885284f5c528ad5a362b736127af03945bad7998ba1edb3108f2afd048",
+      "note": "Use %q for the actual interpreter string without changing argument assertions.",
+      "first_line": 256
+    },
+    {
+      "byte_length": 296,
+      "id": "repl-console-shell",
+      "last_line": 285,
+      "byte_offset": 7343,
+      "sha256": "3c61adea959e6b0ebd97e0211de9bdc5d78c5af4e383d9c96be0597cb10fab51",
+      "note": "NUL redirection and exact multiline input need separate native transport; no POSIX echo emulation.",
+      "first_line": 279
+    },
+    {
+      "byte_length": 139,
+      "id": "t-constructor",
+      "last_line": 523,
+      "byte_offset": 13669,
+      "sha256": "8c1e45ba75b34bbe94b08cccf25de158619b376ea635f623d25e6c0927a87476",
+      "note": "Actual construction refusal remains required; post-creation limit is not equivalent.",
+      "first_line": 521
+    },
+    {
+      "byte_length": 1696,
+      "id": "signals",
+      "last_line": 598,
+      "byte_offset": 14437,
+      "sha256": "aa29185548d415b3294636ad6a14cfe82ce61ba070116af2490c85080e32c391",
+      "note": "Both real interrupt outcomes, child identity, pipe close and signal counts remain mandatory. No Windows positive here.",
+      "first_line": 550
+    }
+  ],
+  "counterpart_cases": [
+    "fresh-private-paths",
+    "actual-version-redirection",
+    "empty-explicit-stdin",
+    "multiline-explicit-stdin",
+    "native-type-pipe",
+    "literal-path-counterpart",
+    "exact-argv-selected-child",
+    "native-set-environment",
+    "actual-require-literal-name",
+    "stdout-stderr-routing",
+    "actual-child-failure-status",
+    "actual-popen-child-identity",
+    "owned-temp-cleanup"
+  ],
+  "positive_observation": {
+    "data": {
+      "schema_version": 1,
+      "kind": "windows-main-transport-native-author-observation",
+      "author": "Codex /root/runtime_gaps",
+      "date": "2026-11-08",
+      "base_revision": "2d956c25db0fc77dd096ebbae35a2ed3cedba6fb",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_adaptation_authority": false,
+      "native_applicability_review": "pending",
+      "independent_source_review": "pending",
+      "transformed_main_emitted": false,
+      "original_main_executed": false,
+      "mode_flags": [],
+      "source_bindings": [
+        {
+          "sha256": "f513be936ac1470fb0f12b6af2f48c223272cc504a654cdc588e98f3a2c00201",
+          "path": "tests/conformance/platform/windows-main-cli-transport.lua"
+        },
+        {
+          "sha256": "50f119a62cf40aa4e45063f682d8f641935ba80771ddedfdd63d1e53a39254f7",
+          "path": "scripts/observe-windows-main-transport.ps1"
+        },
+        {
+          "sha256": "0f31e38c246c3fd7552674d54f5ddd4f683f04372295fa3b4b6d5875721707cf",
+          "path": "scripts/ConformanceRunner.psm1"
+        },
+        {
+          "sha256": "844d13f96bdbf03a554b8b466fdf21aeac2bcddb907ad2b971814c994898d457",
+          "path": "references/lua/testes/main.lua"
+        },
+        {
+          "sha256": "17ce8e73dd3586b84076ceaad9d638887723a1c60945c6ee086d723a6e61453f",
+          "path": "references/lua/lua.c"
+        },
+        {
+          "sha256": "3ed70ea013b0c7a5a758db435f76fe5a99e87f07ea02ed19b2012fb728f8aa13",
+          "path": "references/lua/loslib.c"
+        },
+        {
+          "sha256": "7e941581f34a8443e4ffbe690e9ee68332c7431a3a27e1d35b2312437459241c",
+          "path": "references/lua/liolib.c"
+        },
+        {
+          "sha256": "234e1f3495fe86344ad9e3014b05f4f5a7b9e57370062c01c6b415add7efd9e9",
+          "path": "references/lua/loadlib.c"
+        }
+      ],
+      "counterpart_cases": [
+        "fresh-private-paths",
+        "actual-version-redirection",
+        "empty-explicit-stdin",
+        "multiline-explicit-stdin",
+        "native-type-pipe",
+        "literal-path-counterpart",
+        "exact-argv-selected-child",
+        "native-set-environment",
+        "actual-require-literal-name",
+        "stdout-stderr-routing",
+        "actual-child-failure-status",
+        "actual-popen-child-identity",
+        "owned-temp-cleanup"
+      ],
+      "roles": [
+        {
+          "artifacts": [
+            {
+              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\bin\\lua.exe",
+              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\runtime image\\lua.exe",
+              "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd"
+            },
+            {
+              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\lib\\libconformance_lua.dll",
+              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\runtime image\\libconformance_lua.dll",
+              "sha256": "6fd51198bee9770aab18cf42ebaf7ccc133a26d4e3dedb22770c41aba84500b3"
+            }
+          ],
+          "environment": {
+            "LUA_ADA_CONFORMANCE_RUN_ID": "e55642909b1a470896c1bf466c73cdab",
+            "MEMLIMIT": "2147483648",
+            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\transport-allocator",
+            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648",
+            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\runtime image;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources"
+          },
+          "configuration": "default",
+          "final_cwd_files": [
+            "transport.lua"
+          ],
+          "fixture_sha256": "f513be936ac1470fb0f12b6af2f48c223272cc504a654cdc588e98f3a2c00201",
+          "counterpart_completed": true,
+          "process": {
+            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\runtime image\\lua.exe",
+            "process_id": 42920,
+            "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+            "arguments": [
+              "transport.lua",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\runtime image\\lua.exe",
+              "default"
+            ],
+            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\disposable cwd",
+            "started_utc": "2026-11-08T10:18:17.9362452Z",
+            "elapsed_milliseconds": 244,
+            "timeout_seconds": 30,
+            "exit_code": 0,
+            "abnormal_exit_kind": null,
+            "timed_out": false,
+            "capture_limit_bytes": 1048576,
+            "capture_exceeded": false,
+            "pipe_drain_failed": false,
+            "output_drain_failed": false,
+            "input_write_failed": false,
+            "early_input_close_requested": false,
+            "process_tree_kill_error": null,
+            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\transport.stdout",
+            "stdout_bytes": 699,
+            "stdout_sha256": "9af55ff4bcb82db9ef045a9a6357fbaf1b6ccf75c739727e7461abeab780d8db",
+            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\transport.stderr",
+            "stderr_bytes": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "sidecars": [
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "e55642909b1a470896c1bf466c73cdab",
+                "process_id": 21940,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "default",
+                "managed_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "6b2a698239150ac84b51167ae1935abe0fec0276d10f4e9366078f4c48c85edd",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\transport-allocator.21940.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "e55642909b1a470896c1bf466c73cdab",
+                "process_id": 25716,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "default",
+                "managed_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "cee49253b6afcc97645a8c588fb23d084c0bab95486b8e720f86d8d203f28bfc",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\transport-allocator.25716.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "e55642909b1a470896c1bf466c73cdab",
+                "process_id": 34144,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "default",
+                "managed_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "880e482e3e66583b6a582ca21706bce87b000208ce5df3a78aece3e9eadd20d9",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\transport-allocator.34144.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "e55642909b1a470896c1bf466c73cdab",
+                "process_id": 42920,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "default",
+                "managed_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "0983bde60aebbe0c670e9892edeb7c23b6a6af42edc8c2fa73b51540e45f500b",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\transport-allocator.42920.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "e55642909b1a470896c1bf466c73cdab",
+                "process_id": 44812,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "default",
+                "managed_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "a482bbaef40c21d8481c70e34aa3458963532876991f75107a4d04b4d8469131",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\transport-allocator.44812.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "e55642909b1a470896c1bf466c73cdab",
+                "process_id": 49708,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "default",
+                "managed_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "6070f30fab437b75e078ca93f1f479beec490dcd9e76c31810e85486e2e89213",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\transport-allocator.49708.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "e55642909b1a470896c1bf466c73cdab",
+                "process_id": 79208,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "default",
+                "managed_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "d01baf7c4d3512e8b1966a21f725ab54249faf13b3a5aa25a903ecc206aa147a",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\transport-allocator.79208.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "e55642909b1a470896c1bf466c73cdab",
+                "process_id": 79560,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "default",
+                "managed_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "52907fe6bd5cebb47fd886af1b45f21ab26d29fe44d5cb8d475ca7850dfb0cfc",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\transport-allocator.79560.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "e55642909b1a470896c1bf466c73cdab",
+                "process_id": 87692,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "default",
+                "managed_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "7f19ef80fd18bcc9b80955873ce564a94082054b365d417eab74674d3fb6a9c2",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\transport-allocator.87692.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "e55642909b1a470896c1bf466c73cdab",
+                "process_id": 87952,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "default",
+                "managed_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "e8410da8a9ddeddba5a2988cb341493b684a57cf1fa5410568dbb0271cb92e9e",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\default\\transport-allocator.87952.json"
+            }
+          ],
+          "native_config_child": "Actual io.popen --conformance-config checked internally; no Lua-state sidecar is fabricated."
+        },
+        {
+          "artifacts": [
+            {
+              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\bin\\lua.exe",
+              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\runtime image\\lua.exe",
+              "sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725"
+            },
+            {
+              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\lib\\libconformance_lua.dll",
+              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\runtime image\\libconformance_lua.dll",
+              "sha256": "90cd6bb9cb2f5cdfe04a79ad2a2a8779f1e2cda590d53aaebb3caf5524fe973c"
+            }
+          ],
+          "environment": {
+            "LUA_ADA_CONFORMANCE_RUN_ID": "75ce3bc94456445ba5af193152e7e8c4",
+            "MEMLIMIT": "2147483648",
+            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\transport-allocator",
+            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648",
+            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\runtime image;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources"
+          },
+          "configuration": "upstream-test",
+          "final_cwd_files": [
+            "transport.lua"
+          ],
+          "fixture_sha256": "f513be936ac1470fb0f12b6af2f48c223272cc504a654cdc588e98f3a2c00201",
+          "counterpart_completed": true,
+          "process": {
+            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\runtime image\\lua.exe",
+            "process_id": 10868,
+            "executable_sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
+            "arguments": [
+              "transport.lua",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\runtime image\\lua.exe",
+              "upstream-test"
+            ],
+            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\disposable cwd",
+            "started_utc": "2026-11-08T10:18:18.294003Z",
+            "elapsed_milliseconds": 257,
+            "timeout_seconds": 30,
+            "exit_code": 0,
+            "abnormal_exit_kind": null,
+            "timed_out": false,
+            "capture_limit_bytes": 1048576,
+            "capture_exceeded": false,
+            "pipe_drain_failed": false,
+            "output_drain_failed": false,
+            "input_write_failed": false,
+            "early_input_close_requested": false,
+            "process_tree_kill_error": null,
+            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\transport.stdout",
+            "stdout_bytes": 699,
+            "stdout_sha256": "9af55ff4bcb82db9ef045a9a6357fbaf1b6ccf75c739727e7461abeab780d8db",
+            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\transport.stderr",
+            "stderr_bytes": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "sidecars": [
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "75ce3bc94456445ba5af193152e7e8c4",
+                "process_id": 10868,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "upstream-test",
+                "expected_finalizer_warnings": 0,
+                "managed_refusals": 0,
+                "backing_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "497106fe500364aa79eb6db0ce8983686c87e57a09f6700c64d29d608f014687",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\transport-allocator.10868.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "75ce3bc94456445ba5af193152e7e8c4",
+                "process_id": 49004,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "upstream-test",
+                "expected_finalizer_warnings": 0,
+                "managed_refusals": 0,
+                "backing_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "c3d7c3b47aaa95afe4271e893bea659f961a2fb7653f76271ff91098ecf67e59",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\transport-allocator.49004.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "75ce3bc94456445ba5af193152e7e8c4",
+                "process_id": 60096,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "upstream-test",
+                "expected_finalizer_warnings": 0,
+                "managed_refusals": 0,
+                "backing_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "798e98f10a58684ae8ddaea5f303c159538c40baed07f199ff54c3b346435e03",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\transport-allocator.60096.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "75ce3bc94456445ba5af193152e7e8c4",
+                "process_id": 60220,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "upstream-test",
+                "expected_finalizer_warnings": 0,
+                "managed_refusals": 0,
+                "backing_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "984b044ceb1d8a6b2cfb51621e66b7e478eb56bc4935719ff07cbb76cef2110e",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\transport-allocator.60220.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "75ce3bc94456445ba5af193152e7e8c4",
+                "process_id": 60840,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "upstream-test",
+                "expected_finalizer_warnings": 0,
+                "managed_refusals": 0,
+                "backing_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "ac5ec5061ea016a7b17d2d137afbaa8b6f86041a45b1895c763bcc615b015335",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\transport-allocator.60840.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "75ce3bc94456445ba5af193152e7e8c4",
+                "process_id": 64552,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "upstream-test",
+                "expected_finalizer_warnings": 0,
+                "managed_refusals": 0,
+                "backing_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "5151c41d94cf05410c718134df03e9b7a1d3ef5e5e744094f88f27db1531e058",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\transport-allocator.64552.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "75ce3bc94456445ba5af193152e7e8c4",
+                "process_id": 64584,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "upstream-test",
+                "expected_finalizer_warnings": 0,
+                "managed_refusals": 0,
+                "backing_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "423f5f4461b89f13673a6b24aca23feaf4ee295def2be5994f7c5b09ef18829c",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\transport-allocator.64584.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "75ce3bc94456445ba5af193152e7e8c4",
+                "process_id": 74384,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "upstream-test",
+                "expected_finalizer_warnings": 0,
+                "managed_refusals": 0,
+                "backing_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "d1b46d6069bcf92244b2bc677e8c3bfd7457b8a28b0ef535058458a20b15fb0c",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\transport-allocator.74384.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "75ce3bc94456445ba5af193152e7e8c4",
+                "process_id": 74536,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "upstream-test",
+                "expected_finalizer_warnings": 0,
+                "managed_refusals": 0,
+                "backing_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "a17adabbe6188c5a9b718d95f24b8df398ae49c8766ed3722a205bad40ec4926",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\transport-allocator.74536.json"
+            },
+            {
+              "data": {
+                "schema_version": 1,
+                "run_id": "75ce3bc94456445ba5af193152e7e8c4",
+                "process_id": 80104,
+                "allocator_limit_bytes": 2147483648,
+                "configuration": "upstream-test",
+                "expected_finalizer_warnings": 0,
+                "managed_refusals": 0,
+                "backing_refusals": 0,
+                "outstanding_bytes": 0,
+                "outstanding_blocks": 0
+              },
+              "sha256": "086fefc3991cdf826e8c97f18c751c73ad6973c4c7d270026a8e9e003112504e",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-transport\\5fb6ad511b4243098084cbf66b4ec61c\\upstream-test\\transport-allocator.80104.json"
+            }
+          ],
+          "native_config_child": "Actual io.popen --conformance-config checked internally; no Lua-state sidecar is fabricated."
+        }
+      ]
+    },
+    "sha256": "969191723af004be944d52de153b94e63c007ebf023c194136c5fda4a76edce9",
+    "path": "reports/windows-main-transport/5fb6ad511b4243098084cbf66b4ec61c/observation.json"
+  },
+  "diagnostic_attempts": [
+    {
+      "roles": [
+        {
+          "exit_code": 1,
+          "measured_lua_processes": 4,
+          "configuration": "default",
+          "stdout_sha256": "39567f812470585f1e22c8f7c7b1f2b9fd0d2a381cbafecb2498a6cca1ecc19a",
+          "stderr_sha256": "6225a0941d5dc1fee55ce04bc9d4336aed43a71d0bc13e608e245395128fe74e"
+        },
+        {
+          "exit_code": 1,
+          "measured_lua_processes": 4,
+          "configuration": "upstream-test",
+          "stdout_sha256": "39567f812470585f1e22c8f7c7b1f2b9fd0d2a381cbafecb2498a6cca1ecc19a",
+          "stderr_sha256": "133a94a65f80df11021d9917d3f6f477c1dd39959b21de2357409eabb4cd32ee"
+        }
+      ],
+      "sha256": "4b3cee52d06e3b79599a601ee6fdec37d8928353cee8143c9646942eb161c1e6",
+      "path": "reports/windows-main-transport/d09cbc00d0ae46c0a7613a846b95749b/observation.json"
+    },
+    {
+      "roles": [
+        {
+          "exit_code": 1,
+          "measured_lua_processes": 6,
+          "configuration": "default",
+          "stdout_sha256": "27d036419d483038e53873cf7767d26c8c38ad504e3de655aeddead4e70bb81f",
+          "stderr_sha256": "d9fc8732617c1897562c40ba67f9629825f446fe5654a657f66ac5bf5857dad3"
+        },
+        {
+          "exit_code": 1,
+          "measured_lua_processes": 6,
+          "configuration": "upstream-test",
+          "stdout_sha256": "27d036419d483038e53873cf7767d26c8c38ad504e3de655aeddead4e70bb81f",
+          "stderr_sha256": "64fe402ad58157d8aa4e10295b53660c0960e2aa995ed367b59377281443632b"
+        }
+      ],
+      "sha256": "ad8fb3b5848c22bf95f5a6284526a5254a22f0585f2870b67c3393b24d1bed2d",
+      "path": "reports/windows-main-transport/c5712fcb89374fbca1b6c53528974b4d/observation.json"
+    },
+    {
+      "roles": [
+        {
+          "exit_code": 1,
+          "measured_lua_processes": 8,
+          "configuration": "default",
+          "stdout_sha256": "670a2f23e36248a5e4b58e9bd35e776adcaa4fadac55c7d0b2fd2ce4969404f3",
+          "stderr_sha256": "47a70dcf59529ca36b0c1a953086dbae425b771cc4487eb90dddfde9f5d3eca6"
+        },
+        {
+          "exit_code": 1,
+          "measured_lua_processes": 8,
+          "configuration": "upstream-test",
+          "stdout_sha256": "670a2f23e36248a5e4b58e9bd35e776adcaa4fadac55c7d0b2fd2ce4969404f3",
+          "stderr_sha256": "1616f00df563b4d6e9624d15da9d360e81f8bbf2f92a5803d4b92babb3dd73df"
+        }
+      ],
+      "sha256": "c2378b5d220078235a32fa4f19fdb48b293a65ef1f95025eb382efdcda2b3812",
+      "path": "reports/windows-main-transport/2059500950144d09818b3782e5da4307/observation.json"
+    }
+  ],
+  "unproved_gates": [
+    "original-or-approved-whole-main",
+    "all-shell-command-forms",
+    "empty-environment",
+    "readline-applicability-and-warning",
+    "true-terminal",
+    "first-real-SIGINT-caught",
+    "second-real-SIGINT-terminates-native-search",
+    "T-constructor-refusal",
+    "all-main-child-image-and-module-protocols"
+  ],
+  "scope": "Thirteen authored native positives only. No source replacement map, policy tuple, original assertion credit, Ada-runtime pass or main completion."
+}

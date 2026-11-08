@@ -1,4 +1,6 @@
 with Lua.Engine.Mathematics;
+with Lua.Engine.Diagnostics;
+with Lua.Engine.Strings;
 with Ada.Containers;
 with Ada.Unchecked_Conversion;
 with Interfaces;
@@ -158,7 +160,9 @@ package body Lua.Engine.Core_Libraries is
       procedure Require (Count : Positive);
       function Numeric (Index : Positive) return Lua.Numbers.Number;
       function Integral (Index : Positive) return Integer_Value;
-      function Text (Item : Value) return String;
+      function Text
+        (Item : Value; Index : Integer_Value := 0;
+         Table_Item : Boolean := False) return String;
       procedure Require_Table (Item : Value);
       function Less (Left, Right : Value) return Boolean;
       function Key (Index : Integer_Value) return Value is
@@ -183,7 +187,7 @@ package body Lua.Engine.Core_Libraries is
       procedure Require (Count : Positive) is
       begin
          if Natural (Arguments.Length) < Count then
-            Fail (State, "bad argument to " & Name & " (value expected)");
+            Diagnostics.Argument_Error (State, Count, "value expected");
          end if;
       end Require;
 
@@ -203,7 +207,9 @@ package body Lua.Engine.Core_Libraries is
                end if;
             when others => null;
          end case;
-         Fail (State, "bad argument to " & Name & " (number expected)");
+         Diagnostics.Type_Error
+           (State, Index, "number", Item,
+            Present => Index <= Natural (Arguments.Length));
          return (Kind => Lua.Numbers.Invalid);
       end Numeric;
 
@@ -212,20 +218,34 @@ package body Lua.Engine.Core_Libraries is
          Value : constant Integer_Value := As_Integer (Numeric (Index), Valid);
       begin
          if not Valid then
-            Fail (State, "number has no integer representation");
+            Diagnostics.Argument_Error
+              (State, Index, "number has no integer representation");
          end if;
          return Value;
       end Integral;
 
-      function Text (Item : Value) return String is
+      function Text
+        (Item : Value; Index : Integer_Value := 0;
+         Table_Item : Boolean := False) return String
+      is
       begin
          if Item.Kind = String_Kind then
             return To_String (Item.Reference.Bytes);
          elsif Item.Kind in Integer_Kind | Real_Kind then
             return Image (State.Current.Memory, Item);
          end if;
-         Fail (State, "invalid value (" & Type_Name (Item) &
-               ") in table for 'concat'");
+         --  A bad element reports its actual Lua integer index, including
+         --  either 64-bit endpoint. The separator instead remains argument2;
+         --  confusing these two errors hid ordinary upstream boundary tests.
+         if Table_Item then
+            Diagnostics.Raise_Error
+              (State, "invalid value (" & Type_Name (Item) &
+               ") at index " &
+               Image (State.Current.Memory, (Integer_Kind, Index)) &
+               " in table for 'concat'");
+         else
+            Diagnostics.Type_Error (State, 2, "string", Item);
+         end if;
          return "";
       end Text;
 
@@ -247,8 +267,8 @@ package body Lua.Engine.Core_Libraries is
          then
             return Lua.Numbers.Less (Number (Left), Number (Right));
          elsif Left.Kind = String_Kind and then Right.Kind = String_Kind then
-            return To_String (Left.Reference.Bytes) <
-              To_String (Right.Reference.Bytes);
+            return Strings.Locale_Less
+              (State, Left.Reference.Bytes, Right.Reference.Bytes);
          end if;
          Fail (State, "attempt to compare " & Type_Name (Left) & " with " &
                Type_Name (Right));
@@ -399,7 +419,8 @@ package body Lua.Engine.Core_Libraries is
          while First <= Last loop
             Charge;
             declare
-               Part : constant String := Text (Get (Item, Key (First)));
+               Part : constant String :=
+                 Text (Get (Item, Key (First)), First, Table_Item => True);
                Added : constant Natural := Part'Length +
                  (if First = A then 0 else Length (Separator));
             begin

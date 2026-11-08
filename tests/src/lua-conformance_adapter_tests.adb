@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Conformance_Adapter;
 with Lua.Conformance_Memory;
@@ -18,7 +17,7 @@ package body Lua.Conformance_Adapter_Tests is
          Conformance_Adapter.Install (State);
          if Platform then Conformance_Adapter.Install_Platform (State); end if;
          Assert (Execute (State, Source, "adapter"),
-                 To_String (State.Current.Failure_Text));
+                 Failure_Image (State.Current));
       exception
          when others =>
             Lua.Storage.Clear_Failures (State.Memory);
@@ -52,6 +51,7 @@ package body Lua.Conformance_Adapter_Tests is
    procedure Memory_Inspection;
    procedure Corrupt_Heap_Edge;
    procedure Refusal_Reset;
+   procedure Iterator_Call_Refusal;
    procedure Finalizer_Frame_Refusal;
    procedure Finalizer_Stack_Refusal;
    procedure Measured_Emergency_Headroom;
@@ -352,6 +352,21 @@ package body Lua.Conformance_Adapter_Tests is
         "assert(type(t)=='table')");
    end Refusal_Reset;
 
+   procedure Iterator_Call_Refusal is
+   begin
+      --  The initial Lua iterator installs persistent allocation refusal
+      --  before attempting the real C userdata operation. Refused growth on
+      --  that rooted call path must unwind protection with a memory error;
+      --  a later loop executes after Lua restores its allocator normally.
+      Check ("local calls=0;local function iter()calls=calls+1;" &
+        "T.alloccount(0);return T.newuserdata(128)end;" &
+        "local ok,msg=pcall(function()for u in iter do " &
+        "error('body')end end);" &
+        "T.alloccount();assert(not ok and msg=='not enough memory' " &
+        "and calls==1);local sum=0;for _,v in ipairs{1,2,3}do " &
+        "sum=sum+v end;assert(sum==6)");
+   end Iterator_Call_Refusal;
+
    procedure Finalizer_Frame_Refusal is
    begin
       --  Remove actual unused frames, forbid all growth, and require the
@@ -481,8 +496,55 @@ package body Lua.Conformance_Adapter_Tests is
         "assert(f:read('a')=='ok'); assert(f:close())", Platform => True);
    end Native_Pipe_Validation;
 
+   procedure Fixed_External (Name : String);
+   procedure Fixed_External (Name : String) is
+   begin
+      Check ("_FIXED_EXTERNAL_CASE='" & Name &
+             "';dofile('tests/lua/fixed_external_strings.lua')");
+   end Fixed_External;
+
+   procedure Fixed_Short_Binary;
+   procedure Fixed_Short_Binary is
+   begin
+      --  A short external payload retains its complete NUL-containing bytes
+      --  while its original caller-owned Lua value remains rooted.
+      Fixed_External ("Short_Binary");
+   end Fixed_Short_Binary;
+
+   procedure Fixed_Long_Borrow;
+   procedure Fixed_Long_Borrow is
+   begin
+      --  A dynamic long payload stays borrowed through collection and table
+      --  key lookup. The caller uses the original again after the collection.
+      Fixed_External ("Long_Borrow");
+   end Fixed_Long_Borrow;
+
+   procedure Fixed_Child_State;
+   procedure Fixed_Child_State is
+   begin
+      --  The real separately created state's T module exposes the same C
+      --  driver. Remote publication copies the result before child closure.
+      Fixed_External ("Child_State");
+   end Fixed_Child_State;
+
+   procedure Fixed_Invalid_Type;
+   procedure Fixed_Invalid_Type is
+   begin
+      --  The actual auxiliary string check rejects a table and permits a
+      --  healthy next call; this must not become a Lua-only T facade.
+      Fixed_External ("Invalid_Type");
+   end Fixed_Invalid_Type;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
+      Test_Support.Add (Suite, "fixed external: Short_Binary",
+                        Fixed_Short_Binary'Access);
+      Test_Support.Add (Suite, "fixed external: Long_Borrow",
+                        Fixed_Long_Borrow'Access);
+      Test_Support.Add (Suite, "fixed external: Child_State",
+                        Fixed_Child_State'Access);
+      Test_Support.Add (Suite, "fixed external: Invalid_Type",
+                        Fixed_Invalid_Type'Access);
       Test_Support.Add (Suite, "adapter: real C userdata export",
                         Userdata'Access);
       Test_Support.Add (Suite, "adapter: actual collector color",
@@ -526,6 +588,8 @@ package body Lua.Conformance_Adapter_Tests is
                         Corrupt_Heap_Edge'Access);
       Test_Support.Add (Suite, "allocator: Lua restores persistent refusal",
                         Refusal_Reset'Access);
+      Test_Support.Add (Suite, "allocator: iterator call refusal recovers",
+                        Iterator_Call_Refusal'Access);
       Test_Support.Add (Suite, "finalizer: Lua frame refusal and later retry",
                         Finalizer_Frame_Refusal'Access);
       Test_Support.Add (Suite, "finalizer: Lua stack refusal and later retry",

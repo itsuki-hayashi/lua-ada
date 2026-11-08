@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "kind": "target-source-equivalent",
+  "id": "locals-dead-table-storage",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": "references/lua/testes/locals.lua",
+  "source_sha256": "56b5126c40f48bb1a701f041af28cd72a3a7d50b3db9b05da5659f2485f740c1",
+  "configuration": "upstream-test",
+  "disposition": "ada-internal-equivalent",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "original_required_obligations": [
+    "LUA-LOCALS-INTERNAL-REFERENCE-0001",
+    "LUA-LOCALS-ASSERT-CALL-0023"
+  ],
+  "feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/locals-dead-table-storage.independent-feature-review.json",
+    "sha256": "110246c59dbb2765133b718b24aa3256cd7457b5286fa4a0878b6a152a812f91",
+    "scope": "Feature-only dated decision; implementation/source drift requires separate independent exact review."
+  },
+  "counterpart_source_snapshot": {
+    "repository_revision": "228f95aacbacade6de36477d902ebcbc749fcef4",
+    "bindings": [
+      {
+        "path": "tests/lua/table_storage_public.lua",
+        "sha256": "4e7c949594d81e29b4f065485ab6dd7060a88c68392a63acd4fef00dc6ba8838"
+      },
+      {
+        "path": "tests/lua/table_storage_private.lua",
+        "sha256": "9a4bc32f8a2dd37863c4f7e702f8600a8da8a7f7d887a829aa4ba9f6f3dd9576"
+      },
+      {
+        "path": "tests/src/lua-conformance_adapter.ads",
+        "sha256": "f845a5e1b2f79a5c21b8be8840bf250ff758130dc14c0d9c345cb4d4ffb71b21"
+      },
+      {
+        "path": "tests/src/lua-conformance_adapter.adb",
+        "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3"
+      },
+      {
+        "path": "tests/src/lua-engine-table_storage_probe.ads",
+        "sha256": "67d9cb92e436c029c76f85e25ce8f8528ceea01265ae384ef33d50b51e687ab2"
+      },
+      {
+        "path": "tests/src/lua-engine-table_storage_probe.adb",
+        "sha256": "a30f62f83f16307ed0180de33dc80c61a03dd5e455a000880ab5eb9ca1933579"
+      },
+      {
+        "path": "tests/src/lua-table_storage_inspection_tests.adb",
+        "sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+      },
+      {
+        "path": "tests/src/table_storage_public_tests.adb",
+        "sha256": "d72e02ad4a62b20a5809ed08c098dfea032e02f5b3c9ac9faf97e4e379c58d0c"
+      },
+      {
+        "path": "src/lua-engine-collector.adb",
+        "sha256": "d803883a7f07c8a3ecfa082b7c7c6addc72d29cde65ee35a149002ac6541ff8a"
+      },
+      {
+        "path": "src/lua-engine-tables.adb",
+        "sha256": "31db4043d6b387c08b61a2ff6f6197d9a5495626200d67cf56cfad66f0821173"
+      },
+      {
+        "path": "src/lua-engine.ads",
+        "sha256": "0c9512c28952853f142ed36596977872fe0fe98073c181c7685d0329e2a84cfe"
+      },
+      {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/locals-dead-table-storage.independent-feature-review.json",
+        "sha256": "110246c59dbb2765133b718b24aa3256cd7457b5286fa4a0878b6a152a812f91"
+      },
+      {
+        "path": "src/lua-engine.adb",
+        "sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409"
+      },
+      {
+        "path": "references/lua/manual/manual.of",
+        "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+      },
+      {
+        "path": "src/lua-engine-machine.adb",
+        "sha256": "133d61789e04563a487848a8e2d02519e3cbc0788dad0b980928192b18082326"
+      },
+      {
+        "path": "src/lua-engine-stacks.adb",
+        "sha256": "f2c4291ac27d842a2e0e5b454871ae0e422f5d8c5941103927974d295318a69d"
+      },
+      {
+        "path": "src/lua-engine-canonical.adb",
+        "sha256": "8cc932f984e66265dfa8b9c60da299e73d77c8cf52566ffc46190a641a1d22b2"
+      },
+      {
+        "path": "src/lua-canonical_compiler.adb",
+        "sha256": "afd7c271850015208d5f302735ba5a7feb2cb2a6263ff3daecd033c1039f761c"
+      },
+      {
+        "path": "tests/src/lua-table_storage_inspection_tests.ads",
+        "sha256": "882397a1afd8d1024353b82d402f478a7718d07cee9cc0f4d1cf07a702820a43"
+      },
+      {
+        "path": "tests/src/table_storage_public_tests.ads",
+        "sha256": "acd25837f1d39ca66fe6b89eaa705a358d4b869f6b85aede063cb10460fae77e"
+      },
+      {
+        "path": "scripts/ConformanceLocalsEquivalent.psm1",
+        "sha256": "a3363efad92b7618fb868d17b6690fb18310807aded27ff9b7283a9d1e3b94c9"
+      },
+      {
+        "path": "scripts/ConformanceReviewedSources.psm1",
+        "sha256": "38b45f13b88f62e019d475154b058afdeaffe987d7d7636dfa82b591fb2cb2ac"
+      },
+      {
+        "path": "tests/src/lua-conformance_memory.adb",
+        "sha256": "c003fa691b5a9ab4f889092553ed296247bd162df1c33ea6923c72e1a24ec199"
+      },
+      {
+        "path": "tests/lua/scalar_closing_refusal.lua",
+        "sha256": "b08301ac199b9ce078e42ed5f6a6412c5f7de958364a4fdc855c54c13de9f0c4"
+      },
+      {
+        "path": "tests/lua/scalar_closing_mutation.lua",
+        "sha256": "528b004311b9437af50ddce6236fbe0bcbc5f0be3229b52fc67d7695e9244c6d"
+      },
+      {
+        "path": "tests/src/lua-scalar_closing_tests.ads",
+        "sha256": "17632802344a1007b2d129312e181bc8c59f334e947cbc8f90145f7d2b808092"
+      },
+      {
+        "path": "tests/src/lua-scalar_closing_tests.adb",
+        "sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+      },
+      {
+        "path": "tests/src/lua-closing_prefix_tests.adb",
+        "sha256": "fe38bd2588cd8756fbfbdfa9e4c8f9a8486bb3b42598211481c37ca08fe4dd80"
+      },
+      {
+        "path": "tests/src/lua-execution_retirement_tests.adb",
+        "sha256": "c297fed1363222ae7f1d7c4d7af94d9d02da3e800d6988bdc73b8ab84dcabee5"
+      },
+      {
+        "path": "src/lua-engine-stacks.ads",
+        "sha256": "65db9cc1a5a87cba8c59bba21a5e4033c6fb817902e32ee29a38ce93c7d71398"
+      },
+      {
+        "path": "src/lua-engine-canonical.ads",
+        "sha256": "8dac74cfbbf410f7a53b31b0f6f14766916968353781b64e697d791975dd49ce"
+      },
+      {
+        "path": "src/lua-engine-machine.ads",
+        "sha256": "87b122e678df3b2ada80209bf90c523fb4f5082eac0e8392b280af4237ae8049"
+      },
+      {
+        "path": "tests/src/lua-conformance_memory.ads",
+        "sha256": "e9bb3c35566fa8e6a30ee9437f0622476f3f1efc7792ca0efddd4c44211f2dd7"
+      },
+      {
+        "path": "tests/src/lua-closing_prefix_tests.ads",
+        "sha256": "79cb35726b1d5edaf3746eb7d4f61e32639540bdc4790054a49695d83a094eac"
+      },
+      {
+        "path": "tests/src/lua-execution_retirement_tests.ads",
+        "sha256": "51d5861ee67f06e925d592e1364ec2d46b9e433e807f5869a147b61be9859fc7"
+      },
+      {
+        "path": "tests/src/lua-storage-conformance.ads",
+        "sha256": "bdee8486b34f92fa01941740e2a5ccbabaf232881ed2d9e082bbc8ce3355bd08"
+      },
+      {
+        "path": "tests/src/lua-storage-conformance.adb",
+        "sha256": "b72933c54a580fba2bca39cddad6f8168a497d450287aefe279bc54e6a49ac1b"
+      },
+      {
+        "path": "tests/src/lua-conformance_allocator.ads",
+        "sha256": "8ab6a36234b62f121496a5b32d602039520a62355145400996653ae4ee64fee1"
+      },
+      {
+        "path": "tests/src/lua-conformance_allocator.adb",
+        "sha256": "c5f0347be0e16db96e1d93d7fb7aa4a3ac316fdc7efc3355d8d19f591b548b36"
+      }
+    ],
+    "pending_owner_guard_and_resetCI_changes_not_included": false,
+    "binding_schema_version": 2
+  },
+  "replacements": [
+    {
+      "id": "observe-original-object-key-and-live-entries",
+      "start_byte": 2355,
+      "length_bytes": 26,
+      "source_sha256": "04035d9ee038af9e7f37506bbf2f8c5ae6917c7ecd8de5a99c5205551cd00bc6",
+      "replacement": "  local watched = setmetatable({}, {__mode = 'v'})\n  for key in pairs(a) do\n    if type(key) == 'table' then watched[1] = key end\n  end\n  local checked_rows, live = T.ada_check_table_storage(a)\n  assert(math.type(checked_rows) == 'integer' and checked_rows >= 0)\n  assert(math.type(live) == 'integer' and live >= 0)\n  assert(live == 4 and type(watched[1]) == 'table')\n",
+      "invariant": "Observe original four nonnil entries and anonymous collectable key using actual Ada storage plus a public weak-value table; no C geometry.",
+      "counterpart_tests": [
+        "tests/lua/table_storage_public.lua",
+        "tests/lua/table_storage_private.lua",
+        "tests/src/lua-conformance_adapter.ads",
+        "tests/src/lua-conformance_adapter.adb",
+        "tests/src/lua-engine-table_storage_probe.ads",
+        "tests/src/lua-engine-table_storage_probe.adb",
+        "tests/src/lua-table_storage_inspection_tests.adb",
+        "tests/src/table_storage_public_tests.adb",
+        "src/lua-engine-collector.adb",
+        "src/lua-engine-tables.adb",
+        "src/lua-engine.ads",
+        "tests/conformance/targets/remaining-upstream-compatibility/reviews/locals-dead-table-storage.independent-feature-review.json",
+        "src/lua-engine.adb",
+        "references/lua/manual/manual.of",
+        "src/lua-engine-machine.adb",
+        "src/lua-engine-stacks.adb",
+        "src/lua-engine-canonical.adb",
+        "src/lua-canonical_compiler.adb",
+        "tests/src/lua-table_storage_inspection_tests.ads",
+        "tests/src/table_storage_public_tests.ads",
+        "scripts/ConformanceLocalsEquivalent.psm1",
+        "scripts/ConformanceReviewedSources.psm1",
+        "tests/src/lua-conformance_memory.adb",
+        "tests/lua/scalar_closing_refusal.lua",
+        "tests/lua/scalar_closing_mutation.lua",
+        "tests/src/lua-scalar_closing_tests.ads",
+        "tests/src/lua-scalar_closing_tests.adb",
+        "tests/src/lua-closing_prefix_tests.adb",
+        "tests/src/lua-execution_retirement_tests.adb",
+        "src/lua-engine-stacks.ads",
+        "src/lua-engine-canonical.ads",
+        "src/lua-engine-machine.ads",
+        "tests/src/lua-conformance_memory.ads",
+        "tests/src/lua-closing_prefix_tests.ads",
+        "tests/src/lua-execution_retirement_tests.ads",
+        "tests/src/lua-storage-conformance.ads",
+        "tests/src/lua-storage-conformance.adb",
+        "tests/src/lua-conformance_allocator.ads",
+        "tests/src/lua-conformance_allocator.adb"
+      ]
+    },
+    {
+      "id": "inspect-deleted-table-storage-and-key-reclamation",
+      "start_byte": 2490,
+      "length_bytes": 110,
+      "source_sha256": "00b85ae4732a06e844c82cd987ba31de93c22d726a4cbd18f3914cf8fde5f628",
+      "replacement": "  local checked_rows, live = T.ada_check_table_storage(a)\n  assert(math.type(checked_rows) == 'integer' and checked_rows >= 0)\n  assert(math.type(live) == 'integer' and live >= 0)\n  assert(live == 0 and watched[1] == nil and next(a) == nil)\n",
+      "invariant": "After the unchanged deletion and full collection, verify actual table storage and zero logical entries plus original object-key reclamation. Preserve every following insertion failure/retry byte.",
+      "counterpart_tests": [
+        "tests/lua/table_storage_public.lua",
+        "tests/lua/table_storage_private.lua",
+        "tests/src/lua-conformance_adapter.ads",
+        "tests/src/lua-conformance_adapter.adb",
+        "tests/src/lua-engine-table_storage_probe.ads",
+        "tests/src/lua-engine-table_storage_probe.adb",
+        "tests/src/lua-table_storage_inspection_tests.adb",
+        "tests/src/table_storage_public_tests.adb",
+        "src/lua-engine-collector.adb",
+        "src/lua-engine-tables.adb",
+        "src/lua-engine.ads",
+        "tests/conformance/targets/remaining-upstream-compatibility/reviews/locals-dead-table-storage.independent-feature-review.json",
+        "src/lua-engine.adb",
+        "references/lua/manual/manual.of",
+        "src/lua-engine-machine.adb",
+        "src/lua-engine-stacks.adb",
+        "src/lua-engine-canonical.adb",
+        "src/lua-canonical_compiler.adb",
+        "tests/src/lua-table_storage_inspection_tests.ads",
+        "tests/src/table_storage_public_tests.ads",
+        "scripts/ConformanceLocalsEquivalent.psm1",
+        "scripts/ConformanceReviewedSources.psm1",
+        "tests/src/lua-conformance_memory.adb",
+        "tests/lua/scalar_closing_refusal.lua",
+        "tests/lua/scalar_closing_mutation.lua",
+        "tests/src/lua-scalar_closing_tests.ads",
+        "tests/src/lua-scalar_closing_tests.adb",
+        "tests/src/lua-closing_prefix_tests.adb",
+        "tests/src/lua-execution_retirement_tests.adb",
+        "src/lua-engine-stacks.ads",
+        "src/lua-engine-canonical.ads",
+        "src/lua-engine-machine.ads",
+        "tests/src/lua-conformance_memory.ads",
+        "tests/src/lua-closing_prefix_tests.ads",
+        "tests/src/lua-execution_retirement_tests.ads",
+        "tests/src/lua-storage-conformance.ads",
+        "tests/src/lua-storage-conformance.adb",
+        "tests/src/lua-conformance_allocator.ads",
+        "tests/src/lua-conformance_allocator.adb"
+      ]
+    }
+  ],
+  "output_sha256": "54481f4b2c760ef1f8efd747706a3e6eb02553f582e15210aaaab6ec72c448d8",
+  "review": {
+    "author": "Codex /root",
+    "reviewer": null,
+    "status": "pending",
+    "artifact": null,
+    "artifact_sha256": null
+  },
+  "integration_status": "Pending independent exact review of closing binding schema2:39 committed source paths at228f95a, runtime698ebe5. Exact two source operations/output unchanged. Later public diagnostic Machine/Core/Table changes are not included. No current source approval, adapted source emission or runtime acceptance.",
+  "synthetic_fixture": false,
+  "draft_provenance": {
+    "author": "Codex /root",
+    "original_draft_sha256": "332c372e6c1e0a6b1660bf678141972e6c12164b0d5db46b8835469711598d85",
+    "revision_author": "Codex /root/remaining_suite",
+    "revision_scope": "Explicit integer/nonnegative checks for both actual counts, bounded validator/generator guards and current-source snapshots. Original Root draft authorship remains recorded.",
+    "independent_exact_review": "Accepted exact source-only decision by Codex /root/validation_delivery, distinct from original Root and revision Suite authors; current Machine binding inspected separately. Dated pending author proposal preserved.",
+    "binding_successor_author": "Codex /root/validation_delivery",
+    "binding_successor_scope": "Mechanical committed source capture and explicit checker/control/declaration graph; original and revision source authors remain unchanged. New independent exact review required."
+  }
+}

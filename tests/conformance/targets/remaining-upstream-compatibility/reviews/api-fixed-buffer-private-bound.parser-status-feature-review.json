@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "kind": "t-private-bound-feature-review",
+  "reviewer": "Codex /root",
+  "author": "Codex /root/validation_delivery",
+  "exclusion_id": "LUA-API-REVIEWED-BLOCK-9001",
+  "decision": "accepted",
+  "review_date": "2026-11-08",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "t_dominance": "Pinned api.lua returns before this block when T is absent; this exclusion applies only to upstream-test.",
+  "private_invariant": "Only the exact 18-byte upper allocation-delta conjunct at byte17053 is private; the original mixed assertion is retained and required.",
+  "third_party_irrelevance": "The pinned lua_load contract permits avoiding internal copies but promises no400-byte allocation delta. Memory use is observable; its exact implementation allocation footprint is not a public compatibility obligation.",
+  "feature_review": {
+    "retained_behaviors": [
+      "original mixed assertion remains required and must execute positive allocation growth",
+      "caller retains fixed buffer while loaded code can use it",
+      "reader supplies complete contiguous aligned fixed block and malformed/truncated blocks remain rejected",
+      "allocation refusal remains catchable with retry and balanced ownership cleanup",
+      "X and Y execute with original results and literal type/value",
+      "counted chunk debug source and actual error at line301 remain required"
+    ],
+    "counterpart_source_bindings": [
+      {
+        "sha256": "f8d056b921b31b72566978aed8a19226ce06029c81bd349d0c2051c5b92e2c0c",
+        "path": "c_api/tests/load_dump_contract.h"
+      },
+      {
+        "sha256": "d30c069655d43c095937c916250670b1ec245a6bc51ee7c40ea7158978942a4c",
+        "path": "src/lua-inputs.ads"
+      },
+      {
+        "sha256": "8b681ec3b245bbcd6ac41d20b2260ff25039111b816c7c50feed140518d9844f",
+        "path": "src/lua-chunks.ads"
+      },
+      {
+        "sha256": "f799c90c42236fb22561a83de2a38460044ed57421ea1509a1249c9bf25d079f",
+        "path": "src/lua-chunks.adb"
+      },
+      {
+        "sha256": "93c98589d51546968f8ff84a435f792df5759e70cb57aba93bfecc750b33759f",
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-public.lua"
+      }
+    ],
+    "public_contract_source": {
+      "source_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+      "path": "references/lua/manual/manual.of",
+      "byte_offset": 128635,
+      "anchor_sha256": "5d1e9dce562b304cd7dfb28c8d74a54edcc38fb8204f86ac49006e7228592b6f",
+      "byte_length": 558
+    },
+    "rationale": "Independently reread the original api.lua fixed-buffer block, pinned lua_load fixed-buffer contract, current Inputs/Chunks contracts and decoder, and the relevant retained public-reader C tests plus the complete predecessor delta. Recomputed every original named test-body span and reconstructed the complete previous header by removing only the new parser-depth helper and its two dispatch calls. All28 existing named test bodies and all other previous bytes are unchanged. The two appended status/recovery witnesses neither remove nor relax fixed-buffer ownership, contiguous input, binary rejection, execution or failure recovery. The exact18-byte residual allocation upper bound remains an implementation footprint with no400-byte public guarantee. Preserve the positive growth assertion, original mixed parent, X/Y values/types, retained buffer lifetime and counted debug/error behavior. This new source decision renews only feature relevance against the committed header. It supplies no passing parent/file/runtime evidence and does not approve a successor transformation, composition or final matrix.",
+    "no_public_bound_guarantee": true,
+    "retained_parent_id": "LUA-API-ASSERT-CALL-0125",
+    "module_compatibility_obligation": false,
+    "module_observable": true,
+    "observation_kind": "private-resource-bound"
+  },
+  "review_scope": "New independent source-only feature decision for the committed parser-witness header delta; no inherited runtime or original-parent acceptance.",
+  "previous_feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json",
+    "sha256": "e2b2703a870b265b6505e68a7c8b1e52dc81c69f146c9442eb4fd6d1bdd93ab9"
+  },
+  "refresh_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api18-parser-status-binding-refresh.author-proposal.json",
+    "sha256": "338a8f525b94a887e61fdc8850a1aa3959209677c4e31238c4a3ed6fb2a031df"
+  },
+  "execution_evidence": [],
+  "binding_refresh": {
+    "previous_header_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989",
+    "current_header_sha256": "f8d056b921b31b72566978aed8a19226ce06029c81bd349d0c2051c5b92e2c0c",
+    "unchanged_named_test_bodies": 28,
+    "whole_predecessor_reconstructed": true,
+    "semantic_source_span_unchanged": true,
+    "retained_parent_required": true,
+    "reviewer": "Codex /root",
+    "author": "Codex /root/validation_delivery",
+    "decision": "accepted-feature-only"
+  }
+}

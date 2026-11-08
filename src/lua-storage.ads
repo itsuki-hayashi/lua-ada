@@ -20,8 +20,10 @@ private package Lua.Storage is
      with Convention => C;
    --  Lua allocator convention: null on refusal, preserving Block; a zero
    --  New_Size releases Block and returns null. Successful resizing preserves
-   --  min(Old_Size, New_Size) bytes. Callbacks must not raise exceptions or
-   --  reenter the same owner. Their address and Data must outlive the owner.
+   --  min(Old_Size, New_Size) bytes. When installed on an Owner, callbacks
+   --  must not raise exceptions or reenter that owner; their address/Data
+   --  outlive it. External strings transport this same C ABI to a separate
+   --  guarded release portal, which permits synchronous Lua API reentry.
 
    function Default_Allocator
      (Data, Block : System.Address;
@@ -111,6 +113,15 @@ private package Lua.Storage is
    procedure Release (Self : in out Owner; Block : in out System.Address);
    --  Release a valid block belonging to Self, clearing the caller's address.
    --  Null is harmless. A live block from another owner raises Program_Error.
+
+   procedure Release_Using
+     (Self : in out Owner; Block : in out System.Address;
+      Allocate : not null Allocation_Function; Data : System.Address);
+   --  Unlink/account exactly like Release, then call a retained compatible
+   --  provider. Auxiliary buffer publication captures its external payload
+   --  deallocator; later lua_setallocf must not retarget that callback.
+   --  Allocate/Data obey the same lifetime and non-reentry contract as the
+   --  selected provider, and must accept this block's recorded raw extent.
 
    type Allocation_Statistics is record
       Live_Blocks : Byte_Count := 0;

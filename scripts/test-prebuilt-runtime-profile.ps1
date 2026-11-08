@@ -4,7 +4,8 @@ param(
     [ValidateSet('development', 'validation', 'release')]
     [string] $Profile = 'validation',
     [ValidateSet('default', 'upstream-test')]
-    [string] $Configuration = 'upstream-test'
+    [string] $Configuration = 'upstream-test',
+    [ValidateSet('','remaining-upstream-compatibility')][string] $TargetPolicy = ''
 )
 
 Set-StrictMode -Version Latest
@@ -62,7 +63,7 @@ try {
     }
     Write-Output "PROFILE REGRESSION: root remembers $setupProfile; requested prebuilt image uses $Profile"
     & "$PSScriptRoot/check-core-image.ps1" -Profile $Profile -LibraryType $LibraryType `
-        -Configuration $Configuration -UseExistingRuntime
+        -Configuration $Configuration -UseExistingRuntime -TargetPolicy $TargetPolicy
     if ($LASTEXITCODE -ne 0) { throw 'Prebuilt profile consumer campaign failed' }
     $after = Get-RootProfile
     if ($after.generated -cne $Profile -or $after.remembered -cne $Profile) {

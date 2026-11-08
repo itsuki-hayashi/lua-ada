@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
 with Lua.Engine.Finalizers;
@@ -27,7 +26,7 @@ package body Lua.Finalizer_Runtime_Tests is
          --  selects production enrollment. Actual Lua calls/roots/protection
          --  are used; no callback or successful result is simulated.
          Assert (Execute (State, Before, "finalizer-setup"),
-                 To_String (State.Current.Failure_Text));
+                 Failure_Image (State.Current));
          Begin_Operation (State);
          Key := New_String (State, "candidate");
          Item := Get (Global_Environment (State), Key);
@@ -48,7 +47,7 @@ package body Lua.Finalizer_Runtime_Tests is
          end if;
          End_Operation (State);
          Assert (Execute (State, After, "finalizer-execution"),
-                 To_String (State.Current.Failure_Text));
+                 Failure_Image (State.Current));
          Assert (not State.Finalizer_Active and then
                    State.Finalizing_Object = null and then
                    State.Current.Finalizer_Hook_Suppression = 0 and then

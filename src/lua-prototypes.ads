@@ -98,6 +98,12 @@ private package Lua.Prototypes is
    --  arbitrary bounds/NULs; no unmanaged string copy is retained.
    function String_Count (Self : Program) return Natural;
    function String_Length (Self : Program; Id : String_Id) return Natural;
+   function String_Address
+     (Self : Program; Id : String_Id) return System.Address;
+   --  Borrow immutable managed bytes, including their trailing NUL. The
+   --  logical byte length still includes embedded NULs. Only a frozen owner
+   --  may publish this view: Intern/Close can invalidate it; Move preserves
+   --  it. Every intern entry, including an empty one, owns a terminator.
    function String_Element
      (Self : Program; Id : String_Id; Index : Positive) return Character;
    procedure Query_String

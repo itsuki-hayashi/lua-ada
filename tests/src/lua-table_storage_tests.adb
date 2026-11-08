@@ -1,5 +1,4 @@
 with Ada.Containers;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
 with Test_Support;
@@ -94,10 +93,12 @@ package body Lua.Table_Storage_Tests is
 
    procedure String_Keys (State : in out World) is
       Item : constant Value := New_Table (State);
-      First : constant Value := New_String (State, "a" & ASCII.NUL & "z");
-      Other : constant Value := New_String (State, "a" & ASCII.NUL & "z");
+      Text : constant String :=
+        "a" & ASCII.NUL & "z" & String'(1 .. 40 => 'p');
+      First : constant Value := New_String (State, Text);
+      Other : constant Value := New_String (State, Text);
    begin
-      --  Separate equal byte strings must share a hash bucket and binding.
+      --  Separate equal long byte strings share a hash bucket and binding.
       --  A zero byte is part of the key, not an option-string terminator.
       Assert (First.Reference /= Other.Reference, "fixture string identity");
       Set (State, Item, First, Int (42));
@@ -210,7 +211,7 @@ package body Lua.Table_Storage_Tests is
         "{__mode='k'}); a=nil; collectgarbage(); " &
         "assert(rawlen(weak)==0 and weak[2]==b); " &
         "assert(keys[b]==2); weak[1]=b; assert(#weak==2)", "weak-index"),
-        "weak indexes and border: " & To_String (State.Current.Failure_Text));
+        "weak indexes and border: " & Failure_Image (State.Current));
    end Weak_Index_Cleanup;
 
    procedure Deleted_Key_Churn (State : in out World) is

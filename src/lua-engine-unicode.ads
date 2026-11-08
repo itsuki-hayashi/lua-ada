@@ -1,4 +1,10 @@
+with Lua.Storage.Buffers;
+
 package Lua.Engine.Unicode is
+   procedure Emit
+     (Code : Natural; Text : in out Lua.Storage.Buffers.Buffer);
+   --  Append one extended UTF-8 code point through Text's managed owner.
+   --  @param Code Valid pinned UTF-8 range 0 .. 16#7FFF_FFFF#.
    Charpattern : constant String :=
      "[" & Character'Val (0) & "-" & Character'Val (16#7F#) &
      Character'Val (16#C2#) & "-" & Character'Val (16#FD#) & "][" &

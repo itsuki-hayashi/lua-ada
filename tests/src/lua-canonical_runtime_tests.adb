@@ -617,13 +617,14 @@ package body Lua.Canonical_Runtime_Tests is
         (State, "local function f(a,...v)" &
          "local name,value=debug.getlocal(1,2);" &
          "local i=debug.getinfo(1,'u');" &
-         "return name,value.n,value[1],i.nparams,i.isvararg end;" &
+         "return name,value,v[1],i.nparams,i.isvararg end;" &
          "return f(1,9)");
    begin
-      --  Named varargs are a real final parameter table with live debug
-      --  storage, while numparams still counts only the fixed parameters.
+      --  Read-only indexed varargs keep their named debug slot nil, as in
+      --  the pinned native compiler. The hidden arguments still serve GETVARG,
+      --  and numparams counts only the fixed parameters.
       Assert (Image (Packet (1)) = "v" and then
-                Packet (2) = Value'(Integer_Kind, 1) and then
+                Packet (2).Kind = Nil_Kind and then
                 Packet (3) = Value'(Integer_Kind, 9) and then
                 Packet (4) = Value'(Integer_Kind, 1) and then
                 Packet (5) = Value'(Boolean_Kind, True),

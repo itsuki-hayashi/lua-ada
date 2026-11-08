@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "kind": "t-verifier-equivalent-review",
+  "equivalent_id": "memerr-verifier-allocation",
+  "semantic_sha256": "1b8802bef5a560c241b8f50f46b876db7621b25c31243e16634a79c90f2b5d69",
+  "reviewer": "Codex /root",
+  "decision": "accepted",
+  "synthetic_fixture": false,
+  "source_bound_rationale": "Reviewed the actual unchanged checkerr helper, its two application calls at37/41, T.alloccount reset behavior and the later testbytes/testalloc reset-before-verification design. Recomputed exact source/inserted output and all seven counterpart hashes via validator; independently compared every original source byte around the sole17-byte insertion. Applications still run under the actual active allocator refusal, deliver a false pcall status and original string error. Only the test helper verifier may allocate after the failure. The initial oversized request, limited table growth, original reset and all later6437 campaign bytes remain unchanged. Exact C test-verifier allocation timing is not a third-party module requirement. No source obligation is excluded, no application success is synthesized, and runtime/fault/recovery acceptance still requires actual observations.",
+  "application_refusal_preserved": true,
+  "status_message_assertion_preserved": true,
+  "original_reset_preserved": true,
+  "later_campaigns_preserved": true,
+  "no_source_exclusions": true,
+  "runtime_acceptance": false,
+  "coverage_authority": false
+}

@@ -25,6 +25,23 @@ package body Lua.Number_Storage_Tests is
    procedure Extreme_Classification_Without_Growth;
    procedure Allocator_Refusal_And_Recovery;
    procedure Bounded_String_Work_And_Recovery;
+   procedure Comma_Decimal_Explicit;
+   procedure Dot_Fallback_Under_Comma_Point;
+   procedure Hexadecimal_Comma_Rounding;
+   procedure Mixed_Separator_Rejected;
+   procedure Repeated_Separator_Rejected;
+   procedure Explicit_Base_Rejects_Separator;
+   procedure Default_Parser_Rejects_Comma;
+   procedure Alternate_Point_Retry_Limit;
+
+   procedure Check_Real_With_Point
+     (Memory : in out Owner; Source : String; Decimal_Point : Character;
+      Expected : Interfaces.Unsigned_64);
+   --  Parse with an explicit alternate radix byte in base-zero mode.
+   procedure Check_Invalid
+     (Memory : in out Owner; Source : String;
+      Base : Natural := 0; Decimal_Point : Character := '.');
+   --  Omitted arguments exercise the parser's default base and dot-only API.
 
    procedure Check_Real
      (Memory : in out Owner; Source : String;
@@ -42,6 +59,37 @@ package body Lua.Number_Storage_Tests is
       Assert (Statistics (Memory).Live_Blocks = 0,
               "numeric conversion retained temporary limbs");
    end Check_Real;
+
+   procedure Check_Real_With_Point
+     (Memory : in out Owner; Source : String; Decimal_Point : Character;
+      Expected : Interfaces.Unsigned_64)
+   is
+      Value : constant Lua.Numbers.Number :=
+        Lua.Number_Parsing.Read
+          (Source, Reference (Memory), 0, Decimal_Point);
+   begin
+      Assert (Value.Kind = Lua.Numbers.Real_Number and then
+              Bits (Value.Real_Item) = Expected,
+              "separator-selected conversion bits for " & Source);
+      Assert (Statistics (Memory).Live_Blocks = 0,
+              "separator-selected conversion retained temporary limbs");
+   end Check_Real_With_Point;
+
+   procedure Check_Invalid
+     (Memory : in out Owner; Source : String; Base : Natural := 0;
+      Decimal_Point : Character := '.')
+   is
+      Value : constant Lua.Numbers.Number :=
+        Lua.Number_Parsing.Read
+          (Source, Reference (Memory), Base, Decimal_Point);
+   begin
+      --  Rejections happen in the grammar, before any exact rational scratch,
+      --  so a rejected numeral must leave no live managed limb blocks behind.
+      Assert (Value.Kind = Lua.Numbers.Invalid,
+              "malformed separator numeral accepted: " & Source);
+      Assert (Statistics (Memory).Live_Blocks = 0,
+              "rejected numeral retained temporary limbs");
+   end Check_Invalid;
 
    procedure Shifted_Source is
       Memory : Owner;
@@ -184,6 +232,99 @@ package body Lua.Number_Storage_Tests is
               "numeric work exhaustion allowed subsequent execution");
    end Bounded_String_Work_And_Recovery;
 
+   procedure Comma_Decimal_Explicit is
+      Memory : Owner;
+   begin
+      --  Setup: the runtime supplies comma as the native radix byte.
+      --  Action: parse a plain and a negative comma numeral.
+      --  Expected: the exact binary64 values of 1.5 and -2.25.
+      --  Protects base-zero float mantissas accepting the selected separator.
+      Check_Real_With_Point (Memory, "1,5", ',', 16#3FF8_0000_0000_0000#);
+      Check_Real_With_Point (Memory, "-2,25", ',', 16#C002_0000_0000_0000#);
+   end Comma_Decimal_Explicit;
+
+   procedure Dot_Fallback_Under_Comma_Point is
+      Memory : Owner;
+   begin
+      --  Setup: comma is selected, but the ASCII dot must remain legal.
+      --  Action: parse 1.5 with comma as the selected separator.
+      --  Expected: the same 1.5 bits. Protects the locale-independent spelling
+      --  that Lua's own locale fallback also accepts.
+      Check_Real_With_Point (Memory, "1.5", ',', 16#3FF8_0000_0000_0000#);
+   end Dot_Fallback_Under_Comma_Point;
+
+   procedure Hexadecimal_Comma_Rounding is
+      Memory : Owner;
+   begin
+      --  Setup: comma is selected for hexadecimal mantissas.
+      --  Action: parse 0x1,8 and two exact halfway cases mirroring the dot
+      --  midpoint tests. Expected: 1.5, then the same even tie decisions.
+      --  Protects the selected point through exact hexadecimal rounding.
+      Check_Real_With_Point (Memory, "0x1,8", ',', 16#3FF8_0000_0000_0000#);
+      Check_Real_With_Point
+        (Memory, "0x1,00000000000008p0", ',', 16#3FF0_0000_0000_0000#);
+      Check_Real_With_Point
+        (Memory, "0x1,00000000000018p0", ',', 16#3FF0_0000_0000_0002#);
+   end Hexadecimal_Comma_Rounding;
+
+   procedure Mixed_Separator_Rejected is
+      Memory : Owner;
+   begin
+      --  Setup: comma is selected, so either byte may appear once as a point.
+      --  Action: put the other byte after a fraction, in both orders.
+      --  Expected: Invalid. Protects against accepting two radix characters.
+      Check_Invalid (Memory, "1.5,5", 0, ',');
+      Check_Invalid (Memory, "1,5.5", 0, ',');
+   end Mixed_Separator_Rejected;
+
+   procedure Repeated_Separator_Rejected is
+      Memory : Owner;
+   begin
+      --  Setup: comma is selected and a second point of either kind follows.
+      --  Action: parse repeated decimal and hexadecimal separators.
+      --  Expected: Invalid. Protects the single-point grammar.
+      Check_Invalid (Memory, "1,5,5", 0, ',');
+      Check_Invalid (Memory, "1.5.5", 0, ',');
+      Check_Invalid (Memory, "0x1,8,0p0", 0, ',');
+   end Repeated_Separator_Rejected;
+
+   procedure Explicit_Base_Rejects_Separator is
+      Memory : Owner;
+   begin
+      --  Setup: comma is selected while an explicit base is requested.
+      --  Action: parse fractions and a comma numeral in bases 10 and 16.
+      --  Expected: Invalid, because explicit-base grammar never has fractions.
+      --  Protects the unchanged explicit-base integer contract.
+      Check_Invalid (Memory, "1,5", 10, ',');
+      Check_Invalid (Memory, "1.5", 10, ',');
+      Check_Invalid (Memory, "1,8", 16, ',');
+   end Explicit_Base_Rejects_Separator;
+
+   procedure Default_Parser_Rejects_Comma is
+      Memory : Owner;
+   begin
+      --  Setup: call the private parser with its defaulted arguments only.
+      --  Action: parse comma decimal and comma hexadecimal numerals.
+      --  Expected: Invalid. Lexer, public Ada numeric parsing and every caller
+      --  that does not pass a native byte remain locale independent.
+      Check_Invalid (Memory, "1,5");
+      Check_Invalid (Memory, "0x1,8p0");
+   end Default_Parser_Rejects_Comma;
+
+   procedure Alternate_Point_Retry_Limit is
+      Memory : Owner;
+      Padding : constant String (1 .. 200) := [others => '0'];
+   begin
+      --  The C first conversion accepts an arbitrarily long native spelling,
+      --  but its dot retry refuses inputs above L_MAXLENNUM. Preserve that
+      --  observable distinction without allocating a transformed copy.
+      Check_Invalid (Memory, "1." & Padding, 0, ',');
+      Check_Real_With_Point
+        (Memory, "1," & Padding, ',', 16#3FF0_0000_0000_0000#);
+      Check_Real_With_Point
+        (Memory, "1." & Padding, '.', 16#3FF0_0000_0000_0000#);
+   end Alternate_Point_Retry_Limit;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "owned numbers: shifted source bounds",
@@ -204,5 +345,21 @@ package body Lua.Number_Storage_Tests is
                         Allocator_Refusal_And_Recovery'Access);
       Test_Support.Add (Suite, "owned numbers: bounded scan work recovery",
                         Bounded_String_Work_And_Recovery'Access);
+      Test_Support.Add (Suite, "owned numbers: explicit comma decimal",
+                        Comma_Decimal_Explicit'Access);
+      Test_Support.Add (Suite, "owned numbers: ordinary dot under comma",
+                        Dot_Fallback_Under_Comma_Point'Access);
+      Test_Support.Add (Suite, "owned numbers: hexadecimal comma rounding",
+                        Hexadecimal_Comma_Rounding'Access);
+      Test_Support.Add (Suite, "owned numbers: mixed separator rejected",
+                        Mixed_Separator_Rejected'Access);
+      Test_Support.Add (Suite, "owned numbers: repeated separator rejected",
+                        Repeated_Separator_Rejected'Access);
+      Test_Support.Add (Suite, "owned numbers: explicit base rejects comma",
+                        Explicit_Base_Rejects_Separator'Access);
+      Test_Support.Add (Suite, "owned numbers: default parser rejects comma",
+                        Default_Parser_Rejects_Comma'Access);
+      Test_Support.Add (Suite, "owned numbers: alternate point retry limit",
+                        Alternate_Point_Retry_Limit'Access);
    end Register;
 end Lua.Number_Storage_Tests;

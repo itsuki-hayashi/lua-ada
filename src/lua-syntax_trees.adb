@@ -1,6 +1,10 @@
 with Lua.Lexers; use Lua.Lexers;
+with Ada.Containers;
+with Ada.Characters.Handling;
+with Lua.Storage.Buffers;
 
 package body Lua.Syntax_Trees is
+   use type Ada.Containers.Count_Type;
    use type Lua.Syntax.Check_Status;
    use type Lua.Storage.Owner_Access;
 
@@ -37,7 +41,23 @@ package body Lua.Syntax_Trees is
       Limits : Lua.Syntax.Check_Limits;
       Memory : Lua.Storage.Owner_Access := null;
       Compatible_Global : Boolean :=
-        Lua.Runtime_Configuration.Compatible_Global)
+        Lua.Runtime_Configuration.Compatible_Global;
+      Compatible_Limits : Boolean := False)
+   is
+      Input : Lua.Inputs.Source;
+   begin
+      Input.Borrow (Source'Address, Source'Length);
+      Parse (Unit, Input, Name, Limits, Memory, Compatible_Global,
+             Compatible_Limits);
+   end Parse;
+
+   procedure Parse
+     (Unit : in out Compilation_Unit; Source : in out Lua.Inputs.Source;
+      Name : String; Limits : Lua.Syntax.Check_Limits;
+      Memory : Lua.Storage.Owner_Access := null;
+      Compatible_Global : Boolean :=
+        Lua.Runtime_Configuration.Compatible_Global;
+      Compatible_Limits : Boolean := False)
    is
       Selected : constant not null Lua.Storage.Owner_Access :=
         (if Memory /= null then Memory
@@ -67,7 +87,12 @@ package body Lua.Syntax_Trees is
         (Unit.Texts.Equal (Left, Right));
       function Matches (Left : Text_Ref; Right : String) return Boolean is
         (Unit.Texts.Equal (Left, Right));
-      procedure Error (Message : String; Resource : Boolean := False);
+      procedure Error
+        (Message : String; Resource : Boolean := False;
+         Incomplete : Boolean := False; Near_Token : Boolean := True;
+         At_Line : Positive := Current.After.Line);
+      function Expected_Name (Item : Token_Kind) return String;
+      function Line_Text (Line : Positive) return String;
       procedure Advance;
       function Peek return Token_Kind;
       function Take (Expected : Token_Kind) return Boolean;
@@ -81,9 +106,11 @@ package body Lua.Syntax_Trees is
         range Name_Reference .. Empty_Statement;
       function Make (What : Structural_Kind) return Node_Id;
       procedure Child (Parent, Item : Node_Id);
+      procedure Remember_End (Id : Node_Id);
       function New_Name
         (Name : Text_Ref; Mode : Attribute := Regular;
          Kind : Binding_Kind := Local_Name) return Symbol_Id;
+      procedure Check_Local_Limit (Pending : Natural);
       function Resolve
         (Name : Text_Ref; Environment : Boolean := False;
          Referenced : Text_Ref := Empty_Text)
@@ -107,7 +134,64 @@ package body Lua.Syntax_Trees is
       procedure Enter;
       procedure Leave;
 
-      procedure Error (Message : String; Resource : Boolean := False) is
+      function Line_Text (Line : Positive) return String is
+         Image : constant String := Line'Image;
+      begin
+         return Image (2 .. Image'Last);
+      end Line_Text;
+
+      function Expected_Name (Item : Token_Kind) return String is
+         Label : constant String := Token_Kind'Image (Item);
+      begin
+         --  Token names describe diagnostics, not another grammar. Keep the
+         --  fixed spellings from llex.c distinct from source identifiers.
+         if Item in And_Word .. While_Word then
+            return "'" & Ada.Characters.Handling.To_Lower
+              (Label (Label'First .. Label'Last - 5)) & "'";
+         end if;
+         return (case Item is
+            when End_Of_Input => "<eof>", when Identifier => "<name>",
+            when Integer_Literal => "<integer>",
+            when Float_Literal => "<number>",
+            when String_Literal => "<string>",
+            when Plus => "'+'", when Minus => "'-'", when Star => "'*'",
+            when Slash => "'/'", when Floor_Divide => "'//'",
+            when Percent => "'%'", when Power => "'^'", when Length => "'#'",
+            when Bit_And => "'&'", when Bit_Or => "'|'", when Bit_Xor => "'~'",
+            when Shift_Left => "'<<'", when Shift_Right => "'>>'",
+            when Equal => "'=='", when Not_Equal => "'~='",
+            when Less => "'<'", when Less_Equal => "'<='",
+            when Greater => "'>'", when Greater_Equal => "'>='",
+            when Assign => "'='", when Left_Paren => "'('",
+            when Right_Paren => "')'", when Left_Brace => "'{'",
+            when Right_Brace => "'}'", when Left_Bracket => "'['",
+            when Right_Bracket => "']'", when Semicolon => "';'",
+            when Colon => "':'", when Double_Colon => "'::'",
+            when Comma => "','", when Dot => "'.'",
+            when Concatenate => "'..'", when Lua.Lexers.Varargs => "'...'",
+            when others => "<symbol>");
+      end Expected_Name;
+
+      procedure Error
+        (Message : String; Resource : Boolean := False;
+         Incomplete : Boolean := False; Near_Token : Boolean := True;
+         At_Line : Positive := Current.After.Line)
+      is
+         Diagnostic : Lua.Storage.Buffers.Buffer;
+         Truncated : Boolean := False;
+         procedure Append_Text (Bytes : String);
+         procedure Append_Text (Bytes : String) is
+         begin
+            --  txtToken uses a C string: embedded NUL ends the diagnostic,
+            --  although the actual owned token retains every decoded byte.
+            for Byte of Bytes loop
+               if Byte = Character'Val (0) then
+                  Truncated := True;
+                  exit;
+               end if;
+               Diagnostic.Append (Byte);
+            end loop;
+         end Append_Text;
       begin
          --  Error text belongs to the same unit as the failing token. Only
          --  the public checking wrapper materializes a host diagnostic; an
@@ -115,9 +199,60 @@ package body Lua.Syntax_Trees is
          Unit.Result.Status :=
            (if Resource then Lua.Syntax.Resource_Error
             else Lua.Syntax.Syntax_Error);
-         Unit.Result.Error.Line := Current.After.Line;
+         --  Ordinary syntax errors use the scanned token's final line.
+         --  A completed semantic operation can explicitly retain its last
+         --  consumed token line instead of a later lookahead/EOF position.
+         Unit.Result.Error.Line := At_Line;
          Unit.Result.Error.Column := Here.Column;
-         Unit.Result.Error.Message := Own (Message);
+         Unit.Result.Incomplete_Input := Incomplete and then not Resource;
+         Diagnostic.Set_Owner (Selected);
+         Diagnostic.Append (Message);
+         if Near_Token and then not Resource then
+            Diagnostic.Append (" near ");
+            if Kind = End_Of_Input then
+               Diagnostic.Append ("<eof>");
+            elsif Kind = Byte_Symbol and then
+              Character'Pos (Source.Element (Here.Offset)) not in 32 .. 126
+            then
+               declare
+                  Code : constant String := Natural'Image
+                    (Character'Pos (Source.Element (Here.Offset)));
+               begin
+                  Diagnostic.Append ("'<\" & Code (2 .. Code'Last) & ">'");
+               end;
+            else
+               Diagnostic.Append (''');
+               if Kind = String_Literal then
+                  --  Quoted strings keep their delimiters in C's token
+                  --  buffer. Long strings keep the complete bracket level;
+                  --  borrow only those already-read delimiter bytes here.
+                  declare
+                     First : constant Character :=
+                       Source.Element (Here.Offset);
+                     Level : Natural := 1;
+                  begin
+                     if First = '[' then
+                        while Source.Element (Here.Offset + Level) = '='
+                        loop
+                           Level := Level + 1;
+                        end loop;
+                        Level := Level + 1;
+                     end if;
+                     Source.Query (Here.Offset, Level, Append_Text'Access);
+                     Unit.Texts.Query (Current.Text, Append_Text'Access);
+                     if not Truncated then
+                        Source.Query (Current.After.Offset - Level, Level,
+                                      Append_Text'Access);
+                     end if;
+                  end;
+               else
+                  Unit.Texts.Query (Current.Text, Append_Text'Access);
+               end if;
+               Diagnostic.Append (''');
+            end if;
+         end if;
+         Unit.Result.Error.Message :=
+           Lua.Frontend_Text.Store (Unit.Texts, Diagnostic);
          raise Abandon;
       end Error;
 
@@ -141,6 +276,7 @@ package body Lua.Syntax_Trees is
             Unit.Result.Error.Line := Step.Location.Line;
             Unit.Result.Error.Column := Step.Location.Column;
             Unit.Result.Error.Message := Step.Message;
+            Unit.Result.Incomplete_Input := Step.Incomplete_Input;
             raise Abandon;
          end if;
          return Step.Item;
@@ -180,7 +316,8 @@ package body Lua.Syntax_Trees is
       procedure Expect (Expected : Token_Kind) is
       begin
          if not Take (Expected) then
-            Error (Token_Kind'Image (Expected) & " expected");
+            Error (Expected_Name (Expected) & " expected",
+                   Incomplete => Kind = End_Of_Input);
          end if;
       end Expect;
 
@@ -229,11 +366,30 @@ package body Lua.Syntax_Trees is
          Value.Children.Append (Item);
       end Child;
 
+      procedure Remember_End (Id : Node_Id) is
+         Item : constant Nodes.Reference_Type :=
+           Unit.Tree.Reference (Positive (Id));
+      begin
+         --  Retain only consumed-token metadata. This brief borrow never
+         --  copies a node's input-sized lists or survives a tree append.
+         Item.End_Line := Last_Line;
+      end Remember_End;
+
       procedure Enter is
       begin
          Depth := Depth + 1;
          if Depth > Limits.Nesting then
-            Error ("syntax nesting limit exceeded", Resource => True);
+            --  Compatible execution still needs a finite parser stack. Its
+            --  ceiling rejects a chunk like Lua's parser stack check; it must
+            --  not escape load/pcall as an embedding host-policy abort.
+            --  Explicit checking/session quotas retain their typed resource
+            --  failure and are never made catchable by source code.
+            if Compatible_Limits then
+               Unit.Result.Stack_Overflow := True;
+               Error ("C stack overflow", Near_Token => False);
+            else
+               Error ("syntax nesting limit exceeded", Resource => True);
+            end if;
          end if;
       end Enter;
 
@@ -241,6 +397,39 @@ package body Lua.Syntax_Trees is
       begin
          Depth := Depth - 1;
       end Leave;
+
+      procedure Check_Local_Limit (Pending : Natural) is
+         Count : Natural := Pending;
+      begin
+         if Compatible_Limits then
+            --  Check completed declarations, after parsing their initializer
+            --  and before a later block terminator. A malformed initializer
+            --  must retain its earlier grammar failure. This is a safe lower
+            --  bound on register demand: possible compile-time constants are
+            --  deferred to the canonical compiler's authoritative Fold/Bind
+            --  classification instead of duplicating constant evaluation.
+            for Symbol of Active loop
+               declare
+                  Item : constant Binding := Unit.Names (Positive (Symbol));
+               begin
+                  if Item.Kind = Local_Name and then
+                    Item.Owner = Function_Node and then
+                    Symbol /= Unit.Environment and then
+                    Item.Mode /= Constant_Name
+                  then
+                     Count := Count + 1;
+                     exit when Count > 200;
+                  end if;
+               end;
+            end loop;
+            if Count > 200 then
+               Error ("too many local variables (limit is 200) in " &
+                 (if Function_Node = No_Node then "main function"
+                  else "function at line " &
+                    Line_Text (Fetch (Function_Node).Site.Line)));
+            end if;
+         end if;
+      end Check_Local_Limit;
 
       function New_Name
         (Name : Text_Ref; Mode : Attribute := Regular;
@@ -304,7 +493,7 @@ package body Lua.Syntax_Trees is
                   end loop;
                   if not Found then
                      Error ("variable '" & Image (Name) &
-                            "' not declared");
+                            "' not declared", Near_Token => False);
                   end if;
                end;
             end if;
@@ -315,7 +504,7 @@ package body Lua.Syntax_Trees is
             end if;
             if Environment then
                Error ("_ENV is global when accessing variable '" &
-                      Image (Referenced) & "'");
+                      Image (Referenced) & "'", Near_Token => False);
             end if;
             declare
                Env : constant Node_Id := Resolve
@@ -356,7 +545,7 @@ package body Lua.Syntax_Trees is
             Error ("assignment target expected");
          elsif Item.Kind = Name_Reference and then Item.Flag then
             Error ("attempt to assign to const variable '" &
-                   Image (Item.Text) & "'");
+                   Image (Item.Text) & "'", Near_Token => False);
          end if;
       end Writable;
 
@@ -377,7 +566,8 @@ package body Lua.Syntax_Trees is
             --  Retain the attribute spelling in the diagnostic. Attributes
             --  are contextual names, so an unknown one must not be reported
             --  as a general declaration failure (lparser.c:1807).
-            Error ("unknown attribute '" & Image (Name) & "'");
+            Error ("unknown attribute '" & Image (Name) & "'",
+                   Near_Token => False);
             return Regular;
          end if;
       end Get_Attribute;
@@ -389,6 +579,7 @@ package body Lua.Syntax_Trees is
             Child (Result, Expression);
             exit when not Take (Comma);
          end loop;
+         Remember_End (Result);
          return Result;
       end Expression_List;
 
@@ -441,7 +632,11 @@ package body Lua.Syntax_Trees is
          --  goto visibility, break targets, and vararg eligibility restart at
          --  each function boundary. Restore all parent context on success;
          --  failures discard the entire owned compilation unit.
-         Enter;
+         --  Compatible parsing charges the body block, like Lua's statement
+         --  recursion, without charging the same function boundary twice.
+         --  The standalone/bounded checker retains its original host-depth
+         --  accounting. Expression recursion has its own independent charge.
+         if not Compatible_Limits then Enter; end if;
          Function_Node := Result;
          Item.Site := Definition;
          Item.Target := Saved_Function;
@@ -472,6 +667,8 @@ package body Lua.Syntax_Trees is
                exit when not Take (Comma);
             end loop;
          end if;
+         Check_Local_Limit
+           (if Varargs and then Item.Symbol = No_Symbol then 1 else 0);
          Expect (Right_Paren);
          Item.Flag := Varargs;
          Save (Result, Item);
@@ -485,7 +682,7 @@ package body Lua.Syntax_Trees is
          Varargs := Saved_Varargs;
          Loop_Depth := Saved_Loops;
          Scope := Saved_Scope;
-         Leave;
+         if not Compatible_Limits then Leave; end if;
          return Result;
       end Function_Body;
 
@@ -505,9 +702,10 @@ package body Lua.Syntax_Trees is
             Child (Result, Expression);
             Expect (Right_Paren);
          else
-            Error ("expression expected");
+            Error ("unexpected symbol", Incomplete => Kind = End_Of_Input);
             return No_Node;
          end if;
+         Remember_End (Result);
          loop
             Method := False;
             if Take (Left_Bracket) then
@@ -554,13 +752,15 @@ package body Lua.Syntax_Trees is
                                           Value => Current, others => <>)));
                         Advance;
                      else
-                        Error ("function arguments expected");
+                        Error ("function arguments expected",
+                               Incomplete => Kind = End_Of_Input);
                      end if;
                      Child (Next, Args);
                   end;
                end if;
                Result := Next;
             end if;
+            Remember_End (Result);
          end loop;
          return Result;
       end Prefix;
@@ -628,6 +828,9 @@ package body Lua.Syntax_Trees is
               ((if Op in Power | Concatenate then Rank - 1 else Rank)));
             Result := Next;
          end loop;
+         --  Consumers can materialize a deferred expression later. Keep its
+         --  final consumed token rather than guessing from lookahead/source.
+         Remember_End (Result);
          Leave;
          return Result;
       end Expression;
@@ -651,9 +854,14 @@ package body Lua.Syntax_Trees is
                   then
                      for Id of Label.Active loop
                         if not Pending.Active.Contains (Id) then
-                           Error ("goto enters scope of '" &
+                           Error ("<goto " &
+                                    Image (Fetch (Pending.Item).Text) &
+                                    "> at line " & Line_Text
+                                      (Fetch (Pending.Item).Site.Line) &
+                                    " jumps into the scope of '" &
                                     Image (Unit.Names
-                                      (Positive (Id)).Name) & "'");
+                                      (Positive (Id)).Name) & "'",
+                                  Near_Token => False);
                         end if;
                      end loop;
                      Destination := Fetch (Pending.Item);
@@ -667,7 +875,10 @@ package body Lua.Syntax_Trees is
                if not Pending.Solved then
                   if Parent = 0 then
                      Error ("no visible label '" &
-                            Image (Fetch (Pending.Item).Text) & "'");
+                            Image (Fetch (Pending.Item).Text) &
+                            "' for <goto> at line " & Line_Text
+                              (Fetch (Pending.Item).Site.Line),
+                            Near_Token => False);
                   end if;
                   Pending.Block := Parent;
                   Pending.Active := Base;
@@ -688,6 +899,34 @@ package body Lua.Syntax_Trees is
          Parent : constant Natural := Scope;
          Was_Return : Boolean;
          Item : Node_Id;
+         First_Label : Natural := 0;
+         procedure Check_Label_Run;
+         procedure Check_Label_Run is
+            Current_Label : Node;
+         begin
+            --  Native labelstat finishes the following labels/semicolons
+            --  before checking this label. Preserve that semantic order with
+            --  a bounded run over existing metadata, not parser recursion.
+            --  Later run entries are already defined; earlier entries in the
+            --  same run are still pending. Earlier runs remain visible.
+            for Index in reverse First_Label .. Labels.Last_Index loop
+               Current_Label := Fetch (Labels (Index).Item);
+               for Previous in Labels.First_Index .. Labels.Last_Index loop
+                  if (Previous < First_Label or else Previous > Index) and then
+                    Labels (Previous).Owner = Function_Node and then
+                    Matches (Fetch (Labels (Previous).Item).Text,
+                             Current_Label.Text)
+                  then
+                     Error
+                       ("label '" & Image (Current_Label.Text) &
+                        "' already defined on line " & Line_Text
+                          (Fetch (Labels (Previous).Item).Site.Line),
+                        Near_Token => False, At_Line => Last_Line);
+                  end if;
+               end loop;
+            end loop;
+            First_Label := 0;
+         end Check_Label_Run;
       begin
          Enter;
          if Own_Scope then
@@ -700,6 +939,15 @@ package body Lua.Syntax_Trees is
             Was_Return := Kind = Return_Word;
             Item := Statement;
             Child (Result, Item);
+            if Fetch (Item).Kind = Label_Statement then
+               if First_Label = 0 then
+                  First_Label := Labels.Last_Index;
+               end if;
+               --  Statement has consumed intervening semicolons. Delay the
+               --  semantic check while another label follows: its own syntax
+               --  or lexical failure must take precedence over this duplicate.
+               if Kind /= Double_Colon then Check_Label_Run; end if;
+            end if;
             if Fetch (Item).Kind = Label_Statement and then
               Kind in End_Of_Input | End_Word | Else_Word | Elseif_Word
             then
@@ -760,6 +1008,7 @@ package body Lua.Syntax_Trees is
             Id := New_Name (Read_Name);
             Item.Symbols.Append (Id);
             Active.Append (Id);
+            Check_Local_Limit (0);
             Save (Result, Item);
             Child (Result, Function_Body (Definition));
             return Result;
@@ -767,7 +1016,8 @@ package body Lua.Syntax_Trees is
          Default := Get_Attribute;
          if Global and then Take (Star) then
             if Default = Closing_Name then
-               Error ("global variables cannot be to-be-closed");
+               Error ("global variables cannot be to-be-closed",
+                      Near_Token => False);
             end if;
             Id := New_Name (Empty_Text, Default, Collective_Name);
             Active.Append (Id);
@@ -782,9 +1032,14 @@ package body Lua.Syntax_Trees is
                Mode := Get_Attribute (Default);
                if Mode = Closing_Name then
                   if Global then
-                     Error ("global variables cannot be to-be-closed");
+                     Error ("global variables cannot be to-be-closed",
+                            Near_Token => False);
                   elsif Closing then
-                     Error ("multiple to-be-closed variables in local list");
+                     --  luaK_semerror attributes this completed declaration
+                     --  check to its last consumed name/attribute token, not
+                     --  a following comment, delimiter or EOF lookahead.
+                     Error ("multiple to-be-closed variables in local list",
+                            Near_Token => False, At_Line => Last_Line);
                   end if;
                   Closing := True;
                   Unit.Unsupported := Result;
@@ -804,6 +1059,38 @@ package body Lua.Syntax_Trees is
             end if;
             Child (Result, Expression_List);
          end if;
+         if not Global then
+            declare
+               Pending : Natural := Natural (Item.Symbols.Length);
+            begin
+               declare
+                  Actual : constant Nodes.Constant_Reference_Type :=
+                    Unit.Tree.Constant_Reference (Positive (Result));
+               begin
+                  --  Child appended to the owned node, not the earlier Item
+                  --  snapshot. Borrow that actual initializer list without
+                  --  copying its input-sized vectors or retaining a borrow
+                  --  across another node append.
+                  if not Actual.Children.Is_Empty then
+                     declare
+                        Initializers : constant Nodes.Constant_Reference_Type
+                          := Unit.Tree.Constant_Reference
+                            (Positive (Actual.Children (1)));
+                     begin
+                        if Initializers.Children.Length = Item.Symbols.Length
+                          and then Unit.Names
+                            (Positive (Item.Symbols.Last_Element)).Mode =
+                              Constant_Name
+                        then
+                           --  Defer actual foldability to the compiler.
+                           Pending := Pending - 1;
+                        end if;
+                     end;
+                  end if;
+               end;
+               Check_Local_Limit (Pending);
+            end;
+         end if;
          for Symbol of Item.Symbols loop
             Active.Append (Symbol);
          end loop;
@@ -817,7 +1104,6 @@ package body Lua.Syntax_Trees is
          Id : Symbol_Id;
          Value : Node;
          Method : Boolean := False;
-         Function_Site : Source_Location;
       begin
          if Take (Semicolon) then
             return Make (Empty_Statement);
@@ -837,18 +1123,23 @@ package body Lua.Syntax_Trees is
             and then Peek in Identifier | Less | Star | Function_Word)
          then
             Advance;
-            Function_Site := Here;
             if not Take (Function_Word) then
                return Declaration (Global => True);
             end if;
             Result := Make (Assignment);
             Value := Fetch (Result);
             Value.Flag := True;
+            --  globalfunc attributes its defining store to GLOBAL, even
+            --  when FUNCTION and the name occur on later source lines.
+            Value.Site := Site;
             Save (Result, Value);
             Id := New_Name (Current.Text, Kind => Global_Name);
             Active.Append (Id);
             Target := Resolve (Read_Name);
-            Item := Function_Body (Function_Site);
+            --  Unlike ordinary funcstat, globalfunc supplies the current
+            --  opening-parenthesis line as the child prototype's definition
+            --  line. Keep that separate from the declaration store above.
+            Item := Function_Body (Here);
             Child (Result, Target);
             Child (Result, Item);
          elsif Take (Function_Word) then
@@ -938,6 +1229,12 @@ package body Lua.Syntax_Trees is
                Expect (In_Word);
                Child (Result, Expression_List);
             end if;
+            declare
+               Header : constant Nodes.Reference_Type :=
+                 Unit.Tree.Reference (Positive (Result));
+            begin
+               Header.Header_Line := Here.Line;
+            end;
             Expect (Do_Word);
             for Symbol of Value.Symbols loop
                Active.Append (Symbol);
@@ -946,22 +1243,41 @@ package body Lua.Syntax_Trees is
             Child (Result, Block);
             Loop_Depth := Loop_Depth - 1;
             Active := Saved;
+            declare
+               Loop_Node : constant Nodes.Reference_Type :=
+                 Unit.Tree.Reference (Positive (Result));
+            begin
+               Loop_Node.End_Line := Here.Line;
+            end;
             Expect (End_Word);
          elsif Take (Return_Word) then
-            Result := Make (Return_Statement);
+            --  Take has already scanned the following token. Preserve the
+            --  keyword's original site, not the following end/EOF location.
+            --  The emitted return uses the final expression token, retained
+            --  separately below before an optional semicolon is consumed.
+            Result := Add
+              ((Kind => Return_Statement, Site => Site, others => <>));
             if Kind not in End_Of_Input | End_Word | Else_Word |
               Elseif_Word | Until_Word | Semicolon
             then
                Child (Result, Expression_List);
             end if;
+            declare
+               Return_Node : constant Nodes.Reference_Type :=
+                 Unit.Tree.Reference (Positive (Result));
+            begin
+               Return_Node.End_Line := Last_Line;
+            end;
             if Take (Semicolon) then
                null;
             end if;
-         elsif Take (Break_Word) then
+         elsif Kind = Break_Word then
             if Loop_Depth = 0 then
                Error ("break outside loop");
             end if;
-            Result := Make (Break_Statement);
+            Advance;
+            Result := Add
+              ((Kind => Break_Statement, Site => Site, others => <>));
          elsif Kind in Goto_Word | Double_Colon then
             declare
                Label : constant Boolean := Kind = Double_Colon;
@@ -970,19 +1286,15 @@ package body Lua.Syntax_Trees is
                Result := Make
                  ((if Label then Label_Statement else Goto_Statement));
                Value := Fetch (Result);
+               Value.Site := Site;
                Value.Text := Read_Name;
                Save (Result, Value);
                Unit.Unsupported := Result;
                if Label then
                   Expect (Double_Colon);
-                  for Previous of Labels loop
-                     if Previous.Owner = Function_Node and then
-                       Matches (Fetch (Previous.Item).Text, Value.Text)
-                     then
-                        Error ("label '" & Image (Value.Text) &
-                               "' already defined");
-                     end if;
-                  end loop;
+                  --  Block checks a complete no-op run in native definition
+                  --  order. Keep source-order records here for scope/goto
+                  --  resolution and the unchanged terminal-label handling.
                   Labels.Append
                     (Jump_Record'
                        (Result, Scope, Function_Node, Active, False));
@@ -1034,8 +1346,9 @@ package body Lua.Syntax_Trees is
       Unit.Texts.Clear;
       Unit.Result := (Status => Lua.Syntax.Success,
                       Error => (Source => Own (Name),
-                                others => <>));
-      if Source'Length > Limits.Source_Bytes then
+                                others => <>),
+                      Incomplete_Input => False, Stack_Overflow => False);
+      if Source.Available > Limits.Source_Bytes then
          Error ("source byte limit exceeded", Resource => True);
       end if;
       Unit.Tree.Clear;
@@ -1046,8 +1359,19 @@ package body Lua.Syntax_Trees is
       Unit.Environment := New_Name (Own ("_ENV"));
       Active.Append (Unit.Environment);
       Unit.Root := Block;
+      declare
+         Root : constant Nodes.Reference_Type :=
+           Unit.Tree.Reference (Positive (Unit.Root));
+      begin
+         --  The main function's implicit return belongs to its final consumed
+         --  token, not the final expression visited during lowering or the
+         --  EOF after trailing trivia. Retain the scanner's existing position
+         --  without copying the root's input-sized child list or rescanning.
+         --  Empty input keeps the initial line one, matching luaK_code's
+         --  ls.lastline when mainfunc closes without consuming TK_EOS.
+         Root.End_Line := Last_Line;
+      end;
       Expect (End_Of_Input);
-      pragma Unreferenced (Last_Line);
    exception
       when Abandon =>
          Unit.Tree.Clear;

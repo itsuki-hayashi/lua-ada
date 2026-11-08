@@ -1,9 +1,19 @@
 with Interfaces.C;
+with System;
 
 private package Lua.Platform_Numerics is
    pragma Linker_Options ("-lm");
    --  Carry the math dependency to static Ada consumers as well as shared
    --  builds. It cannot be inferred from this foreign symbol's declaration.
+
+   function Pointer_Text
+     (Pointer, Bytes : System.Address; Capacity : Interfaces.C.size_t;
+      Width, Left : Interfaces.C.int)
+      return Interfaces.C.size_t
+     with Import, Convention => C,
+          External_Name => "lua_ada_host_pointer_text";
+   --  Native bounded %p spelling only, including the host's null spelling.
+   --  No pointer is dereferenced and no Lua value or allocation is involved.
 
    function Divide (Left, Right : Interfaces.C.double)
                     return Interfaces.C.double

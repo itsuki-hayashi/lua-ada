@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-transform",
+  "id": "code-private-optimizer-v3",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": "references/lua/testes/code.lua",
+  "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+  "configuration": "upstream-test",
+  "replacements": [
+    {
+      "length_bytes": 143,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9001",
+      "start_byte": 800,
+      "replacement": "  -- target proposal excludes private constant-table layout inspection\n",
+      "id": "constant-table-inspection",
+      "source_sha256": "26aad09cfda55023d09d73d23353c892cb5e19ba423488629606efc828ddf3fd"
+    },
+    {
+      "length_bytes": 205,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9002",
+      "start_byte": 1808,
+      "replacement": "  -- target proposal excludes exact C optimizer instruction sequences\n",
+      "id": "opcode-sequence-inspection",
+      "source_sha256": "41b6d2b52bb8f3f0d16dc0cf595c5fd6a4ca1b124b16b1bef028a1dda5f27f6b"
+    },
+    {
+      "length_bytes": 239,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9003",
+      "start_byte": 2288,
+      "replacement": "  -- target proposal excludes equality of optimizer-specific instruction streams\n",
+      "id": "opcode-equality-inspection",
+      "source_sha256": "5b3ddc7feef1ddadfa4a18c2526a31ced0495324141bde683ac399700a67e762"
+    },
+    {
+      "length_bytes": 32,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9004",
+      "start_byte": 13327,
+      "replacement": "  -- target proposal excludes outer prototype constant-storage placement\n",
+      "id": "outer-constant-storage",
+      "source_sha256": "13c9570d19cf580345c831907370413a0a9b7c0c3d39f7b6660459373cd8e8af"
+    },
+    {
+      "length_bytes": 32,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9005",
+      "start_byte": 13359,
+      "replacement": "  -- target proposal excludes middle prototype constant-storage placement\n",
+      "id": "middle-constant-storage",
+      "source_sha256": "4b1b8301af5f0f06a693bc66df7fa421860fdf06c9821e447ae6d4af791d8907"
+    },
+    {
+      "length_bytes": 10,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9006",
+      "start_byte": 13587,
+      "replacement": "",
+      "id": "register-inspection-wrapper",
+      "source_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54"
+    },
+    {
+      "length_bytes": 79,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9007",
+      "start_byte": 13655,
+      "replacement": "  -- target proposal excludes physical MOVE-register numbering\n",
+      "id": "physical-move-registers",
+      "source_sha256": "120c5699b24c0b9102eded9963b92049e2d0f8213c5c43d77a64dc7dd3ecdac9"
+    },
+    {
+      "length_bytes": 175,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9008",
+      "start_byte": 14141,
+      "replacement": "  -- target proposal excludes the optimizer-specific SETLIST count\n",
+      "id": "setlist-instruction-count",
+      "source_sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6"
+    }
+  ],
+  "output_sha256": "676304c019ee3afe8796da7ddfaf8f14cba43c2c49332d96f19b3f4c84211fe0",
+  "exclusion_policy_sha256": null,
+  "author_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/code-optimizer-v3.policy.author-proposal.json",
+    "sha256": "3b8e94f9ceebd09e3897faf8c202fabd9385d146815ea6906612c4495fbad487"
+  },
+  "source_feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-current-feature-review.json",
+    "sha256": "6ab0b934dff237d1069df303c84d17eadbc7d9e6cfbab8634ee7eb5422a5083a"
+  },
+  "semantic_retention_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+    "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+  },
+  "policy_binding_status": "Pending independent exact policy review and final installed policy hash; neither diagnostics nor accepted replay may select this pending manifest.",
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "review": {
+    "status": "pending",
+    "author": "Codex /root/validation_delivery",
+    "reviewer": null,
+    "artifact": null,
+    "artifact_sha256": null
+  }
+}

@@ -1,12 +1,16 @@
 with Lua.Prototypes;
 with Lua.Chunks;
 with Lua.Storage.Buffers;
-with Ada.Characters.Handling;
 with Ada.Containers;
 with Ada.Strings.Fixed;
 with Interfaces;
+with Interfaces.C;
 with Lua.Engine.Patterns;
 with Lua.Engine.Formats;
+with Lua.Engine.Diagnostics;
+with Lua.Platform_Locales;
+with System;
+with System.Storage_Elements;
 
 package body Lua.Engine.Strings is
    package Managed renames Lua.Storage.Buffers;
@@ -16,9 +20,73 @@ package body Lua.Engine.Strings is
    use type Lua.Prototypes.Prototype_Access;
    use type Ada.Containers.Count_Type;
    use type Interfaces.Unsigned_64;
+   use type System.Address;
+   use type Interfaces.C.int;
+
+   function Locale_Less
+     (State : in out World; Left, Right : Byte_String) return Boolean
+   is
+      use System.Storage_Elements;
+      Zero : aliased constant Character := Character'Val (0);
+      A : constant System.Address :=
+        (if Left.Size = 0 then Zero'Address else Left.Address);
+      B : constant System.Address :=
+        (if Right.Size = 0 then Zero'Address else Right.Address);
+      A_Start, B_Start, A_End, B_End : Natural := 0;
+      Order : Interfaces.C.int;
+
+      procedure Charge (Count : Natural);
+      procedure Charge (Count : Natural) is
+      begin
+         if State.Policy = Bounded then
+            if Count > State.Bounds.Instructions - Natural'Min
+              (State.Steps, State.Bounds.Instructions)
+            then
+               Fail (State, "instruction limit exceeded", Resource => True);
+            end if;
+            State.Steps := State.Steps + Count;
+         end if;
+      end Charge;
+   begin
+      --  Charge the two inputs separately, without overflowing their combined
+      --  length. Native strcoll and our boundary scans borrow only already
+      --  rooted, NUL-terminated bytes; no managed safe point intervenes.
+      Charge (Left.Size);
+      Charge (Right.Size);
+      loop
+         Order := Lua.Platform_Locales.Collate
+           (A + Storage_Offset (A_Start), B + Storage_Offset (B_Start));
+         if Order /= 0 then
+            return Order < 0;
+         end if;
+         --  Equal native prefixes need not have equal byte lengths. Discover
+         --  each terminator independently and continue after embedded NULs;
+         --  a single C-string comparison would discard observable suffixes.
+         A_End := A_Start;
+         while A_End < Left.Size and then
+           Element (Left, A_End + 1) /= Character'Val (0)
+         loop
+            A_End := A_End + 1;
+         end loop;
+         B_End := B_Start;
+         while B_End < Right.Size and then
+           Element (Right, B_End + 1) /= Character'Val (0)
+         loop
+            B_End := B_End + 1;
+         end loop;
+         if B_End = Right.Size then
+            return False;
+         elsif A_End = Left.Size then
+            return True;
+         end if;
+         A_Start := A_End + 1;
+         B_Start := B_End + 1;
+      end loop;
+   end Locale_Less;
 
    function String_Argument
-     (State : in out World; Item : Value) return String
+     (State : in out World; Item : Value; Index : Natural := 0;
+      Present : Boolean := True) return String
    is
    begin
       if Item.Kind = String_Kind then
@@ -26,13 +94,18 @@ package body Lua.Engine.Strings is
       elsif Item.Kind in Integer_Kind | Real_Kind then
          return Image (State.Current.Memory, Item);
       end if;
+      if Index > 0 then
+         Diagnostics.Type_Error
+           (State, Positive (Index), "string", Item, Present);
+      end if;
       Fail (State, "string expected, got " & Type_Name (Item));
       return "";
    end String_Argument;
 
    procedure Query_Argument
      (State : in out World; Item : Value;
-      Process : not null access procedure (Text : String))
+      Process : not null access procedure (Text : String);
+      Index : Natural := 0; Present : Boolean := True)
    is
    begin
       if Item.Kind = String_Kind then
@@ -45,15 +118,20 @@ package body Lua.Engine.Strings is
       else
          --  Numeric conversion is bounded by the fixed Lua number widths.
          --  Type errors retain the same validation path as String_Argument.
-         Process (String_Argument (State, Item));
+         Process (String_Argument (State, Item, Index, Present));
       end if;
    end Query_Argument;
 
    function Integer_Argument
-     (State : in out World; Item : Value) return Integer_Value
+     (State : in out World; Item : Value; Index : Natural := 0;
+      Present : Boolean := True) return Integer_Value
    is
       Number : Lua.Numbers.Number;
    begin
+      if Index > 0 then
+         return Diagnostics.Integer_Argument
+           (State, Positive (Index), Item, Present);
+      end if;
       case Item.Kind is
          when Integer_Kind => return Item.Integer_Data;
          when Real_Kind =>
@@ -88,11 +166,10 @@ package body Lua.Engine.Strings is
       end if;
    end Relative_Position;
 
-   function Run
-     (State : in out World; Name : String; Arguments : Values.Vector)
-      return Values.Vector
+   procedure Run
+     (State : in out World; Name : String; Arguments : Values.Vector;
+      Result : in out Values.Vector)
    is
-      Result : Values.Vector := Owned_Values (State);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Arguments.Length) then Arguments (Index)
          else Nil_Value);
@@ -107,7 +184,7 @@ package body Lua.Engine.Strings is
       is
       begin
          return (if Arg (Index).Kind = Nil_Kind then Default else
-                   Integer_Argument (State, Arg (Index)));
+                   Integer_Argument (State, Arg (Index), Index));
       end Optional;
 
       procedure Work (Count : Natural := 1) is
@@ -164,7 +241,7 @@ package body Lua.Engine.Strings is
          if Arg (3).Kind = Nil_Kind then
             With_Separator ("");
          else
-            Query_Argument (State, Arg (3), With_Separator'Access);
+            Query_Argument (State, Arg (3), With_Separator'Access, Index => 3);
          end if;
       end Repeat_Text;
 
@@ -173,13 +250,16 @@ package body Lua.Engine.Strings is
          Result.Append (New_String (State, Text));
       end Return_String;
    begin
+      if Arguments'Address = Result'Address then
+         raise Program_Error with "string output aliases its inputs";
+      end if;
+      Result.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Result.Clear;
       if Name = "dump" then
-         if Arg (1).Kind not in Closure_Kind | Native_Closure_Kind |
-           Native_Kind_Value | Foreign_Function_Kind
+         if Arg (1).Kind /= Closure_Kind
          then
-            Fail (State, "bad argument #1 to 'dump' (function expected)");
-         elsif Arg (1).Kind /= Closure_Kind or else
-           Arg (1).Reference.Code.Canonical_Node = null
+            Diagnostics.Argument_Error (State, 1, "Lua function expected");
+         elsif Arg (1).Reference.Code.Canonical_Node = null
          then
             Fail (State, "unable to dump given function");
          end if;
@@ -196,9 +276,10 @@ package body Lua.Engine.Strings is
             Work (Bytes.Length);
             Result.Append (New_String (State, Bytes));
          end;
-         return Result;
+         return;
       elsif Name = "format" then
-         return Formats.Run (State, Arguments);
+         Result := Formats.Run (State, Arguments);
+         return;
       elsif Name = "char" then
          if Arguments.Length > Ada.Containers.Count_Type
            (State.Bounds.String_Bytes)
@@ -208,20 +289,25 @@ package body Lua.Engine.Strings is
          declare
             Text : Managed.Buffer;
             Number : Integer_Value;
+            Item : Value;
          begin
             Text.Set_Owner (Lua.Storage.Reference (State.Memory));
             Text.Reserve_Capacity (Natural (Arguments.Length));
             for Index in 1 .. Natural (Arguments.Length) loop
                Work;
-               Number := Integer_Argument (State, Arguments (Index));
+               --  A Value copy ends the vector's indexing borrow before an
+               --  argument failure can transfer/retire its real phase.
+               Item := Arguments (Index);
+               Number := Integer_Argument (State, Item, Index);
                if Number not in 0 .. 255 then
-                  Fail (State, "value out of range");
+                  Diagnostics.Argument_Error
+                    (State, Index, "value out of range");
                end if;
                Text.Append (Character'Val (Number));
             end loop;
             Result.Append (New_String (State, Text));
          end;
-         return Result;
+         return;
       end if;
       declare
          procedure Apply_Text (Text : String);
@@ -232,7 +318,15 @@ package body Lua.Engine.Strings is
             if Name = "len" then
                Result.Append (Value'(Integer_Kind, Size));
             elsif Name = "sub" or else Name = "byte" then
-               First := Relative_Position (Optional (2, 1), Text'Length);
+               --  sub requires its start, while byte defaults it to one.
+               --  Keep this distinction before optional end conversion;
+               --  an absent start is not the same value as an explicit nil.
+               First := Relative_Position
+                 ((if Name = "sub" then
+                      Integer_Argument
+                        (State, Arg (2), 2,
+                         Present => Natural (Arguments.Length) >= 2)
+                   else Optional (2, 1)), Text'Length);
                Last := Relative_Position
                  (Optional (3, (if Name = "sub" then -1 else Optional (2, 1))),
                   Text'Length);
@@ -264,21 +358,25 @@ package body Lua.Engine.Strings is
                      if Name = "reverse" then
                         Byte := Text (Text'Last - Index + 1);
                      elsif Name = "lower" then
-                        --  Lua's default locale is C, not Unicode/Latin-1.
-                        if Text (Index) in 'A' .. 'Z' then
-                           Byte := Ada.Characters.Handling.To_Lower
-                             (Text (Index));
-                        end if;
-                     elsif Text (Index) in 'a' .. 'z' then
-                        Byte := Ada.Characters.Handling.To_Upper
-                          (Text (Index));
+                        --  ctype is process locale state. Pass an unsigned
+                        --  byte so high-bit characters never become EOF or
+                        --  an invalid negative argument to the native bridge.
+                        Byte := Character'Val (Lua.Platform_Locales.Lower
+                          (Interfaces.C.unsigned_char
+                             (Character'Pos (Text (Index)))));
+                     else
+                        Byte := Character'Val (Lua.Platform_Locales.Upper
+                          (Interfaces.C.unsigned_char
+                             (Character'Pos (Text (Index)))));
                      end if;
                      Changed.Append (Byte);
                   end loop;
                   Result.Append (New_String (State, Changed));
                end;
             elsif Name = "rep" then
-               Count := Integer_Argument (State, Arg (2));
+               Count := Integer_Argument
+                 (State, Arg (2), 2,
+                  Present => Natural (Arguments.Length) >= 2);
                Repeat_Text (Text, Count);
             elsif Name in "find" | "match" then
                declare
@@ -343,15 +441,28 @@ package body Lua.Engine.Strings is
                      end if;
                   end Apply_Pattern;
                begin
-                  Query_Argument (State, Arg (2), Apply_Pattern'Access);
+                  Query_Argument
+                    (State, Arg (2), Apply_Pattern'Access, Index => 2,
+                     Present => Natural (Arguments.Length) >= 2);
                end;
             else
                Fail (State, "unknown string operation: " & Name);
             end if;
          end Apply_Text;
       begin
-         Query_Argument (State, Arg (1), Apply_Text'Access);
+         Query_Argument
+           (State, Arg (1), Apply_Text'Access, Index => 1,
+            Present => not Arguments.Is_Empty);
       end;
+   end Run;
+
+   function Run
+     (State : in out World; Name : String; Arguments : Values.Vector)
+      return Values.Vector
+   is
+      Result : Values.Vector := Owned_Values (State);
+   begin
+      Run (State, Name, Arguments, Result);
       return Result;
    end Run;
 end Lua.Engine.Strings;

@@ -7,6 +7,7 @@
 #include "../../references/lua/lua.h"
 #include "../../references/lua/lauxlib.h"
 #include "../../references/lua/llex.h"
+#include "../../references/lua/lapi.h"
 #include "../../references/lua/lstate.h"
 #include "../../references/lua/lstring.h"
 #include "../../references/lua/lzio.h"
@@ -41,6 +42,10 @@ static int scan(lua_State *L) {
   /* The source label must survive collections triggered by string scanning.
    * Keep it on the C frame's Lua stack, just like the anchor table. */
   lua_pushliteral(L, "=oracle");
+  /* Public C callbacks arrive unlocked. The private scanner, like the C
+   * parser, holds the runtime lock while entering the reader/collector.
+   * A scanner error transfers to lua_pcall's normal locked recovery path. */
+  lua_lock(L);
   luaX_setinput(L, ls, &stream, tsvalue(s2v(L->top.p - 1)),
                 zgetc(&stream));
   do {
@@ -59,6 +64,7 @@ static int scan(lua_State *L) {
     }
     putchar('\n');
   } while (token != TK_EOS);
+  lua_unlock(L);
   return 0;
 }
 /* Each batch case owns a fresh C state; scanner errors are caught before
@@ -79,7 +85,9 @@ static void run(const char *mode, const char *bytes, size_t length) {
     if (status == LUA_ERRSYNTAX)
       printf("ERROR %d\n", input.lexer.linenumber);
     else if (status) puts("RESOURCE");
+    lua_lock(L);
     luaZ_freebuffer(L, &input.buffer);
+    lua_unlock(L);
   } else {
     status = luaL_loadbufferx(L, bytes, length, "=oracle", "t");
     if (status) { const char *message = lua_tostring(L, -1); const char *colon = strchr(message, ':' ); if (status != LUA_ERRSYNTAX) puts("RESOURCE"); else printf("ERROR %ld\n", colon ? strtol(colon + 1, NULL, 10) : 0); }

@@ -1,0 +1,1842 @@
+{
+  "schema_version": 1,
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "review_status": "pending-independent-exact-review",
+  "independent_reviewer": null,
+  "authority_installation": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_snapshot": {
+    "revision": "c15b1eb16be8eb1509abb31ba8cf2098efd3ba90",
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+    "source": "references/lua/testes/code.lua",
+    "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663"
+  },
+  "feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-ten-source-feature-review.json",
+    "sha256": "a0a24b7ee5b8b8cecbe327afced993b44942c0bd93ee85601e09a3083e724635"
+  },
+  "semantic_retention_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+    "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+  },
+  "kind": "code-optimizer-v3-decomposition-author-proposal",
+  "original_ledger": {
+    "path": "tests/conformance/coverage/code.jsonl",
+    "sha256": "27231932dffbd450a7fbdabfbf0de2c9edafd4ab0bbaecf3a16457af98e5fd94",
+    "record_count": 51,
+    "records_unchanged": [
+      {
+        "id": "LUA-CODE-MANUAL-AUDIT-0001",
+        "kind": "manual-audit",
+        "byte_offset": 0,
+        "byte_length": 14715,
+        "line": 1,
+        "end_line": 505,
+        "anchor_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0001",
+        "kind": "conditional-guard",
+        "byte_offset": 83,
+        "byte_length": 2,
+        "line": 6,
+        "end_line": 6,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-SKIP-REPORT-0001",
+        "kind": "skip-report",
+        "byte_offset": 101,
+        "byte_length": 7,
+        "line": 7,
+        "end_line": 7,
+        "anchor_sha256": "2f77668a9dfbf8d5848b9eeb4a7145ca94c6ed9236e4a773f6dcafa5132b2f91",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0001",
+        "kind": "assert-call",
+        "byte_offset": 492,
+        "byte_length": 6,
+        "line": 21,
+        "end_line": 21,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0001",
+        "kind": "internal-reference",
+        "byte_offset": 812,
+        "byte_length": 7,
+        "line": 40,
+        "end_line": 40,
+        "anchor_sha256": "0f4f8500d5e3005e1445ef305004182f31d0c376f6be5b439dee17437d6e5d90",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0002",
+        "kind": "assert-call",
+        "byte_offset": 828,
+        "byte_length": 6,
+        "line": 41,
+        "end_line": 41,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0003",
+        "kind": "assert-call",
+        "byte_offset": 871,
+        "byte_length": 6,
+        "line": 43,
+        "end_line": 43,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0002",
+        "kind": "internal-reference",
+        "byte_offset": 1840,
+        "byte_length": 10,
+        "line": 93,
+        "end_line": 93,
+        "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0004",
+        "kind": "assert-call",
+        "byte_offset": 1953,
+        "byte_length": 6,
+        "line": 97,
+        "end_line": 97,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0005",
+        "kind": "assert-call",
+        "byte_offset": 1986,
+        "byte_length": 6,
+        "line": 99,
+        "end_line": 99,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0006",
+        "kind": "assert-call",
+        "byte_offset": 2136,
+        "byte_length": 6,
+        "line": 106,
+        "end_line": 106,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0003",
+        "kind": "internal-reference",
+        "byte_offset": 2294,
+        "byte_length": 10,
+        "line": 113,
+        "end_line": 113,
+        "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0004",
+        "kind": "internal-reference",
+        "byte_offset": 2314,
+        "byte_length": 10,
+        "line": 114,
+        "end_line": 114,
+        "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0007",
+        "kind": "assert-call",
+        "byte_offset": 2330,
+        "byte_length": 6,
+        "line": 115,
+        "end_line": 115,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0008",
+        "kind": "assert-call",
+        "byte_offset": 2500,
+        "byte_length": 6,
+        "line": 119,
+        "end_line": 119,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0009",
+        "kind": "assert-call",
+        "byte_offset": 3295,
+        "byte_length": 6,
+        "line": 153,
+        "end_line": 153,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0002",
+        "kind": "conditional-guard",
+        "byte_offset": 5041,
+        "byte_length": 2,
+        "line": 231,
+        "end_line": 231,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0003",
+        "kind": "conditional-guard",
+        "byte_offset": 5137,
+        "byte_length": 2,
+        "line": 234,
+        "end_line": 234,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0004",
+        "kind": "conditional-guard",
+        "byte_offset": 5237,
+        "byte_length": 2,
+        "line": 237,
+        "end_line": 237,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0005",
+        "kind": "conditional-guard",
+        "byte_offset": 5339,
+        "byte_length": 2,
+        "line": 240,
+        "end_line": 240,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0006",
+        "kind": "conditional-guard",
+        "byte_offset": 5463,
+        "byte_length": 2,
+        "line": 243,
+        "end_line": 243,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0007",
+        "kind": "conditional-guard",
+        "byte_offset": 5607,
+        "byte_length": 2,
+        "line": 248,
+        "end_line": 248,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0008",
+        "kind": "conditional-guard",
+        "byte_offset": 5707,
+        "byte_length": 2,
+        "line": 251,
+        "end_line": 251,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0009",
+        "kind": "conditional-guard",
+        "byte_offset": 5810,
+        "byte_length": 2,
+        "line": 254,
+        "end_line": 254,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0010",
+        "kind": "conditional-guard",
+        "byte_offset": 5915,
+        "byte_length": 2,
+        "line": 257,
+        "end_line": 257,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0011",
+        "kind": "conditional-guard",
+        "byte_offset": 6012,
+        "byte_length": 2,
+        "line": 260,
+        "end_line": 260,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0012",
+        "kind": "conditional-guard",
+        "byte_offset": 6119,
+        "byte_length": 2,
+        "line": 263,
+        "end_line": 263,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0013",
+        "kind": "conditional-guard",
+        "byte_offset": 6219,
+        "byte_length": 2,
+        "line": 266,
+        "end_line": 266,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0014",
+        "kind": "conditional-guard",
+        "byte_offset": 6328,
+        "byte_length": 2,
+        "line": 269,
+        "end_line": 269,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0010",
+        "kind": "assert-call",
+        "byte_offset": 6535,
+        "byte_length": 6,
+        "line": 277,
+        "end_line": 277,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0011",
+        "kind": "assert-call",
+        "byte_offset": 6655,
+        "byte_length": 6,
+        "line": 283,
+        "end_line": 283,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0012",
+        "kind": "assert-call",
+        "byte_offset": 6775,
+        "byte_length": 6,
+        "line": 289,
+        "end_line": 289,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0005",
+        "kind": "internal-reference",
+        "byte_offset": 11826,
+        "byte_length": 3,
+        "line": 403,
+        "end_line": 403,
+        "anchor_sha256": "03adb9c919aecd32ae7c33502b1d67d9875d06cf81b3935a1b70b3dcb5b91609",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0015",
+        "kind": "conditional-guard",
+        "byte_offset": 12038,
+        "byte_length": 2,
+        "line": 410,
+        "end_line": 410,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0016",
+        "kind": "conditional-guard",
+        "byte_offset": 12107,
+        "byte_length": 2,
+        "line": 411,
+        "end_line": 411,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-CONDITIONAL-GUARD-0017",
+        "kind": "conditional-guard",
+        "byte_offset": 12341,
+        "byte_length": 2,
+        "line": 419,
+        "end_line": 419,
+        "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0013",
+        "kind": "assert-call",
+        "byte_offset": 13246,
+        "byte_length": 6,
+        "line": 452,
+        "end_line": 452,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0014",
+        "kind": "assert-call",
+        "byte_offset": 13329,
+        "byte_length": 6,
+        "line": 455,
+        "end_line": 455,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0006",
+        "kind": "internal-reference",
+        "byte_offset": 13336,
+        "byte_length": 7,
+        "line": 455,
+        "end_line": 455,
+        "anchor_sha256": "0f4f8500d5e3005e1445ef305004182f31d0c376f6be5b439dee17437d6e5d90",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0015",
+        "kind": "assert-call",
+        "byte_offset": 13361,
+        "byte_length": 6,
+        "line": 456,
+        "end_line": 456,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0007",
+        "kind": "internal-reference",
+        "byte_offset": 13368,
+        "byte_length": 7,
+        "line": 456,
+        "end_line": 456,
+        "anchor_sha256": "0f4f8500d5e3005e1445ef305004182f31d0c376f6be5b439dee17437d6e5d90",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0008",
+        "kind": "internal-reference",
+        "byte_offset": 13587,
+        "byte_length": 10,
+        "line": 463,
+        "end_line": 463,
+        "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0016",
+        "kind": "assert-call",
+        "byte_offset": 13598,
+        "byte_length": 6,
+        "line": 463,
+        "end_line": 463,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0017",
+        "kind": "assert-call",
+        "byte_offset": 13679,
+        "byte_length": 6,
+        "line": 466,
+        "end_line": 466,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0018",
+        "kind": "assert-call",
+        "byte_offset": 13903,
+        "byte_length": 6,
+        "line": 471,
+        "end_line": 471,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0019",
+        "kind": "assert-call",
+        "byte_offset": 14120,
+        "byte_length": 6,
+        "line": 478,
+        "end_line": 478,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0009",
+        "kind": "internal-reference",
+        "byte_offset": 14169,
+        "byte_length": 10,
+        "line": 479,
+        "end_line": 479,
+        "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0020",
+        "kind": "assert-call",
+        "byte_offset": 14297,
+        "byte_length": 6,
+        "line": 482,
+        "end_line": 482,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0021",
+        "kind": "assert-call",
+        "byte_offset": 14501,
+        "byte_length": 6,
+        "line": 490,
+        "end_line": 490,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0022",
+        "kind": "assert-call",
+        "byte_offset": 14549,
+        "byte_length": 6,
+        "line": 492,
+        "end_line": 492,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      },
+      {
+        "id": "LUA-CODE-ASSERT-CALL-0023",
+        "kind": "assert-call",
+        "byte_offset": 14599,
+        "byte_length": 6,
+        "line": 494,
+        "end_line": 494,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending",
+        "disposition": "pending",
+        "invariant": null,
+        "configurations": [],
+        "evidence": [],
+        "review": null
+      }
+    ]
+  },
+  "private_children_pending": [
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9001",
+      "kind": "reviewed-block",
+      "byte_offset": 800,
+      "byte_length": 143,
+      "anchor_sha256": "26aad09cfda55023d09d73d23353c892cb5e19ba423488629606efc828ddf3fd",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Only the exact constant-pool-layout inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "line": 40,
+      "end_line": 44
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9002",
+      "kind": "reviewed-block",
+      "byte_offset": 1808,
+      "byte_length": 205,
+      "anchor_sha256": "41b6d2b52bb8f3f0d16dc0cf595c5fd6a4ca1b124b16b1bef028a1dda5f27f6b",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Only the exact opcode-sequence inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "line": 92,
+      "end_line": 99
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9003",
+      "kind": "reviewed-block",
+      "byte_offset": 2288,
+      "byte_length": 239,
+      "anchor_sha256": "5b3ddc7feef1ddadfa4a18c2526a31ced0495324141bde683ac399700a67e762",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Only the exact opcode-equality inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "line": 113,
+      "end_line": 120
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9004",
+      "kind": "reviewed-block",
+      "byte_offset": 13327,
+      "byte_length": 32,
+      "anchor_sha256": "13c9570d19cf580345c831907370413a0a9b7c0c3d39f7b6660459373cd8e8af",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Only the exact outer-constant-placement inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "line": 455,
+      "end_line": 455
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9005",
+      "kind": "reviewed-block",
+      "byte_offset": 13359,
+      "byte_length": 32,
+      "anchor_sha256": "4b1b8301af5f0f06a693bc66df7fa421860fdf06c9821e447ae6d4af791d8907",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Only the exact middle-constant-placement inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "line": 456,
+      "end_line": 456
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9006",
+      "kind": "reviewed-block",
+      "byte_offset": 13587,
+      "byte_length": 10,
+      "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Only the exact private-register-inspection-wrapper inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "line": 463,
+      "end_line": 463
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9007",
+      "kind": "reviewed-block",
+      "byte_offset": 13655,
+      "byte_length": 79,
+      "anchor_sha256": "120c5699b24c0b9102eded9963b92049e2d0f8213c5c43d77a64dc7dd3ecdac9",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Only the exact physical-register-numbering inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "line": 465,
+      "end_line": 467
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9008",
+      "kind": "reviewed-block",
+      "byte_offset": 14141,
+      "byte_length": 175,
+      "anchor_sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Only the exact constructor-opcode-count inspection of private C optimizer representation is proposed for exclusion; it remains observable and supplies no required public compatibility promise. All linked public contracts remain required.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "line": 479,
+      "end_line": 482
+    }
+  ],
+  "required_semantic_nodes_pending": [
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9011",
+      "kind": "reviewed-block",
+      "contract_id": "compile-original",
+      "byte_offset": 0,
+      "byte_length": 800,
+      "anchor_sha256": "dd62fe1e3e31ffbee79ffc6072c2cd4dc3d1af3949357c9fe4b7ecb8dd5b9e8d",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Compile every original retained function/expression and execute the complete derived file under its real T guard; intentionally invalid/infinite optimizer-only bodies need not be called. This whole-source audit cannot be excluded.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "source_exclusion_eligible": false,
+      "retained_original_fragments": [
+        {
+          "byte_offset": 0,
+          "byte_length": 800,
+          "anchor_sha256": "dd62fe1e3e31ffbee79ffc6072c2cd4dc3d1af3949357c9fe4b7ecb8dd5b9e8d"
+        },
+        {
+          "byte_offset": 943,
+          "byte_length": 865,
+          "anchor_sha256": "e996247887974758b121239fe3855782408ac9782e59ef230b492f5fdb1073be"
+        },
+        {
+          "byte_offset": 2013,
+          "byte_length": 275,
+          "anchor_sha256": "645dd6c07121f408a89a90eab6d4fce44ea5df88e331f0a01cf6e9df6f298d4f"
+        },
+        {
+          "byte_offset": 2527,
+          "byte_length": 10800,
+          "anchor_sha256": "c40f3ba91df834e65e6b92e7635699831fb858fa7bd215943a4080dec2a9d5f4"
+        },
+        {
+          "byte_offset": 13391,
+          "byte_length": 196,
+          "anchor_sha256": "53da621608f6388020831b947dd03f3bac0a37509d71e34559a0032e64f1f20b"
+        },
+        {
+          "byte_offset": 13597,
+          "byte_length": 58,
+          "anchor_sha256": "db9b8b1e4af81585970c44b463d207185df4e98fb9df7a4f0a1da21bb8c682e5"
+        },
+        {
+          "byte_offset": 13734,
+          "byte_length": 407,
+          "anchor_sha256": "75a48787cc82b127a6d8cc0508a8f5d514435b952c0c10ce695c4c1ac830f97d"
+        },
+        {
+          "byte_offset": 14316,
+          "byte_length": 399,
+          "anchor_sha256": "07dffb4529bd267fe31138a4c4cf1e12d626163aa7e47ae82965622ddbb9e17e"
+        }
+      ],
+      "required_actual_observations": {
+        "whole_derived_file": true,
+        "unchanged_native_t_file": true,
+        "paired_public_fixture": "code-public-semantics",
+        "paired_public_fixture_configurations": [
+          "default",
+          "upstream-test"
+        ],
+        "named_aunit_cases": [
+          "tests/src/code_public_semantic_tests.adb#F_Zero",
+          "tests/src/code_public_semantic_tests.adb#I_Captured_Zero",
+          "tests/src/code_public_semantic_tests.adb#I_Zero_Floor",
+          "tests/src/code_public_semantic_tests.adb#K_Reciprocal",
+          "tests/src/code_public_semantic_tests.adb#K_Power",
+          "tests/src/code_public_semantic_tests.adb#K_Negative_Power",
+          "tests/src/code_public_semantic_tests.adb#F_Floor",
+          "tests/src/code_public_semantic_tests.adb#I_Modulo",
+          "tests/src/code_public_semantic_tests.adb#F_Division",
+          "tests/src/code_public_semantic_tests.adb#F_Floor_Modulo",
+          "tests/src/code_public_semantic_tests.adb#I_Bitwise_Mixed",
+          "tests/src/code_public_semantic_tests.adb#I_Bitwise_Not",
+          "tests/src/code_public_semantic_tests.adb#I_Bitwise_Float",
+          "tests/src/code_public_semantic_tests.adb#I_Shifts",
+          "tests/src/code_public_semantic_tests.adb#Integer_Borders",
+          "tests/src/code_public_semantic_tests.adb#Float_Borders",
+          "tests/src/code_public_semantic_tests.adb#Maximum_Integer",
+          "tests/src/code_public_semantic_tests.adb#Minimum_Integer",
+          "tests/src/code_public_semantic_tests.adb#Negative_Hex",
+          "tests/src/code_public_semantic_tests.adb#Nested_Constants",
+          "tests/src/code_public_semantic_tests.adb#Callback_Sequence",
+          "tests/src/code_public_semantic_tests.adb#Assignment_Sequence",
+          "tests/src/code_public_semantic_tests.adb#Constructor_49",
+          "tests/src/code_public_semantic_tests.adb#Constructor_50",
+          "tests/src/code_public_semantic_tests.adb#Constructor_51",
+          "tests/src/code_public_semantic_tests.adb#Return_Zero",
+          "tests/src/code_public_semantic_tests.adb#Return_One_Nil",
+          "tests/src/code_public_semantic_tests.adb#Return_Multiple",
+          "tests/src/code_public_semantic_tests.adb#Register_Load"
+        ],
+        "all29_named_public_cases_still_required": true,
+        "selected_owner_cleanup": "actual zero bytes/blocks, shutdown complete and no accounting fault",
+        "evidence_status": "pending-fresh-final-image"
+      },
+      "line": 1,
+      "end_line": 39
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9012",
+      "kind": "reviewed-block",
+      "contract_id": "numeric-values-types-arity",
+      "byte_offset": 2079,
+      "byte_length": 127,
+      "anchor_sha256": "324530f639ef49280bcc33a77b56351c3369cdfd13290c63934071985bb880dc",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Every original numeric expression retains exact value, integer/float kind and one-result cardinality before/after actual dump/load where specified.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "source_exclusion_eligible": false,
+      "retained_original_fragments": [
+        {
+          "byte_offset": 2079,
+          "byte_length": 127,
+          "anchor_sha256": "324530f639ef49280bcc33a77b56351c3369cdfd13290c63934071985bb880dc"
+        },
+        {
+          "byte_offset": 6802,
+          "byte_length": 39,
+          "anchor_sha256": "a605a18241a2114bb5ca899a94fbb6dc32b432709cbbd76deb42989a44b58983"
+        },
+        {
+          "byte_offset": 6842,
+          "byte_length": 36,
+          "anchor_sha256": "5119d999b48d41c9ecaaa9331ff06233a50c857cc20efcbe24c3e71f4b45b017"
+        },
+        {
+          "byte_offset": 6879,
+          "byte_length": 40,
+          "anchor_sha256": "f190d00245c62a01c45e0e5fdee70889750cacea13e51c87dfbe93798649be94"
+        },
+        {
+          "byte_offset": 6920,
+          "byte_length": 40,
+          "anchor_sha256": "7a5b2a68fda112ac5f0250a37d2453b3edb2964d2dd9abf17e3a5b2520031d87"
+        },
+        {
+          "byte_offset": 6961,
+          "byte_length": 55,
+          "anchor_sha256": "79e14d7c5562a7d69c17c0c6995419f1205f4e0326b6b54f3ebbd12d2667821b"
+        },
+        {
+          "byte_offset": 7017,
+          "byte_length": 63,
+          "anchor_sha256": "94be38b889e803aa7c2a0269c23fef1e5ff12db8b07d6c79de22c32967d74e2c"
+        },
+        {
+          "byte_offset": 7081,
+          "byte_length": 54,
+          "anchor_sha256": "87b7de9ae15fac9809bfc6eae42d95c23b6c1f7fc41a9a58cdb86f47a91374ab"
+        },
+        {
+          "byte_offset": 7136,
+          "byte_length": 41,
+          "anchor_sha256": "4596cbe2d490ecc0cd022d4ac3325f7a03ea12b445e6780feab940178e0408cd"
+        },
+        {
+          "byte_offset": 7178,
+          "byte_length": 69,
+          "anchor_sha256": "3f35c031d65e7c11b5bc1b9b8a03e4c39722fea0337f0828fe1cec5801878491"
+        },
+        {
+          "byte_offset": 7248,
+          "byte_length": 68,
+          "anchor_sha256": "0b0d677975c008fa9ff8b3580a74449760df7dfc843aa57ee082dc57e7bcdefd"
+        },
+        {
+          "byte_offset": 7317,
+          "byte_length": 66,
+          "anchor_sha256": "80ac6d617a048c34eff0ceb45274a678200ead9132d60883dba8dfa03764608e"
+        },
+        {
+          "byte_offset": 7384,
+          "byte_length": 49,
+          "anchor_sha256": "ac0759ecf9d15a19fd39be6464abfff90129ac2d5cbfa668eb35e05bdb2c28a0"
+        },
+        {
+          "byte_offset": 7434,
+          "byte_length": 47,
+          "anchor_sha256": "d933fd41036efd399caf7e7db2ea4f1caa41ab0015c2cbda395890e9b52a3081"
+        },
+        {
+          "byte_offset": 7482,
+          "byte_length": 60,
+          "anchor_sha256": "e9d5da980aed5ff2857e7c0002953212433fa306697caccefde72fd0d54dba70"
+        },
+        {
+          "byte_offset": 7544,
+          "byte_length": 704,
+          "anchor_sha256": "3fc0861274703a6845adf0c0b0443fd7904aca262b778897082d5ea5c3cbb4fa"
+        },
+        {
+          "byte_offset": 14322,
+          "byte_length": 379,
+          "anchor_sha256": "f6dd0aa36fed19d80783f231789e891cffdc8fa02887b679284b765f76fe5752"
+        }
+      ],
+      "required_actual_observations": {
+        "whole_derived_file": true,
+        "unchanged_native_t_file": true,
+        "paired_public_fixture": "code-public-semantics",
+        "paired_public_fixture_configurations": [
+          "default",
+          "upstream-test"
+        ],
+        "named_aunit_cases": [
+          "tests/src/code_public_semantic_tests.adb#F_Zero",
+          "tests/src/code_public_semantic_tests.adb#I_Captured_Zero",
+          "tests/src/code_public_semantic_tests.adb#I_Zero_Floor",
+          "tests/src/code_public_semantic_tests.adb#K_Reciprocal",
+          "tests/src/code_public_semantic_tests.adb#K_Power",
+          "tests/src/code_public_semantic_tests.adb#K_Negative_Power",
+          "tests/src/code_public_semantic_tests.adb#F_Floor",
+          "tests/src/code_public_semantic_tests.adb#I_Modulo",
+          "tests/src/code_public_semantic_tests.adb#F_Division",
+          "tests/src/code_public_semantic_tests.adb#F_Floor_Modulo",
+          "tests/src/code_public_semantic_tests.adb#I_Bitwise_Mixed",
+          "tests/src/code_public_semantic_tests.adb#I_Bitwise_Not",
+          "tests/src/code_public_semantic_tests.adb#I_Bitwise_Float",
+          "tests/src/code_public_semantic_tests.adb#I_Shifts",
+          "tests/src/code_public_semantic_tests.adb#Integer_Borders",
+          "tests/src/code_public_semantic_tests.adb#Float_Borders",
+          "tests/src/code_public_semantic_tests.adb#Maximum_Integer",
+          "tests/src/code_public_semantic_tests.adb#Minimum_Integer",
+          "tests/src/code_public_semantic_tests.adb#Negative_Hex"
+        ],
+        "all29_named_public_cases_still_required": true,
+        "selected_owner_cleanup": "actual zero bytes/blocks, shutdown complete and no accounting fault",
+        "evidence_status": "pending-fresh-final-image"
+      },
+      "line": 104,
+      "end_line": 108
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9013",
+      "kind": "reviewed-block",
+      "contract_id": "callback-sequence",
+      "byte_offset": 1204,
+      "byte_length": 203,
+      "anchor_sha256": "609188d1173ee93b9afa1edcef50cd785e53911233e8b08de356a31e68a8c809",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Invoke the actual eight numeric expressions in original order; a public callback observes one argument each, exact +/-100000 values and alternating integer/float kinds. The caller itself returns zero values.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "source_exclusion_eligible": false,
+      "retained_original_fragments": [
+        {
+          "byte_offset": 1204,
+          "byte_length": 203,
+          "anchor_sha256": "609188d1173ee93b9afa1edcef50cd785e53911233e8b08de356a31e68a8c809"
+        }
+      ],
+      "required_actual_observations": {
+        "whole_derived_file": true,
+        "unchanged_native_t_file": true,
+        "paired_public_fixture": "code-public-semantics",
+        "paired_public_fixture_configurations": [
+          "default",
+          "upstream-test"
+        ],
+        "named_aunit_cases": [
+          "tests/src/code_public_semantic_tests.adb#Callback_Sequence"
+        ],
+        "all29_named_public_cases_still_required": true,
+        "selected_owner_cleanup": "actual zero bytes/blocks, shutdown complete and no accounting fault",
+        "evidence_status": "pending-fresh-final-image"
+      },
+      "line": 60,
+      "end_line": 69
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9014",
+      "kind": "reviewed-block",
+      "contract_id": "assignment-sequence",
+      "byte_offset": 1488,
+      "byte_length": 186,
+      "anchor_sha256": "ee4a79426257d96fd55037b8f6cbc544a8d64d7da46f120aec5963c118ec4543",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Execute all fourteen original assignment expressions in order. An absent-key __newindex recorder observes actual receiver/key/value arguments, expected numeric values and alternating integer/float kinds. It does not store into the receiver, so no assignment bypasses the callback.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "source_exclusion_eligible": false,
+      "retained_original_fragments": [
+        {
+          "byte_offset": 1488,
+          "byte_length": 186,
+          "anchor_sha256": "ee4a79426257d96fd55037b8f6cbc544a8d64d7da46f120aec5963c118ec4543"
+        }
+      ],
+      "required_actual_observations": {
+        "whole_derived_file": true,
+        "unchanged_native_t_file": true,
+        "paired_public_fixture": "code-public-semantics",
+        "paired_public_fixture_configurations": [
+          "default",
+          "upstream-test"
+        ],
+        "named_aunit_cases": [
+          "tests/src/code_public_semantic_tests.adb#Assignment_Sequence"
+        ],
+        "all29_named_public_cases_still_required": true,
+        "selected_owner_cleanup": "actual zero bytes/blocks, shutdown complete and no accounting fault",
+        "evidence_status": "pending-fresh-final-image"
+      },
+      "line": 75,
+      "end_line": 83
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9015",
+      "kind": "reviewed-block",
+      "contract_id": "retained-checkR",
+      "byte_offset": 2079,
+      "byte_length": 127,
+      "anchor_sha256": "324530f639ef49280bcc33a77b56351c3369cdfd13290c63934071985bb880dc",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Execute unchanged127-byte checkR, including actual f(p), expected value and numeric type assertions; it remains in the full original-argument source workload.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "source_exclusion_eligible": false,
+      "retained_original_fragments": [
+        {
+          "byte_offset": 2079,
+          "byte_length": 127,
+          "anchor_sha256": "324530f639ef49280bcc33a77b56351c3369cdfd13290c63934071985bb880dc"
+        }
+      ],
+      "required_actual_observations": {
+        "whole_derived_file": true,
+        "unchanged_native_t_file": true,
+        "paired_public_fixture": "code-public-semantics",
+        "paired_public_fixture_configurations": [
+          "default",
+          "upstream-test"
+        ],
+        "named_aunit_cases": [],
+        "all29_named_public_cases_still_required": true,
+        "selected_owner_cleanup": "actual zero bytes/blocks, shutdown complete and no accounting fault",
+        "evidence_status": "pending-fresh-final-image"
+      },
+      "line": 104,
+      "end_line": 108
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9016",
+      "kind": "reviewed-block",
+      "contract_id": "safe-return-cardinality",
+      "byte_offset": 948,
+      "byte_length": 208,
+      "anchor_sha256": "0f017a4b9d94b858fa3e5334741a4bbbb8bbc3d1abe473b60fdaafd69e5268d4",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Require exactly zero, exactly one nil and four ordered integer/nil/float/nil values before and after actual dump/load; do not execute intentionally invalid/infinite opcode-only closures.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "source_exclusion_eligible": false,
+      "retained_original_fragments": [
+        {
+          "byte_offset": 948,
+          "byte_length": 208,
+          "anchor_sha256": "0f017a4b9d94b858fa3e5334741a4bbbb8bbc3d1abe473b60fdaafd69e5268d4"
+        },
+        {
+          "byte_offset": 3374,
+          "byte_length": 48,
+          "anchor_sha256": "58999c13182341efde4a2b1decdd8d1b02cf0826d98db9919cf48898d138c99e"
+        },
+        {
+          "byte_offset": 13956,
+          "byte_length": 185,
+          "anchor_sha256": "b3bd59b46a7e0946dc86f20240e7b0e3145c5dde99b937abdc0d5661ab9da178"
+        },
+        {
+          "byte_offset": 14316,
+          "byte_length": 3,
+          "anchor_sha256": "361e48d0308f20e32dba5fb56328baf18d72ef0ccb43b84f5c262d2a6a1fc6c8"
+        }
+      ],
+      "required_actual_observations": {
+        "whole_derived_file": true,
+        "unchanged_native_t_file": true,
+        "paired_public_fixture": "code-public-semantics",
+        "paired_public_fixture_configurations": [
+          "default",
+          "upstream-test"
+        ],
+        "named_aunit_cases": [
+          "tests/src/code_public_semantic_tests.adb#Return_Zero",
+          "tests/src/code_public_semantic_tests.adb#Return_One_Nil",
+          "tests/src/code_public_semantic_tests.adb#Return_Multiple"
+        ],
+        "all29_named_public_cases_still_required": true,
+        "selected_owner_cleanup": "actual zero bytes/blocks, shutdown complete and no accounting fault",
+        "evidence_status": "pending-fresh-final-image"
+      },
+      "line": 47,
+      "end_line": 55
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9017",
+      "kind": "reviewed-block",
+      "contract_id": "nested-constant-lifetimes",
+      "byte_offset": 12971,
+      "byte_length": 356,
+      "anchor_sha256": "b89bd45a28ed3a05bcc0f4f9045626f4928f367d858d6606215b47d1b6673cba",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Execute all three nested layers with one-result cardinality; preserve the exact fifty-byte string. Dump/load each layer stripped and unstripped and execute its resulting functions. Private outer/middle constant placement is neither inspected nor emulated.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "source_exclusion_eligible": false,
+      "retained_original_fragments": [
+        {
+          "byte_offset": 12971,
+          "byte_length": 356,
+          "anchor_sha256": "b89bd45a28ed3a05bcc0f4f9045626f4928f367d858d6606215b47d1b6673cba"
+        },
+        {
+          "byte_offset": 13391,
+          "byte_length": 3,
+          "anchor_sha256": "361e48d0308f20e32dba5fb56328baf18d72ef0ccb43b84f5c262d2a6a1fc6c8"
+        }
+      ],
+      "required_actual_observations": {
+        "whole_derived_file": true,
+        "unchanged_native_t_file": true,
+        "paired_public_fixture": "code-public-semantics",
+        "paired_public_fixture_configurations": [
+          "default",
+          "upstream-test"
+        ],
+        "named_aunit_cases": [
+          "tests/src/code_public_semantic_tests.adb#Nested_Constants"
+        ],
+        "all29_named_public_cases_still_required": true,
+        "selected_owner_cleanup": "actual zero bytes/blocks, shutdown complete and no accounting fault",
+        "evidence_status": "pending-fresh-final-image"
+      },
+      "line": 441,
+      "end_line": 454
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9018",
+      "kind": "reviewed-block",
+      "contract_id": "register-load-boundaries",
+      "byte_offset": 13397,
+      "byte_length": 190,
+      "anchor_sha256": "77d26412a60ddd7733d3fd29a7ca4548d549a254046057e83f650568e974c6b8",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Retain the original maximum valid successful load and oversized diagnostic without invoking the intentionally nil callee or inspecting MOVE registers.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "source_exclusion_eligible": false,
+      "retained_original_fragments": [
+        {
+          "byte_offset": 13397,
+          "byte_length": 190,
+          "anchor_sha256": "77d26412a60ddd7733d3fd29a7ca4548d549a254046057e83f650568e974c6b8"
+        },
+        {
+          "byte_offset": 13597,
+          "byte_length": 58,
+          "anchor_sha256": "db9b8b1e4af81585970c44b463d207185df4e98fb9df7a4f0a1da21bb8c682e5"
+        },
+        {
+          "byte_offset": 13734,
+          "byte_length": 219,
+          "anchor_sha256": "69fa621baeaf7cc4d7b6b74dc62b2f5452e729e0207d89af631e1b41741a82d5"
+        }
+      ],
+      "required_actual_observations": {
+        "whole_derived_file": true,
+        "unchanged_native_t_file": true,
+        "paired_public_fixture": "code-public-semantics",
+        "paired_public_fixture_configurations": [
+          "default",
+          "upstream-test"
+        ],
+        "named_aunit_cases": [
+          "tests/src/code_public_semantic_tests.adb#Register_Load"
+        ],
+        "all29_named_public_cases_still_required": true,
+        "selected_owner_cleanup": "actual zero bytes/blocks, shutdown complete and no accounting fault",
+        "evidence_status": "pending-fresh-final-image"
+      },
+      "line": 460,
+      "end_line": 463
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9019",
+      "kind": "reviewed-block",
+      "contract_id": "constructor-and-vararg-boundaries",
+      "byte_offset": 13956,
+      "byte_length": 185,
+      "anchor_sha256": "b3bd59b46a7e0946dc86f20240e7b0e3145c5dde99b937abdc0d5661ab9da178",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": "Keep successful compilation and execution of the original nil-element construction at50 and neighboring49/51. Additional constructors check every integer prefix slot, exact trailing zero/one/multiple vararg expansion including nil/float, complete public iteration and one-table return. No SETLIST count is asserted.",
+      "configurations": [
+        "upstream-test"
+      ],
+      "evidence": [],
+      "review": null,
+      "source_exclusion_eligible": false,
+      "retained_original_fragments": [
+        {
+          "byte_offset": 13956,
+          "byte_length": 185,
+          "anchor_sha256": "b3bd59b46a7e0946dc86f20240e7b0e3145c5dde99b937abdc0d5661ab9da178"
+        },
+        {
+          "byte_offset": 14316,
+          "byte_length": 3,
+          "anchor_sha256": "361e48d0308f20e32dba5fb56328baf18d72ef0ccb43b84f5c262d2a6a1fc6c8"
+        }
+      ],
+      "required_actual_observations": {
+        "whole_derived_file": true,
+        "unchanged_native_t_file": true,
+        "paired_public_fixture": "code-public-semantics",
+        "paired_public_fixture_configurations": [
+          "default",
+          "upstream-test"
+        ],
+        "named_aunit_cases": [
+          "tests/src/code_public_semantic_tests.adb#Constructor_49",
+          "tests/src/code_public_semantic_tests.adb#Constructor_50",
+          "tests/src/code_public_semantic_tests.adb#Constructor_51"
+        ],
+        "all29_named_public_cases_still_required": true,
+        "selected_owner_cleanup": "actual zero bytes/blocks, shutdown complete and no accounting fault",
+        "evidence_status": "pending-fresh-final-image"
+      },
+      "line": 475,
+      "end_line": 478
+    }
+  ],
+  "proposed_original_reference_decompositions": [
+    {
+      "original": {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0001",
+        "kind": "internal-reference",
+        "byte_offset": 812,
+        "byte_length": 7,
+        "anchor_sha256": "0f4f8500d5e3005e1445ef305004182f31d0c376f6be5b439dee17437d6e5d90"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9001",
+        "LUA-CODE-REVIEWED-BLOCK-9011",
+        "LUA-CODE-REVIEWED-BLOCK-9012",
+        "LUA-CODE-REVIEWED-BLOCK-9013",
+        "LUA-CODE-REVIEWED-BLOCK-9014"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-ASSERT-CALL-0002",
+        "kind": "assert-call",
+        "byte_offset": 828,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9001",
+        "LUA-CODE-REVIEWED-BLOCK-9011",
+        "LUA-CODE-REVIEWED-BLOCK-9012",
+        "LUA-CODE-REVIEWED-BLOCK-9013",
+        "LUA-CODE-REVIEWED-BLOCK-9014"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-ASSERT-CALL-0003",
+        "kind": "assert-call",
+        "byte_offset": 871,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9001",
+        "LUA-CODE-REVIEWED-BLOCK-9011",
+        "LUA-CODE-REVIEWED-BLOCK-9012",
+        "LUA-CODE-REVIEWED-BLOCK-9013",
+        "LUA-CODE-REVIEWED-BLOCK-9014"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0002",
+        "kind": "internal-reference",
+        "byte_offset": 1840,
+        "byte_length": 10,
+        "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9002",
+        "LUA-CODE-REVIEWED-BLOCK-9011",
+        "LUA-CODE-REVIEWED-BLOCK-9015",
+        "LUA-CODE-REVIEWED-BLOCK-9016"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-ASSERT-CALL-0004",
+        "kind": "assert-call",
+        "byte_offset": 1953,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9002",
+        "LUA-CODE-REVIEWED-BLOCK-9011",
+        "LUA-CODE-REVIEWED-BLOCK-9015",
+        "LUA-CODE-REVIEWED-BLOCK-9016"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-ASSERT-CALL-0005",
+        "kind": "assert-call",
+        "byte_offset": 1986,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9002",
+        "LUA-CODE-REVIEWED-BLOCK-9011",
+        "LUA-CODE-REVIEWED-BLOCK-9015",
+        "LUA-CODE-REVIEWED-BLOCK-9016"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0003",
+        "kind": "internal-reference",
+        "byte_offset": 2294,
+        "byte_length": 10,
+        "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9003",
+        "LUA-CODE-REVIEWED-BLOCK-9011",
+        "LUA-CODE-REVIEWED-BLOCK-9015"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0004",
+        "kind": "internal-reference",
+        "byte_offset": 2314,
+        "byte_length": 10,
+        "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9003",
+        "LUA-CODE-REVIEWED-BLOCK-9011",
+        "LUA-CODE-REVIEWED-BLOCK-9015"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-ASSERT-CALL-0007",
+        "kind": "assert-call",
+        "byte_offset": 2330,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9003",
+        "LUA-CODE-REVIEWED-BLOCK-9011",
+        "LUA-CODE-REVIEWED-BLOCK-9015"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-ASSERT-CALL-0008",
+        "kind": "assert-call",
+        "byte_offset": 2500,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9003",
+        "LUA-CODE-REVIEWED-BLOCK-9011",
+        "LUA-CODE-REVIEWED-BLOCK-9015"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-ASSERT-CALL-0014",
+        "kind": "assert-call",
+        "byte_offset": 13329,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9004",
+        "LUA-CODE-REVIEWED-BLOCK-9017"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0006",
+        "kind": "internal-reference",
+        "byte_offset": 13336,
+        "byte_length": 7,
+        "anchor_sha256": "0f4f8500d5e3005e1445ef305004182f31d0c376f6be5b439dee17437d6e5d90"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9004",
+        "LUA-CODE-REVIEWED-BLOCK-9017"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-ASSERT-CALL-0015",
+        "kind": "assert-call",
+        "byte_offset": 13361,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9005",
+        "LUA-CODE-REVIEWED-BLOCK-9017"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0007",
+        "kind": "internal-reference",
+        "byte_offset": 13368,
+        "byte_length": 7,
+        "anchor_sha256": "0f4f8500d5e3005e1445ef305004182f31d0c376f6be5b439dee17437d6e5d90"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9005",
+        "LUA-CODE-REVIEWED-BLOCK-9017"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0008",
+        "kind": "internal-reference",
+        "byte_offset": 13587,
+        "byte_length": 10,
+        "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9006",
+        "LUA-CODE-REVIEWED-BLOCK-9018"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-ASSERT-CALL-0017",
+        "kind": "assert-call",
+        "byte_offset": 13679,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9007",
+        "LUA-CODE-REVIEWED-BLOCK-9018"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-INTERNAL-REFERENCE-0009",
+        "kind": "internal-reference",
+        "byte_offset": 14169,
+        "byte_length": 10,
+        "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9008",
+        "LUA-CODE-REVIEWED-BLOCK-9019"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "original": {
+        "id": "LUA-CODE-ASSERT-CALL-0020",
+        "kind": "assert-call",
+        "byte_offset": 14297,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+      },
+      "current_status": "pending",
+      "proposed_classification": "reference-after-independent-decomposition-review",
+      "proposed_obligations": [
+        "LUA-CODE-REVIEWED-BLOCK-9008",
+        "LUA-CODE-REVIEWED-BLOCK-9019"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    }
+  ],
+  "scope": "All51 originals remain byte-identical and pending. Proposed18 reference classifications require a distinct independent decomposition review; private children never become passing records. Each proposed reference links its exact private child and separately pending retained runtime nodes.",
+  "draft_status": "pending",
+  "draft_note": "Uninstalled author serialization against the current ten-source feature decision. Original 51 records and the dated input snapshot are retained; final independent decomposition and exact installation decisions remain pending.",
+  "original_input_snapshot": {
+    "revision": "25e8bc6ea93b083891db8c4f2ac46e5e6030a771",
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+    "source": "references/lua/testes/code.lua",
+    "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663"
+  },
+  "source_adaptation_authority": false
+}

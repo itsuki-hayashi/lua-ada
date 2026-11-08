@@ -1,6 +1,7 @@
 with Lua.Storage.Buffers;
 with Lua.Engine.Patterns;
 with Lua.Engine.Strings;
+with Lua.Engine.Diagnostics;
 
 package body Lua.Engine.Pattern_Drivers is
    package Managed renames Lua.Storage.Buffers;
@@ -9,14 +10,15 @@ package body Lua.Engine.Pattern_Drivers is
    function Advance
      (State : in out World; Activation : Frame_Access) return Native_Action
    is
-      Name : constant String := To_String (Activation.Native_Name);
+      Name : constant String := Native_Operation_Name (Activation);
       Action : Native_Action := New_Action (State);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Activation.Native_Arguments.Length) then
            Activation.Native_Arguments (Index) else Nil_Value);
       procedure Work (Count : Natural);
       function Copy_Bytes (Text : Byte_String) return String;
-      function Copy_Argument (Item : Value) return String;
+      function Copy_Argument (Item : Value; Index : Natural := 0)
+                              return String;
       procedure Append_Output (Text : String);
       procedure Finish (Subject : String);
 
@@ -42,12 +44,15 @@ package body Lua.Engine.Pattern_Drivers is
          return To_String (Text);
       end Copy_Bytes;
 
-      function Copy_Argument (Item : Value) return String is
+      function Copy_Argument (Item : Value; Index : Natural := 0)
+                              return String is
       begin
          if Item.Kind = String_Kind then
             return Copy_Bytes (Item.Reference.Bytes);
          end if;
-         return Strings.String_Argument (State, Item);
+         return Strings.String_Argument
+           (State, Item, Index,
+            Present => Index <= Natural (Activation.Native_Arguments.Length));
       end Copy_Argument;
 
       procedure Append_Output (Text : String) is
@@ -78,17 +83,18 @@ package body Lua.Engine.Pattern_Drivers is
       if Name in "gmatch" | "string.gmatch" then
          declare
             Captures : Values.Vector := Owned_Values (State);
-            Subject : constant String := Copy_Argument (Arg (1));
+            Subject : constant String := Copy_Argument (Arg (1), 1);
+            Pattern : constant String := Copy_Argument (Arg (2), 2);
             Initial : Integer_Value := 1;
          begin
             if Arg (3).Kind /= Nil_Kind then
                Initial := Strings.Relative_Position
-                 (Strings.Integer_Argument (State, Arg (3)), Subject'Length);
+                 (Strings.Integer_Argument (State, Arg (3), 3),
+                  Subject'Length);
             end if;
             Initial := Integer_Value'Max (1, Initial);
             Captures.Append (New_String (State, Subject));
-            Captures.Append (New_String
-              (State, Copy_Argument (Arg (2))));
+            Captures.Append (New_String (State, Pattern));
             Captures.Append (Value'(Integer_Kind, Initial - 1));
             Captures.Append (Value'(Integer_Kind, -1));
             Action.Results.Append
@@ -132,8 +138,8 @@ package body Lua.Engine.Pattern_Drivers is
          end;
       end if;
       declare
-         Subject : constant String := Copy_Argument (Arg (1));
-         Pattern : constant String := Copy_Argument (Arg (2));
+         Subject : constant String := Copy_Argument (Arg (1), 1);
+         Pattern : constant String := Copy_Argument (Arg (2), 2);
          Replacement : constant Value := Arg (3);
          Limit : Integer_Value := Integer_Value (Subject'Length) + 1;
          Anchored : constant Boolean := Pattern'Length > 0 and then
@@ -147,13 +153,15 @@ package body Lua.Engine.Pattern_Drivers is
       begin
          Whole.Set_Owner (Lua.Storage.Reference (State.Memory));
          if Arg (4).Kind /= Nil_Kind then
-            Limit := Strings.Integer_Argument (State, Arg (4));
+            Limit := Strings.Integer_Argument (State, Arg (4), 4);
          end if;
          if Replacement.Kind not in String_Kind | Integer_Kind | Real_Kind |
            Table_Kind | Closure_Kind | Native_Kind_Value |
            Native_Closure_Kind | Foreign_Function_Kind
          then
-            Fail (State, "string/function/table expected");
+            Diagnostics.Type_Error
+              (State, 3, "string/function/table", Replacement,
+               Present => Natural (Activation.Native_Arguments.Length) >= 3);
          end if;
          if Activation.Native_Stage = 0 then
             --  Slot one is the last accepted end position. It prevents an

@@ -112,7 +112,8 @@ function Assert-ScopedProbeTelemetry {
           [Parameter(Mandatory)][Collections.IDictionary] $Processes,
           [Parameter(Mandatory)][string] $RunId,
           [Parameter(Mandatory)][string] $Configuration,
-          [Parameter(Mandatory)][ValidateSet('Ada','ReferenceC')][string] $Target)
+          [Parameter(Mandatory)][ValidateSet('Ada','ReferenceC')][string] $Target,
+          [long] $LimitBytes = 2147483648)
     # Parent configuration, bare-child and arg-child probes have their own
     # state lifetimes. Reconcile actual PID records, not merely their matching
     # JSON output: successful probes must not conceal leaked child sessions.
@@ -121,7 +122,7 @@ function Assert-ScopedProbeTelemetry {
         $id = [int]$item.process_id
         if ($seen.ContainsKey($id)) { throw 'Scoped launcher probe telemetry duplicates a process' }
         Assert-ManagedTelemetry -Telemetry $item -RunId $RunId -ProcessId $id `
-            -Configuration $Configuration -RequireShutdown:($Target -eq 'Ada')
+            -Configuration $Configuration -LimitBytes $LimitBytes -RequireShutdown:($Target -eq 'Ada')
         $seen[$id] = $true
     }
     $required = if ($Target -eq 'Ada') { @('parent','bare','arg') } else { @('bare','arg') }

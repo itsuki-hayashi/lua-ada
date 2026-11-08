@@ -285,3 +285,35 @@ Write-Output "PASS: $script:cases matrix regressions; no executed conformance cl
 & (Join-Path $PSScriptRoot 'test-matrix-named-evidence.ps1')
 & (Join-Path $PSScriptRoot 'test-scoped-acceptance-policy.ps1')
 & (Join-Path $PSScriptRoot 'test-files-output.ps1')
+& (Join-Path $PSScriptRoot 'test-conformance-target-matrix.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Full-target matrix regressions failed' }
+& (Join-Path $PSScriptRoot 'test-code-v3-installation.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Installed Code source guards failed' }
+& (Join-Path $PSScriptRoot 'test-t-transform-output.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Disposable T source guards failed' }
+& (Join-Path $PSScriptRoot 'test-conformance-transforms.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Exact-byte transform regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-development-observer.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Development observer regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-file-protocols.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Target file completion regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-context.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Target context/image regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-witness-policy.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Target source witness regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-observation-envelope.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Post-observation envelope regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-compiled-witnesses.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Compiled ABI/layout/header witness regressions failed' }
+& (Join-Path $PSScriptRoot 'test-header-declaration-probes.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Paired header declaration probe regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-workflow.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Target workflow planning/preflight regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-observation-collection.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Target observation bundle transport regressions failed' }
+& (Join-Path $PSScriptRoot 'test-native-module-linkage.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Native image linkage regressions failed' }
+& (Join-Path $PSScriptRoot 'test-native-lua-fixture-evidence.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Native fixture evidence regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-attrib-windows-proposal.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Windows attrib source proposal regressions failed' }

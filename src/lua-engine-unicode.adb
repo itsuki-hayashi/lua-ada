@@ -1,9 +1,34 @@
-with Lua.Storage.Buffers;
 package body Lua.Engine.Unicode is
    package Managed renames Lua.Storage.Buffers;
    use type Integer_Value;
    use type Real_Value;
    use type Lua.Numbers.Number_Kind;
+
+   procedure Emit (Code : Natural; Text : in out Managed.Buffer) is
+      Remaining : Natural := Code;
+      Bytes : String (1 .. 6);
+      First : Positive := Bytes'Last;
+      Prefix : Natural := 16#80#;
+      Capacity : Natural := 16#40#;
+   begin
+      --  Fill continuation bytes backwards in a fixed six-byte span. The
+      --  same encoder serves utf8.char and C ABI %U; neither uses C encoding
+      --  logic or an input-sized unmanaged temporary.
+      if Code < 16#80# then
+         Append (Text, Character'Val (Code));
+      else
+         loop
+            Bytes (First) := Character'Val (16#80# + Remaining mod 64);
+            Remaining := Remaining / 64;
+            First := First - 1;
+            Prefix := Prefix + Capacity;
+            Capacity := Capacity / 2;
+            exit when Remaining < Capacity;
+         end loop;
+         Bytes (First) := Character'Val (Prefix + Remaining);
+         Append (Text, Bytes (First .. Bytes'Last));
+      end if;
+   end Emit;
 
    function Run
      (State : in out World; Name : String; Arguments : Values.Vector)
@@ -26,7 +51,6 @@ package body Lua.Engine.Unicode is
       procedure Decode
         (Text : String; Position : Positive; Lax : Boolean;
          Code : out Natural; Following : out Positive; Valid : out Boolean);
-      procedure Emit (Code : Natural; Text : in out Managed.Buffer);
       procedure Push_Integer (Item : Integer_Value);
 
       procedure Charge (Amount : Natural := 1) is
@@ -209,29 +233,6 @@ package body Lua.Engine.Unicode is
          Following := Position + Width;
          Valid := True;
       end Decode;
-
-      procedure Emit (Code : Natural; Text : in out Managed.Buffer) is
-         Remaining : Natural := Code;
-         Bytes : String (1 .. 6);
-         First : Positive := Bytes'Last;
-         Prefix : Natural := 16#80#;
-         Capacity : Natural := 16#40#;
-      begin
-         if Code < 16#80# then
-            Append (Text, Character'Val (Code));
-         else
-            loop
-               Bytes (First) := Character'Val (16#80# + Remaining mod 64);
-               Remaining := Remaining / 64;
-               First := First - 1;
-               Prefix := Prefix + Capacity;
-               Capacity := Capacity / 2;
-               exit when Remaining < Capacity;
-            end loop;
-            Bytes (First) := Character'Val (Prefix + Remaining);
-            Append (Text, Bytes (First .. Bytes'Last));
-         end if;
-      end Emit;
 
       procedure Push_Integer (Item : Integer_Value) is
       begin

@@ -4,6 +4,22 @@ with Lua.Storage;
 with System;
 
 package Lua.Engine.Foreign is
+   procedure Reserve_Call_Metadata
+     (State : in out World; Context : not null Context_Access);
+   --  Reserve scalar C call records for the current real frame capacity plus
+   --  one host entry. Called before publishing a newly allocated frame;
+   --  refusal leaves the previous pool intact. No surface is created here.
+   procedure Trim_Call_Metadata (Context : not null Context_Access);
+   --  Release only unused reservations above current capacity. Outstanding
+   --  records retain their selected owner through the genuine C guard ACK.
+
+   function Auxiliary_Buffer_Size return Interfaces.C.size_t
+     with Export, Convention => C,
+          External_Name => "lua_ada_auxiliary_buffer_size";
+   --  Borrow the selected configuration's initial scratch capacity without
+   --  a state access or allocation. C buffer callers can use the ordinary
+   --  SDK layout or the pinned tiny T layout at their common public prefix.
+   use type Interfaces.C.int;
    --  C entrypoints belong to the small C-owned boundary in c_api/. This
    --  package performs state operations and returns a typed result before
    --  that boundary raises an error or resumes any foreign callback. No
@@ -19,6 +35,11 @@ package Lua.Engine.Foreign is
    type C_Continuation is access function
      (State : System.Address; Status : Interfaces.C.int;
       Context : Interfaces.C.ptrdiff_t) return Interfaces.C.int
+     with Convention => C;
+
+   type C_Reader is access function
+     (State, Data : System.Address;
+      Size : not null access Interfaces.C.size_t) return System.Address
      with Convention => C;
 
    type IO_Close_Kind is
@@ -46,8 +67,23 @@ package Lua.Engine.Foreign is
       Open_IO_Module, Open_OS_Module, Collector_Control, Push_Collector_Drain,
       Yield_Call, Get_Status, Begin_Resume, Open_Standard_Module,
       Prepare_Index, Mark_Close, Close_Slot,
+      Release_Buffer, Dump_Function,
+      Reader_Barrier, Restore_Load_Stack, Prepare_Reader_Error,
+      Load_Reader,
       Set_Hook, Get_Hook, Get_Hook_Mask, Get_Hook_Count,
-      Get_Debug_Frame, Get_Debug_Line);
+      Get_Debug_Frame, Get_Debug_Line, Get_Debug_Info,
+      Get_Local, Set_Local, Get_Upvalue, Set_Upvalue,
+      Upvalue_Id, Join_Upvalues, Begin_Builtin, Push_External_String,
+      Prepare_External_Release, Complete_External_Release,
+      Prepare_Length, Prepare_Concatenation, Number_To_C_String,
+      Prepare_Arithmetic, Prepare_Comparison,
+      Close_Thread, String_To_Number, Complete_Self_Close, Prepare_Panic,
+      Begin_Hook_View, End_Hook_View,
+      Prepare_Lua_Reader, Observe_Lua_Reader_Piece, Finish_Lua_Reader,
+      Create_Formatter, Append_Format_Value, Append_Format_UTF8,
+      Finish_Formatter, Release_Formatter, Charge_Aux_Work,
+      Create_Aux_Box, Resize_Aux_Box, Release_Aux_Box, Publish_Aux_Box,
+      Load_File, Build_Traceback);
    for Operation_Code use
      (Create_State => 0, Create_Default_State => 1, Close_State => 2,
       Create_Thread => 3, Get_Top => 4, Set_Top => 5,
@@ -74,11 +110,54 @@ package Lua.Engine.Foreign is
       Yield_Call => 58, Get_Status => 59, Begin_Resume => 60,
       Open_Standard_Module => 61,
       Prepare_Index => 62, Mark_Close => 63,
-      Close_Slot => 64,
+      Close_Slot => 64, Release_Buffer => 66,
+      Dump_Function => 67, Reader_Barrier => 68, Restore_Load_Stack => 69,
+      Prepare_Reader_Error => 70, Load_Reader => 71,
       Set_Hook => 80, Get_Hook => 81, Get_Hook_Mask => 82,
-      Get_Hook_Count => 83, Get_Debug_Frame => 84, Get_Debug_Line => 85);
+      Get_Hook_Count => 83, Get_Debug_Frame => 84, Get_Debug_Line => 85,
+      Get_Debug_Info => 86, Get_Local => 87, Set_Local => 88,
+      Get_Upvalue => 89, Set_Upvalue => 90, Upvalue_Id => 91,
+      Join_Upvalues => 92, Begin_Builtin => 93, Push_External_String => 94,
+      Prepare_External_Release => 95, Complete_External_Release => 96,
+      Prepare_Length => 100, Prepare_Concatenation => 101,
+      Number_To_C_String => 102,
+      Prepare_Arithmetic => 103, Prepare_Comparison => 104,
+      Close_Thread => 105, String_To_Number => 106,
+      Complete_Self_Close => 107,
+      Prepare_Panic => 108,
+      Begin_Hook_View => 109, End_Hook_View => 110,
+      Prepare_Lua_Reader => 111, Observe_Lua_Reader_Piece => 112,
+      Finish_Lua_Reader => 113,
+      Create_Formatter => 120, Append_Format_Value => 121,
+      Append_Format_UTF8 => 122, Finish_Formatter => 123,
+      Release_Formatter => 124, Charge_Aux_Work => 125,
+      Create_Aux_Box => 126, Resize_Aux_Box => 127,
+      Release_Aux_Box => 128, Publish_Aux_Box => 129, Load_File => 130,
+      Build_Traceback => 131);
    for Operation_Code'Size use Interfaces.C.int'Size;
    pragma Convention (C, Operation_Code);
+
+   type Debug_Information is record
+      Name : System.Address := System.Null_Address;
+      Source : System.Address := System.Null_Address;
+      Source_Length : Interfaces.C.size_t := 0;
+      Name_Kind : Interfaces.C.int := 0;
+      What : Interfaces.C.int := 0;
+      Current_Line : Interfaces.C.int := -1;
+      First_Line : Interfaces.C.int := -1;
+      Last_Line : Interfaces.C.int := -1;
+      Upvalues : Interfaces.C.int := 0;
+      Parameters : Interfaces.C.int := 0;
+      Vararg : Interfaces.C.int := 1;
+      Tail : Interfaces.C.int := 0;
+      Extra_Arguments : Interfaces.C.int := 0;
+      First_Transfer : Interfaces.C.int := 0;
+      Transfer_Count : Interfaces.C.int := 0;
+      Short_Source : Interfaces.C.char_array (0 .. 59) :=
+        [others => Interfaces.C.nul];
+   end record with Convention => C;
+   --  Metadata crosses an ordinary checked C record. Its borrowed byte
+   --  addresses belong to actual frozen code/constants, never query scratch.
 
    type Request is record
       Operation : Operation_Code;
@@ -102,6 +181,8 @@ package Lua.Engine.Foreign is
       Warning_Continuation : Interfaces.C.int := 0;
       Continuation : C_Continuation := null;
       KContext : Interfaces.C.ptrdiff_t := 0;
+      Reader : C_Reader := null;
+      Debug_Data : System.Address := System.Null_Address;
    end record with Convention => C;
 
    type Response is record
@@ -120,16 +201,21 @@ package Lua.Engine.Foreign is
       Continuation : C_Continuation := null;
       KContext : Interfaces.C.ptrdiff_t := 0;
       KStatus : Interfaces.C.int := 0;
+      Abort_State : System.Address := System.Null_Address;
+      --  Actual saved C caller surface for a host stop on a different
+      --  addressed context. It names no saved Ada stack or fabricated guard.
    end record with Convention => C;
 
    type Action_Status is
      (Action_Done, Action_Call, Action_Raise, Action_Memory,
-      Action_Handling, Action_Abort, Action_Warning, Action_Suspend);
+      Action_Handling, Action_Abort, Action_Warning, Action_Suspend,
+      Action_External_Release, Action_Self_Close);
    for Action_Status use
      (Action_Done => 0, Action_Call => 1,
       Action_Raise => 2, Action_Memory => 4,
       Action_Handling => 5,
-      Action_Abort => 6, Action_Warning => 7, Action_Suspend => 8);
+      Action_Abort => 6, Action_Warning => 7, Action_Suspend => 8,
+      Action_External_Release => 9, Action_Self_Close => 10);
    for Action_Status'Size use Interfaces.C.int'Size;
    pragma Convention (C, Action_Status);
 
@@ -152,6 +238,36 @@ package Lua.Engine.Foreign is
 
    procedure Initialize_Bridge;
    --  Verify the C/Ada surface contract during library elaboration.
+
+   procedure Set_Concatenation_Top (State : in out World; Top : Natural);
+   --  Shrink the actual current C/borrowed API view after a completed fold.
+   --  Top is absolute and stays above its retained prefix. This invokes no
+   --  closer; lua_concat's free-operand precondition excludes closing slots.
+
+   procedure Publish_Direct_Builtin_Base
+     (State : in out World; Base : Natural);
+   --  Record an explicitly normalized public prefix in the current direct
+   --  builtin call. Its completion appends results at this cursor instead of
+   --  restoring the entry top. The caller closes and clears the actual slots
+   --  first; this allocation-free publication belongs to that one live call.
+
+   procedure Prepare_Thread_Surface
+     (State : in out World; Context : Context_Id);
+   --  Reserve the addressed thread's C surface while thread construction
+   --  may allocate. An Ada-only world without a C main surface does nothing;
+   --  its first borrowed C entry prepares existing threads before invocation.
+   --  Public thread-pointer queries subsequently borrow without allocation.
+
+   function Thread_Identity
+     (State : in out World; Context : Context_Id) return System.Address;
+   --  Borrow the actual stable C thread pointer. An Ada-only world lazily
+   --  materializes its main/selected surfaces before publishing an identity,
+   --  so a later first C callback cannot change a saved Lua %p/tostring.
+
+   procedure Release_Context_Control (State : in out World;
+                                      Context : not null Context_Access);
+   --  Release reserved idle reset-driver/record ownership before freeing the
+   --  context's raw C control block. No callback or execution occurs here.
 
    function Contract_Size (Part : Interfaces.C.int)
                           return Interfaces.C.size_t

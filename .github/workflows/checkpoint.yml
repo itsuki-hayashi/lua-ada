@@ -1,0 +1,86 @@
+name: Bounded progress checkpoint
+
+on:
+  push:
+    branches:
+      - master
+      - codex/m3-remaining-upstream-compatibility
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checkpoint-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.checkpoint_matrix }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - id: plan
+        shell: pwsh
+        run: ./scripts/plan-checkpoint-workflow.ps1 -GitHubOutput
+  checkpoint:
+    name: Checkpoint ${{ matrix.context }}
+    needs: plan
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
+    steps:
+      - name: Preserve pinned source bytes
+        shell: pwsh
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          submodules: recursive
+      - uses: alire-project/setup-alire@v6
+      - name: Select stable native toolchain
+        shell: pwsh
+        run: |
+          alr --version
+          ./scripts/select-stable-toolchain.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          alr -n toolchain
+          alr exec -- gcc --version
+          alr exec -- gcc -dumpmachine
+          alr exec -- gprbuild --version
+      - name: Install native Linux readline prerequisite
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libreadline-dev
+      - name: Check bounded planning and CLI selection
+        shell: pwsh
+        run: |
+          ./scripts/test-checkpoint-workflow.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Strict compiled checkpoint gates
+        shell: pwsh
+        run: |
+          ./scripts/check-checkpoint.ps1 -Context '${{ matrix.context }}'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Preserve actual checkpoint reports
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: checkpoint-${{ matrix.id }}-${{ github.event.pull_request.head.sha || github.sha }}
+          path: reports/**
+          if-no-files-found: warn
+          retention-days: 30
+      - name: State checkpoint scope
+        if: always()
+        shell: pwsh
+        run: |
+          'Bounded checkpoint only: validation static/shared on three operating systems and two configurations. Full112 CLI backend protocol and the26-context full upstream acceptance remain deferred; no acceptance certificate is produced.' >> $env:GITHUB_STEP_SUMMARY

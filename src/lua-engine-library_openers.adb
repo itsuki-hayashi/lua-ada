@@ -2,6 +2,7 @@ with Ada.Numerics;
 with Lua.Engine.IO_Libraries;
 with Lua.Engine.Mathematics;
 with Lua.Engine.Operating_System;
+with Lua.Engine.Native_Modules;
 with Lua.Engine.Unicode;
 with Lua_Ada_Config;
 
@@ -90,19 +91,26 @@ package body Lua.Engine.Library_Openers is
                     (Table_Kind, State.Loaded_Modules));
                Set (State, Module, New_String (State, "preload"),
                     (Table_Kind, State.Preload_Modules));
-               Set (State, Module, New_String (State, "path"),
-                    New_String (State, "./?.lua;./?/init.lua"));
+               Native_Modules.Configure_Paths
+                 (State, Module, Native_Defaults => State.Policy =
+                    Lua_Compatible);
                Set (State, Module, New_String (State, "config"),
                     New_String (State, Separator & Character'Val (10) & ";" &
                       Character'Val (10) & "?" & Character'Val (10) & "!" &
                       Character'Val (10) & "-" & Character'Val (10)));
                Set (State, Module, New_String (State, "searchers"), Searchers);
                Set (State, Module, New_String (State, "searchpath"),
-                    New_Native (State, "package.searchpath", Captures));
+                    New_Native (State, "package.searchpath"));
+               Set (State, Module, New_String (State, "loadlib"),
+                    New_Native (State, "package.loadlib"));
                Set (State, Searchers, (Integer_Kind, 1),
                     New_Native (State, "package.preload_searcher", Captures));
                Set (State, Searchers, (Integer_Kind, 2),
                     New_Native (State, "package.lua_searcher", Captures));
+               Set (State, Searchers, (Integer_Kind, 3),
+                    New_Native (State, "package.c_searcher", Captures));
+               Set (State, Searchers, (Integer_Kind, 4),
+                    New_Native (State, "package.croot_searcher", Captures));
                Set (State, Globals, New_String (State, "require"),
                     New_Native (State, "base.require", Captures));
             end;
@@ -115,7 +123,7 @@ package body Lua.Engine.Library_Openers is
             Members ("debug",
               "getinfo getlocal setlocal getupvalue setupvalue " &
               "upvalueid upvaluejoin getregistry getmetatable setmetatable " &
-              "getuservalue setuservalue sethook gethook traceback");
+              "getuservalue setuservalue sethook gethook traceback debug");
 
          when Math_Module =>
             Members ("math",

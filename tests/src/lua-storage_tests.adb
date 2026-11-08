@@ -53,6 +53,19 @@ package body Lua.Storage_Tests is
       return Result;
    end Tracked;
 
+   Alternate_Calls : Natural := 0;
+   function Alternate
+     (Data, Block : System.Address;
+      Old_Size, New_Size : Interfaces.C.size_t) return System.Address
+     with Convention => C;
+   function Alternate
+     (Data, Block : System.Address;
+      Old_Size, New_Size : Interfaces.C.size_t) return System.Address is
+   begin
+      Alternate_Calls := Alternate_Calls + 1;
+      return Tracked (Data, Block, Old_Size, New_Size);
+   end Alternate;
+
    type Integer_Access is access Integer;
    for Integer_Access'Storage_Pool use Pool;
    procedure Free_Integer is new Ada.Unchecked_Deallocation
@@ -90,6 +103,8 @@ package body Lua.Storage_Tests is
    procedure Foreign_Owner_Rejected;
    procedure Unrepresentable_Size_Rejected;
    procedure Safe_Ownership_Query;
+   procedure Retained_Provider_Release;
+   procedure Retained_Provider_Data;
 
    procedure Owner_Isolation is
       First, Second : Owner;
@@ -404,6 +419,50 @@ package body Lua.Storage_Tests is
       Assert (not Owns (Memory, System.Null_Address), "null address query");
    end Safe_Ownership_Query;
 
+   procedure Retained_Provider_Release is
+      State : aliased Provider_State;
+      Memory : Owner;
+      First, Second : System.Address;
+   begin
+      --  Two compatible providers share accounting. Publishing an external
+      --  payload retains the first callback while ordinary owned bytes use
+      --  the replacement; both still retire the same owner's actual list.
+      Set_Allocator (Memory, Tracked'Access, State'Address);
+      First := Allocate (Memory, 64);
+      Second := Allocate (Memory, 128);
+      Alternate_Calls := 0;
+      Set_Allocator (Memory, Alternate'Access, State'Address);
+      Release_Using (Memory, First, Tracked'Access, State'Address);
+      Assert (First = System.Null_Address and then Alternate_Calls = 0,
+              "retained function releases its transferred allocation");
+      Assert (Owns (Memory, Second) and then
+                Statistics (Memory).Payload_Bytes = 128 and then
+                Statistics (Memory).Live_Blocks = 1,
+              "retained release preserves the other actual ownership");
+      Release (Memory, Second);
+      Assert (Alternate_Calls = 1 and then State.Live = 0 and then
+                Statistics (Memory).Raw_Bytes = 0,
+              "replacement releases remaining owned bytes without leaks");
+   end Retained_Provider_Release;
+
+   procedure Retained_Provider_Data is
+      Original, Replacement : aliased Provider_State;
+      Memory : Owner;
+      Block : System.Address;
+   begin
+      --  A provider function can be unchanged while its opaque data changes.
+      --  The transferred payload must retain that pair, rather than borrowing
+      --  the owner's later userdata when its external release eventually runs.
+      Set_Allocator (Memory, Tracked'Access, Original'Address);
+      Block := Allocate (Memory, 64);
+      Set_Allocator (Memory, Tracked'Access, Replacement'Address);
+      Release_Using (Memory, Block, Tracked'Access, Original'Address);
+      Assert (Original.Live = 0 and then Original.Last_New = 0 and then
+                Replacement.Calls = 0 and then
+                Statistics (Memory).Live_Blocks = 0,
+              "retained data receives release after provider replacement");
+   end Retained_Provider_Data;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "storage: owner isolation",
@@ -440,5 +499,9 @@ package body Lua.Storage_Tests is
                         Unrepresentable_Size_Rejected'Access);
       Test_Support.Add (Suite, "storage: safe ownership query",
                         Safe_Ownership_Query'Access);
+      Test_Support.Add (Suite, "storage: retained provider release",
+                        Retained_Provider_Release'Access);
+      Test_Support.Add (Suite, "storage: retained provider data",
+                        Retained_Provider_Data'Access);
    end Register;
 end Lua.Storage_Tests;

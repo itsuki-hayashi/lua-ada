@@ -4,7 +4,7 @@
 /* First-party ABI glue. Interpreter state and all value operations remain
  * Ada-owned. Keep these operation IDs synchronized with Engine.Foreign and
  * validate this ordinary C layout during standalone-library elaboration. */
-#include "lua.h"
+#include "lua_ada_runtime_configuration.h"
 
 enum lua_ada_operation {
     ADA_CREATE_STATE, ADA_CREATE_DEFAULT_STATE, ADA_CLOSE_STATE,
@@ -27,8 +27,53 @@ enum lua_ada_operation {
     ADA_COLLECTOR_CONTROL, ADA_PUSH_COLLECTOR_DRAIN,
     ADA_YIELD_CALL = 58, ADA_GET_STATUS, ADA_BEGIN_RESUME,
     ADA_OPEN_STANDARD_MODULE, ADA_PREPARE_INDEX, ADA_MARK_CLOSE, ADA_CLOSE_SLOT,
+    ADA_RELEASE_BUFFER = 66, ADA_DUMP_FUNCTION,
+    ADA_READER_BARRIER, ADA_RESTORE_LOAD_STACK, ADA_PREPARE_READER_ERROR,
+    ADA_LOAD_READER,
     ADA_SET_HOOK = 80, ADA_GET_HOOK, ADA_GET_HOOK_MASK, ADA_GET_HOOK_COUNT,
-    ADA_GET_DEBUG_FRAME, ADA_GET_DEBUG_LINE
+    ADA_GET_DEBUG_FRAME, ADA_GET_DEBUG_LINE, ADA_GET_DEBUG_INFO,
+    ADA_GET_LOCAL, ADA_SET_LOCAL, ADA_GET_UPVALUE, ADA_SET_UPVALUE,
+    ADA_UPVALUE_ID, ADA_JOIN_UPVALUES, ADA_BEGIN_BUILTIN,
+    ADA_PUSH_EXTERNAL_STRING = 94, ADA_PREPARE_EXTERNAL_RELEASE,
+    ADA_COMPLETE_EXTERNAL_RELEASE,
+    ADA_PREPARE_LENGTH = 100, ADA_PREPARE_CONCATENATION, ADA_NUMBER_TO_C_STRING,
+    ADA_PREPARE_ARITHMETIC = 103, ADA_PREPARE_COMPARISON,
+    ADA_CLOSE_THREAD = 105,
+    ADA_STRING_TO_NUMBER = 106,
+    ADA_COMPLETE_SELF_CLOSE = 107,
+    ADA_PREPARE_PANIC = 108,
+    ADA_BEGIN_HOOK_VIEW = 109, ADA_END_HOOK_VIEW,
+    ADA_PREPARE_LUA_READER = 111, ADA_OBSERVE_LUA_READER_PIECE,
+    ADA_FINISH_LUA_READER,
+    ADA_CREATE_FORMATTER = 120, ADA_APPEND_FORMAT_VALUE,
+    ADA_APPEND_FORMAT_UTF8, ADA_FINISH_FORMATTER,
+    ADA_RELEASE_FORMATTER, ADA_CHARGE_AUX_WORK,
+    ADA_CREATE_AUX_BOX = 126, ADA_RESIZE_AUX_BOX,
+    ADA_RELEASE_AUX_BOX, ADA_PUBLISH_AUX_BOX,
+    ADA_LOAD_FILE = 130,
+    ADA_BUILD_TRACEBACK = 131
+};
+
+/* Ordinary transport metadata, not a native private activation layout.
+ * Pointer fields borrow immutable function-owned bytes (or static strings).
+ * The actual public lua_Debug layout remains wholly on the C side. */
+struct lua_ada_debug_information {
+    const char *name;
+    const char *source;
+    size_t source_length;
+    int name_kind;
+    int what;
+    int current_line;
+    int first_line;
+    int last_line;
+    int upvalues;
+    int parameters;
+    int vararg;
+    int tail;
+    int extra_arguments;
+    int first_transfer;
+    int transfer_count;
+    char short_source[LUA_IDSIZE];
 };
 
 /* Identity is opaque C-owned transport, not a C Lua frame layout. Guard
@@ -60,6 +105,8 @@ struct lua_ada_request {
     int warning_continuation;
     lua_KFunction continuation;
     lua_KContext kcontext;
+    lua_Reader reader;
+    struct lua_ada_debug_information *debug_information;
 };
 
 struct lua_ada_response {
@@ -78,6 +125,7 @@ struct lua_ada_response {
     lua_KFunction continuation;
     lua_KContext kcontext;
     int kstatus;
+    lua_State *abort_state;
 };
 
 enum lua_ada_action {
@@ -88,7 +136,9 @@ enum lua_ada_action {
     ADA_ACTION_HANDLING = LUA_ERRERR,
     ADA_ACTION_ABORT = 6,
     ADA_ACTION_WARNING = 7,
-    ADA_ACTION_SUSPEND = 8
+    ADA_ACTION_SUSPEND = 8,
+    ADA_ACTION_EXTERNAL_RELEASE = 9,
+    ADA_ACTION_SELF_CLOSE = 10
 };
 
 /* This is an opaque state surface, not C Lua's private lua_State layout.
@@ -113,9 +163,25 @@ size_t lua_ada_surface_size(void);
 size_t lua_ada_request_size(void);
 size_t lua_ada_response_size(void);
 size_t lua_ada_extra_space(void);
+size_t lua_ada_auxiliary_buffer_size(void);
 int lua_ada_invoke_borrowed(lua_State *state, enum lua_ada_action action,
                             const struct lua_ada_response *pending,
                             struct lua_ada_response *completion);
+int lua_ada_read_guarded(lua_State *state, lua_Reader reader, void *data,
+                         struct lua_ada_response *completion);
+int lua_ada_run_protected(lua_State *state,
+                         void (*body)(lua_State *, void *), void *data);
+void lua_ada_propagate_status(lua_State *state, int status);
+void lua_ada_aux_charge(lua_State *state, size_t amount);
+int lua_ada_invoke_builtin(lua_State *state, int id);
+void lua_ada_hook_view(lua_State *state, int begin);
+/* Enter/leave the interrupted activation's scalar view while retaining the
+ * genuine C callback guard. Error transfers release it on typed guard ACK. */
+/* Identity of the real private finalizer-pump transport, not a callable Lua
+ * API. Its lifetime is the loaded library; no Lua allocation is involved. */
+void *lua_ada_collector_drain_address(void);
+void *lua_ada_reader_portal_address(void);
+void lua_ada_drain_external_releases(lua_State *state);
 
 /* Test-only C guard probe. It demonstrates that a failing exported operation
  * returned through Ada before C unwinds. It is not a lua_pcall replacement. */

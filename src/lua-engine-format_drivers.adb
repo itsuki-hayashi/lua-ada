@@ -1,5 +1,6 @@
 with Lua.Engine.Formats;
 with Lua.Engine.Strings;
+with Lua.Engine.Diagnostics;
 
 package body Lua.Engine.Format_Drivers is
    function Advance
@@ -8,6 +9,7 @@ package body Lua.Engine.Format_Drivers is
       Action : Native_Action := New_Action (State);
       First : Positive;
       Cursor : Positive;
+      Format_Value, Converted : Value;
       procedure Work (Count : Natural := 1);
       procedure Append_Output (Text : String);
       procedure Render_Output (Specification : String; Item : Value);
@@ -47,8 +49,12 @@ package body Lua.Engine.Format_Drivers is
       end Render_Output;
    begin
       if Activation.Native_Arguments.Is_Empty then
-         Fail (State, "string expected");
+         Diagnostics.Type_Error
+           (State, 1, "string", Nil_Value, Present => False);
       end if;
+      --  Retain values, never vector indexing references, across a renderer
+      --  that can transfer a failed phase's packets for argument callbacks.
+      Format_Value := Activation.Native_Arguments (1);
       if Activation.Native_Arguments (1).Kind = String_Kind then
          --  The retained format is copied once per continuation advance.
          --  Charge before obtaining that view, including callback resumes.
@@ -67,10 +73,13 @@ package body Lua.Engine.Format_Drivers is
          then
             Fail (State, "'__tostring' must return a string");
          end if;
-         Render_Output
-           (To_String
-              (Activation.Native_Captures (1).Reference.Bytes),
-            Activation.Native_Results (1));
+         declare
+            Specification : constant Value := Activation.Native_Captures (1);
+            Value_To_Render : constant Value := Activation.Native_Results (1);
+         begin
+            Render_Output (To_String (Specification.Reference.Bytes),
+                           Value_To_Render);
+         end;
          Activation.Native_Results.Clear;
          Activation.Native_Captures.Clear;
          Activation.Native_Stage := 1;
@@ -117,9 +126,9 @@ package body Lua.Engine.Format_Drivers is
                        (Activation.Native_Arguments (Activation.Native_Aux));
                      Activation.Native_Stage := 2;
                   else
-                     Render_Output
-                       (Form (First .. Cursor),
-                        Activation.Native_Arguments (Activation.Native_Aux));
+                     Converted := Activation.Native_Arguments
+                       (Activation.Native_Aux);
+                     Render_Output (Form (First .. Cursor), Converted);
                      Action.Kind := Continue_Step;
                   end if;
                   Activation.Native_Aux := Activation.Native_Aux + 1;
@@ -130,7 +139,7 @@ package body Lua.Engine.Format_Drivers is
          end Apply_Format;
       begin
          Strings.Query_Argument
-           (State, Activation.Native_Arguments (1), Apply_Format'Access);
+           (State, Format_Value, Apply_Format'Access, Index => 1);
       end;
       if Action.Kind /= Finished then
          return Action;

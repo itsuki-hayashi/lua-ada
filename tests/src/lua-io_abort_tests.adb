@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Interfaces.C;
 with Lua.Engine; use Lua.Engine;
@@ -39,7 +38,7 @@ package body Lua.IO_Abort_Tests is
         Execute (State, Source, "file-abort-test");
    begin
       Assert (Completed,
-              To_String (State.Current.Failure_Text));
+              Failure_Image (State.Current));
    end Run;
 
    type Observation is record

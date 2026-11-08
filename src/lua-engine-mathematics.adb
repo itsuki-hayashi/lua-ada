@@ -1,5 +1,5 @@
 with Ada.Calendar;
-with Ada.Strings.Fixed;
+with Lua.Engine.Diagnostics;
 with Ada.Unchecked_Conversion;
 with Interfaces.C;
 with Lua.Platform_Mathematics;
@@ -273,11 +273,6 @@ package body Lua.Engine.Mathematics is
       function Integral (Index : Positive) return Integer_Value;
       procedure Push (Item : Real_Value);
       function Project (Random, Upper : Word) return Word;
-      Short_Name : constant String :=
-        (if Name'Length > 5 and then
-           Name (Name'First .. Name'First + 4) = "math."
-         then Name (Name'First + 5 .. Name'Last) else Name);
-
       function Numeric (Index : Positive) return Real_Value is
          Item : constant Value := Arg (Index);
          Parsed : Lua.Numbers.Number;
@@ -292,12 +287,9 @@ package body Lua.Engine.Mathematics is
                end if;
             when others => null;
          end case;
-         Fail (State, "bad argument #" &
-               Ada.Strings.Fixed.Trim (Positive'Image (Index),
-                                       Ada.Strings.Both) &
-               " to '" & Short_Name & "' (number expected, got " &
-               (if Index > Natural (Arguments.Length) then "no value"
-                else Type_Name (Item)) & ")");
+         Diagnostics.Type_Error
+           (State, Index, "number", Item,
+            Present => Index <= Natural (Arguments.Length));
          return 0.0;
       end Numeric;
 
@@ -322,7 +314,8 @@ package body Lua.Engine.Mathematics is
          then
             return Integer_Value (Number);
          end if;
-         Fail (State, "number has no integer representation");
+         Diagnostics.Argument_Error
+           (State, Index, "number has no integer representation");
          return 0;
       end Integral;
 

@@ -11,6 +11,85 @@ The installable headers under include/api are unchanged pinned copies with
 per-file hashes and retained notices; production include paths do not enter
 the reference-only tree.
 
+The [traceback checkpoint](../docs/sessions/2026-11-08-shared-traceback.md)
+exports luaL_traceback using the existing Ada debug renderer and actual
+borrowed logical frames. Destination-owned buffers, suspended/closed threads,
+an independent output state, exact names/lines, deep-stack shortening and
+allocation refusal have focused native-paired evidence. Registry metamethod
+continuation and full C-surface acceptance remain open; see
+[ADR 0033](../docs/decisions/0033-shared-traceback-rendering.md).
+
+The [public identity checkpoint](../docs/sessions/2026-11-08-public-value-identities.md)
+uses the same real identities for lua_topointer, default Lua rendering and
+format p. Ada-only coroutine rendering remains stable across a later first
+C callback. Native-width/null spelling and returned string identity have
+local default/T evidence; full ABI/target acceptance remains open. See
+[ADR 0031](../docs/decisions/0031-public-value-identities.md).
+
+
+The [public file checkpoint](../docs/sessions/2026-11-08-public-file-loading.md)
+implements luaL_loadfilex and exercises its convenience macro through owned
+shared file/stdin input. Native errno, text/binary reopening, source/debug
+metadata, actual-growth failures and immediate host-abort cleanup have local
+default/T evidence. Full target acceptance remains open. See
+[ADR 0029](../docs/decisions/0029-owned-file-input.md).
+
+
+The [literal auxiliary substitution checkpoint](../docs/sessions/2026-11-08-auxiliary-substitution.md)
+provides literal nonoverlapping substitution through the owned buffer API,
+with metered foreign scans/comparisons and public stack/result lifetimes.
+Sixteen native-matched C cases and three bounded-work cleanup cases have
+local evidence; complete C API and full-target acceptance remain open.
+
+
+The [public allocator checkpoint](../docs/sessions/2026-11-08-public-auxiliary-allocator.md)
+exports the standard realloc/free callback and host seed function. The C
+auxiliary constructor uses their actual public identities and installs the
+allocation-free default panic diagnostic. Thirteen native-matched cases and
+two named panic probes have local static evidence; final ABI/allocator
+acceptance remains open.
+
+
+The [thread reset checkpoint](../docs/sessions/2026-11-08-thread-reset.md)
+implements `lua_closethread`, including self-close inside a real resume.
+Each nearest C guard releases its own reader/writer/formatter ownership and
+acknowledges its actual callback before the shared Ada scheduler retires old
+execution and runs pending closers. No C transfer crosses suspended Ada.
+Twenty-four public cases match default C; native T matches twenty-three and
+explicitly skips warning API reentry rejected by its lock instrumentation.
+Fifteen new named AUnit cases pass within 1,737 local cases. Fresh Lua-created
+coroutine function slots, integrated T/shared/platform and final acceptance
+remain separate obligations. The session also records a native partial-reader
+scratch leak; the additional Ada-owned regression requires balanced cleanup.
+
+The [host base C closing checkpoint](../docs/sessions/2026-11-08-base-c-closing.md)
+supports direct idle-host `lua_toclose`, `lua_closeslot` and closing `lua_settop`
+through the actual scalar stack and shared iterative closer. Valid registration
+and thread-pointer queries make no selected-allocator request. Thirteen
+same-source cases match both native configurations locally. Full public
+auxiliary-buffer acceptance remains separate. See
+[ADR 0026](../docs/decisions/0026-base-c-closing-ownership.md) for ownership.
+
+The [protected error-closing checkpoint](../docs/sessions/2026-11-08-protected-error-closing.md)
+preserves actual regular C guard ownership across yieldable outer cleanup.
+Thirteen identical-source C cases match native default/T, including suspended
+callk boundaries, failed traceback locals and warm persistent-refusal transfer.
+Ownerless borrowed guards retain their real barriers; self-close now propagates
+through their typed cleanup acknowledgements. Final matrix acceptance remains
+separate. See
+[ADR 0027](../docs/decisions/0027-protected-error-closing.md).
+
+The [public value/auxiliary checkpoint](../docs/sessions/2026-11-08-public-value-auxiliary.md)
+adds lua_len, lua_concat and lua_numbertocstring, plus 28 argument, option,
+metatable, userdata, reference, registration and error/result helpers. All
+value operations execute in Ada; the auxiliary C layer composes public calls
+and handles native varargs. Scalar output uses the shared exact renderer and
+parser with bounded fixed scratch, making no Lua allocator request. Seven
+value cases (including 20,000 seeded binary64 spellings) and 76 auxiliary cases
+match both separately built C configurations locally. Native-platform/shared
+and whole-target gates remain open. Public buffer, file, traceback and further
+core exports still require completion; see [ADR 0023](../docs/decisions/0023-public-value-auxiliary-operations.md).
+
 The implemented surface covers seeded state construction, default construction,
 closure, thread surfaces, allocator selection, stack movement/indexing,
 primitive values/conversions, stable NUL-terminated byte strings, raw tables,
@@ -27,6 +106,37 @@ integration audit. C table capacity arguments remain hints, pending wiring.
 Both constructors leave standard libraries closed, as C Lua does; Ada embedding
 retains its separate eager default environment.
 
+`lua_arith` and `lua_compare` use the shared primitive/metamethod engine.
+Primitive operations require no allocator growth. Handler calls preserve real
+caller operands and unary duplicate slots during debug reads/writes, use the
+same nonyieldable C portal, and retain the existing host budget. Seventeen
+cases match default and native T; the
+[session](../docs/sessions/2026-11-08-c-operator-windows.md) records scope and
+remaining thread-reset/base-closer/final acceptance obligations.
+
+`lua_stringtonumber` borrows the actual C extent and shares the exact runtime
+parser's fixed local numeric scratch. Numeric-string `lua_tonumberx`,
+`lua_tointegerx` and `lua_isnumber` use that path too: no Lua allocator growth
+is needed after stack reservation, and state calls retain the shared scan
+budget. The exported `lua_ident` data uses the pinned metadata macro format.
+Eleven native-default/T paired C cases and 1,641 local AUnit cases pass; the
+[session](../docs/sessions/2026-11-08-c-numeric-conversion.md) records scope.
+
+External `lua_pushexternalstring` payloads preserve their original buffer even
+at short/zero lengths. Their original allocator/userdata receives the exact
+pointer and length-plus-one once, including header-refusal cleanup. Collection
+queues existing headers without allocation; a guarded C portal runs release
+callbacks after Ada steps return. Callback Lua reentry shares the actual driver,
+roots, allocator and work budget. State teardown drains releases before deleting
+globals/code. Ordinary short strings use a weak per-universe intern index;
+external short keys normalize only when inserted as new table keys.
+String `lua_topointer` identifies the actual header while `lua_tolstring`
+borrows the original payload. See [ADR 0021](../docs/decisions/0021-external-string-ownership.md).
+The focused external consumer passes eighteen cases against default C/Ada.
+Its native T ownership-only mode passes thirteen and explicitly skips five
+reentry cases rejected by the reference lock instrumentation; these skips are
+not passing tests. Integrated Ada T and loader/unload/platform gates remain open.
+
 The call portal accepts null continuations and real Lua/C message handlers.
 Handlers run before failed frames and closing declarations unwind; recursive
 handler errors reuse the same protected boundary. A non-yieldable call accepts
@@ -37,11 +147,67 @@ yieldable continuations, public resume windows and C hooks; its
 [session record](../docs/sessions/2026-11-07-expanded-t-conformance.md) owns
 actual verification and remaining failures. These additions are not accepted
 full C API evidence. See [ADR 0017](../docs/decisions/0017-c-continuations-and-resume.md).
-Reader-based loading,
-dumping, full auxiliaries, debug APIs, builtin C trampolines and
-remaining exports are pending. In particular, `lua_tocfunction` currently exposes
-real foreign callbacks; Ada native-library functions need their own stable C
-trampolines before complete `luaL_openlibs`/C-function inspection parity.
+Reader-based `lua_load` and canonical `lua_dump` use real public callbacks.
+The protected reader region preserves callback stack values between reads,
+rejects yielding, returns the real error object, and restores the caller's
+stack with one closure or error. Source buffers use the selected universe
+allocator and are released on every callback/error/refusal path. Binary
+reading stops at the decoded graph without an extra EOF read; documented
+whole-buffer `B` inputs are copied into owned canonical storage. The Lua
+library's `load` continues to reject `B`, as pinned C Lua does.
+The shared scanner/parser and binary decoder now drive acquisition on actual
+byte demand, including native current-byte prefetch before token delivery.
+They consume one frontend pass, without gathering text to EOF first or
+reconstructing binary prefixes. A C-owned refill checkpoint above suspended
+Ada returns actual errors/yields as typed outcomes; explicit user API reentry
+retains the same driver, roots, allocator and work budget. See
+[ADR 0019](../docs/decisions/0019-demand-driven-input.md).
+
+Dumping serializes the selected actual canonical subtree and preserves the
+writer's stack between callbacks. It sends Lua 5.5's terminal NULL/zero call,
+returns a nonzero writer status unchanged, and releases its owned snapshot
+before propagating a writer error through the caller's C guard. The shared
+reader/writer consumer has twenty-eight separately named cases;
+`check-core-image.ps1` runs and compares that same source against both images.
+The demand-driven checkpoint passes the full local Windows/default/static
+consumer and 1,412 AUnit cases. Its standalone output matches the pinned native
+default and instrumented C runs; integrated Ada instrumented and complete
+platform acceptance remain separate final-delivery evidence.
+The public C debug surface now describes real active frames or a popped
+function through all `lua_getinfo` selectors, including source/name lifetimes,
+parameter/upvalue metadata, tail/`__call` data, transfer ranges and active lines.
+Inactive parameter names, active Lua/C locals, hidden varargs and captured
+locals share real canonical registers/cells; public upvalue get/set/id/join
+operate on the actual traced cells. Immutable graph names/source retain their
+NUL-terminated bytes without query allocations; simple selectors remain usable
+under provider refusal after stack reservation. `L` allocates its required
+result table and has separately exercised refusal/recovery behavior.
+`lua_gethook` returns an actual callable C dispatcher for Lua-installed hooks;
+C can save, directly invoke and restore it while the weak registry remains the
+callback owner. Hook transport stays hidden even after a hook replaces itself.
+The Windows/default/static checkpoint passes 1,489 AUnit cases and eighteen
+separately named C debug cases, with identical standalone output against pinned
+native default and T configurations. See its dated
+[session](../docs/sessions/2026-11-08-c-debug-identity.md) for exact checks and
+remaining integration limits. Complete platform/configuration acceptance is
+still required.
+
+Known stateless Ada builtins now use strong scalar identities with actual C
+trampolines; they allocate no closure/cache. C push/tocfunction roundtrips retain
+their identity and callability, while captured library functions retain distinct
+closures and real mutable cells. Direct C pointer calls share the current
+driver, allocator, registry, budget and capture owner through a hidden phase and
+a real C continuation, including yielding callbacks. Strict/lax UTF-8 iterators
+retain distinct stateless function identities. See
+[ADR 0020](../docs/decisions/0020-callable-builtin-identities.md).
+The local default/static checkpoint passes 1,515 AUnit cases, fifteen native-
+matched C builtin cases and the twenty-case C debug consumer. Return hooks read
+real result slots, with append/reuse/trim protocols independently observed;
+fifty-one native operation labels match first-transfer/count ranges. Complete
+matrix/full-upstream evidence remains with the parent delivery, as recorded in
+the dated [session](../docs/sessions/2026-11-08-callable-builtins.md).
+
+Full auxiliaries, external strings and remaining exports are pending.
 Missing APIs are missing symbols, never successful stubs. The separately named
 lua_ada_guard_probe remains a bootstrap boundary fixture; real lua_pcall is
 exercised independently by the consumer.
@@ -51,7 +217,10 @@ exercised independently by the consumer.
 C sees a stable opaque surface whose prefix matches configured LUA_EXTRASPACE.
 Its control block and surface block use the owning universe's storage provider.
 Thread contexts own traced C stacks; registry entries refer to the actual globals
-and main-thread objects. Context reclamation releases its two raw C blocks.
+and main-thread objects. Context reclamation releases its surface/control blocks
+and reserved reset driver/record. C-visible contexts also retain a bounded pool
+of real reset continuation frames so simple C closers can run after refusal;
+arbitrary Lua handlers continue to use the same allocator and host budget.
 String pointers refer to real immutable byte storage and remain valid while the
 Lua string is reachable. A null light-userdata address remains distinct from nil.
 

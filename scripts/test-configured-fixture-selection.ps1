@@ -1,0 +1,216 @@
+Set-StrictMode -Version Latest
+$ErrorActionPreference='Stop'
+$root=Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot 'ConfiguredFixtureEvidence.psm1') -Force
+$temporary=Join-Path $root ('reports/configured-selection-regressions/'+[guid]::NewGuid().ToString('N'))
+[void][IO.Directory]::CreateDirectory((Join-Path $temporary 'tests/lua'))
+[void][IO.Directory]::CreateDirectory((Join-Path $temporary 'tests/conformance/targets'))
+$classification='tests/conformance/targets/configured-fixture-classification.json'
+$sources=@(Get-ConfiguredFixtureDefinitions upstream-test|ForEach-Object source)
+$sourceLinks=@((Get-Content (Join-Path $root $classification) -Raw|ConvertFrom-Json -AsHashtable -Depth 24).entries|
+    Where-Object selection -CEQ configured-Ada-internal-counterpart-only|ForEach-Object{$_.source_linkage.bindings.path})
+$sources+=@($sourceLinks)
+$sourceClassification=Get-Content (Join-Path $root $classification) -Raw|ConvertFrom-Json -AsHashtable -Depth 24
+$sources+=@($sourceClassification.host_entries.path)+@($sourceClassification.host_entries.bindings.path)
+$sources+=@((Get-Content (Join-Path $root $classification) -Raw|ConvertFrom-Json -AsHashtable -Depth 24).entries|
+    Where-Object{$_.Contains('retained_default_counterpart')}|ForEach-Object{$_.retained_default_counterpart.path})
+$script:cases=0
+function Case($Name,[scriptblock]$Change,$Expected=''){
+    # These are source-selection fixtures only. No copied file is executed and
+    # none of the mutations below represents an observation or passing test.
+    Get-ChildItem (Join-Path $temporary 'tests/lua') -File|Remove-Item
+    foreach($path in $sources){
+        $target=Join-Path $temporary $path;[void][IO.Directory]::CreateDirectory((Split-Path -Parent $target))
+        Copy-Item -LiteralPath (Join-Path $root $path) -Destination $target
+    }
+    Copy-Item -LiteralPath (Join-Path $root $classification) -Destination (Join-Path $temporary $classification)
+    & $Change
+    $failure=$null
+    try{$audit=Get-ConfiguredFixtureAudit -Root $temporary}catch{$failure=$_.Exception.Message}
+    if(($Expected -eq '' -and $null -ne $failure) -or
+        ($Expected -ne '' -and ($null -eq $failure -or $failure -notmatch $Expected))){
+        throw "Configured source-selection regression $Name failed: $failure; expected $Expected"
+    }
+    if($Expected -eq '' -and ($audit.runtime_acceptance -or $audit.coverage_authority)){
+        throw 'Source-selection fixtures cannot claim runtime authority'
+    }
+    $script:cases++;Write-Output "CONFIGURED SELECTION PASS: $Name"
+}
+function Add-Source($Text){
+    [IO.File]::WriteAllText((Join-Path $temporary 'tests/lua/new-fixture.lua'),$Text,[Text.UTF8Encoding]::new($false))
+}
+function Change-Classification([scriptblock]$Change){
+    $path=Join-Path $temporary $classification
+    $value=Get-Content $path -Raw|ConvertFrom-Json -AsHashtable
+    & $Change $value
+    [IO.File]::WriteAllText($path,(ConvertTo-Json -InputObject $value -Depth 12),[Text.UTF8Encoding]::new($false))
+}
+Case 'source-bound complete configured selections produce no runtime authority' {}
+Case 'host CLI setup cannot masquerade as ordinary standalone execution' {
+    Change-Classification {param($v)$v.host_entries[0].selection='generic-default-source-comparison'}
+} 'closed source setup'
+Case 'host CLI delegation requires its native prompt operations' {
+    Change-Classification {param($v)$v.host_entries[0].native_prompt_operation_count=0}
+} 'closed source setup'
+Case 'host CLI delegation cannot omit required case arguments' {
+    Change-Classification {param($v)$v.host_entries[0].required_vararg_cases=@()}
+} 'closed source setup'
+Case 'host CLI source links do not invent actual executions' {
+    Change-Classification {param($v)$v.host_entries[0].execution_evidence=@('passed')}
+} 'closed source setup'
+Case 'CLI argument setup cannot be generic unselected execution' {
+    Change-Classification {param($v)$v.host_entries[1].selection='generic-default-source-comparison'}
+} 'closed source setup'
+Case 'CLI argument setup cannot omit a fault or public selector' {
+    Change-Classification {param($v)$v.host_entries[1].required_vararg_cases=@($v.host_entries[1].required_vararg_cases|Select-Object -SkipLast 1)}
+} 'closed source setup'
+Case 'dated CLI argument author observers cannot invent execution authority' {
+    Change-Classification {param($v)$v.host_entries[1].execution_evidence=@(@{synthetic_fixture=$true;result='passed'})}
+} 'closed source setup'
+Case 'ordinary sources cannot acquire the host-only exception' {
+    Change-Classification {param($v)$v.host_entries[0].path='tests/lua/new-fixture.lua'}
+} 'closed source setup'
+Case 'ordinary assertions remain selected for ordinary comparison' {Add-Source 'assert(1+1==2)'}
+Case 'T inside strings and comments does not omit ordinary assertions' {Add-Source "-- T.stacklevel()`nassert('T'=='T')"}
+Case 'unknown real T operations require an explicit campaign review' {Add-Source 'assert(T.stacklevel())'} 'Unclassified T-bearing fixture'
+Case 'a mixed ordinary and T file cannot be silently omitted' {Add-Source "assert(1+1==2)`nif T then assert(T.stacklevel()) end"} 'Unclassified T-bearing fixture'
+Case 'new ordinary assertions in a T-only fixture invalidate its classification' {
+    $path=Join-Path $temporary 'tests/lua/stack_inspection.lua'
+    [IO.File]::AppendAllText($path,"`nassert(1+1==2)`n")
+} 'fresh mixed/default/T source review'
+Case 'a missing T-only classification cannot become an omitted file' {
+    Change-Classification {param($v)$v.entries=@($v.entries|Select-Object -Skip 1)}
+} 'classification is incomplete'
+Case 'a duplicate classification cannot hide a different T-only source' {
+    Change-Classification {param($v)$v.entries[1]=$v.entries[0]}
+} 'fresh mixed/default/T source review'
+Case 'a source-classification artifact cannot claim runtime acceptance' {
+    Change-Classification {param($v)$v.runtime_acceptance=$true}
+} 'claims runtime authority'
+Case 'Ada internal storage cannot be reclassified as a native paired facade' {
+    Change-Classification {param($v)@($v.entries|Where-Object selection -CEQ configured-Ada-internal-counterpart-only)[0].selection='paired-configured-T-only'}
+} 'fresh mixed/default/T source review'
+Case 'an invented source link is not an actual AUnit case' {
+    Change-Classification {param($v)@($v.entries|Where-Object selection -CEQ configured-Ada-internal-counterpart-only)[0].source_linkage.aunit_named_cases[0].case='invented'}
+} 'named AUnit linkage differs'
+Case 'source linkage cannot pretend it contains passing runtime evidence' {
+    Change-Classification {param($v)@($v.entries|Where-Object selection -CEQ configured-Ada-internal-counterpart-only)[0].source_linkage.runtime_evidence=@('passed')}
+} 'invents execution evidence'
+Case 'mixed public semantics cannot lose their ordinary counterpart' {
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/call_metadata_windows.lua)[0];[void]$row.Remove('retained_default_counterpart')}
+} 'lacks its ordinary counterpart'
+Case 'an ordinary counterpart cannot replace a body with a named marker' {
+    $script:mutatedOrdinaryPath=Join-Path $temporary 'tests/lua/call_metadata_public.lua'
+    [IO.File]::WriteAllText($script:mutatedOrdinaryPath,[IO.File]::ReadAllText($script:mutatedOrdinaryPath).Replace('calls==1','calls==2'),[Text.UTF8Encoding]::new($false))
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/call_metadata_windows.lua)[0];$row.retained_default_counterpart.sha256=(Get-FileHash $script:mutatedOrdinaryPath).Hash.ToLowerInvariant()}
+} 'ordinary correspondence source bytes differ'
+Case 'mixed default correspondence cannot omit a public case' {
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/call_metadata_windows.lua)[0];$row.retained_default_counterpart.case_spans=@($row.retained_default_counterpart.case_spans|Select-Object -Skip 1)}
+} 'ordinary correspondence is incomplete'
+Case 'scalar closing cannot hide ordinary weak-root and jump semantics behind T controls' {
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/scalar_closing_refusal.lua)[0];[void]$row.Remove('retained_default_counterpart')}
+} 'lacks its ordinary counterpart'
+Case 'scalar closing ordinary companion must retain all five exact public bodies' {
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/scalar_closing_refusal.lua)[0];$row.retained_default_counterpart.case_spans=@($row.retained_default_counterpart.case_spans|Select-Object -Skip 1)}
+} 'ordinary correspondence is incomplete'
+Case 'a rehashed scalar closing companion cannot change an actual collected weak value' {
+    $script:mutatedOrdinaryPath=Join-Path $temporary 'tests/lua/scalar_closing_public.lua'
+    [IO.File]::WriteAllText($script:mutatedOrdinaryPath,[IO.File]::ReadAllText($script:mutatedOrdinaryPath).Replace('weak[1]==nil','weak[1]~=nil'),[Text.UTF8Encoding]::new($false))
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/scalar_closing_refusal.lua)[0];$row.retained_default_counterpart.sha256=(Get-FileHash $script:mutatedOrdinaryPath).Hash.ToLowerInvariant()}
+} 'ordinary correspondence source bytes differ'
+Case 'matching scalar closing case bodies cannot hide a changed metatable helper' {
+    $script:mutatedOrdinaryPath=Join-Path $temporary 'tests/lua/scalar_closing_public.lua'
+    [IO.File]::WriteAllText($script:mutatedOrdinaryPath,[IO.File]::ReadAllText($script:mutatedOrdinaryPath).Replace('__close=fn','__index=fn'),[Text.UTF8Encoding]::new($false))
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/scalar_closing_refusal.lua)[0];$row.retained_default_counterpart.sha256=(Get-FileHash $script:mutatedOrdinaryPath).Hash.ToLowerInvariant()}
+} 'ordinary helper differs'
+Case 'scalar closing helper span lengths require actual integral source coordinates' {
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/scalar_closing_refusal.lua)[0];$row.retained_default_counterpart.helper_spans[0].ordinary.byte_length=[string]$row.retained_default_counterpart.helper_spans[0].ordinary.byte_length}
+} 'helper correspondence is outside its source'
+function Link-Case($Name,[scriptblock]$Action,$Expected=''){
+    $failure=$null
+    try{& $Action}catch{$failure=$_.Exception.Message}
+    if(($Expected -eq '' -and $null -ne $failure) -or
+        ($Expected -ne '' -and ($null -eq $failure -or $failure -notmatch $Expected))){
+        throw "Configured linkage regression $Name failed: $failure; expected $Expected"
+    }
+    $script:cases++;Write-Output "CONFIGURED LINKAGE PASS: $Name"
+}
+# The named-evidence objects below are synthetic guard inputs. Actual callers
+# obtain this projection only from source-bound raw AUnit evidence validation;
+# passing this small linkage unit test never claims that a case was executed.
+$context='upstream-test/windows/validation/static'
+$namedCases=@((Get-Content (Join-Path $root $classification) -Raw|ConvertFrom-Json -AsHashtable -Depth 24).entries|
+    Where-Object selection -CEQ configured-Ada-internal-counterpart-only|ForEach-Object{$_.source_linkage.aunit_named_cases.case})
+$codeSource='tests/src/code_public_semantic_tests.adb'
+$codeCases=@([regex]::Matches((Get-Content (Join-Path $root $codeSource) -Raw),
+    "(?s)Test_Support\.Add\s*\(Suite,\s*`"([^`"]+)`"\s*,\s*([A-Za-z0-9_]+)'Access")|
+    ForEach-Object{$codeSource+'#'+$_.Groups[2].Value})
+$namedCases+=@($codeCases)
+Link-Case 'only Ada can supply the actual owned-storage inspector role' {
+    $definition=@(Get-ConfiguredFixtureDefinitions upstream-test|Where-Object id -CEQ table-storage-private)[0]
+    if((@(Get-ConfiguredFixtureRoles $definition) -join '|') -cne 'Ada'){throw 'Wrong private inspector role'}
+}
+Link-Case 'native T cannot be declared an Ada inspector facade' {
+    $null=Get-ConfiguredFixtureRoles @{id='table-storage-private';roles=@('ReferenceC')}
+} 'internal counterpart roles differ'
+Link-Case 'all39 storage and29 public code identities satisfy only the source-linkage guard' {
+    Assert-ConfiguredFixtureNamedCounterparts -Root $root -Context $context -NamedEvidence @{context=$context;runtime_observed=$true;named_aunit_cases=$namedCases}
+}
+Link-Case 'nextvar public mode remains a native and Ada pair in both configurations' {
+    foreach($configuration in @('default','upstream-test')){
+        $d=@(Get-ConfiguredFixtureDefinitions $configuration|Where-Object id -CEQ nextvar-storage-public)[0]
+        if((@(Get-ConfiguredFixtureRoles $d)-join '|') -cne 'ReferenceC|Ada' -or $d.script_arguments[0] -cne 'public'){
+            throw 'Public nextvar mode lost its native counterpart'
+        }
+    }
+}
+Link-Case 'nextvar actual storage cannot borrow a native inspector facade' {
+    $null=Get-ConfiguredFixtureRoles @{id='nextvar-storage-private';roles=@('ReferenceC')}
+} 'internal counterpart roles differ'
+Link-Case 'nextvar explicit public mode cannot silently call the private inspector' {
+    $d=@(Get-ConfiguredFixtureDefinitions default|Where-Object id -CEQ nextvar-storage-public)[0]
+    $d.script_arguments=@('ada-storage')
+    $null=Get-ConfiguredFixtureArguments -Root $root -Definition $d
+} 'mode or return protocol differs'
+Link-Case 'nextvar source helper must retain its actual one-integer return protocol' {
+    $d=@(Get-ConfiguredFixtureDefinitions default|Where-Object id -CEQ nextvar-storage-public)[0]
+    $d.call_return=0
+    $null=Get-ConfiguredFixtureArguments -Root $root -Definition $d
+} 'mode or return protocol differs'
+Link-Case 'default public code counterparts require all29 actual named identities too' {
+    $ordinaryContext='default/windows/validation/static'
+    Assert-ConfiguredFixtureNamedCounterparts -Root $root -Context $ordinaryContext -NamedEvidence @{context=$ordinaryContext;runtime_observed=$true;named_aunit_cases=$codeCases}
+}
+Link-Case 'default contexts cannot omit a public numeric/cardinality counterpart' {
+    $ordinaryContext='default/windows/validation/static'
+    Assert-ConfiguredFixtureNamedCounterparts -Root $root -Context $ordinaryContext -NamedEvidence @{context=$ordinaryContext;runtime_observed=$true;named_aunit_cases=@($codeCases|Select-Object -Skip 1)}
+} 'public optimizer lacks an actual required named'
+Link-Case 'ordinary public code remains selected for generic default execution too' {
+    $definition=@(Get-ConfiguredFixtureDefinitions default|Where-Object id -CEQ code-public-semantics)
+    if($definition.Count -ne 1 -or $definition[0].generic_default -isnot [bool] -or -not $definition[0].generic_default){
+        throw 'Public code semantics lost its ordinary default route'
+    }
+}
+Link-Case 'ordinary mutation materialization diagnostics and locale bodies keep their default route' {
+    $audit=Get-ConfiguredFixtureAudit -Root $root
+    foreach($path in @('tests/lua/scalar_closing_mutation.lua','tests/lua/materialized_vararg.lua',
+        'tests/lua/table_error_arguments.lua','tests/lua/locale_strings.lua')){
+        $row=@($audit.entries|Where-Object path -CEQ $path)
+        if($row.Count -ne 1 -or $row[0].selection -cne 'generic-default-source-comparison'){
+            throw 'An ordinary public fixture lost its generic default route'
+        }
+    }
+}
+Link-Case 'source labels alone cannot replace actual named observations' {
+    Assert-ConfiguredFixtureNamedCounterparts -Root $root -Context $context -NamedEvidence @{context=$context;runtime_observed=$false;named_aunit_cases=$namedCases}
+} 'actual same-context named'
+Link-Case 'named observations from a different configuration cannot transfer' {
+    Assert-ConfiguredFixtureNamedCounterparts -Root $root -Context $context -NamedEvidence @{context='default/windows/validation/static';runtime_observed=$true;named_aunit_cases=$namedCases}
+} 'actual same-context named'
+Link-Case 'one missing actual named inspector counterpart blocks target receipts' {
+    Assert-ConfiguredFixtureNamedCounterparts -Root $root -Context $context -NamedEvidence @{context=$context;runtime_observed=$true;named_aunit_cases=@($namedCases|Select-Object -Skip 1)}
+} 'lacks an actual required named'
+Link-Case 'invented names cannot replace required actual inspector cases' {
+    Assert-ConfiguredFixtureNamedCounterparts -Root $root -Context $context -NamedEvidence @{context=$context;runtime_observed=$true;named_aunit_cases=@('invented')+@($namedCases|Select-Object -Skip 1)}
+} 'lacks an actual required named'
+Write-Output "PASS: $script:cases configured source-selection regressions; synthetic non-execution fixtures"

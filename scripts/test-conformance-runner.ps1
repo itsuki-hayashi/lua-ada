@@ -311,6 +311,17 @@ Case 'execution contract source hashes cannot drift' {
     $fixture = New-AcceptanceFixture 'contract-hash'; $fixture.Contract.source_hashes['sample.lua']=('b' * 64)
     Assert-AcceptanceRejected $fixture 'stale contract source accepted'
 }
+Case 'Aggregate cannot borrow a file contract missing the other original source hashes' {
+    # The helper process is synthetic harness input. Even a reviewed successful
+    # observation must bind all 34 original files for Aggregate acceptance.
+    $fixture=New-AcceptanceFixture 'aggregate-incomplete-contract'
+    $fixture.Operation='aggregate';$fixture.Contract.operation='aggregate'
+    $fixture.Contract.source_hashes=[ordered]@{'all.lua'=('a'*64)}
+    $fixture.SourceRecords=@([ordered]@{path='all.lua';sha256=('a'*64)})
+    $failure=$null
+    try{[void](Test-ConformanceAcceptance @fixture)}catch{$failure=$_.Exception.Message}
+    Assert-True ($failure -ceq 'Aggregate contract must identify all 34 original Lua sources') 'Incomplete Aggregate contract was accepted or failed at an unrelated gate'
+}
 Case 'unexpected warning text fails reviewed execution acceptance' {
     # Unlike observation collection, acceptance enumerates every stderr line.
     # An unexpected warning cannot disappear behind a successful exit/marker.
@@ -479,6 +490,134 @@ if ($ReferenceInterpreter -ne '') {
         Assert-True ([IO.File]::ReadAllText($p.stderr_path).Contains('invalid LUA_ADA_CONFORMANCE_ALLOCATOR')) 'budget diagnostic missing'
     }
 }
+function New-ExcludedOmissionFixture {
+    # Only protocol fixtures are synthesized here. Real exclusions must first
+    # pass the source/hash/independent-review inventory validator.
+    $fixture = New-AcceptanceFixture 'target-excluded-omission' `
+        'Write-Output ">>> testC not active: skipping opcode tests <<<"; Write-Output "DONE"'
+    $id = 'LUA-SAMPLE-REVIEWED-BLOCK-0001'
+    $fixture.Contract.expected_skips = @(@{message=$fixture.Outcome.skip_messages[0];coverage_ids=@($id);
+        review_artifact='synthetic omission review';original_c_evidence='synthetic C absence'})
+    $fixture.CoverageRecords = @{$id=@{status='pending';kind='reviewed-block';evidence=@()}}
+    $fixture.TargetPolicy = 'remaining-upstream-compatibility'
+    $fixture.ResolvedExclusions = @{$id=@{id=$id;status='excluded';disposition='reviewed-t-internal-exclusion';
+        eligibility='t-only-private-invariant';configurations=@('upstream-test');public_api=$false;
+        mixed_obligation=$false;module_observable=$false;evidence=@()}}
+    return $fixture
+}
+Case 'explicit target T absence reports an exclusion without pass evidence' {
+    $fixture = New-ExcludedOmissionFixture
+    $result = Test-ConformanceAcceptance @fixture
+    Assert-True ($result.gate_acceptance -and $result.excluded_omissions.Count -eq 1) 'Authorized target omission rejected'
+    $record = @($fixture.CoverageRecords.Values)[0]
+    Assert-True ($record.status -ceq 'pending' -and @($record.evidence).Count -eq 0) 'Exclusion became runtime evidence'
+}
+Case 'strict execution cannot consume an approved target exclusion' {
+    $fixture = New-ExcludedOmissionFixture; $fixture.TargetPolicy = 'strict-upstream'
+    Assert-AcceptanceRejected $fixture 'Strict original-suite protocol accepted an exclusion'
+}
+Case 'v2 observable private bounds require explicit compatibility and retained-parent bindings' {
+    # Synthetic resolved source metadata only; no feature review or execution.
+    $fixture=New-ExcludedOmissionFixture
+    $excluded=@($fixture.ResolvedExclusions.Values)[0]
+    $excluded.eligibility_schema_version=2;$excluded.module_observable=$true
+    $excluded.module_compatibility_obligation=$false;$excluded.observation_kind='private-resource-bound'
+    $excluded.retained_parent=@{id='LUA-SAMPLE-ASSERT-CALL-0001';byte_offset=0;byte_length=33;anchor_sha256=('a'*64)}
+    $result=Test-ConformanceAcceptance @fixture
+    Assert-True ($result.gate_acceptance -and $result.excluded_omissions.Count -eq 1) 'Truthful observable annotation was conflated with public compatibility'
+    $excluded.module_compatibility_obligation=$true
+    Assert-AcceptanceRejected $fixture 'A public module compatibility obligation became a private omission'
+    $excluded.module_compatibility_obligation=$false;$excluded.retained_parent=@{}
+    Assert-AcceptanceRejected $fixture 'A v2 bound omitted its separately retained original assertion'
+}
+Case 'instrumented T absence cannot be waived by an exclusion' {
+    $fixture = New-ExcludedOmissionFixture; $fixture.Configuration = 'upstream-test'
+    Assert-AcceptanceRejected $fixture 'Instrumented T omission accepted'
+}
+Case 'non-T omissions cannot consume the T-private exclusion policy' {
+    $fixture = New-ExcludedOmissionFixture
+    $fixture.Outcome.skip_messages = @('skipping an ordinary test')
+    $fixture.Contract.expected_skips[0].message = $fixture.Outcome.skip_messages[0]
+    Assert-AcceptanceRejected $fixture 'Ordinary behavior was excluded through a T policy'
+}
+Case 'public and mixed omissions still require real execution' {
+    foreach ($field in @('public_api','mixed_obligation','module_observable')) {
+        $fixture = New-ExcludedOmissionFixture
+        $fixture.ResolvedExclusions.Values | ForEach-Object { $_[$field] = $true }
+        Assert-AcceptanceRejected $fixture "Target omission waived $field"
+    }
+}
+Case 'target context mismatch blocks every operation before a compiler or Lua process' {
+    # This launches only the PowerShell producer. A context that names another
+    # host must stop before interpreter lookup or a fixture build, regardless
+    # of whether the real coverage ledger is pending or complete.
+    foreach ($mode in @('File','Aggregate','Heavy')) {
+        $reportPath = Join-Path $temporary "target-$mode.json"
+        $arguments = @('-NoProfile','-File',(Join-Path $PSScriptRoot 'run-conformance.ps1'),
+            '-Target','Ada','-TargetPolicy','remaining-upstream-compatibility','-RequireTargetAcceptance',
+            '-Mode',$mode,'-Context','default/unsupported/validation/static','-Report',$reportPath)
+        if ($mode -ceq 'File') { $arguments += @('-File','api.lua') }
+        $process = Invoke-ConformanceProcess -Executable $shell -Arguments $arguments -Directory $root `
+            -OutputPrefix (Join-Path $temporary "target-$mode-capture") -TimeoutSeconds 60
+        Assert-True ($process.exit_code -ne 0 -and -not $process.timed_out) 'Incomplete target accepted'
+        $report = Get-Content -LiteralPath $reportPath -Raw | ConvertFrom-Json -AsHashtable
+        Assert-True ($report.setup_error -ceq 'Full-target context does not identify this configuration and host' -and
+            $null -eq $report.process -and @($report.build_processes).Count -eq 0 -and
+            -not $report.target_operation_acceptance -and -not $report.gate_acceptance -and
+            $report.variant -ceq 'primary' -and $report.target_policy -ceq 'remaining-upstream-compatibility') `
+            'Producer bypassed its incomplete-coverage gate or performed a build'
+        if ($mode -ceq 'Heavy') {
+            Assert-True ($report.allocator_limit_bytes -eq 67108864 -and $report.timeout_seconds -eq 600) 'Heavy policy drift'
+        } elseif ($mode -ceq 'Aggregate') {
+            Assert-True ($report.allocator_limit_bytes -eq 2147483648 -and $report.timeout_seconds -eq 3600) 'Aggregate policy drift'
+        }
+    }
+}
+Case 'full-target native fixture compiler omissions and frozen hash drift reject before Lua' {
+    $platform=if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'}
+    foreach($selection in @(@(),@('-FixtureCompiler',$shell,'-FixtureCompilerSha256',('0'*64)))) {
+        $reportPath=Join-Path $temporary ('target-native-compiler-'+[Guid]::NewGuid().ToString('N')+'.json')
+        $arguments=@('-NoProfile','-File',(Join-Path $PSScriptRoot 'run-conformance.ps1'),'-Target','ReferenceC',
+            '-TargetPolicy','remaining-upstream-compatibility','-Mode','File','-File','attrib.lua',
+            '-Context',('default/'+$platform+'/validation/static'),'-Report',$reportPath,'-Interpreter','unused')+@($selection)
+        $process=Invoke-ConformanceProcess -Executable $shell -Arguments $arguments -Directory $root `
+            -OutputPrefix (Join-Path $temporary ('native-compiler-'+[Guid]::NewGuid().ToString('N'))) -TimeoutSeconds 60
+        $report=Get-Content $reportPath -Raw|ConvertFrom-Json -AsHashtable
+        Assert-True ($process.exit_code -ne 0 -and $report.setup_error -match 'fixture.*compiler|frozen FixtureCompiler' -and
+            $null -eq $report.configuration_process -and $null -eq $report.process -and $report.build_processes.Count -eq 0) 'Missing/stale compiler entered a Lua or build process'
+    }
+}
+Case 'full-target smoke and mixed acceptance flags reject before setup' {
+    foreach ($arguments in @(
+        @('-TargetPolicy','remaining-upstream-compatibility','-Mode','Smoke'),
+        @('-TargetPolicy','remaining-upstream-compatibility','-Scope','expanded-t-conformance','-Mode','File','-File','api.lua'),
+        @('-RequireTargetAcceptance','-Target','Ada','-Mode','File','-File','api.lua'),
+        @('-AggregateManifest','unreviewed.json','-Mode','Aggregate'),
+        @('-AggregateManifest','unreviewed.json','-TargetPolicy','remaining-upstream-compatibility','-Mode','File','-File','code.lua'),
+        @('-AggregateManifest','unreviewed.json','-TargetPolicy','remaining-upstream-compatibility','-Mode','Aggregate','-TAdaptationManifest','unreviewed-t.json'),
+        @('-Variant','native-original','-Target','Ada','-TargetPolicy','remaining-upstream-compatibility','-Mode','File','-File','attrib.lua','-ReportOnly'),
+        @('-Variant','native-original','-Target','ReferenceC','-TargetPolicy','remaining-upstream-compatibility','-Mode','File','-File','attrib.lua'),
+        @('-Variant','native-original','-Target','ReferenceC','-TargetPolicy','remaining-upstream-compatibility','-Mode','File','-File','attrib.lua','-ReportOnly','-EquivalentManifest','unreviewed.json')
+    )) {
+        $process = Invoke-ConformanceProcess -Executable $shell `
+            -Arguments (@('-NoProfile','-File',(Join-Path $PSScriptRoot 'run-conformance.ps1')) + $arguments) `
+            -Directory $root -OutputPrefix (Join-Path $temporary ('bad-target-' + [Guid]::NewGuid().ToString('N'))) -TimeoutSeconds 20
+        Assert-True ($process.exit_code -ne 0 -and $process.stderr_bytes -gt 0) 'Invalid target flags entered execution'
+    }
+}
+Case 'exact binary stdin and bounded simultaneous pipe transport' {
+    & (Join-Path $PSScriptRoot 'test-conformance-stdin.ps1')
+}
+Case 'file binary producer and stdin replay rejects synthetic incomplete or altered paths' {
+    & (Join-Path $PSScriptRoot 'test-file-consumer-io.ps1')
+}
+Case 'public SDK macro protocols preserve actual configuration and expanded bytes' {
+    & (Join-Path $PSScriptRoot 'test-sdk-macro-evidence.ps1')
+}
 Write-Output "RUNNER TESTS: $script:cases cases; $($failures.Count) failed"
 if ($failures.Count -gt 0) { exit 1 }
+if ($ReferenceInterpreter -ne '') {
+    & $shell -NoProfile -File (Join-Path $PSScriptRoot 'test-target-file-protocols.ps1') -ReferenceInterpreter $ReferenceInterpreter
+    if ($LASTEXITCODE -ne 0) { throw 'Target file wrapper execution regressions failed' }
+}
 exit 0

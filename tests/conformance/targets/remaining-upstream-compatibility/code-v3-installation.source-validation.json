@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "kind": "source-installation-validation-observation",
+  "id": "code-v3-exact-installation",
+  "author": "Codex /root/remaining_suite",
+  "date": "2026-11-08",
+  "authoring_base": "9cb8ff028b1ac488669586a4b8a334fc83797c21",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_decision": "Independent Suite review of Validation authored drafts; no Root identity was forged. New guard code is authored by Suite and awaits Root review.",
+  "source_guards": {
+    "header_entries": 473,
+    "pending_source_anchors": 2266,
+    "target_complete": false,
+    "source_anchors": 4777,
+    "strict_complete": false,
+    "installed_normal_guards": 14,
+    "strict_inventory": "pass",
+    "resource_v4": 68,
+    "reviewed_source_exclusions": 9,
+    "remaining_target_inventory": "pass",
+    "exclusion_guards": 45,
+    "required_pending_source_obligations": 2257,
+    "draft_pending_audit": 243,
+    "optimizer_v3": 42
+  },
+  "source_graph": {
+    "original_source_identities": 51,
+    "source_reference_classifications": 18,
+    "protected_historical_scope_hashes_unchanged": true,
+    "original_51_raw_snapshot_preserved": true,
+    "derived_end_line_corrections": 12,
+    "private_children": 8,
+    "active_nodes": 28,
+    "existing_api18_policy_row_unchanged": true,
+    "required_public_nodes_pending": 9,
+    "checked_bindings": 237,
+    "acyclic": true
+  },
+  "generation": {
+    "disposable_reports_only": true,
+    "after_independent_review_and_guards": true,
+    "alire_or_gpr_invoked": false,
+    "code_output": {
+      "path": "reports/debug-metadata/code8-reviewed-source/code.lua",
+      "bytes": 14299,
+      "sha256": "676304c019ee3afe8796da7ddfaf8f14cba43c2c49332d96f19b3f4c84211fe0"
+    },
+    "lua_executed": false,
+    "normal_validator_only": true,
+    "api18_output": {
+      "path": "reports/debug-metadata/code8-reviewed-source/api18.lua",
+      "bytes": 40011,
+      "sha256": "51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc"
+    }
+  },
+  "initial_failures": [
+    "The first normal inventory rejected a draft derived end_line field. Twelve trailing-LF derived metadata fields were corrected without changing spans/hashes/originals/validators; exact corrections are in the independent review.",
+    "The initial new guard harness expected a different executable-replacement error phrase; the normal reader correctly rejected the bypass. Only the expected message pattern changed before the final14-case pass."
+  ],
+  "broader_integration": {
+    "documentation": "Full checker blocked by the uninitialized future Busted rockspec link; changed-file encoding/links separately checked.",
+    "reviewed_source_selection": {
+      "exit_code": 1,
+      "status": "blocked at stale API composite policy/operation identity; no renewed API941/composition authority"
+    },
+    "transform_script": {
+      "completed_exact_byte_unit_cases": 35,
+      "status": "blocked at dated GC adapter-test and verifier adapter source bindings; not a passing combined script",
+      "exit_code": 1
+    }
+  },
+  "source_bindings": [
+    {
+      "path": "scripts/test-code-v3-installation.ps1",
+      "bytes": 9995,
+      "sha256": "7923a1e0f5589e60cc83f2121cce609e57032aa4c515f583add1f813fb102427"
+    },
+    {
+      "path": "scripts/test-conformance-exclusions.ps1",
+      "bytes": 38906,
+      "sha256": "96083224d15f26bff8b872a76677e913b5ff61f24a6287264f8f5ffdaa365a34"
+    },
+    {
+      "path": "tests/conformance/coverage/code.jsonl",
+      "bytes": 54603,
+      "sha256": "68d7da0eb7f58f2320495ee71d8ba45aacf0c2529832d68ceffd97184d6e613b"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility.exclusions.json",
+      "bytes": 28620,
+      "sha256": "a7ae9b40b57dc48ce5742a7a3baefd2ddc79696a1c028eb8287c0efe5623a5ec"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/code-private-optimizer-v3.decomposition.json",
+      "bytes": 66759,
+      "sha256": "ac5b0eeb7cccffb359b3b0cc41dd8425714f4a04836a75ec24023d86f8d54c4a"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/code-private-optimizer-v3.transform.json",
+      "bytes": 5588,
+      "sha256": "713b149e95ed5d82ddb1e0183e13d758ba53ebad2869bc1b3839744879bfbf34"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.transform.json",
+      "bytes": 3678,
+      "sha256": "85a69ef2e9152631d1e6ab4155a615daf73a480b4bd332a67c998225db20459d"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3.source-installation-approval.json",
+      "bytes": 4045,
+      "sha256": "7aa623cd24dd967d0cf2315db416bdda34abe9da4158db25f70a1f7671d7bfcf"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3-installation.independent-review.json",
+      "bytes": 26142,
+      "sha256": "faffcd7c683bbcf96ec235e92ec34be85f33f7cc5335df56c548a25e07502bf2"
+    },
+    {
+      "path": "tests/conformance/scopes/gc-io-events.json",
+      "bytes": 4502,
+      "sha256": "79fa732f60f380c93be190f43640acf0b2ac595bdf9196d2fc8fd0a7ee62eae7"
+    },
+    {
+      "path": "tests/conformance/scopes/expanded-t-conformance.json",
+      "bytes": 9938,
+      "sha256": "9df8642d10238abaa48c97184ed2345be7106d4c2c74668954e43bc0cb6ecdc1"
+    }
+  ],
+  "artifact_bindings": [
+    {
+      "path": "reports/debug-metadata/code8-draft-audit.log",
+      "bytes": 100,
+      "sha256": "7fb269f834fd150a678e3c2565747c12ef351a1583c0337a058fae11cb8d6cd9"
+    },
+    {
+      "path": "reports/debug-metadata/code8-installed-inventory.log",
+      "bytes": 73,
+      "sha256": "20d10e6510ba468dd3f917736cc1792fcfad2d51d41bca60dfc755a3c7094a04"
+    },
+    {
+      "path": "reports/debug-metadata/code8-installed-inventory-corrected.log",
+      "bytes": 319,
+      "sha256": "cae26fcf0c52f1882a386df31d213168e8143a7395c4c6cccd9369349d0f151e"
+    },
+    {
+      "path": "reports/debug-metadata/code8-strict-inventory.log",
+      "bytes": 157,
+      "sha256": "ebcfd72bf48e6ca4c36c2222b5076d918db43a90375e1ea4bb80e89f6a488ce3"
+    },
+    {
+      "path": "reports/debug-metadata/code8-test-conformance-exclusions.log",
+      "bytes": 3938,
+      "sha256": "a14ce317b285fb8ece65a5f130e91e2ff4364606cc2f2ac84ee8ec694c5d0bf2"
+    },
+    {
+      "path": "reports/debug-metadata/code8-test-optimizer-exclusion-v3.log",
+      "bytes": 3588,
+      "sha256": "d40357e1d8fed37e6e00a483ca6859a5e8a1dd73829029dfc9d86b7ded45148e"
+    },
+    {
+      "path": "reports/debug-metadata/code8-test-resource-exclusion-v4.log",
+      "bytes": 5350,
+      "sha256": "29583ca01149248ca7540086a9042c56943c007c249c5fadfeb14445181c9ac4"
+    },
+    {
+      "path": "reports/debug-metadata/code8-test-conformance-transforms.log",
+      "bytes": 3986,
+      "sha256": "bf593cee616c7d7a30bb7588d943b45c27722bf3649678c1e21a47249f25d7bd"
+    },
+    {
+      "path": "reports/debug-metadata/code8-test-reviewed-source-selection.log",
+      "bytes": 98,
+      "sha256": "d16ea17b9a8476c66fc8b5fbe493c1726ec4f7bbe5a568a052d76527f0ab7e15"
+    },
+    {
+      "path": "reports/debug-metadata/code8-installation-guards.log",
+      "bytes": 1564,
+      "sha256": "2e32a6d48b30d54b04e9bb74ad4117e0b58b6548afe4aa9db46c32fd5346c655"
+    },
+    {
+      "path": "reports/debug-metadata/code8-installation-guards-corrected.log",
+      "bytes": 1519,
+      "sha256": "ce0cb4b6cc37edd3120be62135d3dd1317a683290728778c9b2bc93a764b3731"
+    },
+    {
+      "path": "reports/debug-metadata/code8-active-graph.json",
+      "bytes": 15509,
+      "sha256": "77ecdc38ac1c8984f72a198960c3d55be488eac04393ee5e891cc4428d6215a7"
+    },
+    {
+      "path": "reports/debug-metadata/code8-active-graph-corrected.log",
+      "bytes": 121,
+      "sha256": "000ab417310878951b0e961db0e1cab37bdabfa003de8077748ca07b889313ad"
+    },
+    {
+      "path": "reports/debug-metadata/code8-code-generation.log",
+      "bytes": 989,
+      "sha256": "0231477975df72c34ee21407d87dd1b942492a7e29db0fc6c461c341e9d00b57"
+    },
+    {
+      "path": "reports/debug-metadata/code8-api18-generation.log",
+      "bytes": 782,
+      "sha256": "54c021e48445f87ac64392b5d9952bc628527a6f7965442c3e4718c65ccd9474"
+    }
+  ],
+  "limits": [
+    "No native C or Ada upstream/runtime execution occurs in this checkpoint.",
+    "Eight new Code exclusions plus the prior API child are source-only dispositions, not nine passing tests.",
+    "Fresh current-image Code/public witnesses/binary roles and full API/source/context/aggregate acceptance remain mandatory.",
+    "The unchanged dated drafts and prior Root reviews do not gain current authority; frozen inputs retain their exact old hashes.",
+    "API941/composition, GC/verifier, Querystr, Memerr and Nextvar policies are not renewed or installed here."
+  ]
+}

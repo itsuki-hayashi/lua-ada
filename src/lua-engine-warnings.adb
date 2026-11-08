@@ -2,6 +2,7 @@ with Ada.Strings.Fixed;
 with Interfaces.C;
 with Lua.Platform_Streams;
 with Lua.Engine.Stacks;
+with Lua.Engine.Stack_Views;
 with System;
 
 package body Lua.Engine.Warnings is
@@ -15,7 +16,6 @@ package body Lua.Engine.Warnings is
 
    function C_View (Message : Byte_String) return Byte_String;
    procedure Write (Message : Byte_String);
-   procedure Restore_View (Activation : not null Frame_Access);
 
    function C_View (Message : Byte_String) return Byte_String is
       Result : Byte_String := Message;
@@ -136,41 +136,18 @@ package body Lua.Engine.Warnings is
    procedure Begin_Callback (State : in out World) is
       Activation : constant Frame_Access := State.Warning_Head;
       Context : Context_Access;
-      Window : Frame_Access;
    begin
       if not Pending (State) then
          raise Program_Error with "no requested warning callback";
       end if;
       Context := Activation.Context;
-      Window := Context.Stack_Window;
-      Activation.Warning_Previous_Base := Context.Foreign_Base;
-      Activation.Warning_Previous_Top := Context.Foreign_Top;
-      Activation.Warning_Previous_Frame := Context.Foreign_Activation;
       --  The handler is invisible to Lua inspection. Borrow the actual
       --  current real frame rather than inventing a C frame or using the
       --  stale base of a foreign caller suspended below intervening Lua.
-      if Window /= null then
-         Activation.Warning_Window := Window;
-         Window.Warning_Borrow_Depth := Window.Warning_Borrow_Depth + 1;
-         Context.Foreign_Base := Window.Stack_Base;
-         Context.Foreign_Top :=
-           (if Window.Is_Native then Window.Stack_Live_Top else
-              Window.Stack_Base + Window.Canonical_Top);
-         Window.Stack_Live_Top := Context.Foreign_Top;
-         Context.Foreign_Activation := Window;
-      end if;
+      Stack_Views.Borrow
+        (State, Context, Context.Stack_Window, Activation.Warning_View);
       Activation.Warning_Phase := Warning_Callback_Active;
    end Begin_Callback;
-
-   procedure Restore_View (Activation : not null Frame_Access) is
-      Context : constant Context_Access := Activation.Context;
-   begin
-      if Activation.Warning_Phase = Warning_Callback_Active then
-         Context.Foreign_Base := Activation.Warning_Previous_Base;
-         Context.Foreign_Top := Activation.Warning_Previous_Top;
-         Context.Foreign_Activation := Activation.Warning_Previous_Frame;
-      end if;
-   end Restore_View;
 
    procedure Acknowledge
      (State : in out World; Token : Callback_Identity)
@@ -193,12 +170,7 @@ package body Lua.Engine.Warnings is
       if State.Warning_Head /= Activation then
          raise Program_Error with "warning event retirement is not LIFO";
       end if;
-      Restore_View (Activation);
-      if Activation.Warning_Window /= null then
-         Activation.Warning_Window.Warning_Borrow_Depth :=
-           Activation.Warning_Window.Warning_Borrow_Depth - 1;
-         Activation.Warning_Window := null;
-      end if;
+      Stack_Views.Restore (State, Activation.Warning_View);
       State.Warning_Head := Activation.Warning_Previous;
       Activation.Warning_Phase := No_Pending_Warning;
       Activation.Warning_Previous := null;
