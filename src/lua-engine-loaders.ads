@@ -1,4 +1,12 @@
 private package Lua.Engine.Loaders is
+   function Compile_Chunk
+     (State : in out World; Activation : Frame_Access;
+      Source, Chunk_Name, Mode : String; Environment : Value)
+      return Values.Vector;
+   --  Shared dynamic loader and debug-console compilation. Activation stays
+   --  traced throughout; its temporary capture roots any saved error value.
+   --  Return a closure or nil/message while preserving prior error ownership.
+
    function Advance
      (State : in out World; Activation : Frame_Access) return Native_Action;
    --  Resume loading or a package operation. Reader, searcher,

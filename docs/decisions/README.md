@@ -1,5 +1,8 @@
 # Architecture Decision Log
 
+ADR 0043 records [debug-console continuations](0043-debug-console-continuations.md),
+shared dynamic compilation and the existing protected scheduler path.
+
 ADR 0041 records the [test-only string-hash invariant](0041-test-string-hash-invariant.md),
 actual cached 64-bit reading and explicitly narrower main-state adapter scope.
 

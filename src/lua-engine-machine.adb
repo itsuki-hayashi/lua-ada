@@ -22,6 +22,7 @@ with Lua.Engine.Unicode;
 with Lua.Engine.Core_Libraries;
 with Lua.Engine.Pattern_Drivers;
 with Lua.Engine.Loaders;
+with Lua.Engine.Debug_Console;
 with Lua.Engine.Native_Modules;
 with Lua.Engine.Format_Drivers;
 with Lua.Engine.Diagnostics;
@@ -1657,7 +1658,7 @@ package body Lua.Engine.Machine is
            "base.tostring" | "base.print" | "ipairs.iterator" |
            "math.min" | "math.max" | "table.concat" | "table.insert" |
            "table.remove" | "table.move" | "table.unpack" | "table.sort" |
-           "base.load" | "base.loadfile" | "base.require" |
+           "base.load" | "base.loadfile" | "base.require" | "debug.debug" |
            "package.preload_searcher" | "package.lua_searcher" |
            "package.c_searcher" | "package.croot_searcher" |
            "package.loadlib" or else
@@ -4635,11 +4636,15 @@ package body Lua.Engine.Machine is
          end if;
          return;
       end if;
-      if Name'Length > 6 and then Name (1 .. 6) = "debug." then
+      if Name /= "debug.debug" and then
+        Name'Length > 6 and then Name (1 .. 6) = "debug."
+      then
          Complete (Self, Inspection.Inspect (State, Activation));
          return;
       end if;
-      if Name = "base.collectgarbage" then
+      if Name = "debug.debug" then
+         Action := Debug_Console.Advance (State, Activation);
+      elsif Name = "base.collectgarbage" then
          Garbage_Collection.Advance (State, Activation, Action);
       elsif Name'Length > 3 and then Name (1 .. 3) = "io." then
          Action := IO_Libraries.Advance (State, Activation);

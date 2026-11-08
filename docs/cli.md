@@ -54,8 +54,11 @@ global. The converted string remains rooted until its C-string prefix is
 written and flushed. Prompt lookup/conversion failure is a fatal raw
 diagnostic, and `os.exit` preserves its typed exit code/close request. The
 [CLI-only prompt transport](decisions/0039-cli-prompt-transport.md) retains the
-actual anonymous C callback frame without a Lua shim. Readline, SIGINT/hook
-interruption and tracebacks in REPL errors remain deferred.
+actual anonymous C callback frame without a Lua shim. The separate
+`debug.debug()` console reads native stdin in fixed-size commands and uses
+the [protected scheduler](decisions/0043-debug-console-continuations.md),
+reporting prompts and errors to stderr. Readline, SIGINT/hook interruption
+and tracebacks in REPL errors remain deferred.
 
 `--check` validates each requested chunk without executing it, creating globals,
 or loading modules. It accepts the same files, snippets, explicit stdin, `--`,

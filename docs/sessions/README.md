@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [debug console and actual C calls](2026-11-08-debug-console.md).
+
 Component: [bounded Nextvar storage counterparts](2026-11-08-nextvar-storage-counterparts.md).
 
 Component: [reviewed Verybig Windows replay](2026-11-08-verybig-approved-source.md).

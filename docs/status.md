@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [debug console](sessions/2026-11-08-debug-console.md) executes commands
+through shared Ada compilation and protected continuations, including actual
+direct C calls and closing slots. Local default/T builds pass 2,629 AUnit
+cases, 16 paired console operations, four paired C modes and the retained
+CLI/C consumers. Full main.lua and final-context acceptance remain pending.
+
 The [bounded Nextvar counterparts](sessions/2026-11-08-nextvar-storage-counterparts.md)
 exercise all 529 constructor size pairs, real table churn/values and actual
 Ada storage walks without fabricating C capacities. Both local configurations

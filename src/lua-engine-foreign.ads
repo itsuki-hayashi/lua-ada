@@ -244,6 +244,13 @@ package Lua.Engine.Foreign is
    --  Top is absolute and stays above its retained prefix. This invokes no
    --  closer; lua_concat's free-operand precondition excludes closing slots.
 
+   procedure Publish_Direct_Builtin_Base
+     (State : in out World; Base : Natural);
+   --  Record an explicitly normalized public prefix in the current direct
+   --  builtin call. Its completion appends results at this cursor instead of
+   --  restoring the entry top. The caller closes and clears the actual slots
+   --  first; this allocation-free publication belongs to that one live call.
+
    procedure Prepare_Thread_Surface
      (State : in out World; Context : Context_Id);
    --  Reserve the addressed thread's C surface while thread construction

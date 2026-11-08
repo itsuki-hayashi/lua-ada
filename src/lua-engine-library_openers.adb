@@ -123,7 +123,7 @@ package body Lua.Engine.Library_Openers is
             Members ("debug",
               "getinfo getlocal setlocal getupvalue setupvalue " &
               "upvalueid upvaluejoin getregistry getmetatable setmetatable " &
-              "getuservalue setuservalue sethook gethook traceback");
+              "getuservalue setuservalue sethook gethook traceback debug");
 
          when Math_Module =>
             Members ("math",

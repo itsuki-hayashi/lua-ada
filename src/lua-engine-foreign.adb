@@ -226,6 +226,8 @@ package body Lua.Engine.Foreign is
       --  A C call can address another context in this same universe. Its
       --  entry drive suspends only scalar driver ownership, not a Lua resume.
       Direct_Builtin : Boolean := False;
+      Builtin_Base_Published : Boolean := False;
+      Published_Builtin_Base : Natural := 0;
       Reuse_Argument_Span : Boolean := False;
       Saved_Driver : Driver_View;
       Saved_Owned_Driver : VM.Driver_Access;
@@ -1321,6 +1323,29 @@ package body Lua.Engine.Foreign is
       Publish_Top (Context, Top);
    end Set_C_Top;
 
+   procedure Publish_Direct_Builtin_Base
+     (State : in out World; Base : Natural)
+   is
+      Surface : constant Surfaces.Object_Pointer :=
+        Surfaces.To_Pointer (State.Current.Foreign_State);
+      Main : constant Controls.Object_Pointer :=
+        Controls.To_Pointer (Surfaces.To_Pointer (Surface.Main).Owner);
+      Current : constant Controls.Object_Pointer :=
+        Controls.To_Pointer (Surface.Owner);
+      Pending : constant Calls.Object_Pointer := Calls.To_Pointer (Main.Calls);
+   begin
+      if Main.Calls = System.Null_Address or else
+        not Pending.Direct_Builtin or else
+        Pending.Context /= Current.Context or else
+        Main.Universe.all'Address /= State'Address or else
+        Base /= Pending.Original_Base
+      then
+         raise Program_Error with "invalid direct builtin prefix publication";
+      end if;
+      Pending.Published_Builtin_Base := Base;
+      Pending.Builtin_Base_Published := True;
+   end Publish_Direct_Builtin_Base;
+
    procedure Set_Concatenation_Top (State : in out World; Top : Natural) is
       Context : constant Context_Access := State.Current;
    begin
@@ -1966,7 +1991,10 @@ package body Lua.Engine.Foreign is
          elsif not Held_Error_View and then
            not (Pending.Reuse_Argument_Span and then Error_Status = 0)
          then
-            Set_C_Top (Owner.Universe.all, Caller, Pending.Base);
+            Set_C_Top
+              (Owner.Universe.all, Caller,
+               (if Pending.Builtin_Base_Published then
+                   Pending.Published_Builtin_Base else Pending.Base));
          end if;
          Count := (if Error_Status not in 0 | 1 then 1
                    elsif Pending.Wanted = -1 then Natural (Packet.Length)

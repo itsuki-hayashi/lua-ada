@@ -24,6 +24,194 @@ package body Lua.Engine.Loaders is
    use type Native_Modules.Failure_Stage;
    use type File_Inputs.Outcome;
 
+   function Compile_Chunk
+     (State : in out World; Activation : Frame_Access;
+      Source, Chunk_Name, Mode : String; Environment : Value)
+      return Values.Vector
+   is
+      Results : Values.Vector := Owned_Values (State);
+      Code : Prototype_Access;
+      Scope : Object_Access;
+      function Prefix_Last (Bytes : String) return Natural;
+      function Prefix_Last (Bytes : String) return Natural is
+         Terminator : Natural;
+      begin
+         --  Name/mode are C options even though their Lua values contain
+         --  counted bytes. Charge the scan, then borrow the prefix rather
+         --  than materializing another input-sized ordinary String.
+         Diagnostic_Work (State, Bytes'Length);
+         Terminator := Ada.Strings.Fixed.Index
+           (Bytes, "" & Character'Val (0));
+         return (if Terminator = 0 then Bytes'Last else Terminator - 1);
+      end Prefix_Last;
+      Label : String renames Chunk_Name
+        (Chunk_Name'First .. Prefix_Last (Chunk_Name));
+      Flags : String renames Mode (Mode'First .. Prefix_Last (Mode));
+      --  Lua load's name is a C string, even though its source is counted
+      --  bytes. Borrow the prefix without copying/truncating the source.
+      Saved_Text : constant Lua.Diagnostic_Text.Text :=
+        State.Current.Failure_Text;
+      Saved_Value : constant Value := State.Current.Failure;
+      Saved_Has_Value : constant Boolean := State.Current.Has_Failure_Value;
+      Saved_At : constant Lua.Lexers.Source_Location :=
+        State.Current.Failure_At;
+      Saved_Class : constant Failure_Kind := State.Current.Failure_Class;
+      Saved_Captures : constant Ada.Containers.Count_Type :=
+        Activation.Native_Captures.Length;
+      type Saved_Error_Root is new Ada.Finalization.Limited_Controlled with
+      record
+         Registered : Boolean := False;
+      end record;
+      overriding procedure Finalize (Self : in out Saved_Error_Root);
+      overriding procedure Finalize (Self : in out Saved_Error_Root) is
+      begin
+         if Self.Registered then
+            --  Compilation never executes this loader's continuation.
+            --  Its one temporary capture remains the last owned slot;
+            --  remove it on every return, refusal or host-abort path.
+            if Activation.Native_Captures.Length = Saved_Captures + 1 then
+               Activation.Native_Captures.Delete_Last;
+            end if;
+            --  Restore checks normal-path ownership. During exceptional
+            --  unwinding, never replace the original host stop/refusal
+            --  with a finalizer exception. An unexpected capture layout
+            --  remains owned by the departing frame's ordinary cleanup.
+            Self.Registered := False;
+         end if;
+      end Finalize;
+      Saved_Root : Saved_Error_Root;
+      procedure Restore;
+      procedure Restore is
+      begin
+         State.Current.Failure_Text := Saved_Text;
+         State.Current.Failure := Saved_Value;
+         State.Current.Has_Failure_Value := Saved_Has_Value;
+         if Saved_Has_Value then
+            if not Saved_Root.Registered or else
+              Activation.Native_Captures.Length /= Saved_Captures + 1
+            then
+               raise Program_Error with "saved error lost its root";
+            end if;
+            Root_Barrier (State, Saved_Value);
+         end if;
+         State.Current.Failure_At := Saved_At;
+         State.Current.Failure_Class := Saved_Class;
+      end Restore;
+   begin
+      if Saved_Has_Value then
+         --  A local Value is not a tracing root. Preserve the original
+         --  error while compilation replaces context failure state and
+         --  can collect, then transfer ownership back before this guard
+         --  removes its actual activation capture. Shared text copies
+         --  alone must not conceal a collected original error identity.
+         Append_Root (State, Activation.Native_Captures, Saved_Value);
+         Saved_Root.Registered := True;
+      end if;
+      --  The signature selects binary versus text before parsing. Mode
+      --  filtering applies to that selection even for a malformed chunk;
+      --  allowed binary input then uses the same owned codec as C loading.
+      Diagnostic_Work (State, Flags'Length);
+      declare
+         Binary : constant Boolean := Source'Length > 0 and then
+           Source (Source'First) = Character'Val (27);
+         Accepted : constant Boolean := Ada.Strings.Fixed.Index
+           (Flags, (if Binary then "b" else "t")) /= 0;
+      begin
+         if not Accepted then
+            declare
+               Message : Managed.Buffer;
+            begin
+               Message.Set_Owner (Lua.Storage.Reference (State.Memory));
+               Message.Append ("attempt to load a ");
+               Message.Append ((if Binary then "binary" else "text"));
+               Message.Append (" chunk (mode is '");
+               Diagnostic_Work (State, Flags'Length);
+               Message.Append (Flags);
+               Message.Append ("')");
+               Diagnostic_Work (State, Message.Length);
+               Diagnostic_Work (State, Message.Length);
+               Results.Append (Nil_Value);
+               Results.Append (New_String (State, Message));
+            end;
+            Restore;
+            return Results;
+         end if;
+      end;
+      --  Dynamic compilation belongs to this execution's work budget.
+      --  Per-source limits alone allow a reader/loop to repeatedly scan
+      --  a large retained string at effectively constant VM cost.
+      if State.Policy = Bounded and then
+        Source'Length > State.Bounds.Instructions - Natural'Min
+          (State.Steps, State.Bounds.Instructions)
+      then
+         Fail (State, "instruction limit exceeded", Resource => True);
+      end if;
+      if State.Policy = Bounded then
+         State.Steps := State.Steps + Source'Length;
+      end if;
+      begin
+         State.Current.Failure_Class := No_Failure;
+         Code := Compiler.Compile (State, Source, Label);
+      exception
+         when Language_Error =>
+            if (State.Current.Failure_Class = Host_Abort) then
+               raise;
+            elsif State.Current.Failure_Class = Memory_Failure then
+               Restore;
+               Results.Append (Nil_Value);
+               Results.Append (State.Memory_Error_Value);
+               return Results;
+            end if;
+            declare
+               Display_Name : constant String :=
+                 Inspection.Short_Source (Label);
+               --  luaG_addinfo uses the same bounded chunk identifier as
+               --  debug records. A default string-load name is source
+               --  text, not an unquoted file path or a synthetic label.
+               Message : Managed.Buffer;
+               procedure Append_Diagnostic (Bytes : String);
+               procedure Publish_Message (Bytes : String);
+               procedure Append_Diagnostic (Bytes : String) is
+               begin
+                  Diagnostic_Work (State, Bytes'Length);
+                  Message.Append (Bytes);
+               end Append_Diagnostic;
+               procedure Publish_Message (Bytes : String) is
+               begin
+                  Diagnostic_Work (State, Bytes'Length);
+                  Diagnostic_Work (State, Bytes'Length);
+                  Results.Append (New_String (State, Bytes));
+               end Publish_Message;
+            begin
+               Message.Set_Owner (Lua.Storage.Reference (State.Memory));
+               if State.Current.Failure_Class = Syntax_Failure then
+                  Message.Append (Display_Name);
+                  Message.Append (":");
+                  Message.Append (Ada.Strings.Fixed.Trim
+                    (State.Current.Failure_At.Line'Image,
+                     Ada.Strings.Both));
+                  Message.Append (": ");
+               end if;
+               --  Pending syntax text is already managed. Borrow it into
+               --  the destination builder, avoiding concatenation through
+               --  an input-sized ordinary Ada String during error handling.
+               Lua.Diagnostic_Text.Query
+                 (State.Current.Failure_Text, Append_Diagnostic'Access);
+               Restore;
+               Results.Append (Nil_Value);
+               Message.Query (Publish_Message'Access);
+               return Results;
+            end;
+      end;
+      Restore;
+      --  A loaded closure captures its own root _ENV cell. Passing nil is
+      --  different from omitting argument four; no caller locals leak in.
+      Scope := New_Environment (State, null);
+      Declare_Local (State, Scope, Code.Environment_Symbol, Environment);
+      Results.Append (New_Closure (State, Code, Scope));
+      return Results;
+   end Compile_Chunk;
+
    function Advance
      (State : in out World; Activation : Frame_Access) return Native_Action
    is
@@ -422,190 +610,9 @@ package body Lua.Engine.Loaders is
 
       function Compile_Source
         (Source, Chunk_Name, Mode : String; Environment : Value)
-         return Values.Vector
-      is
-         Results : Values.Vector := Owned_Values (State);
-         Code : Prototype_Access;
-         Scope : Object_Access;
-         function Prefix_Last (Bytes : String) return Natural;
-         function Prefix_Last (Bytes : String) return Natural is
-            Terminator : Natural;
-         begin
-            --  Name/mode are C options even though their Lua values contain
-            --  counted bytes. Charge the scan, then borrow the prefix rather
-            --  than materializing another input-sized ordinary String.
-            Diagnostic_Work (State, Bytes'Length);
-            Terminator := Ada.Strings.Fixed.Index
-              (Bytes, "" & Character'Val (0));
-            return (if Terminator = 0 then Bytes'Last else Terminator - 1);
-         end Prefix_Last;
-         Label : String renames Chunk_Name
-           (Chunk_Name'First .. Prefix_Last (Chunk_Name));
-         Flags : String renames Mode (Mode'First .. Prefix_Last (Mode));
-         --  Lua load's name is a C string, even though its source is counted
-         --  bytes. Borrow the prefix without copying/truncating the source.
-         Saved_Text : constant Lua.Diagnostic_Text.Text :=
-           State.Current.Failure_Text;
-         Saved_Value : constant Value := State.Current.Failure;
-         Saved_Has_Value : constant Boolean := State.Current.Has_Failure_Value;
-         Saved_At : constant Lua.Lexers.Source_Location :=
-           State.Current.Failure_At;
-         Saved_Class : constant Failure_Kind := State.Current.Failure_Class;
-         Saved_Captures : constant Ada.Containers.Count_Type :=
-           Activation.Native_Captures.Length;
-         type Saved_Error_Root is new Ada.Finalization.Limited_Controlled with
-         record
-            Registered : Boolean := False;
-         end record;
-         overriding procedure Finalize (Self : in out Saved_Error_Root);
-         overriding procedure Finalize (Self : in out Saved_Error_Root) is
-         begin
-            if Self.Registered then
-               --  Compilation never executes this loader's continuation.
-               --  Its one temporary capture remains the last owned slot;
-               --  remove it on every return, refusal or host-abort path.
-               if Activation.Native_Captures.Length = Saved_Captures + 1 then
-                  Activation.Native_Captures.Delete_Last;
-               end if;
-               --  Restore checks normal-path ownership. During exceptional
-               --  unwinding, never replace the original host stop/refusal
-               --  with a finalizer exception. An unexpected capture layout
-               --  remains owned by the departing frame's ordinary cleanup.
-               Self.Registered := False;
-            end if;
-         end Finalize;
-         Saved_Root : Saved_Error_Root;
-         procedure Restore;
-         procedure Restore is
-         begin
-            State.Current.Failure_Text := Saved_Text;
-            State.Current.Failure := Saved_Value;
-            State.Current.Has_Failure_Value := Saved_Has_Value;
-            if Saved_Has_Value then
-               if not Saved_Root.Registered or else
-                 Activation.Native_Captures.Length /= Saved_Captures + 1
-               then
-                  raise Program_Error with "saved error lost its root";
-               end if;
-               Root_Barrier (State, Saved_Value);
-            end if;
-            State.Current.Failure_At := Saved_At;
-            State.Current.Failure_Class := Saved_Class;
-         end Restore;
-      begin
-         if Saved_Has_Value then
-            --  A local Value is not a tracing root. Preserve the original
-            --  error while compilation replaces context failure state and
-            --  can collect, then transfer ownership back before this guard
-            --  removes its actual activation capture. Shared text copies
-            --  alone must not conceal a collected original error identity.
-            Append_Root (State, Activation.Native_Captures, Saved_Value);
-            Saved_Root.Registered := True;
-         end if;
-         --  The signature selects binary versus text before parsing. Mode
-         --  filtering applies to that selection even for a malformed chunk;
-         --  allowed binary input then uses the same owned codec as C loading.
-         Diagnostic_Work (State, Flags'Length);
-         declare
-            Binary : constant Boolean := Source'Length > 0 and then
-              Source (Source'First) = Character'Val (27);
-            Accepted : constant Boolean := Ada.Strings.Fixed.Index
-              (Flags, (if Binary then "b" else "t")) /= 0;
-         begin
-            if not Accepted then
-               declare
-                  Message : Managed.Buffer;
-               begin
-                  Message.Set_Owner (Lua.Storage.Reference (State.Memory));
-                  Message.Append ("attempt to load a ");
-                  Message.Append ((if Binary then "binary" else "text"));
-                  Message.Append (" chunk (mode is '");
-                  Diagnostic_Work (State, Flags'Length);
-                  Message.Append (Flags);
-                  Message.Append ("')");
-                  Diagnostic_Work (State, Message.Length);
-                  Diagnostic_Work (State, Message.Length);
-                  Results.Append (Nil_Value);
-                  Results.Append (New_String (State, Message));
-               end;
-               Restore;
-               return Results;
-            end if;
-         end;
-         --  Dynamic compilation belongs to this execution's work budget.
-         --  Per-source limits alone allow a reader/loop to repeatedly scan
-         --  a large retained string at effectively constant VM cost.
-         if State.Policy = Bounded and then
-           Source'Length > State.Bounds.Instructions - Natural'Min
-             (State.Steps, State.Bounds.Instructions)
-         then
-            Fail (State, "instruction limit exceeded", Resource => True);
-         end if;
-         if State.Policy = Bounded then
-            State.Steps := State.Steps + Source'Length;
-         end if;
-         begin
-            State.Current.Failure_Class := No_Failure;
-            Code := Compiler.Compile (State, Source, Label);
-         exception
-            when Language_Error =>
-               if (State.Current.Failure_Class = Host_Abort) then
-                  raise;
-               elsif State.Current.Failure_Class = Memory_Failure then
-                  Restore;
-                  Results.Append (Nil_Value);
-                  Results.Append (State.Memory_Error_Value);
-                  return Results;
-               end if;
-               declare
-                  Display_Name : constant String :=
-                    Inspection.Short_Source (Label);
-                  --  luaG_addinfo uses the same bounded chunk identifier as
-                  --  debug records. A default string-load name is source
-                  --  text, not an unquoted file path or a synthetic label.
-                  Message : Managed.Buffer;
-                  procedure Append_Diagnostic (Bytes : String);
-                  procedure Publish_Message (Bytes : String);
-                  procedure Append_Diagnostic (Bytes : String) is
-                  begin
-                     Diagnostic_Work (State, Bytes'Length);
-                     Message.Append (Bytes);
-                  end Append_Diagnostic;
-                  procedure Publish_Message (Bytes : String) is
-                  begin
-                     Diagnostic_Work (State, Bytes'Length);
-                     Diagnostic_Work (State, Bytes'Length);
-                     Results.Append (New_String (State, Bytes));
-                  end Publish_Message;
-               begin
-                  Message.Set_Owner (Lua.Storage.Reference (State.Memory));
-                  if State.Current.Failure_Class = Syntax_Failure then
-                     Message.Append (Display_Name);
-                     Message.Append (":");
-                     Message.Append (Ada.Strings.Fixed.Trim
-                       (State.Current.Failure_At.Line'Image,
-                        Ada.Strings.Both));
-                     Message.Append (": ");
-                  end if;
-                  --  Pending syntax text is already managed. Borrow it into
-                  --  the destination builder, avoiding concatenation through
-                  --  an input-sized ordinary Ada String during error handling.
-                  Lua.Diagnostic_Text.Query
-                    (State.Current.Failure_Text, Append_Diagnostic'Access);
-                  Restore;
-                  Results.Append (Nil_Value);
-                  Message.Query (Publish_Message'Access);
-                  return Results;
-               end;
-         end;
-         Restore;
-         --  A loaded closure captures its own root _ENV cell. Passing nil is
-         --  different from omitting argument four; no caller locals leak in.
-         Scope := New_Environment (State, null);
-         Declare_Local (State, Scope, Code.Environment_Symbol, Environment);
-         Results.Append (New_Closure (State, Code, Scope));
-         return Results;
-      end Compile_Source;
+         return Values.Vector is
+        (Compile_Chunk
+           (State, Activation, Source, Chunk_Name, Mode, Environment));
 
       function Compile_Buffer
         (Source : in out Managed.Buffer; Chunk_Name, Mode : String;

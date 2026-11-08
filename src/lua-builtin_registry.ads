@@ -168,7 +168,8 @@ private package Lua.Builtin_Registry is
       Os_Time_Function,
       Os_Tmpname_Function,
       Ipairs_Iterator_Function,
-      Gmatch_Iterator_Function);
+      Gmatch_Iterator_Function,
+      Debug_Debug_Function);
    type Lookup (Exists : Boolean := False) is record
       case Exists is
          when True => Id : Kind;

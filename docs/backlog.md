@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+Integrate the [debug-console campaigns](sessions/2026-11-08-debug-console.md)
+into routine/frozen builds and refresh affected source/callable bindings.
+Preserve actual C prefix publication and closing before argument release.
+The component does not replace main.lua's subprocess, signal, environment,
+message-handler or complete file protocol obligations.
+
 Independently review the [bounded Nextvar storage counterparts](sessions/2026-11-08-nextvar-storage-counterparts.md)
 before any exact mixed-source equivalent. Preserve all construction/warm-call,
 GC, values, expected mp2 evaluations and original 100,000-cycle churn. Actual

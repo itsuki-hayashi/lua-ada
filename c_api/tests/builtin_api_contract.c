@@ -40,9 +40,11 @@ static void exposed_functions(lua_State *L) {
         {"assert", "error", "next", "pcall", "print", "select", "tonumber",
          "tostring", "pairs", "ipairs", "load", "require"};
     static const char *const modules[] =
-        {"math", "string", "table", "utf8", "coroutine", "debug", "io", "os"};
+        {"math", "string", "table", "utf8", "coroutine", "debug", "io", "os",
+         "debug"};
     static const char *const names[] =
-        {"deg", "format", "concat", "codes", "yield", "getinfo", "open", "time"};
+        {"deg", "format", "concat", "codes", "yield", "getinfo", "open", "time",
+         "debug"};
     size_t i;
     lua_Debug ar;
     for (i = 0; i < sizeof globals / sizeof globals[0]; ++i) {
@@ -450,8 +452,72 @@ static void check(const char *name, void (*body)(lua_State *), lua_State *L) {
     printf("PASS: builtin-%s\n", name); fflush(stdout);
 }
 
+static void debug_console_host_body(lua_State *L, int closing) {
+    lua_CFunction console = field(L, "debug", "debug");
+    lua_pop(L, 1);
+    run(L, "watch=setmetatable({},{__mode='v'})");
+    if (closing) {
+        run(L, closing == 2 ?
+            "closed=0;console_object=setmetatable({},"
+            "{__close=function(self,...)assert(select('#',...)==0);"
+            "closed=closed+1;error('CLOSE',0) end})" :
+            "closed=0;console_object=setmetatable({},"
+            "{__close=function(self,...)assert(select('#',...)==0);"
+            "closed=closed+1 end})");
+        lua_getglobal(L, "console_object");
+        lua_pushnil(L); lua_setglobal(L, "console_object");
+    } else lua_newtable(L);
+    lua_getglobal(L, "watch");
+    lua_pushvalue(L, 1); lua_rawseti(L, -2, 1); lua_pop(L, 1);
+    if (closing) lua_toclose(L, 1);
+    /* stdin supplies two commands, then cont. The first sees this initial
+       argument; the second must see it collected after lua_settop(L,0). */
+    assert(console(L) == 0 && lua_gettop(L) == 0);
+    run(L, "assert(watch[1]==nil)");
+    if (closing) run(L, "assert(closed==1)");
+}
+
+static void debug_console_host(lua_State *L) {
+    debug_console_host_body(L, 0);
+}
+
+static void debug_console_host_close(lua_State *L) {
+    debug_console_host_body(L, 1);
+}
+
+static int debug_console_callback(lua_State *L) {
+    debug_console_host_body(L, 1);
+    return 0;
+}
+
+static int debug_console_failing_callback(lua_State *L) {
+    debug_console_host_body(L, 2);
+    assert(!"a failing closer cannot return to debug.debug");
+    return 0;
+}
+
+static void debug_console_callback_close(lua_State *L) {
+    lua_pushcfunction(L, debug_console_callback);
+    assert(lua_pcall(L, 0, 0, 0) == LUA_OK);
+    run(L, "assert(closed==1)");
+}
+
+static void debug_console_callback_error(lua_State *L) {
+    lua_pushcfunction(L, debug_console_failing_callback);
+    assert(lua_pcall(L, 0, 0, 0) == LUA_ERRRUN);
+    assert(strcmp(lua_tostring(L, -1), "CLOSE") == 0);
+    lua_pop(L, 1);
+    run(L, "assert(closed==1)");
+}
+
 int main(int argc, char **argv) {
-    lua_State *L = lua_newstate(counted_allocator, &counts, 971U);
+    int console_trial = argc == 2 &&
+        strncmp(argv[1], "--debug-console-", 16) == 0;
+    /* The native T library requires its own default debug allocator when
+       opening T. These console-only modes use the ordinary public state
+       constructor on both runtimes; counts is not their allocator witness. */
+    lua_State *L = console_trial ? luaL_newstate() :
+        lua_newstate(counted_allocator, &counts, 971U);
     assert(L); luaL_openlibs(L);
     if (argc == 2) {
         /* Keep known-failing native T partial-parser teardown isolated.
@@ -464,6 +530,14 @@ int main(int argc, char **argv) {
             check("reader-partial-self-close", reader_partial_self_close, L);
         else if (strcmp(argv[1], "--reader-direct-self-close") == 0)
             check("reader-direct-self-close", reader_direct_self_close, L);
+        else if (strcmp(argv[1], "--debug-console-host") == 0)
+            check("debug-console-host", debug_console_host, L);
+        else if (strcmp(argv[1], "--debug-console-host-close") == 0)
+            check("debug-console-host-close", debug_console_host_close, L);
+        else if (strcmp(argv[1], "--debug-console-callback-close") == 0)
+            check("debug-console-callback-close", debug_console_callback_close, L);
+        else if (strcmp(argv[1], "--debug-console-callback-error") == 0)
+            check("debug-console-callback-error", debug_console_callback_error, L);
         else assert(!"unknown reader lifecycle trial");
     } else {
     assert(argc == 1);
@@ -498,7 +572,8 @@ int main(int argc, char **argv) {
     check("reader-direct-extra-root", reader_direct_extra_root, L);
     check("reader-injected-refusal", reader_injected_refusal, L);
     }
-    lua_close(L); assert(counts.bytes == 0 && counts.blocks == 0);
+    lua_close(L);
+    if (!console_trial) assert(counts.bytes == 0 && counts.blocks == 0);
     puts("PASS: public builtin contract");
     return 0;
 }

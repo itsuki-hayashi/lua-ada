@@ -439,6 +439,23 @@ the actual evidence state.
 
 ## Output delivery regression consumer
 
+The separate scripts/check-debug-console.ps1 campaign compares actual native
+and Ada CLI child processes. Supply the matching reference executable/library
+directory, product CLI and optional shared-runtime directory. Fourteen named
+cases cover complete and partial commands, recovery, actual error conversion,
+global environments, fixed read boundaries, NUL and non-yieldability; Windows
+adds native CRLF/Ctrl-Z cases. Raw input/output and copied image identities
+remain in the report. This is component evidence, with no invented allocator
+telemetry, upstream source credit or complete-target acceptance.
+
+scripts/check-debug-console-c.ps1 additionally compiles the same public C
+consumer against the separate native oracle and runs four paired direct-host
+and callback protocols. Real C closing slots must close exactly once before
+their final weak root disappears; a closer error must reach the real outer
+protected C call. Native T uses its actual default debug allocator. These
+console-only modes do not borrow the ordinary consumer's unused custom
+allocator counters as cleanup evidence.
+
 The ordinary test crate builds output_consumer alongside its AUnit/API mains.
 scripts/check-output-policy.ps1 captures raw process stdout rather than
 decoding it, preserving NUL and 0xff observations. Nine named cases exercise
