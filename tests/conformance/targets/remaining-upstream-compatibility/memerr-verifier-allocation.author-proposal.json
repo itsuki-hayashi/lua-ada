@@ -13,11 +13,11 @@
     "reset": "alloc_count with no argument sets countlimit to unsigned all-ones and returns no values; there is no getter for remaining count."
   },
   "proposed_insertion": {
-    "replacement_base64": "ICBULmFsbG9jY291bnQoKSAgLS0gcmVzdG9yZSBhbGxvY2F0aW9uIG9ubHkgZm9yIHRoZSB2ZXJpZmllcgo=",
+    "replacement_base64": "ICBULmFsbG9jY291bnQoKQo=",
     "length_bytes": 0,
     "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "offset_bytes": 140,
-    "replacement_utf8": "  T.alloccount()  -- restore allocation only for the verifier\n"
+    "replacement_utf8": "  T.alloccount()\n"
   },
   "coverage_authority": false,
   "preserved_spans": [
@@ -54,7 +54,7 @@
       "sha256": "453c9d685bb1dce92f956975ce05e7358b2b0d8e0f54248b2b147fbf07ccb32a"
     }
   },
-  "in_memory_output_sha256": "741faddfa9876909e3fda0d61ab24e48f8cd041e64922335f6c49e6d4f5c2353",
+  "in_memory_output_sha256": "880d83e6ee5b5cf621c59d410fa928340375ac4f4191913c8092a5f385bbda76",
   "configurations": [
     "upstream-test"
   ],
@@ -65,8 +65,9 @@
   "author": "Codex /root/validation_delivery",
   "adapted_upstream_written": false,
   "required_next_actions": [
-    "Independent source/configuration/feature review before any transformation authority.",
-    "Design a separately reviewed exact-byte equivalent schema; current pure-private-bound exclusion/transform authority does not authorize this insertion.",
+    "Independent exact-byte source/configuration/feature review of the bounded verifier-equivalent schema and pending manifest.",
+    "Accepted approval must bind complete semantic hash and separate source-decision artifact; no runtime acceptance or source exclusions.",
+    "No adapted file may be written or executed before that separate Root exact review.",
     "Fresh original native and approved Ada whole-file observations in every required context, retaining complete failure campaigns.",
     "Final matrix and ledger reconciliation remain required."
   ],
@@ -93,5 +94,11 @@
     "Public allocation failure, roots, coroutine/close behavior, cleanup, subsequent healthy execution and balanced shutdown remain required.",
     "No exact allocation-count assertion or minimum-count output elsewhere in memerr.lua is classified or waived by this proposal."
   ],
-  "target": "remaining-upstream-compatibility"
+  "target": "remaining-upstream-compatibility",
+  "equivalent_manifest": {
+    "scope": "Only17literal insertion bytes after helperpcall; no source exclusion or execution authority",
+    "schema": "t-verifier-equivalent-v1",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/memerr-verifier-allocation.equivalent.author-proposal.json",
+    "status": "pending-exact-review"
+  }
 }

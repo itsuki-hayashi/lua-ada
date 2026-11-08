@@ -145,6 +145,19 @@ alternatively, a reviewed reference must retain an unexcluded runtime child
 outside the private span. These rules keep visible implementation measurements
 from waiving application failure, cleanup or execution requirements.
 
+The pending `memerr-verifier-allocation.equivalent.author-proposal.json` uses
+a separate bounded `t-verifier-equivalent` schema. Its one allowed operation
+inserts the literal `T.alloccount()` reset after the original helper's protected
+application call and before its unchanged false-status/error-text assertion.
+It preserves both application calls, the existing following reset and every
+later failure campaign byte. This is a source-equivalent proposal with an
+explicit empty exclusion set. Its pinned whole-source hash, exact insertion,
+retained source spans and native/first-party configuration counterparts all
+bind a separate independent exact review. Pending or labelled synthetic review
+artifacts cannot authorize actual replay. The schema currently reconstructs
+memory for inspection only; it is not selected by any runner and installs no
+adapted source or passing evidence. Its focused regressions execute no Lua.
+
 ## Resolution and evidence contract
 
 Pending entries have `status: pending`, `disposition: pending`, no invariant,

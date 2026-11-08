@@ -580,4 +580,5 @@ $null = Write-Json (Join-Path $temporary 'production-applicability.json') @{
 foreach ($blocker in $productionBlockers) {
     Write-Output "PRODUCTION REPLAY BLOCKED: $($blocker.id): $($blocker.error); frozen unit fixtures do not clear this integration blocker"
 }
+& (Join-Path $PSScriptRoot 'test-conformance-verifier-equivalents.ps1')
 exit 0
