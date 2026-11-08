@@ -405,7 +405,7 @@ static void global_handler_frame_and_prefix(lua_State *L) {
         "assert(n=='(C temporary)' and (v==t or v==k));"
         "assert(debug.getlocal(2,4)==nil);return 991 end});"
         "assert(index_getglobal_handler(419,'prefix')==991)");
-    /* The collecting/debug-inspecting handler above is for frame semantics.
+    /* The debug-inspecting handler above is for frame semantics.
      * A separately warmed scalar handler isolates allocation-free dispatch. */
     run(L, "setmetatable(_G,{__index=function(t,k)"
         "assert(t==_G and k==index_global_key);"
