@@ -11,7 +11,7 @@
   "execution_evidence": [],
   "source_exclusions": [],
   "source_snapshot": {
-    "revision": "f3865c65e24e1fac3a47cd9991b32601bf05dd3a",
+    "revision": "ce0907ef353ee74941f5a248e447483ec93c8abe",
     "repository_dirty": true
   },
   "feature_review": {
@@ -41,7 +41,7 @@
     },
     {
       "path": "scripts/ConfiguredFixtureEvidence.psm1",
-      "sha256": "a430061a35a0b0580f23f09505edd92c1266260aab6ce62d80d1167bdd9cfeab"
+      "sha256": "76b488bba3f6e67b476d5f0324d7ae79c8d2c3765573996741b2c5438394c457"
     },
     {
       "path": "scripts/compare.ps1",
@@ -57,7 +57,7 @@
     },
     {
       "path": "scripts/TargetWitnessPolicy.psm1",
-      "sha256": "47db42a5bfd214c427b107c0f4c94e7734d13e86588ffa33529a0e476debbce1"
+      "sha256": "bd7d340670a5ed369120cc44e5f7e913591c0bbdbcbad98d2887b5b81633db20"
     },
     {
       "path": "scripts/TargetObservationEnvelope.psm1",
@@ -73,7 +73,7 @@
     },
     {
       "path": "tests/conformance/targets/configured-fixture-classification.json",
-      "sha256": "1438e4c0da95ef8ccd6adb30067b3f43eb6a4b3eb611e119a8ff82ff0813f6e9"
+      "sha256": "02736f30c4aa799b615f49538f1697ceb49c6cb95b3f305ecacb8c418c10446b"
     }
   ],
   "review_scope": [

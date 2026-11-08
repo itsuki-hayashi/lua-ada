@@ -18,11 +18,11 @@
     },
     {
       "path": "tests/src/lua-foreign_hook_tests.adb",
-      "sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "path": "tests/c/foreign_hook_contract.c",
-      "sha256": "295b334b56fad8f71cdba51abac4e2d254d2aec267de67a5ac9c941badebc282"
+      "sha256": "3f0909df519cd9334dc7a8a5d2b78cfb9430750ba4a96a658e4efa39a0105a93"
     },
     {
       "path": "tests/src/lua-math_reopen_tests.adb",
@@ -42,7 +42,7 @@
     },
     {
       "path": "c_api/tests/foreign_api_contract.c",
-      "sha256": "2fc0aed7b893d4ca95deee82be1d067afb44424371674e203322048ace7964a9"
+      "sha256": "dc483f5d24846a87940623bb65682576359331ec4fe9353fa1cefc9e74de014d"
     },
     {
       "path": "c_api/tests/consumer_allocator.h",
@@ -50,7 +50,7 @@
     },
     {
       "path": "tests/c/conformance_api.c",
-      "sha256": "f0e259c0b6c5473c7fa4f7dc17d02bc8d6aa1a367b6706912a38c7a1bff77ba7"
+      "sha256": "b4617f81e9d638b8871113ebe2b9ce374d83151b14fd07918ff899c23b4eeb9b"
     },
     {
       "path": "tests/c/conformance_api.h",
@@ -58,7 +58,7 @@
     },
     {
       "path": "tests/c/conformance_adapter.c",
-      "sha256": "4141d51fbabd31aae0d7f1c529d2caab381c2a15f980fd7750bfb360f757ceb2"
+      "sha256": "d787cde6feab4ecc8ee9e80c96a33de473b4d31b5e91b638399dda0641ece269"
     },
     {
       "path": "references/lua/testes/coroutine.lua",
@@ -126,7 +126,7 @@
     },
     {
       "path": "tests/src/lua-conformance_adapter_tests.adb",
-      "sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e"
+      "sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8"
     },
     {
       "path": "tests/src/lua-physical_stack_tests.adb",
@@ -150,15 +150,15 @@
     },
     {
       "path": "scripts/check.ps1",
-      "sha256": "232674e796e24459d9cc6690ce3b46cf2b352722bb22865a41a094d431910579"
+      "sha256": "bf96f7e568269b1efcb530a2d29365ada6fb28f6cd145aa4f66e0d90903806ee"
     },
     {
       "path": "scripts/check-instrumented.ps1",
-      "sha256": "be764d4400a70c58b2eee5e43ccdfffa290a01fb442b464f37d6d40949351177"
+      "sha256": "c02337787dff4a6be7712e3c867278b27b8b0abeb515e248b9026d1486865c4e"
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "26d9a01a292a14a2fe7ccf6d6d049cfd9c970c4a98ad8c1a0b930c67e0353fa8"
+      "sha256": "bc34d494cca9a7010331c5fc3e14c23161805eba3a36426e0487573bebeccd8b"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
@@ -309,12 +309,52 @@
       "path": "tests/src/pending_reader_tests.adb"
     },
     {
-      "sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e",
+      "sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086",
       "path": "tests/src/reader_portal_tests.adb"
     },
     {
       "sha256": "a2d9869c335d6e219578f5a84d7f1e04665b1b17d8dcd2e34b4ae5c3bcf2f1e0",
       "path": "tests/src/return_hook_mutation_tests.adb"
+    },
+    {
+      "sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8",
+      "path": "tests/src/lua-table_storage_inspection_tests.adb"
+    },
+    {
+      "sha256": "d72e02ad4a62b20a5809ed08c098dfea032e02f5b3c9ac9faf97e4e379c58d0c",
+      "path": "tests/src/table_storage_public_tests.adb"
+    },
+    {
+      "sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a",
+      "path": "tests/src/code_public_semantic_tests.adb"
+    },
+    {
+      "sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea",
+      "path": "tests/src/lua-call_metadata_tests.adb"
+    },
+    {
+      "sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87",
+      "path": "tests/src/lua-scalar_closing_tests.adb"
+    },
+    {
+      "sha256": "0499d39b7207149c87b81f6f22589a2c702f3a8f1055f0a935678d6fb858b97b",
+      "path": "tests/src/lua-materialized_vararg_tests.adb"
+    },
+    {
+      "sha256": "9e52f69ebd06fe9ac285c5a82ecb43786aca7d7e1b03a5809dcb866c168c1845",
+      "path": "tests/src/table_algorithm_tests.adb"
+    },
+    {
+      "sha256": "a9fd8efda69fac822099eb40e17d712bd72085db3f38a1657f6c9b94074fdfc5",
+      "path": "tests/src/library_runtime_tests.adb"
+    },
+    {
+      "sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef",
+      "path": "tests/src/lua-sessions-cli_prompt_tests.adb"
+    },
+    {
+      "sha256": "35395675883c39cf2a0e5babcc3b33946c7799910c94bef196e7f337354647b0",
+      "path": "tests/src/lua-string_hash_tests.adb"
     }
   ],
   "entries": [
@@ -464,7 +504,7 @@
     },
     {
       "case": "tests/src/lua-conformance_adapter_tests.adb#Atomic_Orphan_Cell",
-      "source_sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8",
       "registered_label": "collector: orphan cell survives atomic sweep",
       "required_stdout_line": "OK collector: orphan cell survives atomic sweep",
       "registration_procedure": "Atomic_Orphan_Cell",
@@ -478,7 +518,7 @@
     },
     {
       "case": "tests/src/lua-conformance_adapter_tests.adb#Measured_Emergency_Headroom",
-      "source_sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8",
       "registered_label": "collector: measured emergency table headroom",
       "required_stdout_line": "OK collector: measured emergency table headroom",
       "registration_procedure": "Measured_Emergency_Headroom",
@@ -492,7 +532,7 @@
     },
     {
       "case": "tests/src/lua-conformance_adapter_tests.adb#Parameters",
-      "source_sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8",
       "registered_label": "adapter: production parameter codec",
       "required_stdout_line": "OK adapter: production parameter codec",
       "registration_procedure": "Parameters",
@@ -511,7 +551,7 @@
     },
     {
       "case": "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads",
-      "source_sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8",
       "registered_label": "collector: weak string payload reclamation",
       "required_stdout_line": "OK collector: weak string payload reclamation",
       "registration_procedure": "Weak_String_Payloads",
@@ -526,7 +566,7 @@
     },
     {
       "case": "tests/src/lua-conformance_adapter_tests.adb#Frame_Reset",
-      "source_sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8",
       "registered_label": "adapter: physical unused frame reset",
       "required_stdout_line": "OK adapter: physical unused frame reset",
       "registration_procedure": "Frame_Reset",
@@ -542,7 +582,7 @@
     },
     {
       "case": "tests/src/lua-conformance_adapter_tests.adb#Stack_Resize",
-      "source_sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8",
       "registered_label": "adapter: physical stack resize preserves cell",
       "required_stdout_line": "OK adapter: physical stack resize preserves cell",
       "registration_procedure": "Stack_Resize",
@@ -558,7 +598,7 @@
     },
     {
       "case": "tests/src/lua-conformance_adapter_tests.adb#Finalizer_Frame_Refusal",
-      "source_sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8",
       "registered_label": "finalizer: Lua frame refusal and later retry",
       "required_stdout_line": "OK finalizer: Lua frame refusal and later retry",
       "registration_procedure": "Finalizer_Frame_Refusal",
@@ -574,7 +614,7 @@
     },
     {
       "case": "tests/src/lua-conformance_adapter_tests.adb#Finalizer_Stack_Refusal",
-      "source_sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8",
       "registered_label": "finalizer: Lua stack refusal and later retry",
       "required_stdout_line": "OK finalizer: Lua stack refusal and later retry",
       "registration_procedure": "Finalizer_Stack_Refusal",
@@ -590,7 +630,7 @@
     },
     {
       "case": "tests/src/lua-conformance_adapter_tests.adb#Refusal_Reset",
-      "source_sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8",
       "registered_label": "allocator: Lua restores persistent refusal",
       "required_stdout_line": "OK allocator: Lua restores persistent refusal",
       "registration_procedure": "Refusal_Reset",
@@ -822,7 +862,7 @@
     },
     {
       "case": "tests/src/lua-conformance_adapter_tests.adb#Atomic_Transient_Root",
-      "source_sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8",
       "registered_label": "collector: atomic transient root expires",
       "required_stdout_line": "OK collector: atomic transient root expires",
       "registration_procedure": "Atomic_Transient_Root",
@@ -838,7 +878,7 @@
     },
     {
       "case": "tests/src/lua-conformance_adapter_tests.adb#Atomic_Retained_Root",
-      "source_sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8",
       "registered_label": "collector: atomic live register survives",
       "required_stdout_line": "OK collector: atomic live register survives",
       "registration_procedure": "Atomic_Retained_Root",
@@ -1396,7 +1436,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#Reflection",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C hooks: callback mask and count reflection",
       "required_stdout_line": "OK C hooks: callback mask and count reflection",
       "registration_procedure": "Reflection",
@@ -1417,7 +1457,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#Line_Events",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C hooks: actual line events and inspection",
       "required_stdout_line": "OK C hooks: actual line events and inspection",
       "registration_procedure": "Line_Events",
@@ -1438,7 +1478,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#Count_Events",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C hooks: count-only instruction events",
       "required_stdout_line": "OK C hooks: count-only instruction events",
       "registration_procedure": "Count_Events",
@@ -1459,7 +1499,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#Remove_Inside_Hook",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C hooks: callback removes itself",
       "required_stdout_line": "OK C hooks: callback removes itself",
       "registration_procedure": "Remove_Inside_Hook",
@@ -1480,7 +1520,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#Independent_States",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C hooks: independent state ownership",
       "required_stdout_line": "OK C hooks: independent state ownership",
       "registration_procedure": "Independent_States",
@@ -1501,7 +1541,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#Inactive_Frame",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C hooks: inactive frame token rejected",
       "required_stdout_line": "OK C hooks: inactive frame token rejected",
       "registration_procedure": "Inactive_Frame",
@@ -1522,7 +1562,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#C_Return_Close",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C close: normal return retains result",
       "required_stdout_line": "OK C close: normal return retains result",
       "registration_procedure": "C_Return_Close",
@@ -1543,7 +1583,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#C_Error_Close",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C close: error preserves object identity",
       "required_stdout_line": "OK C close: error preserves object identity",
       "registration_procedure": "C_Error_Close",
@@ -1564,7 +1604,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#C_Continuation_Close",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C close: continuation retains slot and result",
       "required_stdout_line": "OK C close: continuation retains slot and result",
       "registration_procedure": "C_Continuation_Close",
@@ -1585,7 +1625,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#C_Error_Location",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C errors: logical caller location",
       "required_stdout_line": "OK C errors: logical caller location",
       "registration_procedure": "C_Error_Location",
@@ -1606,7 +1646,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#Combined_Yield_Events",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C hooks: combined events before yield",
       "required_stdout_line": "OK C hooks: combined events before yield",
       "registration_procedure": "Combined_Yield_Events",
@@ -1627,7 +1667,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#C_Set_Top_Close",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C close: settop closes before slot reuse",
       "required_stdout_line": "OK C close: settop closes before slot reuse",
       "registration_procedure": "C_Set_Top_Close",
@@ -1648,7 +1688,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#C_Explicit_Close",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C close: explicit slot becomes nil",
       "required_stdout_line": "OK C close: explicit slot becomes nil",
       "registration_procedure": "C_Explicit_Close",
@@ -1669,7 +1709,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#C_Refusal_Reuse",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C resume: refusal restores reusable owners",
       "required_stdout_line": "OK C resume: refusal restores reusable owners",
       "registration_procedure": "C_Refusal_Reuse",
@@ -1690,7 +1730,7 @@
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#C_Suspended_Indexing",
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b",
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039",
       "registered_label": "C indexing: suspended thread retains frames",
       "required_stdout_line": "OK C indexing: suspended thread retains frames",
       "registration_procedure": "C_Suspended_Indexing",
@@ -4900,7 +4940,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Nested_Call",
@@ -4909,7 +4949,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Protected_Error",
@@ -4918,7 +4958,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Unprotected_Error",
@@ -4927,7 +4967,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Blocks_Nested_Yield",
@@ -4936,7 +4976,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Direct_Yield",
@@ -4945,7 +4985,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Argument_Weak_Root",
@@ -4954,7 +4994,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Upvalue_Weak_Root",
@@ -4963,7 +5003,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#External_Release_Lua_View",
@@ -4972,7 +5012,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "case": "tests/src/lua-line_baseline_tests.adb#Empty_Root",
@@ -6277,7 +6317,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root",
@@ -6286,7 +6326,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
@@ -6295,7 +6335,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
@@ -6304,7 +6344,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "case": "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal",
@@ -6313,7 +6353,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "77f6c6759c9693126be79faee7d09c4bf06fe0f924adf2df38486a19e6b9856b"
+      "source_sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
     },
     {
       "case": "tests/src/lua-label_diagnostic_tests.adb#Trailing_Newline",
@@ -6799,7 +6839,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Mutable_Reader",
@@ -6808,7 +6848,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Retired_Reader_Root",
@@ -6817,7 +6857,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Mutable_Environment",
@@ -6826,7 +6866,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Text_Mode_Stop",
@@ -6835,7 +6875,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Binary_Mode_Stop",
@@ -6844,7 +6884,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Binary_Trailing",
@@ -6853,7 +6893,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Reader_Yield",
@@ -6862,7 +6902,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Protected_Nil_Error",
@@ -6871,7 +6911,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Return_Hook_Result",
@@ -6880,7 +6920,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Return_Hook_Nil_Tuple",
@@ -6889,7 +6929,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Single_Public_Call",
@@ -6898,7 +6938,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Nested_Reader_Load",
@@ -6907,7 +6947,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Inherited_Handler",
@@ -6916,7 +6956,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Numeric_Chunk_Name",
@@ -6925,7 +6965,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Numeric_Mode",
@@ -6934,7 +6974,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/reader_portal_tests.adb#Retired_Extra_Argument",
@@ -6943,7 +6983,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "620ec484fcc876fd6a7542b555792d588bb8b4f85a5ef1ebdcb66e50bab7346e"
+      "source_sha256": "787a35139716bf132673723feddbc9dae04b9c45c9390c84a827ec83eb628086"
     },
     {
       "case": "tests/src/return_hook_mutation_tests.adb#Closure_Scalar",
@@ -7106,6 +7146,1464 @@
       "runtime_acceptance": false,
       "coverage_authority": false,
       "source_sha256": "a2d9869c335d6e219578f5a84d7f1e04665b1b17d8dcd2e34b4ae5c3bcf2f1e0"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: actual Lua counts and weak witness",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Lua_Actual_Counts",
+      "required_stdout_line": "OK table storage: actual Lua counts and weak witness",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: empty table",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Empty_Table",
+      "required_stdout_line": "OK table storage: empty table",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: actual row and live counts",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Mixed_Storage",
+      "required_stdout_line": "OK table storage: actual row and live counts",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: indexed nil-valued tombstone",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Indexed_Tombstone",
+      "required_stdout_line": "OK table storage: indexed nil-valued tombstone",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: revived free-listed row",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Revived_Free_Row",
+      "required_stdout_line": "OK table storage: revived free-listed row",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: collected key unlinks actual row",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Collected_Key",
+      "required_stdout_line": "OK table storage: collected key unlinks actual row",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: same-table collected row reuse",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Reused_Row",
+      "required_stdout_line": "OK table storage: same-table collected row reuse",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: insertion refusal and retry",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Refused_Insert",
+      "required_stdout_line": "OK table storage: insertion refusal and retry",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: read-only checker under refusal",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#No_Allocation",
+      "required_stdout_line": "OK table storage: read-only checker under refusal",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects null target",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Null_Target",
+      "required_stdout_line": "OK table storage: rejects null target",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects unregistered key",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Unregistered_Key",
+      "required_stdout_line": "OK table storage: rejects unregistered key",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects key object tag mismatch",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Wrong_Key_Tag",
+      "required_stdout_line": "OK table storage: rejects key object tag mismatch",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects value object tag mismatch",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Wrong_Value_Tag",
+      "required_stdout_line": "OK table storage: rejects value object tag mismatch",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects array row outside members",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Array_Bounds",
+      "required_stdout_line": "OK table storage: rejects array row outside members",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects hash row outside members",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Hash_Bounds",
+      "required_stdout_line": "OK table storage: rejects hash row outside members",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects cyclic hash chain",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Hash_Cycle",
+      "required_stdout_line": "OK table storage: rejects cyclic hash chain",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects free row outside members",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Free_Bounds",
+      "required_stdout_line": "OK table storage: rejects free row outside members",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects cyclic free chain",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Free_Cycle",
+      "required_stdout_line": "OK table storage: rejects cyclic free chain",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects unreachable free flag",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Free_Flags",
+      "required_stdout_line": "OK table storage: rejects unreachable free flag",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects linked nil-key row",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Nil_Linked",
+      "required_stdout_line": "OK table storage: rejects linked nil-key row",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects wrong hash bucket",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Wrong_Bucket",
+      "required_stdout_line": "OK table storage: rejects wrong hash bucket",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects incorrect hash row count",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Hash_Count",
+      "required_stdout_line": "OK table storage: rejects incorrect hash row count",
+      "execution_evidence": [],
+      "source_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: anonymous key",
+      "case": "tests/src/table_storage_public_tests.adb#Anonymous_Key",
+      "required_stdout_line": "OK table storage: anonymous key",
+      "execution_evidence": [],
+      "source_sha256": "d72e02ad4a62b20a5809ed08c098dfea032e02f5b3c9ac9faf97e4e379c58d0c"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: live key",
+      "case": "tests/src/table_storage_public_tests.adb#Live_Key",
+      "required_stdout_line": "OK table storage: live key",
+      "execution_evidence": [],
+      "source_sha256": "d72e02ad4a62b20a5809ed08c098dfea032e02f5b3c9ac9faf97e4e379c58d0c"
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: same table",
+      "case": "tests/src/table_storage_public_tests.adb#Same_Table",
+      "required_stdout_line": "OK table storage: same table",
+      "execution_evidence": [],
+      "source_sha256": "d72e02ad4a62b20a5809ed08c098dfea032e02f5b3c9ac9faf97e4e379c58d0c"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#F_Zero",
+      "registered_label": "code public semantics: f zero",
+      "required_stdout_line": "OK code public semantics: f zero",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#I_Captured_Zero",
+      "registered_label": "code public semantics: i captured zero",
+      "required_stdout_line": "OK code public semantics: i captured zero",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#I_Zero_Floor",
+      "registered_label": "code public semantics: i zero floor",
+      "required_stdout_line": "OK code public semantics: i zero floor",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#K_Reciprocal",
+      "registered_label": "code public semantics: k reciprocal",
+      "required_stdout_line": "OK code public semantics: k reciprocal",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#K_Power",
+      "registered_label": "code public semantics: k power",
+      "required_stdout_line": "OK code public semantics: k power",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#K_Negative_Power",
+      "registered_label": "code public semantics: k negative power",
+      "required_stdout_line": "OK code public semantics: k negative power",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#F_Floor",
+      "registered_label": "code public semantics: f floor",
+      "required_stdout_line": "OK code public semantics: f floor",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#I_Modulo",
+      "registered_label": "code public semantics: i modulo",
+      "required_stdout_line": "OK code public semantics: i modulo",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#F_Division",
+      "registered_label": "code public semantics: f division",
+      "required_stdout_line": "OK code public semantics: f division",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#F_Floor_Modulo",
+      "registered_label": "code public semantics: f floor modulo",
+      "required_stdout_line": "OK code public semantics: f floor modulo",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#I_Bitwise_Mixed",
+      "registered_label": "code public semantics: i bitwise mixed",
+      "required_stdout_line": "OK code public semantics: i bitwise mixed",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#I_Bitwise_Not",
+      "registered_label": "code public semantics: i bitwise not",
+      "required_stdout_line": "OK code public semantics: i bitwise not",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#I_Bitwise_Float",
+      "registered_label": "code public semantics: i bitwise float",
+      "required_stdout_line": "OK code public semantics: i bitwise float",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#I_Shifts",
+      "registered_label": "code public semantics: i shifts",
+      "required_stdout_line": "OK code public semantics: i shifts",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Integer_Borders",
+      "registered_label": "code public semantics: integer borders",
+      "required_stdout_line": "OK code public semantics: integer borders",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Float_Borders",
+      "registered_label": "code public semantics: float borders",
+      "required_stdout_line": "OK code public semantics: float borders",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Maximum_Integer",
+      "registered_label": "code public semantics: maximum integer",
+      "required_stdout_line": "OK code public semantics: maximum integer",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Minimum_Integer",
+      "registered_label": "code public semantics: minimum integer",
+      "required_stdout_line": "OK code public semantics: minimum integer",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Negative_Hex",
+      "registered_label": "code public semantics: negative hex",
+      "required_stdout_line": "OK code public semantics: negative hex",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Nested_Constants",
+      "registered_label": "code public semantics: nested constants",
+      "required_stdout_line": "OK code public semantics: nested constants",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Callback_Sequence",
+      "registered_label": "code public semantics: callback sequence",
+      "required_stdout_line": "OK code public semantics: callback sequence",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Assignment_Sequence",
+      "registered_label": "code public semantics: assignment sequence",
+      "required_stdout_line": "OK code public semantics: assignment sequence",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Constructor_49",
+      "registered_label": "code public semantics: constructor 49",
+      "required_stdout_line": "OK code public semantics: constructor 49",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Constructor_50",
+      "registered_label": "code public semantics: constructor 50",
+      "required_stdout_line": "OK code public semantics: constructor 50",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Constructor_51",
+      "registered_label": "code public semantics: constructor 51",
+      "required_stdout_line": "OK code public semantics: constructor 51",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Return_Zero",
+      "registered_label": "code public semantics: return zero",
+      "required_stdout_line": "OK code public semantics: return zero",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Return_One_Nil",
+      "registered_label": "code public semantics: return one nil",
+      "required_stdout_line": "OK code public semantics: return one nil",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Return_Multiple",
+      "registered_label": "code public semantics: return multiple",
+      "required_stdout_line": "OK code public semantics: return multiple",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Register_Load",
+      "registered_label": "code public semantics: register load",
+      "required_stdout_line": "OK code public semantics: register load",
+      "source_sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Pure_Ada_Capacity",
+      "registered_label": "C metadata: pure Ada frame capacity",
+      "required_stdout_line": "OK C metadata: pure Ada frame capacity",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Cached_Capacity",
+      "registered_label": "C metadata: cached reservation reuse",
+      "required_stdout_line": "OK C metadata: cached reservation reuse",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Surface_Preserves_Warm_Cache",
+      "registered_label": "C metadata: first surface preserves depth",
+      "required_stdout_line": "OK C metadata: first surface preserves depth",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Refused_Reservation",
+      "registered_label": "C metadata: transactional refusal",
+      "required_stdout_line": "OK C metadata: transactional refusal",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Physical_Shrink",
+      "registered_label": "C metadata: physical capacity shrink",
+      "required_stdout_line": "OK C metadata: physical capacity shrink",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Physical_Headroom_Privacy",
+      "registered_label": "C backing: no visible capacity publication",
+      "required_stdout_line": "OK C backing: no visible capacity publication",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Headroom_Value_Refusal",
+      "registered_label": "C backing: value array refusal",
+      "required_stdout_line": "OK C backing: value array refusal",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Headroom_Cell_Refusal",
+      "registered_label": "C backing: cell array refusal",
+      "required_stdout_line": "OK C backing: cell array refusal",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Headroom_Close_Refusal",
+      "registered_label": "C backing: close-link array refusal",
+      "required_stdout_line": "OK C backing: close-link array refusal",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Host_Abort_Recovery",
+      "registered_label": "C metadata: abandoned nested guard recovery",
+      "required_stdout_line": "OK C metadata: abandoned nested guard recovery",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Primitive_Strings",
+      "registered_label": "Equality: primitive string equality",
+      "required_stdout_line": "OK Equality: primitive string equality",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Primitive_Numbers",
+      "registered_label": "Equality: integer real NaN equality",
+      "required_stdout_line": "OK Equality: integer real NaN equality",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Primitive_False_Nil",
+      "registered_label": "Equality: false nil equality",
+      "required_stdout_line": "OK Equality: false nil equality",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Same_Object_Equality",
+      "registered_label": "Equality: same object skips handler",
+      "required_stdout_line": "OK Equality: same object skips handler",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Table_Equality_Yields",
+      "registered_label": "Equality: distinct table handler yields",
+      "required_stdout_line": "OK Equality: distinct table handler yields",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Userdata_Equality_Handler",
+      "registered_label": "Equality: distinct userdata handler",
+      "required_stdout_line": "OK Equality: distinct userdata handler",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Equality_Budget_Recovery",
+      "registered_label": "Equality: charged scan and host recovery",
+      "required_stdout_line": "OK Equality: charged scan and host recovery",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Assert_Success_Tuple",
+      "registered_label": "C metadata: refused successful assert tuple",
+      "required_stdout_line": "OK C metadata: refused successful assert tuple",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Assert_Protected_Tuple",
+      "registered_label": "C metadata: protected assert tuple",
+      "required_stdout_line": "OK C metadata: protected assert tuple",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Independent_Checkstack_Refusal",
+      "registered_label": "C metadata: fresh state checkstack refusal",
+      "required_stdout_line": "OK C metadata: fresh state checkstack refusal",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#First_Protected",
+      "registered_label": "C metadata: first protected entry",
+      "required_stdout_line": "OK C metadata: first protected entry",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Nested_Protected",
+      "registered_label": "C metadata: nested protected entries",
+      "required_stdout_line": "OK C metadata: nested protected entries",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Numeric_Error",
+      "registered_label": "C metadata: numeric protected error",
+      "required_stdout_line": "OK C metadata: numeric protected error",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#False_Result",
+      "registered_label": "C metadata: false success result",
+      "required_stdout_line": "OK C metadata: false success result",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Byte_Ceiling",
+      "registered_label": "C metadata: zero spare provider bytes",
+      "required_stdout_line": "OK C metadata: zero spare provider bytes",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Repeated_Entry",
+      "registered_label": "C metadata: repeated refused entries",
+      "required_stdout_line": "OK C metadata: repeated refused entries",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Outstanding_Shrink",
+      "registered_label": "C metadata: shrink under outstanding call",
+      "required_stdout_line": "OK C metadata: shrink under outstanding call",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Error_After_Shrink",
+      "registered_label": "C metadata: error after outstanding shrink",
+      "required_stdout_line": "OK C metadata: error after outstanding shrink",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Cross_Context_Return",
+      "registered_label": "C metadata: cross-context return after shrink",
+      "required_stdout_line": "OK C metadata: cross-context return after shrink",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Cross_Context_Error",
+      "registered_label": "C metadata: cross-context error after shrink",
+      "required_stdout_line": "OK C metadata: cross-context error after shrink",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#ResetCI_Capacity",
+      "registered_label": "C metadata: resetCI physical capacity release",
+      "required_stdout_line": "OK C metadata: resetCI physical capacity release",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#ResetCI_Outstanding",
+      "registered_label": "C metadata: resetCI outstanding guard",
+      "required_stdout_line": "OK C metadata: resetCI outstanding guard",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#ResetCI_Refusal",
+      "registered_label": "C metadata: resetCI actual growth refusal",
+      "required_stdout_line": "OK C metadata: resetCI actual growth refusal",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Optimized_Vararg_Count",
+      "registered_label": "Tail ownership: optimized vararg M0",
+      "required_stdout_line": "OK Tail ownership: optimized vararg M0",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Optimized_Vararg_Bytes",
+      "registered_label": "Tail ownership: optimized vararg byte ceiling",
+      "required_stdout_line": "OK Tail ownership: optimized vararg byte ceiling",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Tuple",
+      "registered_label": "Tail ownership: owned nil tuple",
+      "required_stdout_line": "OK Tail ownership: owned nil tuple",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Chain",
+      "registered_label": "Tail ownership: recursive owned arena",
+      "required_stdout_line": "OK Tail ownership: recursive owned arena",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Weak_Argument",
+      "registered_label": "Tail ownership: retired weak argument",
+      "required_stdout_line": "OK Tail ownership: retired weak argument",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Hook_Mutation",
+      "registered_label": "Tail ownership: actual callee hook mutation",
+      "required_stdout_line": "OK Tail ownership: actual callee hook mutation",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Hook_Error",
+      "registered_label": "Tail ownership: hook error recovery",
+      "required_stdout_line": "OK Tail ownership: hook error recovery",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Yield",
+      "registered_label": "Tail ownership: yielded callee tuple",
+      "required_stdout_line": "OK Tail ownership: yielded callee tuple",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Close_Error",
+      "registered_label": "Tail ownership: outer close error roots",
+      "required_stdout_line": "OK Tail ownership: outer close error roots",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Refusal_Recovery",
+      "registered_label": "Tail ownership: callee publication refusal",
+      "required_stdout_line": "OK Tail ownership: callee publication refusal",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Budget_Recovery",
+      "registered_label": "Tail ownership: charged work and recovery",
+      "required_stdout_line": "OK Tail ownership: charged work and recovery",
+      "source_sha256": "dcf0be0c75df836fdd1c35d8d96b6ee232050d56601bef2e20d829fce2329dea"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Uncaptured_Slot",
+      "registered_label": "scalar closing: no artificial capture",
+      "required_stdout_line": "OK scalar closing: no artificial capture",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Liveness_Independent_Root",
+      "registered_label": "scalar closing: independent live root",
+      "required_stdout_line": "OK scalar closing: independent live root",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Invalid_Link_Recovery",
+      "registered_label": "scalar closing: invalid link recovery",
+      "required_stdout_line": "OK scalar closing: invalid link recovery",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Wrong_Frame_Head",
+      "registered_label": "scalar closing: reject another frame head",
+      "required_stdout_line": "OK scalar closing: reject another frame head",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Outside_Context_Head",
+      "registered_label": "scalar closing: reject uninitialized head",
+      "required_stdout_line": "OK scalar closing: reject uninitialized head",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Original_Failure",
+      "registered_label": "scalar closing: Original_Failure",
+      "required_stdout_line": "OK scalar closing: Original_Failure",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Multiple_Failure",
+      "registered_label": "scalar closing: Multiple_Failure",
+      "required_stdout_line": "OK scalar closing: Multiple_Failure",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Closer_Failure",
+      "registered_label": "scalar closing: Closer_Failure",
+      "required_stdout_line": "OK scalar closing: Closer_Failure",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Cold_True",
+      "registered_label": "scalar closing: Cold_True",
+      "required_stdout_line": "OK scalar closing: Cold_True",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Nil_Entry",
+      "registered_label": "scalar closing: Nil_Entry",
+      "required_stdout_line": "OK scalar closing: Nil_Entry",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#False_Entry",
+      "registered_label": "scalar closing: False_Entry",
+      "required_stdout_line": "OK scalar closing: False_Entry",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Closed_Upvalue",
+      "registered_label": "scalar closing: Closed_Upvalue",
+      "required_stdout_line": "OK scalar closing: Closed_Upvalue",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Mutable_Stack",
+      "registered_label": "scalar closing: Mutable_Stack",
+      "required_stdout_line": "OK scalar closing: Mutable_Stack",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Suspended_Roots",
+      "registered_label": "scalar closing: Suspended_Roots",
+      "required_stdout_line": "OK scalar closing: Suspended_Roots",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Captured_Suspended",
+      "registered_label": "scalar closing: Captured_Suspended",
+      "required_stdout_line": "OK scalar closing: Captured_Suspended",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Generic_For_Scope",
+      "registered_label": "scalar closing: Generic_For_Scope",
+      "required_stdout_line": "OK scalar closing: Generic_For_Scope",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Jump_Scope",
+      "registered_label": "scalar closing: Jump_Scope",
+      "required_stdout_line": "OK scalar closing: Jump_Scope",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-scalar_closing_tests.adb#Nil_Mutation",
+      "registered_label": "scalar mutation: Nil_Mutation",
+      "required_stdout_line": "OK scalar mutation: Nil_Mutation",
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-scalar_closing_tests.adb#False_Mutation",
+      "registered_label": "scalar mutation: False_Mutation",
+      "required_stdout_line": "OK scalar mutation: False_Mutation",
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-scalar_closing_tests.adb#False_Type_Closer",
+      "registered_label": "scalar mutation: False_Type_Closer",
+      "required_stdout_line": "OK scalar mutation: False_Type_Closer",
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-scalar_closing_tests.adb#Outer_Error_GC_Recovery",
+      "registered_label": "scalar mutation: Outer_Error_GC_Recovery",
+      "required_stdout_line": "OK scalar mutation: Outer_Error_GC_Recovery",
+      "execution_evidence": [],
+      "source_sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Payload_Types",
+      "registered_label": "materialized vararg: Payload_Types",
+      "required_stdout_line": "OK materialized vararg: Payload_Types",
+      "execution_evidence": [],
+      "source_sha256": "0499d39b7207149c87b81f6f22589a2c702f3a8f1055f0a935678d6fb858b97b"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Nil_Holes",
+      "registered_label": "materialized vararg: Nil_Holes",
+      "required_stdout_line": "OK materialized vararg: Nil_Holes",
+      "execution_evidence": [],
+      "source_sha256": "0499d39b7207149c87b81f6f22589a2c702f3a8f1055f0a935678d6fb858b97b"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Fresh_Aliases",
+      "registered_label": "materialized vararg: Fresh_Aliases",
+      "required_stdout_line": "OK materialized vararg: Fresh_Aliases",
+      "execution_evidence": [],
+      "source_sha256": "0499d39b7207149c87b81f6f22589a2c702f3a8f1055f0a935678d6fb858b97b"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Captured_Table",
+      "registered_label": "materialized vararg: Captured_Table",
+      "required_stdout_line": "OK materialized vararg: Captured_Table",
+      "execution_evidence": [],
+      "source_sha256": "0499d39b7207149c87b81f6f22589a2c702f3a8f1055f0a935678d6fb858b97b"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Count_Faults",
+      "registered_label": "materialized vararg: Count_Faults",
+      "required_stdout_line": "OK materialized vararg: Count_Faults",
+      "execution_evidence": [],
+      "source_sha256": "0499d39b7207149c87b81f6f22589a2c702f3a8f1055f0a935678d6fb858b97b"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Byte_Faults",
+      "registered_label": "materialized vararg: Byte_Faults",
+      "required_stdout_line": "OK materialized vararg: Byte_Faults",
+      "execution_evidence": [],
+      "source_sha256": "0499d39b7207149c87b81f6f22589a2c702f3a8f1055f0a935678d6fb858b97b"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Partial_Release",
+      "registered_label": "materialized vararg: Partial_Release",
+      "required_stdout_line": "OK materialized vararg: Partial_Release",
+      "execution_evidence": [],
+      "source_sha256": "0499d39b7207149c87b81f6f22589a2c702f3a8f1055f0a935678d6fb858b97b"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Retained_Recovery",
+      "registered_label": "materialized vararg: Retained_Recovery",
+      "required_stdout_line": "OK materialized vararg: Retained_Recovery",
+      "execution_evidence": [],
+      "source_sha256": "0499d39b7207149c87b81f6f22589a2c702f3a8f1055f0a935678d6fb858b97b"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/table_algorithm_tests.adb#Concat_Maximum",
+      "registered_label": "table errors: Concat_Maximum",
+      "required_stdout_line": "OK table errors: Concat_Maximum",
+      "execution_evidence": [],
+      "source_sha256": "9e52f69ebd06fe9ac285c5a82ecb43786aca7d7e1b03a5809dcb866c168c1845"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/table_algorithm_tests.adb#Concat_Minimum",
+      "registered_label": "table errors: Concat_Minimum",
+      "required_stdout_line": "OK table errors: Concat_Minimum",
+      "execution_evidence": [],
+      "source_sha256": "9e52f69ebd06fe9ac285c5a82ecb43786aca7d7e1b03a5809dcb866c168c1845"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/table_algorithm_tests.adb#Concat_Zero",
+      "registered_label": "table errors: Concat_Zero",
+      "required_stdout_line": "OK table errors: Concat_Zero",
+      "execution_evidence": [],
+      "source_sha256": "9e52f69ebd06fe9ac285c5a82ecb43786aca7d7e1b03a5809dcb866c168c1845"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/table_algorithm_tests.adb#Concat_Proxy",
+      "registered_label": "table errors: Concat_Proxy",
+      "required_stdout_line": "OK table errors: Concat_Proxy",
+      "execution_evidence": [],
+      "source_sha256": "9e52f69ebd06fe9ac285c5a82ecb43786aca7d7e1b03a5809dcb866c168c1845"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/table_algorithm_tests.adb#Concat_Separator",
+      "registered_label": "table errors: Concat_Separator",
+      "required_stdout_line": "OK table errors: Concat_Separator",
+      "execution_evidence": [],
+      "source_sha256": "9e52f69ebd06fe9ac285c5a82ecb43786aca7d7e1b03a5809dcb866c168c1845"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/table_algorithm_tests.adb#Pairs_Missing",
+      "registered_label": "table errors: Pairs_Missing",
+      "required_stdout_line": "OK table errors: Pairs_Missing",
+      "execution_evidence": [],
+      "source_sha256": "9e52f69ebd06fe9ac285c5a82ecb43786aca7d7e1b03a5809dcb866c168c1845"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/table_algorithm_tests.adb#Ipairs_Missing",
+      "registered_label": "table errors: Ipairs_Missing",
+      "required_stdout_line": "OK table errors: Ipairs_Missing",
+      "execution_evidence": [],
+      "source_sha256": "9e52f69ebd06fe9ac285c5a82ecb43786aca7d7e1b03a5809dcb866c168c1845"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/library_runtime_tests.adb#C_Collation",
+      "registered_label": "locale strings: C_Collation",
+      "required_stdout_line": "OK locale strings: C_Collation",
+      "execution_evidence": [],
+      "source_sha256": "a9fd8efda69fac822099eb40e17d712bd72085db3f38a1657f6c9b94074fdfc5"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/library_runtime_tests.adb#C_Classes",
+      "registered_label": "locale strings: C_Classes",
+      "required_stdout_line": "OK locale strings: C_Classes",
+      "execution_evidence": [],
+      "source_sha256": "a9fd8efda69fac822099eb40e17d712bd72085db3f38a1657f6c9b94074fdfc5"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/library_runtime_tests.adb#C_Case",
+      "registered_label": "locale strings: C_Case",
+      "required_stdout_line": "OK locale strings: C_Case",
+      "execution_evidence": [],
+      "source_sha256": "a9fd8efda69fac822099eb40e17d712bd72085db3f38a1657f6c9b94074fdfc5"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/library_runtime_tests.adb#Non_C_Collation",
+      "registered_label": "locale strings: NonC_Collation availability",
+      "required_stdout_line": "OK locale strings: NonC_Collation availability",
+      "execution_evidence": [],
+      "source_sha256": "a9fd8efda69fac822099eb40e17d712bd72085db3f38a1657f6c9b94074fdfc5"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/library_runtime_tests.adb#Non_C_Classes_Case",
+      "registered_label": "locale strings: NonC_Classes_Case availability",
+      "required_stdout_line": "OK locale strings: NonC_Classes_Case availability",
+      "execution_evidence": [],
+      "source_sha256": "a9fd8efda69fac822099eb40e17d712bd72085db3f38a1657f6c9b94074fdfc5"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/library_runtime_tests.adb#Unavailable_Locale_Unchanged",
+      "registered_label": "locale strings: Unavailable_Unchanged",
+      "required_stdout_line": "OK locale strings: Unavailable_Unchanged",
+      "execution_evidence": [],
+      "source_sha256": "a9fd8efda69fac822099eb40e17d712bd72085db3f38a1657f6c9b94074fdfc5"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Fixed_Short_Binary",
+      "registered_label": "fixed external: Short_Binary",
+      "required_stdout_line": "OK fixed external: Short_Binary",
+      "execution_evidence": [],
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Fixed_Long_Borrow",
+      "registered_label": "fixed external: Long_Borrow",
+      "required_stdout_line": "OK fixed external: Long_Borrow",
+      "execution_evidence": [],
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Fixed_Child_State",
+      "registered_label": "fixed external: Child_State",
+      "required_stdout_line": "OK fixed external: Child_State",
+      "execution_evidence": [],
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Fixed_Invalid_Type",
+      "registered_label": "fixed external: Invalid_Type",
+      "required_stdout_line": "OK fixed external: Invalid_Type",
+      "execution_evidence": [],
+      "source_sha256": "8d2041733ba7f91a122357ef6061ca6b24677f0c2cd11e96549865f514f447f8"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Primary_Nil",
+      "registered_label": "CLI prompt: nil primary",
+      "required_stdout_line": "OK CLI prompt: nil primary",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Secondary_Nil",
+      "registered_label": "CLI prompt: nil secondary",
+      "required_stdout_line": "OK CLI prompt: nil secondary",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Custom_String",
+      "registered_label": "CLI prompt: custom string",
+      "required_stdout_line": "OK CLI prompt: custom string",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Empty_String",
+      "registered_label": "CLI prompt: empty string",
+      "required_stdout_line": "OK CLI prompt: empty string",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Numeric_Prompt",
+      "registered_label": "CLI prompt: numeric value",
+      "required_stdout_line": "OK CLI prompt: numeric value",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Boolean_Prompt",
+      "registered_label": "CLI prompt: boolean value",
+      "required_stdout_line": "OK CLI prompt: boolean value",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Embedded_Nul",
+      "registered_label": "CLI prompt: embedded NUL",
+      "required_stdout_line": "OK CLI prompt: embedded NUL",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Replaced_Tostring",
+      "registered_label": "CLI prompt: replaced global tostring",
+      "required_stdout_line": "OK CLI prompt: replaced global tostring",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Numeric_Handler",
+      "registered_label": "CLI prompt: numeric handler result",
+      "required_stdout_line": "OK CLI prompt: numeric handler result",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Global_Handler",
+      "registered_label": "CLI prompt: global handler",
+      "required_stdout_line": "OK CLI prompt: global handler",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Tostring_Frame",
+      "registered_label": "CLI prompt: actual tostring C frame",
+      "required_stdout_line": "OK CLI prompt: actual tostring C frame",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Global_Frame",
+      "registered_label": "CLI prompt: actual global C frame",
+      "required_stdout_line": "OK CLI prompt: actual global C frame",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Invalid_Handler_Result",
+      "registered_label": "CLI prompt: invalid handler result",
+      "required_stdout_line": "OK CLI prompt: invalid handler result",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Handler_Error",
+      "registered_label": "CLI prompt: handler error",
+      "required_stdout_line": "OK CLI prompt: handler error",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Table_Error",
+      "registered_label": "CLI prompt: table error report",
+      "required_stdout_line": "OK CLI prompt: table error report",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Boolean_Error",
+      "registered_label": "CLI prompt: boolean error report",
+      "required_stdout_line": "OK CLI prompt: boolean error report",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Nul_Error",
+      "registered_label": "CLI prompt: NUL error display",
+      "required_stdout_line": "OK CLI prompt: NUL error display",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Global_Error",
+      "registered_label": "CLI prompt: global error",
+      "required_stdout_line": "OK CLI prompt: global error",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Handler_Yield",
+      "registered_label": "CLI prompt: handler yield",
+      "required_stdout_line": "OK CLI prompt: handler yield",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Dynamic_Handler",
+      "registered_label": "CLI prompt: dynamic handler",
+      "required_stdout_line": "OK CLI prompt: dynamic handler",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Retired_Root",
+      "registered_label": "CLI prompt: retired weak argument",
+      "required_stdout_line": "OK CLI prompt: retired weak argument",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Budget_Recovery",
+      "registered_label": "CLI prompt: charged callback recovery",
+      "required_stdout_line": "OK CLI prompt: charged callback recovery",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Output_Budget",
+      "registered_label": "CLI prompt: output policy",
+      "required_stdout_line": "OK CLI prompt: output policy",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Exit_Without_Close",
+      "registered_label": "CLI prompt: exit without close",
+      "required_stdout_line": "OK CLI prompt: exit without close",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Exit_With_Close",
+      "registered_label": "CLI prompt: exit with close",
+      "required_stdout_line": "OK CLI prompt: exit with close",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Refusal_Recovery",
+      "registered_label": "CLI prompt: actual allocation refusal",
+      "required_stdout_line": "OK CLI prompt: actual allocation refusal",
+      "execution_evidence": [],
+      "source_sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Cached_Low",
+      "registered_label": "string hash: actual cached low field",
+      "required_stdout_line": "OK string hash: actual cached low field",
+      "execution_evidence": [],
+      "source_sha256": "35395675883c39cf2a0e5babcc3b33946c7799910c94bef196e7f337354647b0"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Cached_High",
+      "registered_label": "string hash: full high-bit field",
+      "required_stdout_line": "OK string hash: full high-bit field",
+      "execution_evidence": [],
+      "source_sha256": "35395675883c39cf2a0e5babcc3b33946c7799910c94bef196e7f337354647b0"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Length_0",
+      "registered_label": "string hash: length zero",
+      "required_stdout_line": "OK string hash: length zero",
+      "execution_evidence": [],
+      "source_sha256": "35395675883c39cf2a0e5babcc3b33946c7799910c94bef196e7f337354647b0"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Length_10",
+      "registered_label": "string hash: length ten",
+      "required_stdout_line": "OK string hash: length ten",
+      "execution_evidence": [],
+      "source_sha256": "35395675883c39cf2a0e5babcc3b33946c7799910c94bef196e7f337354647b0"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Length_39",
+      "registered_label": "string hash: length thirty-nine",
+      "required_stdout_line": "OK string hash: length thirty-nine",
+      "execution_evidence": [],
+      "source_sha256": "35395675883c39cf2a0e5babcc3b33946c7799910c94bef196e7f337354647b0"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Length_40",
+      "registered_label": "string hash: length forty",
+      "required_stdout_line": "OK string hash: length forty",
+      "execution_evidence": [],
+      "source_sha256": "35395675883c39cf2a0e5babcc3b33946c7799910c94bef196e7f337354647b0"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Length_41",
+      "registered_label": "string hash: length forty-one",
+      "required_stdout_line": "OK string hash: length forty-one",
+      "execution_evidence": [],
+      "source_sha256": "35395675883c39cf2a0e5babcc3b33946c7799910c94bef196e7f337354647b0"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Length_1000",
+      "registered_label": "string hash: length one thousand",
+      "required_stdout_line": "OK string hash: length one thousand",
+      "execution_evidence": [],
+      "source_sha256": "35395675883c39cf2a0e5babcc3b33946c7799910c94bef196e7f337354647b0"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Binary_Content",
+      "registered_label": "string hash: binary payload",
+      "required_stdout_line": "OK string hash: binary payload",
+      "execution_evidence": [],
+      "source_sha256": "35395675883c39cf2a0e5babcc3b33946c7799910c94bef196e7f337354647b0"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Invalid_Type",
+      "registered_label": "string hash: strict string type",
+      "required_stdout_line": "OK string hash: strict string type",
+      "execution_evidence": [],
+      "source_sha256": "35395675883c39cf2a0e5babcc3b33946c7799910c94bef196e7f337354647b0"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Extra_Arguments",
+      "registered_label": "string hash: extra argument rejection",
+      "required_stdout_line": "OK string hash: extra argument rejection",
+      "execution_evidence": [],
+      "source_sha256": "35395675883c39cf2a0e5babcc3b33946c7799910c94bef196e7f337354647b0"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Default_Absent",
+      "registered_label": "string hash: default absence",
+      "required_stdout_line": "OK string hash: default absence",
+      "execution_evidence": [],
+      "runtime_obligation_coverage": false,
+      "coverage_boundary": "Negative T-absence control only; cannot discharge any omitted string-hash or public API operation.",
+      "source_sha256": "35395675883c39cf2a0e5babcc3b33946c7799910c94bef196e7f337354647b0"
     }
   ],
   "required_contexts": [

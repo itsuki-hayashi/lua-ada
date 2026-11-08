@@ -88,6 +88,11 @@ function Get-ConfiguredFixtureDefinitions {
             setup="$guard;assert(type(T.externKstr)=='function' and rawget(_G,'_FIXED_EXTERNAL_CASE')==nil);print('CONFIGURED-FIXTURE: real T fixed external strings')";
             stdout="CONFIGURED-FIXTURE: real T fixed external strings`n"+
                 (($external|ForEach-Object{"PASS fixed external $_"})-join "`n")+"`n"}
+        $hashCases=@('Length_0','Length_10','Length_39','Length_40','Length_41','Length_1000','Binary','Invalid_Type')
+        $definitions+=@{id='string-hash-invariants';source='tests/lua/string_hash_invariants.lua';
+            setup="$guard;assert(type(T.hash)=='function' and type(T.externstr)=='function' and type(T.externKstr)=='function');print('CONFIGURED-FIXTURE: real T string hash')";
+            stdout="CONFIGURED-FIXTURE: real T string hash`n"+
+                (($hashCases|ForEach-Object{"PASS string hash $_"})-join "`n")+"`n"}
     }
     # This fixture deliberately counts instructions. Its own source contract
     # requires one C-compiled graph, consumed unchanged by both interpreters;
@@ -148,6 +153,7 @@ function Get-ConfiguredFixtureSources {
         'tests/lua/scalar_closing_refusal.lua','tests/lua/scalar_closing_public.lua',
         'tests/lua/scalar_closing_mutation.lua','tests/lua/materialized_vararg.lua','tests/lua/materialized_vararg_refusal.lua',
         'tests/lua/fixed_external_strings.lua','tests/lua/table_error_arguments.lua','tests/lua/locale_strings.lua',
+        'tests/lua/string_hash_invariants.lua','tests/src/lua-string_hash_tests.adb','tests/src/lua-string_hash_tests.ads',
         'tests/lua/cli_prompt_controls.lua','scripts/CliFixtureCases.psm1','scripts/CliFixtureEvidence.psm1',
         'scripts/check-configured-cli.ps1','scripts/check-cli.ps1',
         'tests/src/lua-sessions-cli_prompt_tests.adb','tests/src/lua-sessions-cli_prompt_tests.ads',

@@ -5669,6 +5669,92 @@
       "registered_label": "CLI prompt: actual allocation refusal",
       "required_stdout_line": "OK CLI prompt: actual allocation refusal",
       "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Cached_Low",
+      "registered_label": "string hash: actual cached low field",
+      "required_stdout_line": "OK string hash: actual cached low field",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Cached_High",
+      "registered_label": "string hash: full high-bit field",
+      "required_stdout_line": "OK string hash: full high-bit field",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Length_0",
+      "registered_label": "string hash: length zero",
+      "required_stdout_line": "OK string hash: length zero",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Length_10",
+      "registered_label": "string hash: length ten",
+      "required_stdout_line": "OK string hash: length ten",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Length_39",
+      "registered_label": "string hash: length thirty-nine",
+      "required_stdout_line": "OK string hash: length thirty-nine",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Length_40",
+      "registered_label": "string hash: length forty",
+      "required_stdout_line": "OK string hash: length forty",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Length_41",
+      "registered_label": "string hash: length forty-one",
+      "required_stdout_line": "OK string hash: length forty-one",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Length_1000",
+      "registered_label": "string hash: length one thousand",
+      "required_stdout_line": "OK string hash: length one thousand",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Binary_Content",
+      "registered_label": "string hash: binary payload",
+      "required_stdout_line": "OK string hash: binary payload",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Invalid_Type",
+      "registered_label": "string hash: strict string type",
+      "required_stdout_line": "OK string hash: strict string type",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Extra_Arguments",
+      "registered_label": "string hash: extra argument rejection",
+      "required_stdout_line": "OK string hash: extra argument rejection",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-string_hash_tests.adb#Default_Absent",
+      "registered_label": "string hash: default absence",
+      "required_stdout_line": "OK string hash: default absence",
+      "execution_evidence": [],
+      "runtime_obligation_coverage": false,
+      "coverage_boundary": "Negative T-absence control only; cannot discharge any omitted string-hash or public API operation."
     }
   ]
 }

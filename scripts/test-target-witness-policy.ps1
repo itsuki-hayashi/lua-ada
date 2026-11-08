@@ -137,7 +137,7 @@ Case 'new value auxiliary and scalar source routes remain proposals with no exec
     $relative=[IO.Path]::GetRelativePath($root,(Join-Path $path 'witness-policy.author-proposal.json')).Replace('\','/')
     $r=Read-TargetWitnessPolicy -Root $root -Path $relative
     $new=@($r.global_api.entries|Where-Object{ $_.Contains('proposed_classification') })
-    Assert-True ($r.consumer.cases.Count -eq 605 -and $r.aunit.entries.Count -eq 805 -and $new.Count -eq 126 -and
+    Assert-True ($r.consumer.cases.Count -eq 605 -and $r.aunit.entries.Count -eq 817 -and $new.Count -eq 126 -and
         @($new|Where-Object{ $_.classification -cne 'pending-semantic-review' -or $_.review_status -cne 'pending' -or
             $_.runtime_acceptance -or $_.execution_evidence.Count }).Count -eq 0 -and -not $r.source_reviewed -and -not $r.runtime_acceptance) 'Source routes invented acceptance'
     foreach($entry in $new){Assert-True ($entry.proposed_context_witnesses.Count -eq 26 -and -not $entry.Contains('context_witnesses')) 'A future route became an actual context observation'}
@@ -173,6 +173,16 @@ Case 'new value auxiliary and scalar source routes remain proposals with no exec
         Assert-True ($entries.Count -gt 0 -and @($entries|Where-Object{$_.runtime_acceptance -or $_.execution_evidence.Count}).Count -eq 0) 'Registered source candidate gained fabricated observation authority'
     }
     Reject {Read-TargetWitnessPolicy -Root $root -Path $relative -RequireReview} 'incomplete|independent review|function source'
+}
+Case 'a named default T-absence control cannot discharge a global API operation'{
+    $path=New-PublicProposals (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/additional-public-api.author-routes.json')
+    $relative=[IO.Path]::GetRelativePath($root,(Join-Path $path 'witness-policy.author-proposal.json')).Replace('\','/')
+    $policy=Get-Content (Join-Path $root $relative) -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+    $api=Get-Content (Join-Path $root $policy.global_api.path) -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+    $api.entries[0].named_aunit_cases+=@('tests/src/lua-string_hash_tests.adb#Default_Absent')
+    $policy.global_api.sha256=Save (Join-Path $root $policy.global_api.path) $api
+    $null=Save (Join-Path $root $relative) $policy
+    Reject {Read-TargetWitnessPolicy -Root $root -Path $relative} 'negative T-absence control'
 }
 Case 'API author routes reject invented witnesses declaration-only calls and smuggled passing metadata'{
     $original=Get-Content (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/additional-public-api.author-routes.json') -Raw

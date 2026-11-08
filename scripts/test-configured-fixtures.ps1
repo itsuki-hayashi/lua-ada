@@ -174,6 +174,16 @@ if($baseline.configuration -ceq 'upstream-test'){
     Case 'instrumented execution cannot substitute a T-absent external string return' {param($r)
         $r.processes=@($r.processes|Where-Object operation -CNE fixed-external-strings)
     } 'process set is incomplete'
+    Case 'string hash input arguments cannot select a single public body' {param($r)
+        (Row $r string-hash-invariants).process.arguments+=@('Length_0')
+    } 'explicit setup'
+    Case 'string hash completion cannot omit the binary borrowed-key operation' {param($r)
+        $p=(Row $r string-hash-invariants).process
+        Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS string hash Binary`n",''))
+    } 'complete ordered protocol'
+    Case 'the full T campaign cannot omit actual string hash observations' {param($r)
+        $r.processes=@($r.processes|Where-Object operation -CNE string-hash-invariants)
+    } 'process set is incomplete'
     foreach($pair in @(@('reader-refusal-phases','PASS: reader refusal Refused_Partial_Source'),
         @('string-refusal-phases','PASS: string refusal Refused_Error'),
         @('c-hook-transitions','PASS: C hook transition C_Count_Removes_All'))){

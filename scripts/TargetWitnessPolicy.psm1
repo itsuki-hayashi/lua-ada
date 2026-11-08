@@ -136,7 +136,14 @@ function Read-TargetWitnessPolicy {
     }
     foreach ($entry in $unit.entries) {
         if ($unitIds.ContainsKey($entry.case)) { throw 'Duplicate target AUnit witness identity' }
-        $unitIds[$entry.case] = $true
+        if($entry.Contains('runtime_obligation_coverage') -and $entry.runtime_obligation_coverage -isnot [bool]){
+            throw 'Target AUnit coverage role requires an explicit boolean'
+        }
+        $discharges=-not $entry.Contains('runtime_obligation_coverage') -or $entry.runtime_obligation_coverage
+        if($entry.case -ceq 'tests/src/lua-string_hash_tests.adb#Default_Absent' -and $discharges){
+            throw 'The T-absence control cannot discharge an omitted operation'
+        }
+        $unitIds[$entry.case] = $discharges
         [void](Resolve-ReviewedFile -Root $Root -Path $entry.case.Split('#')[0] -Sha256 $entry.source_sha256)
         if (@($unit.bindings | Where-Object { $_.path -ceq $entry.case.Split('#')[0] -and $_.sha256 -ceq $entry.source_sha256 }).Count -ne 1) {
             throw 'Target AUnit witness lacks its current source binding'
@@ -185,7 +192,10 @@ function Read-TargetWitnessPolicy {
             }
         }
         foreach ($case in $entry.named_c_cases) { if (-not $cIds.ContainsKey($case)) { throw 'Global API route names an unknown C witness' } }
-        foreach ($case in $entry.named_aunit_cases) { if (-not $unitIds.ContainsKey($case)) { throw 'Global API route names an unknown AUnit witness' } }
+        foreach ($case in $entry.named_aunit_cases) {
+            if (-not $unitIds.ContainsKey($case)) { throw 'Global API route names an unknown AUnit witness' }
+            if(-not $unitIds[$case]){throw 'A negative T-absence control cannot discharge a global API operation'}
+        }
         if ($RequireReview) {
             if ($entry.classification -cnotin @('runtime-behavior','compiled-declaration','conditional-declaration') -or
                 $entry.review_status -cne 'accepted' -or [string]::IsNullOrWhiteSpace([string]$entry.invariant) -or
@@ -217,7 +227,10 @@ function Read-TargetWitnessPolicy {
                     if (-not $cIds.ContainsKey($case)) { throw 'Global API context names unknown C witness' }
                     if($route.context -cnotin $cContexts[$case]){throw 'Global API context selects an inactive C witness receiver'}
                 }
-                foreach ($case in $route.named_aunit_cases) { if (-not $unitIds.ContainsKey($case)) { throw 'Global API context names unknown AUnit witness' } }
+                foreach ($case in $route.named_aunit_cases) {
+                    if (-not $unitIds.ContainsKey($case)) { throw 'Global API context names unknown AUnit witness' }
+                    if(-not $unitIds[$case]){throw 'A negative T-absence control cannot discharge a global API context operation'}
+                }
                 foreach($case in $route.compiled_witnesses){
                     if(-not $compiledIds.ContainsKey($case) -or $route.context -cnotin $compiledIds[$case].contexts){
                         throw 'Global API context names unknown or inapplicable compiled witness'

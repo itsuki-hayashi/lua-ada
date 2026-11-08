@@ -146,7 +146,7 @@
         "kind": "source-linkage-only",
         "bindings": [
           {
-            "sha256": "ece21d89d07963cf86191316e0ca7d3ce0c8f45de44a5fb91fee3356265e2c01",
+            "sha256": "80a6c4b17e0dd1c2758c4bc79d159cf22bd74ccedb41f70ed82066f658abfd1c",
             "path": "tests/src/lua-conformance_adapter.adb"
           },
           {
@@ -393,6 +393,12 @@
       "sha256": "20b93ffca9aeafab840cf299e1cd22f18d758076a47d5fc6402bf251d5f19373",
       "selection": "paired-configured-T-only",
       "rationale": "All four real T.externKstr C-wrapper cases require actual instrumented public external-string operations, including binary payload, rooted borrow and key, remote source copied before child closure, and invalid-type recovery. Run the complete unfiltered native/Ada T pair; T absence is failure, never ordinary coverage."
+    },
+    {
+      "path": "tests/lua/string_hash_invariants.lua",
+      "sha256": "19492201c7f4171900cadb9cbbc4ecdf5cba0c590fbbd0fb94e33a0a312126f2",
+      "selection": "paired-configured-T-only",
+      "rationale": "All eight actual string hash/external copy/borrow/key/GC/type cases require real T and run unfiltered in the mandatory native/Ada instrumented pair. Numeric hash literals, C widths, physical bucket positions and the Ada-only extra-argument contract are not asserted equivalent. Default absence is an explicit negative control, never omitted hash coverage."
     }
   ],
   "host_entries": [
