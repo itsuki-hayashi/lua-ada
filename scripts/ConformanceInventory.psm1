@@ -479,12 +479,146 @@ function Assert-ConformancePrivateBoundParentRecord {
     throw 'V2 retained public runtime child must cite preserved parent bytes outside the private bound'
 }
 
+function Assert-ConformanceOptimizerSource {
+    param([byte[]]$Bytes,[Collections.IDictionary]$Exclusion)
+    # A fixed full-source hash and closed registry bind the private inspection
+    # context, including public helper calls that merely reduce its data.
+    # This is not a token-based exemption for arbitrary optimizer/debug code.
+    if($Exclusion.t_guard.mode -cne 'absent-return' -or $Exclusion.t_guard.byte_offset -ne 83 -or
+        $Exclusion.t_guard.byte_length -ne 104 -or
+        $Exclusion.t_guard.sha256 -cne '6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050'){
+        throw 'V3 optimizer must retain its exact pinned top-level T guard'
+    }
+    $original=@(Get-ConformanceCoverageUnits -Path code.lua -Bytes $Bytes)
+    if($original.Count -ne 51){throw 'V3 optimizer original51 anchor set differs'}
+    $inside=@($original|Where-Object{$_.byte_offset -ge $Exclusion.byte_offset -and
+        $_.byte_offset+$_.byte_length -le $Exclusion.byte_offset+$Exclusion.byte_length})
+    if($Exclusion.original_anchor_links.Count -ne $inside.Count){throw 'V3 optimizer original-anchor decomposition is incomplete'}
+    foreach($anchor in $inside){
+        $link=@($Exclusion.original_anchor_links|Where-Object id -CEQ $anchor.id)
+        if($link.Count -ne 1 -or (($link[0].Keys|Sort-Object)-join '|') -cne
+            'anchor_sha256|byte_length|byte_offset|id|kind'){throw 'V3 optimizer original-anchor link differs'}
+        foreach($key in @('id','kind','byte_offset','byte_length','anchor_sha256')){
+            if($link[0][$key] -cne $anchor[$key]){throw 'V3 optimizer original-anchor identity differs'}
+        }
+    }
+    $checkR=[byte[]]::new(127);[Array]::Copy($Bytes,2079,$checkR,0,127)
+    if((Get-ConformanceHash $checkR) -cne '324530f639ef49280bcc33a77b56351c3369cdfd13290c63934071985bb880dc'){
+        throw 'V3 optimizer must retain exact checkR execution/type bytes'
+    }
+}
+
+function Assert-ConformanceOptimizerReviews {
+    param([string]$Root,[Collections.IDictionary]$Exclusion,[Collections.IDictionary]$Decision,
+        [Collections.IDictionary]$Approval,[switch]$AllowSyntheticReview)
+    function Source-Only($value){
+        foreach($flag in @('runtime_acceptance','coverage_authority')){
+            if($value[$flag] -isnot [bool] -or $value[$flag]){throw 'V3 source review cannot grant runtime authority'}
+        }
+        if($value.Contains('synthetic_fixture') -and
+            ($value.synthetic_fixture -isnot [bool] -or ($value.synthetic_fixture -and -not $AllowSyntheticReview))){
+            throw 'V3 actual source authority cannot use a synthetic review'
+        }
+        if($value.execution_evidence -isnot [Array] -or $value.execution_evidence.Count){throw 'V3 source review cannot invent execution evidence'}
+        if($value.Contains('source_exclusions') -and
+            ($value.source_exclusions -isnot [Array] -or $value.source_exclusions.Count)){throw 'V3 source review cannot introduce another source waiver'}
+    }
+    Source-Only $Approval;Source-Only $Decision
+    if($Decision.schema_version -ne 3 -or $Decision.kind -cne 't-private-optimizer-exclusion-review'){
+        throw 'V3 optimizer lacks its independent exact source narrative'
+    }
+    $feature=Get-Content (Resolve-ReviewedFile -Root $Root -Path $Exclusion.feature_review.path -Sha256 $Exclusion.feature_review.sha256) -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+    $retention=Get-Content (Resolve-ReviewedFile -Root $Root -Path $Exclusion.semantic_retention_review.path -Sha256 $Exclusion.semantic_retention_review.sha256) -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+    foreach($review in @($feature,$retention)){
+        Source-Only $review
+        if([string]::IsNullOrWhiteSpace($review.author) -or [string]::IsNullOrWhiteSpace($review.reviewer) -or
+            $review.author -ceq $review.reviewer -or $review.reviewer -ceq $Exclusion.review.author -or
+            $review.source.path -cne 'references/lua/testes/code.lua' -or $review.source.sha256 -cne $Exclusion.source_sha256){
+            throw 'V3 optimizer feature/retention review identity or independence differs'
+        }
+    }
+    if($feature.kind -cne 't-private-optimizer-feature-review' -or $feature.candidate_id -cne 'code-private-optimizer' -or
+        $feature.decision -cnotin @('accepted-feature-only','accepted-feature-only-with-required-revisions') -or
+        $feature.configuration -cne 'upstream-test' -or $feature.candidates.Count -ne 8){
+        throw 'V3 optimizer lacks bounded independent feature relevance'
+    }
+    $registry=@(Get-ConformanceOptimizerRegistry)
+    foreach($row in $registry){
+        $candidate=@($feature.candidates|Where-Object id -CEQ $row.id)
+        if($candidate.Count -ne 1 -or $candidate[0].decision -cne 'accepted-feature-only' -or
+            $candidate[0].module_observable -isnot [bool] -or -not $candidate[0].module_observable -or
+            $candidate[0].module_compatibility_obligation -isnot [bool] -or $candidate[0].module_compatibility_obligation){
+            throw 'V3 optimizer feature cannot hide visibility or waive public compatibility'
+        }
+        foreach($key in @('byte_offset','byte_length','anchor_sha256')){
+            if($candidate[0][$key] -cne $row[$key]){throw 'V3 optimizer feature candidate widened or changed'}
+        }
+    }
+    $featurePaths=@('references/lua/manual/manual.of','references/lua/ltests.c','src/lua-canonical_compiler.adb',
+        'src/lua-canonical_compiler.ads','src/lua-opcodes.ads','src/lua-chunks.ads',
+        'scripts/ConformanceExclusionEligibility.psm1','scripts/ConformanceTransforms.psm1')
+    if($feature.source_bindings -isnot [Array] -or (($feature.source_bindings.path|Sort-Object)-join '|') -cne (($featurePaths|Sort-Object)-join '|')){
+        throw 'V3 feature lacks current implementation/source bindings'
+    }
+    foreach($binding in $feature.source_bindings){[void](Resolve-ReviewedFile -Root $Root -Path $binding.path -Sha256 $binding.sha256)}
+    if($retention.schema_version -ne 1 -or $retention.kind -cne 'code-optimizer-semantic-retention-review' -or
+        $retention.decision -cne 'accepted-source-retention-contract-only' -or
+        $retention.schema_implementation_scope.version -ne 3 -or
+        $retention.schema_implementation_scope.target -cne 'remaining-upstream-compatibility' -or
+        $retention.schema_implementation_scope.permitted_candidates.Count -ne 8 -or
+        $retention.protected_checkR.byte_offset -ne 2079 -or $retention.protected_checkR.byte_length -ne 127 -or
+        $retention.protected_checkR.sha256 -cne '324530f639ef49280bcc33a77b56351c3369cdfd13290c63934071985bb880dc' -or
+        $retention.retained_contracts -isnot [Array] -or $retention.retained_contracts.Count -lt 7 -or
+        @($retention.retained_contracts|Where-Object{[string]::IsNullOrWhiteSpace($_)}).Count){
+        throw 'V3 optimizer requires separately reviewed public semantic retention and exact checkR'
+    }
+    foreach($row in $registry){
+        $candidate=@($retention.schema_implementation_scope.permitted_candidates|Where-Object id -CEQ $row.id)
+        if($candidate.Count -ne 1){throw 'V3 retention candidate set differs'}
+        foreach($key in @('byte_offset','byte_length','anchor_sha256')){
+            if($candidate[0][$key] -cne $row[$key]){throw 'V3 retention candidate widened or changed'}
+        }
+    }
+    $sources=@('tests/lua/code_public_semantics.lua','tests/src/code_public_semantic_tests.adb','tests/src/code_public_semantic_tests.ads')
+    if($retention.witness_sources -isnot [Array] -or (($retention.witness_sources.path|Sort-Object)-join '|') -cne (($sources|Sort-Object)-join '|')){
+        throw 'V3 optimizer lacks the exact public semantic source set'
+    }
+    foreach($binding in $retention.witness_sources){[void](Resolve-ReviewedFile -Root $Root -Path $binding.path -Sha256 $binding.sha256)}
+    [void](Resolve-ReviewedFile -Root $Root -Path $retention.witness.path -Sha256 $retention.witness.sha256)
+}
+
+function Assert-ConformanceOptimizerParentRecords {
+    param([byte[]]$Bytes,[Collections.IDictionary]$Exclusion,[Collections.IDictionary]$Records,[Collections.IDictionary]$Exclusions)
+    # An excluded derived child cannot overwrite even one original identity.
+    # Pending originals remain pending; resolved references need their own
+    # independent classification and a separately retained runtime obligation.
+    $original=@(Get-ConformanceCoverageUnits -Path code.lua -Bytes $Bytes)
+    foreach($anchor in $original){
+        if(-not $Records.Contains($anchor.id) -or $Exclusions.Contains($anchor.id)){throw 'V3 optimizer must preserve every original51 anchor and parent'}
+        foreach($key in @('kind','byte_offset','byte_length','anchor_sha256')){
+            if($Records[$anchor.id][$key] -cne $anchor[$key]){throw 'V3 optimizer original identity changed'}
+        }
+    }
+    foreach($link in $Exclusion.original_anchor_links){
+        $record=$Records[$link.id]
+        if($record.status -ceq 'passed' -or @($record.evidence).Count){throw 'V3 previously passing original obligations cannot become private exclusions'}
+        if($record.status -ceq 'pending'){continue}
+        $retained=@($record.obligations|Where-Object{$_ -cne $Exclusion.id -and -not $Exclusions.Contains($_) -and $Records.Contains($_) -and
+            $Records[$_].kind -cin @('assert-call','reviewed-block')})
+        if($record.status -cne 'reviewed' -or $record.classification -cne 'reference' -or
+            $Exclusion.id -cnotin $record.obligations -or $retained.Count -eq 0){
+            throw 'V3 original reference requires explicit private-child and retained-runtime decomposition'
+        }
+    }
+}
+
 function Test-ConformanceTargetExclusion {
     param([Parameter(Mandatory)][string] $Root,
           [Parameter(Mandatory)][string] $Source,
           [Parameter(Mandatory)][byte[]] $SourceBytes,
           [Parameter(Mandatory)][Collections.IDictionary] $Record,
-          [Parameter(Mandatory)][Collections.IDictionary] $Exclusion)
+          [Parameter(Mandatory)][Collections.IDictionary] $Exclusion,
+          [switch]$AllowSyntheticReview)
     # Exclusions belong to a separately authorized target, never to the pass
     # ledger. Bind the review to the original bytes and the pending obligation
     # before allowing it to discharge that target's coverage requirement.
@@ -538,6 +672,10 @@ function Test-ConformanceTargetExclusion {
     }
     $eligibilityVersion=Get-ConformanceExclusionEligibilityVersion $Exclusion
     if($eligibilityVersion -eq 2){Assert-ConformancePrivateBoundSource -Source $Source -Bytes $SourceBytes -Record $Record -Exclusion $Exclusion}
+    if($eligibilityVersion -eq 3){
+        if($Record.kind -cne 'reviewed-block'){throw 'V3 optimizer must use an exact derived reviewed block'}
+        Assert-ConformanceOptimizerSource -Bytes $SourceBytes -Exclusion $Exclusion
+    }
     $guard = $Exclusion.t_guard
     if ($null -eq $guard -or $guard.mode -cnotin @('positive-guard','absent-return') -or
         ($guard.byte_offset -isnot [int] -and $guard.byte_offset -isnot [long]) -or
@@ -675,6 +813,7 @@ function Test-ConformanceTargetExclusion {
         throw 'Exclusion independent source decision differs or lacks rationale'
     }
     if($eligibilityVersion -eq 2){Assert-ConformancePrivateBoundFeatureReview -Root $Root -Exclusion $Exclusion -Decision $decision}
+    if($eligibilityVersion -eq 3){Assert-ConformanceOptimizerReviews -Root $Root -Exclusion $Exclusion -Decision $decision -Approval $approval -AllowSyntheticReview:$AllowSyntheticReview}
     return $Exclusion
 }
 
@@ -1015,6 +1154,9 @@ function Test-ConformanceInventory {
         foreach($exclusion in $resolvedExclusions.Values){
             if($exclusion.source -ceq $file.path -and (Get-ConformanceExclusionEligibilityVersion $exclusion) -eq 2){
                 Assert-ConformancePrivateBoundParentRecord -Exclusion $exclusion -Records $indexed -Exclusions $exclusions
+            }
+            if($exclusion.source -ceq $file.path -and (Get-ConformanceExclusionEligibilityVersion $exclusion) -eq 3){
+                Assert-ConformanceOptimizerParentRecords -Bytes $bytes -Exclusion $exclusion -Records $indexed -Exclusions $exclusions
             }
         }
         Test-ConformanceSourceLinks -Records $records -RequireComplete:$RequireComplete `

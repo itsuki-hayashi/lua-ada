@@ -199,7 +199,7 @@ Case 'v2 eligibility cannot inherit approval after compatibility fields or paren
     Assert-Rejected {Invoke-Fixture $f} 'approved semantics differ'
     $f=New-V2Fixture;$f.exclusion.retained_parent.anchor_sha256='0'*64
     Assert-Rejected {Invoke-Fixture $f} 'retained parent source hash'
-    $f=New-V2Fixture;$f.exclusion.eligibility_schema_version=3
+    $f=New-V2Fixture;$f.exclusion.eligibility_schema_version=99
     Assert-Rejected {Invoke-Fixture $f} 'Unsupported exclusion eligibility'
     $f=New-V2Fixture;$f.exclusion.review.reviewer=$f.exclusion.review.author
     Assert-Rejected {Invoke-Fixture $f} 'accepted independent review'

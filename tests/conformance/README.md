@@ -154,6 +154,16 @@ T requirement cannot hide those default public assertions.
 `code_public_semantics.lua` also remains an ordinary source comparison; its29
 source-linked semantic cases grant no private optimizer exclusion authority.
 
+Eligibility version3 implements only the eight exact pinned `code.lua` private
+structure candidates. It requires truthful observable=true, no public/mixed/
+module compatibility obligation, exact original-anchor links, fixed semantic
+contracts, current independent feature and public-retention decisions, and the
+unchanged127-byte `checkR`. All51 original records remain required. V1/V2 and
+historical scopes retain their previous meaning. No optimizer exclusion is
+installed merely because its shape is supported. The V3 security tests use
+labelled synthetic, non-execution reviews through a direct test-only switch;
+ordinary inventory and final consumers never enable that switch.
+
 `debug_iterator_counts.lua` also runs in both configured campaigns. Its source
 explicitly requires one C-compiled graph when comparing exact hook counts.
 The measured native interpreter loads that exact text file and dumps its
