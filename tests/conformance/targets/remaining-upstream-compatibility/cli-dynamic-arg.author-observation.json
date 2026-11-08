@@ -1,0 +1,1647 @@
+{
+  "schema_version": 1,
+  "kind": "cli-dynamic-arg-author-observation",
+  "author": "Codex /root/runtime_gaps",
+  "date": "2026-11-08",
+  "source_snapshot_revision": "503549c8e3dbeb3fc3cd43425a92b07eaaeceb40",
+  "selected_artifact_repository_revision": "5218e38a4dfe2d624b0607eaab4130d14632e50e",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "independent_feature_review": "pending",
+  "transformed_main_emitted": false,
+  "original_main_executed": false,
+  "modes": [],
+  "source_bindings": [
+    {
+      "path": "references/lua/testes/main.lua",
+      "sha256": "844d13f96bdbf03a554b8b466fdf21aeac2bcddb907ad2b971814c994898d457"
+    },
+    {
+      "path": "references/lua/lua.c",
+      "sha256": "17ce8e73dd3586b84076ceaad9d638887723a1c60945c6ee086d723a6e61453f"
+    },
+    {
+      "path": "references/lua/lauxlib.c",
+      "sha256": "12479bc0ada905452185278dc681d72eb865e1fc247a0143227c210bc3f9dd78"
+    },
+    {
+      "path": "scripts/ConformanceRunner.psm1",
+      "sha256": "a5715c2da32df777eed533d6eeb87ddef85ef5f854e64d25c00cc3e812acd245"
+    },
+    {
+      "path": "scripts/observe-cli-dynamic-arg.ps1",
+      "sha256": "c6a2e89b706872f46213fcac9aae5df7f07baa82871dc78625ccaa9e73ee25c1"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/cli-dynamic-arg.author-cases.json",
+      "sha256": "8c2229b6b8970e04cb6b8c8cad8187b5ec3e10bc54807c7d598be1cd508eceec"
+    },
+    {
+      "path": "tests/conformance/platform/cli-dynamic-arg.lua",
+      "sha256": "faebaa48ee366dcb6d8072f2652b75edfa70fd35ab871b20c266e290e912194f"
+    },
+    {
+      "path": "cli/shared/lua_cli.adb",
+      "sha256": "62de30c3309a0693a769c496a9c65fbaad5878b6f3ba0f115bde5de5f6b134bc"
+    },
+    {
+      "path": "src/lua-sessions.adb",
+      "sha256": "bc2427a58d0fa0d45f24fef006571af91c2feeb1dee617cc9285a6f1d282cac7"
+    },
+    {
+      "path": "cli/shared/lua-sessions-cli.ads",
+      "sha256": "878499ac5847df9f02fe9ebb7814abf2fe7da2379d3aec6ff0446bc6785c6ee6"
+    },
+    {
+      "path": "cli/shared/lua-sessions-cli.adb",
+      "sha256": "aa56000998a806e5c09dd517af947c3830343672332360dc5e5725a10941b88e"
+    },
+    {
+      "path": "experiments/conformance/oracle.gpr",
+      "sha256": "05c9640918231db5ee6a09572d833ceb57831458e6c4531f76b14fdbd02366d0"
+    },
+    {
+      "path": "experiments/conformance/reference.gpr",
+      "sha256": "6c79ca4e821634be54685e72a159dc1afef528e13eeac1c59ef9fd4fcb24a676"
+    }
+  ],
+  "roles": [
+    {
+      "implementation": "ReferenceC",
+      "configuration_label": "default",
+      "artifacts": [
+        {
+          "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\bin\\lua.exe",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\frozen\\lua.exe"
+        },
+        {
+          "sha256": "6fd51198bee9770aab18cf42ebaf7ccc133a26d4e3dedb22770c41aba84500b3",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\lib\\libconformance_lua.dll",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\frozen\\libconformance_lua.dll"
+        }
+      ],
+      "configuration_process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\frozen\\lua.exe",
+        "process_id": 44536,
+        "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+        "arguments": [
+          "--conformance-config"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\frozen",
+        "started_utc": "2026-11-08T08:46:51.4231537Z",
+        "elapsed_milliseconds": 40,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 1048576,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\configuration.stdout",
+        "stdout_bytes": 451,
+        "stdout_sha256": "6c63f956109c778efd508539cfdb94eabe3d06a41a56c2a6a1fae68983e20295",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\configuration.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "configuration_data": {
+        "schema_version": 1,
+        "configuration": "default",
+        "implementation": "C Lua",
+        "test_adapter": false,
+        "lua_version": "Lua 5.5",
+        "lua_release": "Lua 5.5.1",
+        "integer_bytes": 8,
+        "number_bytes": 8,
+        "compat_global": 1,
+        "extra_space_bytes": 8,
+        "expected_extra_space_bytes": 8,
+        "pointer_bytes": 8,
+        "max_stack": 1000000,
+        "max_c_calls": 200,
+        "aux_buffer_bytes": 1024,
+        "rand32": false,
+        "compat_math": false,
+        "allocator_limit_bytes": 2147483648,
+        "allocator_accounting": "lua-managed-payload-bytes"
+      },
+      "cases": [
+        {
+          "record_sha256": "9b277b46065736c8712e3bceb4629578654a49beaf1317743898a91b536aa0b5",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "8daec472d29dc50bdbf90d455eebbaee3a0b99557b0714a527391ee1385b9c79",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\unchanged-strings-result-process.json",
+          "id": "unchanged-strings"
+        },
+        {
+          "record_sha256": "6f85819752122872954fbc28d493c2ceb386917cbbdc0ef4298f7448142c5e0e",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "e036ae2b34857e349eb5487b5d2acf72c38b4045c63d33c96661b3c3c2408870",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\numeric-slot-result-process.json",
+          "id": "numeric-slot"
+        },
+        {
+          "record_sha256": "44e174c1aba18d22737ae27d5062aa61cbdca284a4538df1dc8eb92c9c83d1d7",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "12db5126d3654461622c3d604baf2899a67ed5d65d0284af1e21ee46c497ac8c",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\boolean-slot-result-process.json",
+          "id": "boolean-slot"
+        },
+        {
+          "record_sha256": "75aaca5f9febb127afda7f547aa6e427fb585a7bac10e72807435cd43dd5a6f5",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "974f6c2014a1d2ffe20f5d475e57ecec705d1468f6066af4282d8735c209f126",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\replace-table-result-process.json",
+          "id": "replace-table"
+        },
+        {
+          "record_sha256": "52012ce357ca64dbccda6d62edc04b38443ae6ddba4520d676b2b0d5014d325c",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "62a00e684c79aac72c47f421589fb9ef12b9c1d84a8de8922a7d1c2118620961",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\replace-empty-result-process.json",
+          "id": "replace-empty"
+        },
+        {
+          "record_sha256": "bb703c252c1337e435cc66b9838a0daf954b655c5ceb32dc40b9401ccd4b6aa7",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "d00dd91b1c344b2967bd9fc581cfc266bafaf6aac818790c3203bf99e16e0b03",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\mixed-object-identity-result-process.json",
+          "id": "mixed-object-identity"
+        },
+        {
+          "record_sha256": "1f1ede9c84d73300155d6c65754f30eb8648aa9cfa9e6d1a765f1e45b898517b",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "66c194439393868e4c44222ce30e032817bb1a7faa6de097322ce4371535db1b",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\metalen-holes-result-process.json",
+          "id": "metalen-holes"
+        },
+        {
+          "record_sha256": "b1858e8572ffbc5626e7d4a7f88050a98527ecd949c8e6ddf8aa4b299d3d747e",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "9a6f540f8c520bd8d38ad644f00f0f7ef70ab1fd65ea8bf8f717ec3c982b91ca",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\raw-indexing-result-process.json",
+          "id": "raw-indexing"
+        },
+        {
+          "record_sha256": "590e10f364431319c4084869380fd8ab048393cbd757ddb2247dcbcc3e798874",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "f2d61d86ad7df386347736719d9faa792d1bf0c5905fc6094e098341da2401bc",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\metalen-number-string-result-process.json",
+          "id": "metalen-number-string"
+        },
+        {
+          "record_sha256": "174be32a7642b296dbc6090100631aafc8b5c06bd5f890f7b03f188b61551259",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "b91ce38a2617445b219cf8cf8d409ce00f9696b2c21daa768db60668b09a95cb",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\metalen-float-integer-result-process.json",
+          "id": "metalen-float-integer"
+        },
+        {
+          "record_sha256": "858debd80f1d895409b37ce5c21155115e5ad6ad391e426d02f22e26f1d9f41b",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "381ace63d938bb4a6eeb770c9064ac7f2a1dfe44a918f3018cee417b0098d7e2",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\metalen-mutates-values-result-process.json",
+          "id": "metalen-mutates-values"
+        },
+        {
+          "record_sha256": "a612a57555d80799d70cd64ba95b89c81a868abf65ca3af753d6de468db3529e",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "e25a6d82a505d142eadcbc6c95b4f9ff55df54b54c0fb4af18dc9fcf28a138c5",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\metalen-replaces-global-gc-result-process.json",
+          "id": "metalen-replaces-global-gc"
+        },
+        {
+          "record_sha256": "7fe834a60bdff6bc3cf5bf31c42fcc905d2e074f9b0fbf4898f8276f7f663c6f",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "04b84e0499799c333c25dba60148054d4bb06de535542acb56c764040913b0a2",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\global-handler-result-process.json",
+          "id": "global-handler"
+        },
+        {
+          "record_sha256": "dc940971cdcae5da168aeeda3c12fcbe80fa544d20bd52e69f51ffcb564bbf4e",
+          "matches_native_contract": true,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "7ec0ad040ef2477f46c5c049f9c9653eb836b969623a571115f8ea6c5fcd04b6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\non-table-number-result-process.json",
+          "id": "non-table-number"
+        },
+        {
+          "record_sha256": "53f5cd7d6141ac56d2a8d67d4359d575813a6878f804ccb8f4a84da40795d682",
+          "matches_native_contract": true,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "7ec0ad040ef2477f46c5c049f9c9653eb836b969623a571115f8ea6c5fcd04b6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\non-table-nil-result-process.json",
+          "id": "non-table-nil"
+        },
+        {
+          "record_sha256": "b152c6749719ffc8ea7623402f25acb95c489020bb0e2674ac37ad8239878201",
+          "matches_native_contract": true,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "f9183d65fb197b0dd51893a7a5299510cbbcedea6b9ebcc68a7a2371617ddd20",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\metalen-fraction-result-process.json",
+          "id": "metalen-fraction"
+        },
+        {
+          "record_sha256": "f1289ccb932104a9a8ef513fe1b87c13d8680ba56cdc057cffd63d5606076f49",
+          "matches_native_contract": true,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "f9183d65fb197b0dd51893a7a5299510cbbcedea6b9ebcc68a7a2371617ddd20",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\metalen-table-result-result-process.json",
+          "id": "metalen-table-result"
+        },
+        {
+          "record_sha256": "73982f7631667336b4ce018e83123255313abd2e50183aa1ba1c57fea0648e42",
+          "matches_native_contract": true,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "d0f0156b7885f1983398cf3620eae199e4aeecb088c988e283cc2118d71cd405",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\metalen-error-result-process.json",
+          "id": "metalen-error"
+        },
+        {
+          "record_sha256": "05668e1251d939a296f4e00bb745abcc6cd5654802d8b46c541c398281cad4e3",
+          "matches_native_contract": true,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "5c4432f814f447d7673f3bf51abc9fee81775a945f32591e03af90f7b0d8690b",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\metalen-yield-result-process.json",
+          "id": "metalen-yield"
+        },
+        {
+          "record_sha256": "cc702e67e5fbecca1592a50141efbaf1d83cebbccc1e9427eccdd6a73631ae85",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "104eef8307da1314e00ee987cfdcaa30dd7326209157e9e03f2332478940038d",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\arg-zero-does-not-retarget-result-process.json",
+          "id": "arg-zero-does-not-retarget"
+        },
+        {
+          "record_sha256": "84860732f4afa850127e2d3fe601b6d43f50b0b87b896c7eaf04701dbb85999e",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "7927ef45b28a00c2eda7422e1ccb80d432c264cb5579ed150ddeb3312cd61511",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-default\\negative-index-does-not-retarget-result-process.json",
+          "id": "negative-index-does-not-retarget"
+        }
+      ],
+      "passes_native_contract": 21,
+      "fails_native_contract": 0,
+      "telemetry_required": true,
+      "product_configuration_note": "Product CLI has no conformance configuration command; build-path label is not an adapter claim. Actual _VERSION/type(T) are separately captured."
+    },
+    {
+      "implementation": "ReferenceC",
+      "configuration_label": "upstream-test",
+      "artifacts": [
+        {
+          "sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\bin\\lua.exe",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\frozen\\lua.exe"
+        },
+        {
+          "sha256": "90cd6bb9cb2f5cdfe04a79ad2a2a8779f1e2cda590d53aaebb3caf5524fe973c",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\lib\\libconformance_lua.dll",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\frozen\\libconformance_lua.dll"
+        }
+      ],
+      "configuration_process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\frozen\\lua.exe",
+        "process_id": 37488,
+        "executable_sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
+        "arguments": [
+          "--conformance-config"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\frozen",
+        "started_utc": "2026-11-08T08:46:52.1162472Z",
+        "elapsed_milliseconds": 29,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 1048576,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\configuration.stdout",
+        "stdout_bytes": 456,
+        "stdout_sha256": "65bc59bb7bd1f68dc6670263547590fc5b3878f7cd7c205ec7aa8a9d9775ebfb",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\configuration.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "configuration_data": {
+        "schema_version": 1,
+        "configuration": "upstream-test",
+        "implementation": "C Lua",
+        "test_adapter": true,
+        "lua_version": "Lua 5.5",
+        "lua_release": "Lua 5.5.1",
+        "integer_bytes": 8,
+        "number_bytes": 8,
+        "compat_global": 0,
+        "extra_space_bytes": 16,
+        "expected_extra_space_bytes": 16,
+        "pointer_bytes": 8,
+        "max_stack": 68000,
+        "max_c_calls": 180,
+        "aux_buffer_bytes": 23,
+        "rand32": true,
+        "compat_math": true,
+        "allocator_limit_bytes": 2147483648,
+        "allocator_accounting": "debug-allocator-backing-bytes"
+      },
+      "cases": [
+        {
+          "record_sha256": "d184d44eb68b93ad09840d20f07cf2f334872051d62f076110f7f01c6c593265",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "8daec472d29dc50bdbf90d455eebbaee3a0b99557b0714a527391ee1385b9c79",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\unchanged-strings-result-process.json",
+          "id": "unchanged-strings"
+        },
+        {
+          "record_sha256": "f2552d160da4303d8099bde386e5a468f07732bdbae6d99b35e30c0a7b2d61be",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "e036ae2b34857e349eb5487b5d2acf72c38b4045c63d33c96661b3c3c2408870",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\numeric-slot-result-process.json",
+          "id": "numeric-slot"
+        },
+        {
+          "record_sha256": "83ca3bcd12e485fdbe4c32778e65a84bcdd43e01d386bbaf149a2cfdc5c1ea0f",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "12db5126d3654461622c3d604baf2899a67ed5d65d0284af1e21ee46c497ac8c",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\boolean-slot-result-process.json",
+          "id": "boolean-slot"
+        },
+        {
+          "record_sha256": "b01b5e0e95db059bfce9a93c1f6567324ee2ffa6c8255e8ab253068645e346f0",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "974f6c2014a1d2ffe20f5d475e57ecec705d1468f6066af4282d8735c209f126",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\replace-table-result-process.json",
+          "id": "replace-table"
+        },
+        {
+          "record_sha256": "66d05086a811e312c9a1d8d139c33da7f998722fae75da2f77c3d8ff2bc6bd46",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "62a00e684c79aac72c47f421589fb9ef12b9c1d84a8de8922a7d1c2118620961",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\replace-empty-result-process.json",
+          "id": "replace-empty"
+        },
+        {
+          "record_sha256": "73a84ceb1183f22a6bc0439899af139c1ca47d67307d123b8d904e0d41dab01f",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "d00dd91b1c344b2967bd9fc581cfc266bafaf6aac818790c3203bf99e16e0b03",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\mixed-object-identity-result-process.json",
+          "id": "mixed-object-identity"
+        },
+        {
+          "record_sha256": "8606737d16474b75fe8c52ec73e2d9fa355991ca6a067ca462bfc53be27b8f01",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "66c194439393868e4c44222ce30e032817bb1a7faa6de097322ce4371535db1b",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\metalen-holes-result-process.json",
+          "id": "metalen-holes"
+        },
+        {
+          "record_sha256": "fb56752ad34ed160b6d581b94bd682370727baa2bc1f398c5786343e0e0bd25f",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "9a6f540f8c520bd8d38ad644f00f0f7ef70ab1fd65ea8bf8f717ec3c982b91ca",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\raw-indexing-result-process.json",
+          "id": "raw-indexing"
+        },
+        {
+          "record_sha256": "a3f6a3050bbe811ba66480aeffa2ff89daccaf4c8ac73e82cb07880d0c7742ee",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "f2d61d86ad7df386347736719d9faa792d1bf0c5905fc6094e098341da2401bc",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\metalen-number-string-result-process.json",
+          "id": "metalen-number-string"
+        },
+        {
+          "record_sha256": "0ea74ee1c87f70c4496b9d67505c5ed138fb2471f31f02d3632833fcdf3daac2",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "b91ce38a2617445b219cf8cf8d409ce00f9696b2c21daa768db60668b09a95cb",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\metalen-float-integer-result-process.json",
+          "id": "metalen-float-integer"
+        },
+        {
+          "record_sha256": "282b7fe4bf496ccbe66e3e998dddd2097fb14ada40223986678e88cee976a303",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "381ace63d938bb4a6eeb770c9064ac7f2a1dfe44a918f3018cee417b0098d7e2",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\metalen-mutates-values-result-process.json",
+          "id": "metalen-mutates-values"
+        },
+        {
+          "record_sha256": "dd66e24c3e440db93c59054d55f13f3fbb68e35c31a45970ac85d33c8c363e50",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "e25a6d82a505d142eadcbc6c95b4f9ff55df54b54c0fb4af18dc9fcf28a138c5",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\metalen-replaces-global-gc-result-process.json",
+          "id": "metalen-replaces-global-gc"
+        },
+        {
+          "record_sha256": "fb455c20ad737935698e498fcbe251c2b11cc68d4ab6d8faeb333435277eb076",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "04b84e0499799c333c25dba60148054d4bb06de535542acb56c764040913b0a2",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\global-handler-result-process.json",
+          "id": "global-handler"
+        },
+        {
+          "record_sha256": "8f64cd97b479ecf18dede46e448090f2740765f3025eced667b4886976ebc2a9",
+          "matches_native_contract": true,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e8903dfa8cb02b04f3d42fa3a13c3a9ee320f3aa3c92699767f5700b97ee688b",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\non-table-number-result-process.json",
+          "id": "non-table-number"
+        },
+        {
+          "record_sha256": "c8a70f3862acba548ad6c1a3109d5cfa653bc289e51f464055114aafdae10094",
+          "matches_native_contract": true,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e8903dfa8cb02b04f3d42fa3a13c3a9ee320f3aa3c92699767f5700b97ee688b",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\non-table-nil-result-process.json",
+          "id": "non-table-nil"
+        },
+        {
+          "record_sha256": "574f6b870b3f8167641188b3be4237484badf5cfc4bab240f15e6193bfcced0a",
+          "matches_native_contract": true,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6b4bbbbbc451f86e9a9cb5d508b85560a3484d934ad76ad2c257171ab8c5f258",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\metalen-fraction-result-process.json",
+          "id": "metalen-fraction"
+        },
+        {
+          "record_sha256": "d329da67ef74711d6f10b1f5267212eee7cac178d715629f706bd7ca842e1eee",
+          "matches_native_contract": true,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6b4bbbbbc451f86e9a9cb5d508b85560a3484d934ad76ad2c257171ab8c5f258",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\metalen-table-result-result-process.json",
+          "id": "metalen-table-result"
+        },
+        {
+          "record_sha256": "8a9e44c223497d45d6e1824db03a70483f34d645c3178a18feb7979accc9149f",
+          "matches_native_contract": true,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "f0de4691ba666d47d7741ec2de8248057869de50278b12c5fc21de88e10c0585",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\metalen-error-result-process.json",
+          "id": "metalen-error"
+        },
+        {
+          "record_sha256": "0de8a5f9b746c2889158e433788a740508837738658bd7cc469a4731895f7606",
+          "matches_native_contract": true,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "2b156cf787cee5b8c88733d044b5e7585148899d86311c159cf7d015483fe595",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\metalen-yield-result-process.json",
+          "id": "metalen-yield"
+        },
+        {
+          "record_sha256": "bfc25f7903d9733436cd1880eaa01f1420d6f179f59a84d996ec892d439f9959",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "104eef8307da1314e00ee987cfdcaa30dd7326209157e9e03f2332478940038d",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\arg-zero-does-not-retarget-result-process.json",
+          "id": "arg-zero-does-not-retarget"
+        },
+        {
+          "record_sha256": "f6d6b95f9962efd15ac982adc6a9c469cfcf16872bbca4246756a636179be201",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "7927ef45b28a00c2eda7422e1ccb80d432c264cb5579ed150ddeb3312cd61511",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\ReferenceC-upstream-test\\negative-index-does-not-retarget-result-process.json",
+          "id": "negative-index-does-not-retarget"
+        }
+      ],
+      "passes_native_contract": 21,
+      "fails_native_contract": 0,
+      "telemetry_required": true,
+      "product_configuration_note": "Product CLI has no conformance configuration command; build-path label is not an adapter claim. Actual _VERSION/type(T) are separately captured."
+    },
+    {
+      "implementation": "AdaConformance",
+      "configuration_label": "default",
+      "artifacts": [
+        {
+          "sha256": "e4b3f54b4017166662c247e8b94ad253c0b476ab9df32e52111b2dc16f973a95",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\tests\\bin\\static\\conformance_runner.exe",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\frozen\\lua.exe"
+        }
+      ],
+      "configuration_process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\frozen\\lua.exe",
+        "process_id": 49984,
+        "executable_sha256": "e4b3f54b4017166662c247e8b94ad253c0b476ab9df32e52111b2dc16f973a95",
+        "arguments": [
+          "--conformance-config"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\frozen",
+        "started_utc": "2026-11-08T08:46:52.9152537Z",
+        "elapsed_milliseconds": 266,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 1048576,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\configuration.stdout",
+        "stdout_bytes": 548,
+        "stdout_sha256": "52da7c70140c7c215757ad88bbbbd1db7f61f946569cd89206b1f5f164b142b4",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\configuration.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "configuration_data": {
+        "schema_version": 1,
+        "implementation": "Lua Ada",
+        "lua_release": "Lua 5.5.1",
+        "configuration": "default",
+        "test_adapter": false,
+        "runtime_build_profile": "validation",
+        "launcher_build_profile": "validation",
+        "launcher_library_type": "static",
+        "integer_bytes": 8,
+        "number_bytes": 8,
+        "pointer_bytes": 8,
+        "extra_space_bytes": 8,
+        "expected_extra_space_bytes": 8,
+        "max_stack": 1000000,
+        "max_c_calls": 200,
+        "aux_buffer_bytes": 1024,
+        "compat_global": 1,
+        "rand32": false,
+        "compat_math": false,
+        "allocator_accounting": "managed-provider-raw-bytes",
+        "allocator_limit_bytes": 2147483648,
+        "telemetry": {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\configuration-allocator.49984.json",
+          "sha256": "4a09d9e92304dd79a32c750cca484266040de6802b1131c89c13a3a3ce8bc307"
+        }
+      },
+      "cases": [
+        {
+          "record_sha256": "83a4a7cde52b9b610e0e3067dc4193de78bf8978d2479faa19da17927578683c",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "8daec472d29dc50bdbf90d455eebbaee3a0b99557b0714a527391ee1385b9c79",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\unchanged-strings-result-process.json",
+          "id": "unchanged-strings"
+        },
+        {
+          "record_sha256": "210f942f4f59d4bd295279c21dd139ad2d0441a2e45261933a4df81837c69d37",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\numeric-slot-result-process.json",
+          "id": "numeric-slot"
+        },
+        {
+          "record_sha256": "0ee3e09cf73c97f83bb4d84755904c6f4ab96141ec922886255b32d87b2b6882",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\boolean-slot-result-process.json",
+          "id": "boolean-slot"
+        },
+        {
+          "record_sha256": "334fd871f33001ada7197c430072884588a35fb375f865b37798883c13d5cb6d",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\replace-table-result-process.json",
+          "id": "replace-table"
+        },
+        {
+          "record_sha256": "7405e3b56a91fe29d721905087a8fc1da5cf67331c41c9a50c0008be6620e32e",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\replace-empty-result-process.json",
+          "id": "replace-empty"
+        },
+        {
+          "record_sha256": "89fea6bc8c26dc349c508a5013b22293d8c85d91a5a714fe047a8832aa0538d6",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\mixed-object-identity-result-process.json",
+          "id": "mixed-object-identity"
+        },
+        {
+          "record_sha256": "31b7b5785c8573910b66c20c1b1ba81d5ce650f5038246a5b46e36d99ab59ce5",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\metalen-holes-result-process.json",
+          "id": "metalen-holes"
+        },
+        {
+          "record_sha256": "a8a7eac8380a986ba783dc10c82d90653d1ab05b7f74206e4a6982e42d350923",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\raw-indexing-result-process.json",
+          "id": "raw-indexing"
+        },
+        {
+          "record_sha256": "d22099d7bd708d7fa0b73499e50e8550f6162424bd1914eada418e8c0468e31e",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\metalen-number-string-result-process.json",
+          "id": "metalen-number-string"
+        },
+        {
+          "record_sha256": "b79c17cb522778e8b9026f33adfea8d1334f9416aa9a4fb59a7a245b5bc64897",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\metalen-float-integer-result-process.json",
+          "id": "metalen-float-integer"
+        },
+        {
+          "record_sha256": "40bbba3df8d6a71259b6b233a743172d5f066f54c0475009ab835b5878f1ef8c",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\metalen-mutates-values-result-process.json",
+          "id": "metalen-mutates-values"
+        },
+        {
+          "record_sha256": "3faaf190bae38abaf49fdc3461fc25558893fe86d374e494d0bcbbdaf9d71110",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\metalen-replaces-global-gc-result-process.json",
+          "id": "metalen-replaces-global-gc"
+        },
+        {
+          "record_sha256": "26444c24067d8aa21c1adb727e8bda56ed373cffdca017465aae678155374aec",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\global-handler-result-process.json",
+          "id": "global-handler"
+        },
+        {
+          "record_sha256": "241ce62ab26a1e4c02b982fe408e6ac2cddc0ab363f2bca5e49f3ebfea989893",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\non-table-number-result-process.json",
+          "id": "non-table-number"
+        },
+        {
+          "record_sha256": "4a595f76510755f2973e4b84200b3605bb1d37efe34c04cf22169f1d17bd5b3a",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\non-table-nil-result-process.json",
+          "id": "non-table-nil"
+        },
+        {
+          "record_sha256": "ef58b4c7451f8391541627b53ad7fedc25679ad75db5b14553ea769fbf1cc732",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\metalen-fraction-result-process.json",
+          "id": "metalen-fraction"
+        },
+        {
+          "record_sha256": "918b4f254db240c1ce67a2903ceb61f27d10ea1a19fb5634e4e04c380e87918a",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\metalen-table-result-result-process.json",
+          "id": "metalen-table-result"
+        },
+        {
+          "record_sha256": "7b643217685c7579d4126f052a146b44d07bfd25835e23c8fda5b83e3ec7fb65",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\metalen-error-result-process.json",
+          "id": "metalen-error"
+        },
+        {
+          "record_sha256": "b24a076905d30c6cd765d1815d3671c6a446d9471dde3ee7473ca727aef96cd2",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\metalen-yield-result-process.json",
+          "id": "metalen-yield"
+        },
+        {
+          "record_sha256": "14a03a4d2dc69f586b6e80f8ca52bdd40169b76732dca881987de839bb2eb78b",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "104eef8307da1314e00ee987cfdcaa30dd7326209157e9e03f2332478940038d",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\arg-zero-does-not-retarget-result-process.json",
+          "id": "arg-zero-does-not-retarget"
+        },
+        {
+          "record_sha256": "b8b7a7fed42917eee1f85ba041de0082644cace98b4ed4f8932af77215c5860f",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "7927ef45b28a00c2eda7422e1ccb80d432c264cb5579ed150ddeb3312cd61511",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-default\\negative-index-does-not-retarget-result-process.json",
+          "id": "negative-index-does-not-retarget"
+        }
+      ],
+      "passes_native_contract": 3,
+      "fails_native_contract": 18,
+      "telemetry_required": true,
+      "product_configuration_note": "Product CLI has no conformance configuration command; build-path label is not an adapter claim. Actual _VERSION/type(T) are separately captured."
+    },
+    {
+      "implementation": "AdaConformance",
+      "configuration_label": "upstream-test",
+      "artifacts": [
+        {
+          "sha256": "a157f03eba0782090aa9f946a70517dfe046fc4b924530cbb8d2561b82fc8de0",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\tests\\bin\\upstream-test\\static\\conformance_runner.exe",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\frozen\\lua.exe"
+        }
+      ],
+      "configuration_process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\frozen\\lua.exe",
+        "process_id": 14616,
+        "executable_sha256": "a157f03eba0782090aa9f946a70517dfe046fc4b924530cbb8d2561b82fc8de0",
+        "arguments": [
+          "--conformance-config"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\frozen",
+        "started_utc": "2026-11-08T08:46:54.7581815Z",
+        "elapsed_milliseconds": 416,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 1048576,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\configuration.stdout",
+        "stdout_bytes": 547,
+        "stdout_sha256": "2d100d0743d643c35d225646eb2bd8fe2b28b1c146c19109d0835943f613ca08",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\configuration.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "configuration_data": {
+        "schema_version": 1,
+        "implementation": "Lua Ada",
+        "lua_release": "Lua 5.5.1",
+        "configuration": "upstream-test",
+        "test_adapter": true,
+        "runtime_build_profile": "validation",
+        "launcher_build_profile": "validation",
+        "launcher_library_type": "static",
+        "integer_bytes": 8,
+        "number_bytes": 8,
+        "pointer_bytes": 8,
+        "extra_space_bytes": 8,
+        "expected_extra_space_bytes": 8,
+        "max_stack": 68000,
+        "max_c_calls": 180,
+        "aux_buffer_bytes": 23,
+        "compat_global": 0,
+        "rand32": true,
+        "compat_math": true,
+        "allocator_accounting": "managed-provider-raw-bytes",
+        "allocator_limit_bytes": 2147483648,
+        "telemetry": {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\configuration-allocator.14616.json",
+          "sha256": "77f4d85ac553ee2b7d5cbac831ae8a783be26c7aed9f6553d7f1dbac803135d3"
+        }
+      },
+      "cases": [
+        {
+          "record_sha256": "d1e3c08500cb5709d4155111b68ecfa09b8914197f85336db4abfc1ecd47a2e3",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "8daec472d29dc50bdbf90d455eebbaee3a0b99557b0714a527391ee1385b9c79",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\unchanged-strings-result-process.json",
+          "id": "unchanged-strings"
+        },
+        {
+          "record_sha256": "5b539778a13114c24b669aa3f5d4203408d21d04eef2ecad7d94b7817b97e3cd",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\numeric-slot-result-process.json",
+          "id": "numeric-slot"
+        },
+        {
+          "record_sha256": "2be3f5769f0366eaa3b7e305c3dec25a1c406b78f3b098d4c46c96addcfb9fba",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\boolean-slot-result-process.json",
+          "id": "boolean-slot"
+        },
+        {
+          "record_sha256": "76db46437780d93814d6ffe0ae9dafd3e3b04ae82132927e40b1384fc942b473",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\replace-table-result-process.json",
+          "id": "replace-table"
+        },
+        {
+          "record_sha256": "caa04d39a552b4d17358aa059d39a9641d4519f5cb05c93e308026f873ef48fe",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\replace-empty-result-process.json",
+          "id": "replace-empty"
+        },
+        {
+          "record_sha256": "c6ec0439328d00527b245e65de29e67e387cc643e8cbfada184509a023d5567d",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\mixed-object-identity-result-process.json",
+          "id": "mixed-object-identity"
+        },
+        {
+          "record_sha256": "efdd46f7022bf0f7c4fbc7668daefcf392151ccaff7846dc1bba185c979a6166",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\metalen-holes-result-process.json",
+          "id": "metalen-holes"
+        },
+        {
+          "record_sha256": "e229cfdf1f8b56ad8fb80ef163cd5b7b32784d1eb7ab0f2b279b9dd66c8045b7",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\raw-indexing-result-process.json",
+          "id": "raw-indexing"
+        },
+        {
+          "record_sha256": "ed24a2df8e4c0f5c536b00d99fb4796cd1fa5c120d01539d11ededf1b768faa2",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\metalen-number-string-result-process.json",
+          "id": "metalen-number-string"
+        },
+        {
+          "record_sha256": "4b6f98844baea3530ed46f26111a6f69de18e2c90a2fb1ab58c5abe20662d8c3",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\metalen-float-integer-result-process.json",
+          "id": "metalen-float-integer"
+        },
+        {
+          "record_sha256": "9cbaebdcbd296cd5e6c34b86e775974d6f6e6498b8b3b80de5d2ad7f689b2655",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\metalen-mutates-values-result-process.json",
+          "id": "metalen-mutates-values"
+        },
+        {
+          "record_sha256": "df415396def18415b2176fa3f3cdc1035adc9fc0ba611db50ad223ac922d992f",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\metalen-replaces-global-gc-result-process.json",
+          "id": "metalen-replaces-global-gc"
+        },
+        {
+          "record_sha256": "bcb7d30d095acbf4bc83a0f723aed24765825ac5d032b0555ea97187615f1f02",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\global-handler-result-process.json",
+          "id": "global-handler"
+        },
+        {
+          "record_sha256": "88fbfe53c25528f74e440fbfeb20af9f24603d7b35686d170f778027ee6d8ed4",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\non-table-number-result-process.json",
+          "id": "non-table-number"
+        },
+        {
+          "record_sha256": "fe7e8dffec9b4a422163c2ee3fb7457552400764bb2d2db0ebc9e77281eec69a",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\non-table-nil-result-process.json",
+          "id": "non-table-nil"
+        },
+        {
+          "record_sha256": "450b48cf8bd58f6a93905a5fbe7355461f325adab0a55fbdfb128dee9ab4f877",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\metalen-fraction-result-process.json",
+          "id": "metalen-fraction"
+        },
+        {
+          "record_sha256": "afe37048547ca91602c7c388e714bc227681ce2040abd2e7bd9a04c593aa845a",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\metalen-table-result-result-process.json",
+          "id": "metalen-table-result"
+        },
+        {
+          "record_sha256": "9555880e5837271a8ce894416a4c80778f0ef0a03e89da6c3335e7fa03992d48",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\metalen-error-result-process.json",
+          "id": "metalen-error"
+        },
+        {
+          "record_sha256": "5fa4c4a1272f86ff522f978e6c131bedc61ea98aa068222356ace857443ad066",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\metalen-yield-result-process.json",
+          "id": "metalen-yield"
+        },
+        {
+          "record_sha256": "66616b6aeeea70c9cac12185ba89d033ed222b460beeea07e994d3e106abb76b",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "104eef8307da1314e00ee987cfdcaa30dd7326209157e9e03f2332478940038d",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\arg-zero-does-not-retarget-result-process.json",
+          "id": "arg-zero-does-not-retarget"
+        },
+        {
+          "record_sha256": "50f44e42021e30c300bbb37f4030876d19451dd0544e12d8419888fc4aebe011",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "7927ef45b28a00c2eda7422e1ccb80d432c264cb5579ed150ddeb3312cd61511",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaConformance-upstream-test\\negative-index-does-not-retarget-result-process.json",
+          "id": "negative-index-does-not-retarget"
+        }
+      ],
+      "passes_native_contract": 3,
+      "fails_native_contract": 18,
+      "telemetry_required": true,
+      "product_configuration_note": "Product CLI has no conformance configuration command; build-path label is not an adapter claim. Actual _VERSION/type(T) are separately captured."
+    },
+    {
+      "implementation": "AdaProduct",
+      "configuration_label": "default",
+      "artifacts": [
+        {
+          "sha256": "ff758dce5c6cb26c38651cb3f48b64ebdbf21ecd1377c6cee3493098889688a6",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\cli\\bin\\static\\lua_ada.exe",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\frozen\\lua.exe"
+        }
+      ],
+      "configuration_process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\frozen\\lua.exe",
+        "process_id": 41956,
+        "executable_sha256": "ff758dce5c6cb26c38651cb3f48b64ebdbf21ecd1377c6cee3493098889688a6",
+        "arguments": [
+          "-e",
+          "print(_VERSION,type(T))"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\frozen",
+        "started_utc": "2026-11-08T08:46:56.5437325Z",
+        "elapsed_milliseconds": 242,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 1048576,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\configuration.stdout",
+        "stdout_bytes": 13,
+        "stdout_sha256": "f3c9c7937aef234518043b1644c50a1cb7897d534aeb3ae7f1d471e2dfb79b3c",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\configuration.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "configuration_data": {
+        "lua_version": "Lua 5.5",
+        "test_adapter": false,
+        "source": "actual user-level _VERSION/type(T) probe; no conformance metadata"
+      },
+      "cases": [
+        {
+          "record_sha256": "b145d79dc953454d62ac7166305b04e42c02fffef6660ea2becdbeb8b936cd13",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "8daec472d29dc50bdbf90d455eebbaee3a0b99557b0714a527391ee1385b9c79",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\unchanged-strings-result-process.json",
+          "id": "unchanged-strings"
+        },
+        {
+          "record_sha256": "d89cc0a51a8809f30e18ca7811b1b136ccbc16763f8fcc948eab0c8d17b91c58",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\numeric-slot-result-process.json",
+          "id": "numeric-slot"
+        },
+        {
+          "record_sha256": "d523b2cd83acf3172cf1a0366048860dbcd255e20bd8821102c9efac5beb52d9",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\boolean-slot-result-process.json",
+          "id": "boolean-slot"
+        },
+        {
+          "record_sha256": "7622c66e339b0a83cbe585a5a5aeaf9f483d95a952f2514e35693792c9f58305",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\replace-table-result-process.json",
+          "id": "replace-table"
+        },
+        {
+          "record_sha256": "cd5c376f513e0a2a54c4a10fa4edd0b14f0525e8505374a337dbe08e74285046",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\replace-empty-result-process.json",
+          "id": "replace-empty"
+        },
+        {
+          "record_sha256": "25f38dc78b0286f514e4db17ead40a87d6a0f98f264f2a36cc60ef3349054e14",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\mixed-object-identity-result-process.json",
+          "id": "mixed-object-identity"
+        },
+        {
+          "record_sha256": "74d3d0c0951f24262a1cfcae5edeb645a52c1f61c5d5a9b6570cc3eb83e6849a",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\metalen-holes-result-process.json",
+          "id": "metalen-holes"
+        },
+        {
+          "record_sha256": "8d2fc435ee6441623c5952a0e1aebdc384b2f9b5d41fc81d6fcee5bb2a9a178c",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\raw-indexing-result-process.json",
+          "id": "raw-indexing"
+        },
+        {
+          "record_sha256": "bf2973e8109c240ee002356f22bc52a9b1581218f490f903a80eb5a449e7f635",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\metalen-number-string-result-process.json",
+          "id": "metalen-number-string"
+        },
+        {
+          "record_sha256": "c44c4299a1b405a537cc006e6581500907e12bdc5eebf24ad9b74b68e5224aa9",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\metalen-float-integer-result-process.json",
+          "id": "metalen-float-integer"
+        },
+        {
+          "record_sha256": "f88160d314dce9e8d1c4d0278e2e46f4337eedac8fb99ecec4bdc36e7f35a294",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\metalen-mutates-values-result-process.json",
+          "id": "metalen-mutates-values"
+        },
+        {
+          "record_sha256": "cba0700838b93dcae37c8f957c16ab42882c0093084e6d6ebe7ee40cb39ac0db",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\metalen-replaces-global-gc-result-process.json",
+          "id": "metalen-replaces-global-gc"
+        },
+        {
+          "record_sha256": "4c0efd74cba6408b4e026efa756bed0356ff5adad02ac4a5a922d96eb6c654dc",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\global-handler-result-process.json",
+          "id": "global-handler"
+        },
+        {
+          "record_sha256": "2ccaba005af2a72a847ce6e5b59aa5f5862809abe61a4f01b58f14b4444e7eed",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\non-table-number-result-process.json",
+          "id": "non-table-number"
+        },
+        {
+          "record_sha256": "56ce8f24d28eb2cdece59ef9e694cca23c1d35cc0acb6b747824ca7fccbd7dbf",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\non-table-nil-result-process.json",
+          "id": "non-table-nil"
+        },
+        {
+          "record_sha256": "60757d62873840699b63f598c0c5f963eddaf1f31790d65444198be8144244c7",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\metalen-fraction-result-process.json",
+          "id": "metalen-fraction"
+        },
+        {
+          "record_sha256": "760ee4a5ab4c74b66f383951d9e9ff50dd5fb8faca22a32eeb9daf2226d563dc",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\metalen-table-result-result-process.json",
+          "id": "metalen-table-result"
+        },
+        {
+          "record_sha256": "c8b2f8c58f367c3d2fac6af616527ffaae2a77f93bce18aea89ca401c36f6090",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\metalen-error-result-process.json",
+          "id": "metalen-error"
+        },
+        {
+          "record_sha256": "5b5ea6baf9b7ea1331681abc01e842f76550f38dc2bee8300f222efdc5b0b929",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\metalen-yield-result-process.json",
+          "id": "metalen-yield"
+        },
+        {
+          "record_sha256": "450ce2b23657e2e372b0ade7c6cc2e5325de217df5e78d29985d0040f311f744",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "104eef8307da1314e00ee987cfdcaa30dd7326209157e9e03f2332478940038d",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\arg-zero-does-not-retarget-result-process.json",
+          "id": "arg-zero-does-not-retarget"
+        },
+        {
+          "record_sha256": "00a3e420d5a87dd1de26103a60c8e89807890ae8a29f046fb9513628296e05c7",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "7927ef45b28a00c2eda7422e1ccb80d432c264cb5579ed150ddeb3312cd61511",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-default\\negative-index-does-not-retarget-result-process.json",
+          "id": "negative-index-does-not-retarget"
+        }
+      ],
+      "passes_native_contract": 3,
+      "fails_native_contract": 18,
+      "telemetry_required": false,
+      "product_configuration_note": "Product CLI has no conformance configuration command; build-path label is not an adapter claim. Actual _VERSION/type(T) are separately captured."
+    },
+    {
+      "implementation": "AdaProduct",
+      "configuration_label": "upstream-test",
+      "artifacts": [
+        {
+          "sha256": "b6d43685341aa49db5d07c51ad0f1f368da425d8e19860ffbf444114515a590a",
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\cli\\bin\\upstream-test\\static\\lua_ada.exe",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\frozen\\lua.exe"
+        }
+      ],
+      "configuration_process": {
+        "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\frozen\\lua.exe",
+        "process_id": 91412,
+        "executable_sha256": "b6d43685341aa49db5d07c51ad0f1f368da425d8e19860ffbf444114515a590a",
+        "arguments": [
+          "-e",
+          "print(_VERSION,type(T))"
+        ],
+        "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\frozen",
+        "started_utc": "2026-11-08T08:46:58.1014469Z",
+        "elapsed_milliseconds": 242,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "abnormal_exit_kind": null,
+        "timed_out": false,
+        "capture_limit_bytes": 1048576,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\configuration.stdout",
+        "stdout_bytes": 13,
+        "stdout_sha256": "f3c9c7937aef234518043b1644c50a1cb7897d534aeb3ae7f1d471e2dfb79b3c",
+        "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\configuration.stderr",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "configuration_data": {
+        "lua_version": "Lua 5.5",
+        "test_adapter": false,
+        "source": "actual user-level _VERSION/type(T) probe; no conformance metadata"
+      },
+      "cases": [
+        {
+          "record_sha256": "2430264d674d3c8d3a1876dc25ab7342431a693b00278e6be86be370b8cc6fd7",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "8daec472d29dc50bdbf90d455eebbaee3a0b99557b0714a527391ee1385b9c79",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\unchanged-strings-result-process.json",
+          "id": "unchanged-strings"
+        },
+        {
+          "record_sha256": "89093de635e0c00b666895f2a2b2a45f8fdbd64a98949070b14f54b86dcffbe8",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\numeric-slot-result-process.json",
+          "id": "numeric-slot"
+        },
+        {
+          "record_sha256": "0887d618f18dd06746b2b78de265a5ef590b71d9a510cb4afe9e218d9ac387e2",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\boolean-slot-result-process.json",
+          "id": "boolean-slot"
+        },
+        {
+          "record_sha256": "20ebc3a5d46b4ad363e18e57e01b0ccf9fcc30019dae5803525ae6a8acc9832f",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\replace-table-result-process.json",
+          "id": "replace-table"
+        },
+        {
+          "record_sha256": "5e8599ee37a3a14cc0e86a1e9ea2d5ee0b3dc4cc4ab6c88b669cea772fc1cfa2",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\replace-empty-result-process.json",
+          "id": "replace-empty"
+        },
+        {
+          "record_sha256": "35716f7b9f5bccf5c559372b39cda6067cd379a8f28999bd4f06d8384836fe64",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\mixed-object-identity-result-process.json",
+          "id": "mixed-object-identity"
+        },
+        {
+          "record_sha256": "94f809743f5a1a40423bb3ba74cd01b21b81e4f01535b52b246fd8a2d0f53a0a",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\metalen-holes-result-process.json",
+          "id": "metalen-holes"
+        },
+        {
+          "record_sha256": "89f6ed700dc83600011d6553df1801d68b74150511baea4d16c1d9a953ebdc1b",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\raw-indexing-result-process.json",
+          "id": "raw-indexing"
+        },
+        {
+          "record_sha256": "fea2224259f9dafeec4a635787608b1d9928ba674b2e96ba4e5611fdb12cc513",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\metalen-number-string-result-process.json",
+          "id": "metalen-number-string"
+        },
+        {
+          "record_sha256": "1906c5278b0b02c41ad45808857440e9040c7634a90e9ee737402403405c4988",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\metalen-float-integer-result-process.json",
+          "id": "metalen-float-integer"
+        },
+        {
+          "record_sha256": "2c895abca3c53f24db0db62b8e104b16efa0edfaa424d7983bfd6067468d0c59",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\metalen-mutates-values-result-process.json",
+          "id": "metalen-mutates-values"
+        },
+        {
+          "record_sha256": "4f3f1b8305d5de3a14f29dacd578dbd3514c2deee61b5847ba51a3a9e139e057",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\metalen-replaces-global-gc-result-process.json",
+          "id": "metalen-replaces-global-gc"
+        },
+        {
+          "record_sha256": "1a35ec1964222c3f06c61bbd2e52fb1432c65d55151d8cbc50bc9d88e548455f",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "ed67a8779ea57870ac5a346b6697dd72d22f2ee80d2122a24cfdd5063a02a8e6",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\global-handler-result-process.json",
+          "id": "global-handler"
+        },
+        {
+          "record_sha256": "fcbe6e30bd3635edd8a464bc2c6d5d0ce5b3fbe954aec6bfdb74cd2d645c542e",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\non-table-number-result-process.json",
+          "id": "non-table-number"
+        },
+        {
+          "record_sha256": "043ca0cc5a66bd3778394d72ed4e4886aee9058af62b8039f663a5c1ae8a4513",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\non-table-nil-result-process.json",
+          "id": "non-table-nil"
+        },
+        {
+          "record_sha256": "806bb1b00b24b7a4c9d686a4d56faa3d4e91f638ba3864f918d515b442e2b284",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\metalen-fraction-result-process.json",
+          "id": "metalen-fraction"
+        },
+        {
+          "record_sha256": "da6f5a9fc6495dcd80a8cf88d207a13f4d20d2a7668128097df8709967d97891",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\metalen-table-result-result-process.json",
+          "id": "metalen-table-result"
+        },
+        {
+          "record_sha256": "17eb2d5d44304e356f77bd5feb32200b35ca704684aa770846c4f113e2119f75",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\metalen-error-result-process.json",
+          "id": "metalen-error"
+        },
+        {
+          "record_sha256": "64e5e26572e3b559fa42c9b8f4252a30597265d11563a966d38a989278f65694",
+          "matches_native_contract": false,
+          "exit_code": 1,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "6332e3621ec466106d85a4b841fbcff7215d8e229077223592a0b38ab73e3391",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\metalen-yield-result-process.json",
+          "id": "metalen-yield"
+        },
+        {
+          "record_sha256": "c18c7569bbc6d4ea67ce9f9d05f886e3ee351f127f23fa6e7b67717c50229670",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "104eef8307da1314e00ee987cfdcaa30dd7326209157e9e03f2332478940038d",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\arg-zero-does-not-retarget-result-process.json",
+          "id": "arg-zero-does-not-retarget"
+        },
+        {
+          "record_sha256": "e6771e38de1266bcecf2894e0abca2fda4138ed3302e4092a05b7315f0b3d081",
+          "matches_native_contract": true,
+          "exit_code": 0,
+          "stdout_sha256": "7927ef45b28a00c2eda7422e1ccb80d432c264cb5579ed150ddeb3312cd61511",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\cli-dynamic-arg\\fb359eccf2b54daa937aee4fc76921f2\\AdaProduct-upstream-test\\negative-index-does-not-retarget-result-process.json",
+          "id": "negative-index-does-not-retarget"
+        }
+      ],
+      "passes_native_contract": 3,
+      "fails_native_contract": 18,
+      "telemetry_required": false,
+      "product_configuration_note": "Product CLI has no conformance configuration command; build-path label is not an adapter claim. Actual _VERSION/type(T) are separately captured."
+    }
+  ],
+  "compiler_flags_provenance": "Existing artifacts only; source/GPR hashes are not compile-command receipts.",
+  "limits": {
+    "capture_limit_bytes": 1048576,
+    "conformance_allocator_limit_bytes": 2147483648,
+    "per_process_timeout_seconds": 30,
+    "product_cli_allocator_ceiling_measured": false
+  },
+  "evidence_repository_root": "C:/Users/Itsuki/.codex/worktrees/remaining-c-api/lua-ada",
+  "cases_path": "tests/conformance/targets/remaining-upstream-compatibility/cli-dynamic-arg.author-cases.json",
+  "new_lua_case_processes": 126,
+  "new_configuration_processes": 6,
+  "measured_workload_sidecars": 84,
+  "actual_implementation_changes": false,
+  "first_failed_preflights": "Two observer-authoring attempts failed before Lua execution because a line break omitted Freeze target. Corrected before the final132-process frozen campaign; both failed raw directories remain separate.",
+  "evidence_directory": "reports/cli-dynamic-arg/fb359eccf2b54daa937aee4fc76921f2",
+  "raw_summary": {
+    "path": "reports/cli-dynamic-arg/fb359eccf2b54daa937aee4fc76921f2/observation.json",
+    "sha256": "52b9098196cca0ed0720b0055010960f0753f6b40211a8bb08276aab0f878490"
+  },
+  "outcome": "Both native configurations satisfy 21 authored contracts; each of four Ada images satisfies 3 and fails 18. No original main.lua coverage or fixed implementation is established.",
+  "previous_completed_diagnostic": {
+    "directory": "reports/cli-dynamic-arg/ba05862050864b388db4166589f1e7bd",
+    "reason": "Prior identical21 contracts had same outcomes; replayed after renaming automatic PowerShell Matches variable to a task-specific name. No runtime or Lua case changed."
+  },
+  "planned_design": {
+    "status": "pending-root-review",
+    "private_cli_child_entry": "proposed Execute_Selected_Script(Self,Source,Name) -> Execution_Result; no runtime SAL/public value API addition",
+    "compile_before_arg_callbacks": true,
+    "semantics_in_ada": true,
+    "new_machine_entry_preferred": false,
+    "phases": [
+      "Compile and create selected callable before argument callbacks; transfer code ownership from Entry_Code into an actual Current.Arguments closure prefix.",
+      "Prompt-style tiny C callback only calls lua_getglobal(arg) and returns compiled closure plus resulting table; Ada requires table.",
+      "Second tiny C callback retains/returns closure, same table, and luaL_len result; Ada validates/reserves count. No C arg-copy loop.",
+      "Keep closure/table/length in Current.Arguments, transactionally reserve, meter raw-copy slots1..n, then remove metadata only after actual callee/arguments root publication.",
+      "Use existing Function_Value driver start with actual compiled closure and argument values; final pin/epoch ordering must be proved before any prefix clear. Normal completion/error/exit/host-abort cleanup."
+    ],
+    "scope": "Only explicit selected scripts including explicit stdin; not implicit stdin, snippets, LUA_INIT, REPL or --check.",
+    "bridge_decision": "Pending actual native callback-ancestry measurement before choosing tiny callback shape. Use existing actual C-owned guard/portal and iterative drives, never recurse into executor.",
+    "root_budget_evidence": "Start/Finish do not modify Entry_Code or reset Steps. Begin_Operation ends prior temporary pins; Entry_Code and Current.Arguments are authoritative roots across sequential drives. Collector shades Entry_Code. Initialize/reset budget once for compile+lookup+length+copy+script, not at each helper.",
+    "forbidden": [
+      "Lua shim for global arg/length/call",
+      "stringifying Lua arguments",
+      "recompile or call public Sessions.Execute after resolving actual values",
+      "C implementation of argument semantics",
+      "reading arg[0] to select a different script",
+      "relying on transient Operation_Programs pins across Machine.Start"
+    ],
+    "initial_environment_capture_open_question": "Root agreed closure-before-callbacks and carrying actual closure prefix across tiny C callbacks. Additional native ordering/global-environment controls remain required. Existing final Function_Value start must preserve closure before any allocation, caller-packet clear or Begin_Operation root-epoch transition; a local Value is not a traced root. No new field or Machine continuation is authorized by this proposal."
+  },
+  "design_source_bindings": [
+    {
+      "path": "src/lua-engine-machine.ads",
+      "sha256": "87b122e678df3b2ada80209bf90c523fb4f5082eac0e8392b280af4237ae8049"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "sha256": "a8679e1348552d54d9af30c86fe8c0143e7fea6146dffe336c159e0834fc2bf3"
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "sha256": "d803883a7f07c8a3ecfa082b7c7c6addc72d29cde65ee35a149002ac6541ff8a"
+    },
+    {
+      "path": "src/lua-engine-compiler.ads",
+      "sha256": "88ff3f7d32edf4d92b4961cc49d223585a6bec55f33b046b373d6564a15d06f3"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409"
+    }
+  ]
+}

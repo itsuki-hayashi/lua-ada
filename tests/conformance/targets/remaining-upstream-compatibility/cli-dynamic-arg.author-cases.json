@@ -1,0 +1,357 @@
+{
+  "schema_version": 1,
+  "kind": "cli-dynamic-arg-author-cases",
+  "author": "Codex /root/runtime_gaps",
+  "date": "2026-11-08",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "independent_feature_review": "pending",
+  "upstream_source": "references/lua/testes/main.lua",
+  "original_lines": [
+    274,
+    277
+  ],
+  "script": "tests/conformance/platform/cli-dynamic-arg.lua",
+  "selected_name": "selected script.lua",
+  "wrong_script": "error(\"ARG RETARGETED SCRIPT\",0)\n",
+  "arguments_contract": "-e <setup> <selected script.lua> a b c, always explicit argv with no shell; no original main.lua/source equivalent is emitted",
+  "cases": [
+    {
+      "id": "unchanged-strings",
+      "setup": "case_name=\"unchanged-strings\";;check_dynamic_arg=function(v) assert(v.n==3 and v[1]=='a' and v[2]=='b' and v[3]=='c') end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-unchanged-strings\r\n",
+        "stderr": ""
+      },
+      "purpose": "Baseline actual selected-script host argv."
+    },
+    {
+      "id": "numeric-slot",
+      "setup": "case_name=\"numeric-slot\";arg[1]=100;check_dynamic_arg=function(v) assert(v.n==3 and type(v[1])=='number' and math.type(v[1])=='integer' and v[1]==100 and v[2]=='b' and v[3]=='c') end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-numeric-slot\r\n",
+        "stderr": ""
+      },
+      "purpose": "Original main274-276 plus actual numeric type, not printed-string equality."
+    },
+    {
+      "id": "boolean-slot",
+      "setup": "case_name=\"boolean-slot\";arg[2]=false;check_dynamic_arg=function(v) assert(v.n==3 and v[1]=='a' and v[2]==false and v[3]=='c') end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-boolean-slot\r\n",
+        "stderr": ""
+      },
+      "purpose": "Actual boolean value survives host-to-script publication."
+    },
+    {
+      "id": "replace-table",
+      "setup": "case_name=\"replace-table\";arg={11,true,\"text\"};check_dynamic_arg=function(v) assert(v.n==3 and v[1]==11 and v[2]==true and v[3]=='text') end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-replace-table\r\n",
+        "stderr": ""
+      },
+      "purpose": "Current global table is read after -e rather than host argv reused."
+    },
+    {
+      "id": "replace-empty",
+      "setup": "case_name=\"replace-empty\";arg={};check_dynamic_arg=function(v) assert(v.n==0) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-replace-empty\r\n",
+        "stderr": ""
+      },
+      "purpose": "Actual replacement table length determines zero argument count."
+    },
+    {
+      "id": "mixed-object-identity",
+      "setup": "case_name=\"mixed-object-identity\";want={};fn=function()end;co=coroutine.create(function()end);u=io.stdout;arg={want,fn,co,u};check_dynamic_arg=function(v) assert(v.n==4 and v[1]==want and v[2]==fn and v[3]==co and v[4]==u);assert(type(v[1])=='table' and type(v[2])=='function' and type(v[3])=='thread' and type(v[4])=='userdata') end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-mixed-object-identity\r\n",
+        "stderr": ""
+      },
+      "purpose": "Preserve table/function/thread/userdata identity without string conversion."
+    },
+    {
+      "id": "metalen-holes",
+      "setup": "case_name=\"metalen-holes\";len_calls=0;arg=setmetatable({[1]=\"left\",[3]=\"right\"},{__len=function(self) len_calls=len_calls+1;return 4 end});check_dynamic_arg=function(v) assert(len_calls==1 and v.n==4 and v[1]=='left' and v[2]==nil and v[3]=='right' and v[4]==nil) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-metalen-holes\r\n",
+        "stderr": ""
+      },
+      "purpose": "Deterministic __len count preserves internal hole and trailing nil."
+    },
+    {
+      "id": "raw-indexing",
+      "setup": "case_name=\"raw-indexing\";index_calls=0;arg=setmetatable({[1]=\"first\"},{__len=function()return 3 end,__index=function()index_calls=index_calls+1;error(\"ARG INDEX RAN\",0)end});check_dynamic_arg=function(v) assert(index_calls==0 and v.n==3 and v[1]=='first' and v[2]==nil and v[3]==nil) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-raw-indexing\r\n",
+        "stderr": ""
+      },
+      "purpose": "lua_rawgeti copies absent entries without table __index callback."
+    },
+    {
+      "id": "metalen-number-string",
+      "setup": "case_name=\"metalen-number-string\";len_calls=0;arg=setmetatable({7,8},{__len=function()len_calls=len_calls+1;return \"2\" end});check_dynamic_arg=function(v) assert(len_calls==1 and v.n==2 and v[1]==7 and v[2]==8) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-metalen-number-string\r\n",
+        "stderr": ""
+      },
+      "purpose": "luaL_len numeric-string conversion, distinct from host array size."
+    },
+    {
+      "id": "metalen-float-integer",
+      "setup": "case_name=\"metalen-float-integer\";len_calls=0;arg=setmetatable({7,8},{__len=function()len_calls=len_calls+1;return 2.0 end});check_dynamic_arg=function(v) assert(len_calls==1 and v.n==2 and v[1]==7 and v[2]==8) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-metalen-float-integer\r\n",
+        "stderr": ""
+      },
+      "purpose": "lua_tointegerx accepts integral real length."
+    },
+    {
+      "id": "metalen-mutates-values",
+      "setup": "case_name=\"metalen-mutates-values\";len_calls=0;arg=setmetatable({1,2},{__len=function(self)len_calls=len_calls+1;self[1]=17;self[2]=false;return 2 end});check_dynamic_arg=function(v) assert(len_calls==1 and v.n==2 and v[1]==17 and v[2]==false) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-metalen-mutates-values\r\n",
+        "stderr": ""
+      },
+      "purpose": "Slot reads happen after actual length callback."
+    },
+    {
+      "id": "metalen-replaces-global-gc",
+      "setup": "case_name=\"metalen-replaces-global-gc\";len_calls=0;local t={};t[1]=t;weak=setmetatable({t},{__mode=\"v\"});setmetatable(t,{__len=function(self)len_calls=len_calls+1;arg={99};collectgarbage();assert(weak[1]==self);self[2]=false;return 3 end});arg=t;t=nil;check_dynamic_arg=function(v) assert(len_calls==1 and v.n==3 and v[1]==weak[1] and type(v[1])=='table' and v[2]==false and v[3]==nil);assert(arg[1]==99);collectgarbage();assert(weak[1]==v[1]) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-metalen-replaces-global-gc\r\n",
+        "stderr": ""
+      },
+      "purpose": "Captured original table remains rooted while __len replaces global arg and collects; raw reads keep that same table."
+    },
+    {
+      "id": "global-handler",
+      "setup": "case_name=\"global-handler\";arg=nil;arg_hits=0;setmetatable(_G,{__index=function(_,key)if key==\"arg\" then arg_hits=arg_hits+1;return {41,false}end end});check_dynamic_arg=function(v) assert(arg_hits==1 and v.n==2 and v[1]==41 and v[2]==false) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-global-handler\r\n",
+        "stderr": ""
+      },
+      "purpose": "lua_getglobal(arg) uses actual environment lookup."
+    },
+    {
+      "id": "non-table-number",
+      "setup": "case_name=\"non-table-number\";arg=1;check_dynamic_arg=function(v) error('SCRIPT INCORRECTLY ENTERED',0) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-not-entered-error",
+        "exit_nonzero": true,
+        "stderr_contains": "'arg' is not a table",
+        "stdout": ""
+      },
+      "purpose": "Original main277 non-table rejection."
+    },
+    {
+      "id": "non-table-nil",
+      "setup": "case_name=\"non-table-nil\";arg=nil;check_dynamic_arg=function(v) error('SCRIPT INCORRECTLY ENTERED',0) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-not-entered-error",
+        "exit_nonzero": true,
+        "stderr_contains": "'arg' is not a table",
+        "stdout": ""
+      },
+      "purpose": "Missing current global arg is a non-table failure."
+    },
+    {
+      "id": "metalen-fraction",
+      "setup": "case_name=\"metalen-fraction\";arg=setmetatable({},{__len=function()return 2.5 end});check_dynamic_arg=function(v) error('SCRIPT INCORRECTLY ENTERED',0) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-not-entered-error",
+        "exit_nonzero": true,
+        "stderr_contains": "object length is not an integer",
+        "stdout": ""
+      },
+      "purpose": "luaL_len rejects fractional length result."
+    },
+    {
+      "id": "metalen-table-result",
+      "setup": "case_name=\"metalen-table-result\";arg=setmetatable({},{__len=function()return {} end});check_dynamic_arg=function(v) error('SCRIPT INCORRECTLY ENTERED',0) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-not-entered-error",
+        "exit_nonzero": true,
+        "stderr_contains": "object length is not an integer",
+        "stdout": ""
+      },
+      "purpose": "luaL_len rejects nonnumeric length result."
+    },
+    {
+      "id": "metalen-error",
+      "setup": "case_name=\"metalen-error\";arg=setmetatable({},{__len=function()error(\"ARG LENGTH FAILURE\",0)end});check_dynamic_arg=function(v) error('SCRIPT INCORRECTLY ENTERED',0) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-not-entered-error",
+        "exit_nonzero": true,
+        "stderr_contains": "ARG LENGTH FAILURE",
+        "stdout": ""
+      },
+      "purpose": "Length callback error aborts before selected script body."
+    },
+    {
+      "id": "metalen-yield",
+      "setup": "case_name=\"metalen-yield\";arg=setmetatable({},{__len=function()coroutine.yield(\"BAD\")end});check_dynamic_arg=function(v) error('SCRIPT INCORRECTLY ENTERED',0) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-not-entered-error",
+        "exit_nonzero": true,
+        "stderr_contains": "attempt to yield from outside a coroutine",
+        "stdout": ""
+      },
+      "purpose": "Native top-level CLI callback is not yieldable; observe actual native wording first."
+    },
+    {
+      "id": "arg-zero-does-not-retarget",
+      "setup": "case_name=\"arg-zero-does-not-retarget\";arg[0]=\"wrong-script.lua\";check_dynamic_arg=function(v) assert(v.n==3 and v[1]=='a' and arg[0]=='wrong-script.lua');assert(debug.getinfo(2,'S').source=='@selected script.lua') end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-arg-zero-does-not-retarget\r\n",
+        "stderr": ""
+      },
+      "purpose": "Already selected script remains selected when arg[0] changes."
+    },
+    {
+      "id": "negative-index-does-not-retarget",
+      "setup": "case_name=\"negative-index-does-not-retarget\";arg[-1]=\"wrong-script.lua\";check_dynamic_arg=function(v) assert(v.n==3 and v[1]=='a' and arg[-1]=='wrong-script.lua');assert(debug.getinfo(2,'S').source=='@selected script.lua') end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout": "PASS: cli-dynamic-arg-negative-index-does-not-retarget\r\n",
+        "stderr": ""
+      },
+      "purpose": "Editing interpreter-side table entry does not replace selected script."
+    }
+  ]
+}
