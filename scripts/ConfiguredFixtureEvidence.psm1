@@ -134,11 +134,13 @@ function Assert-ConfiguredFixtureImageReport {
         [Parameter(Mandatory)][Collections.IDictionary]$Image,[Parameter(Mandatory)][string]$Payload)
     if($Report.repository_revision -cne $Image.revision -or $Report.repository_dirty -isnot [bool] -or $Report.repository_dirty -or
         $Report.context -cne $Image.context){throw 'Configured fixture image source/context differs or is dirty'}
-    $origin=$Report.repository_root.Replace('\','/').TrimEnd('/')+'/'
+    # Resolver scriptblocks use PowerShell's dynamic scope. Keep this binding
+    # distinct from the ordinary report reader's unnormalized execution root.
+    $imageOriginPrefix=$Report.repository_root.Replace('\','/').TrimEnd('/')+'/'
     $resolve={param($path,$hash)
         $normalized=$path.Replace('\','/')
-        if(-not $normalized.StartsWith($origin,[StringComparison]::Ordinal)){throw 'Configured fixture image path is outside its original repository'}
-        $relative=$normalized.Substring($origin.Length)
+        if(-not $normalized.StartsWith($imageOriginPrefix,[StringComparison]::Ordinal)){throw 'Configured fixture image path is outside its original repository'}
+        $relative=$normalized.Substring($imageOriginPrefix.Length)
         if($relative -match '(^|/)\.\.?(/|$)|:' -or $relative.StartsWith('/') -or
             @($Image.files|Where-Object{$_.path -ceq $relative -and $_.sha256 -ceq $hash}).Count -ne 1){
             throw 'Configured fixture file is absent from its exact frozen image'
@@ -147,10 +149,10 @@ function Assert-ConfiguredFixtureImageReport {
     }
     foreach($runtime in $Report.runtimes){
         $ada=$runtime.role -ceq 'Ada';$expected=$Image.paths[$(if($ada){'ada_launcher'}else{'c_oracle'})]
-        if($runtime.executable.Replace('\','/') -cne ($origin+$expected)){throw 'Configured fixture uses a different frozen interpreter'}
+        if($runtime.executable.Replace('\','/') -cne ($imageOriginPrefix+$expected)){throw 'Configured fixture uses a different frozen interpreter'}
         $directory=$Image.paths[$(if($ada){'ada_runtime'}else{'c_runtime'})]
         foreach($library in $runtime.library_files){
-            if($library.path.Replace('\','/') -cne ($origin+$directory+'/'+[IO.Path]::GetFileName($library.path.Replace('\','/')))){
+            if($library.path.Replace('\','/') -cne ($imageOriginPrefix+$directory+'/'+[IO.Path]::GetFileName($library.path.Replace('\','/')))){
                 throw 'Configured fixture uses a different frozen runtime directory'
             }
         }
