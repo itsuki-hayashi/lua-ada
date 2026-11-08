@@ -1,7 +1,8 @@
 param(
     [Parameter(Mandatory)][string] $Interpreter,
     [Parameter(Mandatory)][string] $ReferenceInterpreter,
-    [string] $RuntimeDirectory = ''
+    [string] $RuntimeDirectory = '',
+    [ValidateSet('default','upstream-test')][string] $Configuration='default'
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -79,9 +80,9 @@ print(table.concat(hex))
 '@
 try {
     Test-ConformanceReferenceTree -Root $root
-    $configuration = Invoke-Fixture $ReferenceInterpreter @('--conformance-config') 'configuration'
-    $observed = Get-Content -LiteralPath $configuration.stdout_path -Raw | ConvertFrom-Json -AsHashtable
-    [void](Test-ConformanceConfiguration -Observed $observed -Configuration default `
+    $configurationProcess = Invoke-Fixture $ReferenceInterpreter @('--conformance-config') 'configuration'
+    $observed = Get-Content -LiteralPath $configurationProcess.stdout_path -Raw | ConvertFrom-Json -AsHashtable
+    [void](Test-ConformanceConfiguration -Observed $observed -Configuration $Configuration `
         -Target ReferenceC -AllocatorLimitBytes 2147483648L)
     [IO.File]::WriteAllText((Join-Path $directory 'generate.lua'),$generate,$encoding)
     [void](Invoke-Fixture $ReferenceInterpreter @('generate.lua') 'generate')
@@ -120,7 +121,7 @@ try {
 }
 finally {
     $report=[ordered]@{schema_version=1;reference_revision='7579fc9d7ed90240487251dfb69168f8e64e9294';
-        configuration='default';interpreter=$Interpreter;reference=$ReferenceInterpreter;
+        configuration=$Configuration;interpreter=$Interpreter;reference=$ReferenceInterpreter;
         cases=$cases.ToArray();processes=$processes.ToArray()}
     [IO.File]::WriteAllText((Join-Path $directory 'report.json'),
         (ConvertTo-Json -InputObject $report -Depth 12)+"`n",$encoding)

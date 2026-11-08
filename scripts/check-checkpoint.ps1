@@ -102,7 +102,7 @@ try{
     Invoke-Check debug-console-c4 check-debug-console-c.ps1 @('-Interpreter',$oracle,'-AdaConsumer',
         (Join-Path $root "build/c-api/bin/${prefix}validation/$type/builtin_api_contract$suffix"),'-Compiler',$compiler,
         '-ReferenceLibrary',$oracleLibrary,'-AdaRuntimeDirectory',$runtime,'-Configuration',$configuration,'-OutputDirectory',(Join-Path $directory 'console-c'))
-    Invoke-Check binary-cli check-binary-cli.ps1 @('-Interpreter',$cli,'-ReferenceInterpreter',$oracle,'-RuntimeDirectory',$runtime)
+    Invoke-Check binary-cli check-binary-cli.ps1 @('-Interpreter',$cli,'-ReferenceInterpreter',$oracle,'-RuntimeDirectory',$runtime,'-Configuration',$configuration)
     Invoke-Check lifecycle check-lifecycle.ps1 @('-Interpreter',$cli)
     Invoke-Check allocator-ceiling test-conformance-allocator-ceiling.ps1 @('-Interpreter',"$bin/conformance_runner$suffix",'-Configuration',$configuration,
         '-OutputDirectory',(Join-Path $directory 'allocator-ceiling'))
