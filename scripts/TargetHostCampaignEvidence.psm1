@@ -111,6 +111,25 @@ function Assert-TargetHostCampaignReport {
     if($kind -ceq 'readline' -and ($Report.comparison_failures -isnot [Array] -or $Report.comparison_failures.Count)){
         throw 'Readline campaign retained comparison failures'
     }
+    if($kind -ceq 'readline'){
+        $reviewed=$parts[0] -ceq 'upstream-test' -and $parts[1] -ceq 'linux'
+        if($reviewed){
+            $expectedReview=Get-TargetReadlineExpectedWarningReview -Root $Root
+            if(-not $Report.Contains('reviewed_expected_warning') -or
+                $Report.reviewed_expected_warning -isnot [Collections.IDictionary] -or
+                (($Report.reviewed_expected_warning.Keys|Sort-Object)-join '|') -cne (($expectedReview.Keys|Sort-Object)-join '|')){
+                throw 'Readline expected-warning review binding differs'
+            }
+            # Object key order is irrelevant; every closed field retains its
+            # type as well as its exact value. A string false is not a boolean.
+            foreach($key in $expectedReview.Keys){
+                $actual=$Report.reviewed_expected_warning[$key];$expected=$expectedReview[$key]
+                if($null -eq $actual -or $actual.GetType() -ne $expected.GetType() -or $actual -cne $expected){
+                    throw 'Readline expected-warning review binding differs'
+                }
+            }
+        }elseif($Report.Contains('reviewed_expected_warning')){throw 'Readline expected-warning review is outside its exact configuration and platform'}
+    }
     $pairs=@{};$newline=if($parts[1] -ceq 'windows'){"`r`n"}else{"`n"}
     for($index=0;$index -lt $sequence.Count;$index++){
         $expected=$sequence[$index];$case=$expected.case;$row=$Report.processes[$index];$process=$row.process
@@ -118,7 +137,7 @@ function Assert-TargetHostCampaignReport {
         if($row.role -cne $expected.role -or $name -cne $case.name){throw 'Host campaign operation order role or case differs'}
         if($kind -ceq 'console-lua' -and $row.setup -cne $case.setup){throw 'Console setup differs from its retained source contract'}
         $cwd=$directory+'/'+$row.role+'/'+$name
-        $captures=Assert-ThcProcess $process (Get-TargetHostCampaignArguments $kind $case) $cwd ($cwd+'/process') $origin $ArtifactRoot $Image
+        $captures=Assert-ThcProcess $process (Get-TargetHostCampaignArguments $kind $case $parts[0] $parts[1] $Root) $cwd ($cwd+'/process') $origin $ArtifactRoot $Image
         $inputName=if($kind -ceq 'readline'){'input'}else{'stdin'}
         Assert-ThcInput $process (Get-TargetHostCampaignInputBytes $kind $case) $origin $ArtifactRoot $Image ($cwd+'/'+$inputName)
         if($kind -ceq 'console-c' -and ($row.stdin.path -cne $process.standard_input.source_path -or

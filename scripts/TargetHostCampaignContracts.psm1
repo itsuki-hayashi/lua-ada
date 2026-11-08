@@ -56,13 +56,36 @@ if(($Platform -ceq 'windows')){$cases+=@{name='native-text-ctrl-z';input="`u{001
 
 function Get-TargetHostCampaignArguments {
     param([ValidateSet('console-lua','console-c','readline')][string]$Kind,
-        [Collections.IDictionary]$Case)
+        [Collections.IDictionary]$Case,
+        [ValidateSet('default','upstream-test')][string]$Configuration='default',
+        [ValidateSet('windows','linux','macos')][string]$Platform='windows',
+        [string]$Root=(Split-Path -Parent $PSScriptRoot))
     if($Kind -ceq 'console-lua'){return @('-e',$Case.setup)}
     if($Kind -ceq 'console-c'){return @('--debug-console-'+$Case.name)}
     $arguments=@('-i')
     if($Case.Contains('warnings')){$arguments+='-W'}
     if($Case.Contains('ignore')){$arguments+='-E'}
-    return $arguments+@('-e',"_PROMPT='P';_PROMPT2='C'")
+    $setup="_PROMPT='P';_PROMPT2='C'"
+    if($Configuration -ceq 'upstream-test' -and $Platform -ceq 'linux' -and $Case.name -ceq 'missing-library-warnings-on'){
+        # The native private observer otherwise aborts this intentionally
+        # requested warning. Its independently reviewed printing mode keeps
+        # the real warning, library failure and raw comparison fully visible.
+        $null=Get-TargetReadlineExpectedWarningReview -Root $Root
+        $setup="if T then warn('@allow')end;"+$setup
+    }
+    return $arguments+@('-e',$setup)
+}
+
+function Get-TargetReadlineExpectedWarningReview {
+    param([Parameter(Mandatory)][string]$Root)
+    $path='tests/conformance/targets/remaining-upstream-compatibility/reviews/readline-expected-warning.feature-review.md'
+    $hash='a7a0bce436101ff9835008929fdb6923b4940c4833eec14faa10459db4194944'
+    if(-not (Test-Path -LiteralPath (Join-Path $Root $path) -PathType Leaf) -or
+        (Get-FileHash -LiteralPath (Join-Path $Root $path)).Hash.ToLowerInvariant() -cne $hash){
+        throw 'Expected readline warning requires its exact independent feature review'
+    }
+    return @{path=$path;sha256=$hash;configuration='upstream-test';platform='linux';case='missing-library-warnings-on';
+        setup_prefix="if T then warn('@allow')end;";runtime_acceptance=$false;coverage_authority=$false}
 }
 
 function Get-TargetHostCampaignInputBytes {
@@ -78,7 +101,9 @@ function Get-TargetHostCampaignInputBytes {
 function Get-TargetHostCampaignSourcePaths {
     param([ValidateSet('console-lua','console-c','readline')][string]$Kind)
     $scriptName=switch($Kind){'console-lua'{'check-debug-console.ps1'}'console-c'{'check-debug-console-c.ps1'}'readline'{'check-cli-readline.ps1'}}
-    return @('scripts/TargetHostCampaignContracts.psm1','scripts/ConformanceRunner.psm1',('scripts/'+$scriptName))
+    $sources=@('scripts/TargetHostCampaignContracts.psm1','scripts/ConformanceRunner.psm1',('scripts/'+$scriptName))
+    if($Kind -ceq 'readline'){$sources+='tests/conformance/targets/remaining-upstream-compatibility/reviews/readline-expected-warning.feature-review.md'}
+    return $sources
 }
 
 function Get-TargetHostConsoleCompileArguments {
@@ -106,4 +131,4 @@ function Get-TargetHostConsoleCompileArguments {
 
 Export-ModuleMember -Function Get-TargetHostCampaignCases,Get-TargetHostCampaignArguments,
     Get-TargetHostCampaignInputBytes,Get-TargetHostCampaignSourcePaths,
-    Get-TargetHostConsoleCompileArguments
+    Get-TargetHostConsoleCompileArguments,Get-TargetReadlineExpectedWarningReview

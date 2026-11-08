@@ -44,7 +44,7 @@ foreach($role in @('native','ada')){
         $environment=@{}
         $environment[$loader]=$image+[IO.Path]::PathSeparator+[Environment]::GetEnvironmentVariable($loader)
         if($case.ContainsKey('library')){$environment.LUA_READLINELIB=$case.library}
-        $arguments=@(Get-TargetHostCampaignArguments -Kind readline -Case $case)
+        $arguments=@(Get-TargetHostCampaignArguments -Kind readline -Case $case -Configuration $Configuration -Platform $platform -Root $root)
         $process=Invoke-ConformanceProcess -Executable $exe -Arguments $arguments `
             -Directory $directory -OutputPrefix (Join-Path $directory 'process') `
             -TimeoutSeconds 30 -StandardInputPath $inputPath -Environment $environment
@@ -82,6 +82,9 @@ $report=@{schema_version=2;kind='cli-readline-process-regressions';configuration
     limitations=@('Product CLI observations do not supply measured Ada allocator telemetry or final context acceptance.',
         'Native backend selection is exercised on the actual host; this is not a TTY observation.',
         'References remain unchanged; each exact raw comparison uses the same-host original C CLI.')}
+if($Configuration -ceq 'upstream-test' -and $platform -ceq 'linux'){
+    $report['reviewed_expected_warning']=Get-TargetReadlineExpectedWarningReview -Root $root
+}
 [IO.File]::WriteAllText((Join-Path $OutputDirectory 'result.json'),
     ($report|ConvertTo-Json -Depth 32).Replace("`r`n","`n")+"`n",[Text.UTF8Encoding]::new($false))
 if($failures.Count){throw "CLI readline differs in $($failures.Count) cases; $OutputDirectory"}
