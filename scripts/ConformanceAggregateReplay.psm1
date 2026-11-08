@@ -4,6 +4,7 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceTransforms.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceReviewedSources.psm1')
 
 function Get-TargetAggregateClaims {
     param([Collections.IDictionary] $Specification)
@@ -48,7 +49,7 @@ function Get-TargetAggregateReplay {
     }
     foreach($selection in $Specification.selections){
         if(-not $sources.ContainsKey($selection.source) -or $selection.source -ceq 'heavy.lua' -or
-            $seen.ContainsKey($selection.source) -or $selection.kind -cnotin @('equivalent','t-private')){
+            $seen.ContainsKey($selection.source) -or $selection.kind -cnotin @('equivalent','t-private','reviewed-source')){
             throw 'Aggregate replay has unknown duplicate heavy or mixed source selections'
         }
         $seen[$selection.source]=$true
@@ -59,13 +60,20 @@ function Get-TargetAggregateReplay {
             $mapping.configuration -cnotin @($Configuration,'default-and-upstream-test')){
             throw 'Aggregate selection identifies another source or configuration'
         }
-        if($selection.kind -ceq 't-private'){
+        if($selection.kind -ceq 'reviewed-source'){
+            $replay=Get-TargetReviewedSourceReplay -Root $Root -Specification $mapping -Implementation $Implementation -Configuration $Configuration `
+                -PolicySha256 $PolicySha256 -ResolvedExclusions $ResolvedExclusions
+            $excluded+=@($replay.excluded_obligations)
+        }elseif($selection.kind -ceq 't-private'){
             if($Implementation -cne 'Ada' -or $Configuration -cne 'upstream-test'){
                 throw 'Aggregate T adaptation cannot replace default or original C execution'
             }
             $replay=Get-ConformanceTReplay -Root $Root -Specification $mapping -PolicySha256 $PolicySha256 -ResolvedExclusions $ResolvedExclusions
             $excluded+=@($replay.excluded_obligations)
         }else{
+            if($mapping.Contains('kind') -and $mapping.kind -cin @('target-api-source-composite','target-source-equivalent','t-verifier-equivalent')){
+                throw 'Bounded aggregate source operations require reviewed-source selection'
+            }
             $replay=Get-ConformanceEquivalentReplay -Root $Root -Specification $mapping
             if($replay.disposition -ceq 'ada-internal-equivalent' -and $Implementation -cne 'Ada'){
                 throw 'Aggregate Ada equivalent cannot replace original C execution'

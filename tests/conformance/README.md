@@ -209,8 +209,13 @@ composition approval, now recorded separately from its inner approvals.
 Its source-only reader rejects default/native selection,
 pending inner approvals, changed replacements, stale policy/counterparts and
 fabricated or labelled synthetic authority. Explicit synthetic unit fixtures
-remain diagnostic. Existing File/Aggregate selectors still reject this new
-composite kind pending their explicit integration. The bounded
+remain diagnostic. File selection uses the explicit `ReviewedSourceManifest`
+parameter and a separately hashed `reviewed_source` observation identity.
+Aggregate selection uses a `reviewed-source` member under its independently
+reviewed complete 34-source selection. Both replay the same bounded inner
+decisions. The execution contract and post-observation envelope must bind
+the exact selected manifest, output bytes, policy and exclusion set. A generic
+equivalent selection cannot bypass this route. The bounded
 `New-ConformanceReviewedSource.ps1` generator recognizes only this composite,
 the decoded-string equivalent and the memory-verifier equivalent. It
 revalidates their independent exact decisions and emits new disposable

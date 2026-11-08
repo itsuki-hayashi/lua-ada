@@ -80,6 +80,13 @@ Case 'a refreshed raw hash cannot reuse the approval for the preceding observati
     $f=New-Fixture;$f.report.process.stdout_sha256='0'*64;$f.raw.sha256=Save $f.raw_path $f.report
     Reject {Replay $f} 'bindings differ'
 }
+Case 'selected reviewed source identity requires a fresh observation envelope decision'{
+    $f=New-Fixture
+    $f.report.reviewed_source=@{manifest_path='synthetic-reviewed-source.json';manifest_sha256=('4'*64);
+        output_sha256=('5'*64);runtime_acceptance=$false;coverage_authority=$false}
+    $f.raw.sha256=Save $f.raw_path $f.report
+    Reject {Replay $f} 'bindings differ'
+}
 Case 'missing pending and self review each reject'{
     foreach($change in @('missing','pending','self')){
         $f=New-Fixture

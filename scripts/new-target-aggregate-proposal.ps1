@@ -4,6 +4,7 @@ param(
     [Parameter(Mandatory)][ValidateSet('windows','linux','macos')][string] $Platform,
     [string[]] $EquivalentManifest=@(),
     [string[]] $TAdaptationManifest=@(),
+    [string[]] $ReviewedSourceManifest=@(),
     [Parameter(Mandatory)][string] $Output
 )
 Set-StrictMode -Version Latest
@@ -12,8 +13,8 @@ $root=Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 $suite=Get-Content (Join-Path $root 'tests/conformance/suite.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 48
 $selections=@();$seen=@{}
-foreach($kind in @('equivalent','t-private')){
-    $paths=if($kind -ceq 'equivalent'){$EquivalentManifest}else{$TAdaptationManifest}
+foreach($kind in @('equivalent','t-private','reviewed-source')){
+    $paths=if($kind -ceq 'equivalent'){$EquivalentManifest}elseif($kind -ceq 't-private'){$TAdaptationManifest}else{$ReviewedSourceManifest}
     foreach($path in $paths){
         $full=if([IO.Path]::IsPathRooted($path)){$path}else{Join-Path $root $path}
         $relative=[IO.Path]::GetRelativePath($root,$full).Replace('\','/')

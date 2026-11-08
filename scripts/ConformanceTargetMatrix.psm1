@@ -12,6 +12,7 @@ Import-Module (Join-Path $PSScriptRoot 'TargetObservationEnvelope.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetCompiledWitnesses.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceAggregateReplay.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceReviewedSources.psm1')
 Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtureEvidence.psm1')
 
 function Assert-TargetNativeOriginalImageBindings {
@@ -48,7 +49,8 @@ function Assert-TargetTransformReplay {
     $sourceName = if ($Entry.operation -ceq 'aggregate') { 'all.lua' }
         elseif ($Entry.operation -ceq 'heavy') { 'heavy.lua' } else { $Entry.operation.Substring(5) }
     $adapted = $Report.execution_disposition -ceq 'reviewed-t-adapted'
-    $identity = if ($adapted) { $Report.t_adaptation } else { $Report.equivalent }
+    $selected=$Report.Contains('reviewed_source') -and $null -ne $Report.reviewed_source
+    $identity = if($selected){$Report.reviewed_source}elseif ($adapted) { $Report.t_adaptation } else { $Report.equivalent }
     if ($identity.diagnostic_only -ne $false -or $identity.review_status -cne 'accepted') {
         throw 'Full-target transform is not independently accepted'
     }
@@ -58,7 +60,15 @@ function Assert-TargetTransformReplay {
         $specification.configuration -cnotin @($Report.requested_configuration,'default-and-upstream-test')) {
         throw 'Full-target transform identifies another original source or configuration'
     }
-    if ($adapted) {
+    if($selected){
+        $replay=Get-TargetReviewedSourceReplay -Root $Root -Specification $specification -Implementation $Report.target `
+            -Configuration $Report.requested_configuration -PolicySha256 $Report.exclusion_policy_sha256 -ResolvedExclusions $ResolvedExclusions
+        if((@($replay.excluded_obligations|Sort-Object)-join '|') -cne (@($Report.excluded_obligations|Sort-Object)-join '|') -or
+            $Contract.reviewed_source_manifest_sha256 -cne $identity.manifest_sha256 -or
+            $Contract.exclusion_policy_sha256 -cne $Report.exclusion_policy_sha256){
+            throw 'Full-target reviewed source contract or exact exclusion set differs'
+        }
+    }elseif ($adapted) {
         if ($Report.target -cne 'Ada' -or $Report.requested_configuration -cne 'upstream-test') {
             throw 'T transformation cannot replace default or original C execution'
         }
@@ -71,6 +81,9 @@ function Assert-TargetTransformReplay {
             throw 'Full-target T contract or excluded transform set differs'
         }
     } else {
+        if($specification.Contains('kind') -and $specification.kind -cin @('target-api-source-composite','target-source-equivalent','t-verifier-equivalent')){
+            throw 'Bounded target source operations require reviewed_source report identity'
+        }
         $replay = Get-ConformanceEquivalentReplay -Root $Root -Specification $specification
         if ($replay.disposition -ceq 'ada-internal-equivalent' -and $Report.target -cne 'Ada') {
             throw 'Ada internal transformation cannot replace original C execution'
@@ -248,7 +261,7 @@ function Test-TargetMatrixReport {
         $Report.setup_error -or $Report.acceptance_error -or @($Report.fixture_changes).Count -ne 0 -or
         $Report.gate_acceptance -ne $false -or $Report.scoped_operation_acceptance -ne $false -or
         $Report.status -cnotin @('passed','completed-with-skips') -or
-        $Report.execution_disposition -cnotin @('unchanged','ada-internal-equivalent','native-platform-equivalent','reviewed-t-adapted','reviewed-aggregate-replay') -or
+        $Report.execution_disposition -cnotin @('unchanged','ada-internal-equivalent','native-platform-equivalent','reviewed-t-adapted','reviewed-aggregate-replay','reviewed-source-composite') -or
         $Report.synthetic_fixture -isnot [bool]) { throw 'Full-target report revision, identity or policy differs' }
     $variant = if ($Entry.Contains('variant')) { $Entry.variant } else { 'primary' }
     if ($Report.variant -cne $variant) { throw 'Full-target report variant differs' }
@@ -342,7 +355,7 @@ function Test-TargetMatrixReport {
         $Report.exclusion_policy_sha256 -cne $ExclusionPolicySha256) {
         throw 'Full-target report excluded obligation set or policy hash differs'
     }
-    if (($excludedIds.Count -gt 0 -and $Report.execution_disposition -cnotin @('reviewed-t-adapted','reviewed-aggregate-replay')) -or
+    if (($excludedIds.Count -gt 0 -and $Report.execution_disposition -cnotin @('reviewed-t-adapted','reviewed-aggregate-replay','reviewed-source-composite')) -or
         ($excludedIds.Count -eq 0 -and $Report.execution_disposition -ceq 'reviewed-t-adapted')) {
         throw 'Full-target exclusions and adapted execution disposition differ'
     }

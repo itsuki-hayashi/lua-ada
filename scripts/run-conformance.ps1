@@ -22,6 +22,7 @@ param(
     [ValidateSet(0,1)][int] $ConstructsBranch = 0,
     [string] $EquivalentManifest = '',
     [string] $TAdaptationManifest = '',
+    [string] $ReviewedSourceManifest = '',
     [string] $AggregateManifest = '',
     [string] $FileProtocolManifest = '',
     [string] $NativeApplicability = '',
@@ -38,6 +39,7 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceTransforms.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceFileProtocols.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceAggregateReplay.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceReviewedSources.psm1')
 Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtures.psm1')
 $root = Split-Path -Parent $PSScriptRoot
 $original = Get-Location
@@ -83,7 +85,7 @@ if ($Scope -ne '') {
 $acceptanceRequested = $RequireAcceptance -or $RequireScopedAcceptance -or $RequireTargetAcceptance
 $nativeOriginalObservation = $TargetPolicy -ne '' -and $Target -ceq 'ReferenceC' -and $Variant -ceq 'native-original'
 if ($Variant -ceq 'native-original' -and (-not $nativeOriginalObservation -or -not $ReportOnly -or $acceptanceRequested -or
-    $EquivalentManifest -ne '' -or $TAdaptationManifest -ne '' -or $AggregateManifest -ne '')) {
+    $EquivalentManifest -ne '' -or $TAdaptationManifest -ne '' -or $ReviewedSourceManifest -ne '' -or $AggregateManifest -ne '')) {
     throw 'Native-original observations require unmodified ReferenceC ReportOnly target execution'
 }
 if ($TargetPolicy -ne '' -and $AllowUnreviewedEquivalent) {
@@ -95,6 +97,10 @@ if ($TAdaptationManifest -ne '' -and ($TargetPolicy -eq '' -or $Target -cne 'Ada
 }
 if ($TargetPolicy -ne '' -and $EquivalentManifest -ne '' -and $Mode -cne 'File') {
     throw 'Single-file equivalent manifests require full-target File mode'
+}
+if($ReviewedSourceManifest -ne '' -and ($TargetPolicy -eq '' -or $Target -cne 'Ada' -or $Configuration -cne 'upstream-test' -or
+    $Mode -cne 'File' -or $EquivalentManifest -ne '' -or $TAdaptationManifest -ne '' -or $AggregateManifest -ne '')){
+    throw 'ReviewedSourceManifest requires a separate instrumented Ada File target'
 }
 if($AggregateManifest -ne '' -and ($TargetPolicy -eq '' -or $Mode -cne 'Aggregate' -or
     $EquivalentManifest -ne '' -or $TAdaptationManifest -ne '' -or $FileProtocolManifest -ne '')){
@@ -165,6 +171,7 @@ $evidence = [ordered]@{
     execution_disposition = 'unchanged'
     equivalent = $null
     t_adaptation = $null
+    reviewed_source = $null
     file_completion_protocol = $null
     native_applicability = $null
     native_applicability_verified = $false
@@ -348,7 +355,7 @@ try {
                 ($Mode -ceq 'Heavy' -and $_.source -ceq 'heavy.lua') -or
                 ($Mode -ceq 'File' -and $_.source -ceq $File)
             } | ForEach-Object id | Sort-Object)
-            if ($evidence.excluded_obligations.Count -gt 0 -and $TAdaptationManifest -eq '' -and $AggregateManifest -eq '') {
+            if ($evidence.excluded_obligations.Count -gt 0 -and $TAdaptationManifest -eq '' -and $AggregateManifest -eq '' -and $ReviewedSourceManifest -eq '') {
                 throw 'Full-target excluded obligations require an independently reviewed exact T transformation'
             }
         }
@@ -633,6 +640,10 @@ try {
     $nativeSetup = ''
     if ($EquivalentManifest -ne '') {
         $mapping = Get-Content -LiteralPath $EquivalentManifest -Raw | ConvertFrom-Json
+        if($TargetPolicy -ne '' -and $mapping.PSObject.Properties['kind'] -and
+            $mapping.kind -cin @('target-api-source-composite','target-source-equivalent','t-verifier-equivalent')){
+            throw 'Bounded target source operations require ReviewedSourceManifest'
+        }
         if ($mapping.source -cne "references/lua/testes/$File" -or
             $mapping.configuration -notin @($Configuration, 'default-and-upstream-test')) {
             throw 'Equivalent identifies a different source/configuration'
@@ -735,6 +746,17 @@ try {
                 source_sha256=(Get-FileHash $counterpart).Hash.ToLowerInvariant(); artifact=$counterpartCopy;
                 artifact_sha256=(Get-FileHash $counterpartCopy).Hash.ToLowerInvariant()}
         }
+    }
+    if($ReviewedSourceManifest -ne ''){
+        $specification=Get-Content -LiteralPath $ReviewedSourceManifest -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+        if($specification.source -cne "references/lua/testes/$File"){throw 'Reviewed source selection identifies another primary'}
+        $generated=Join-Path $runRoot "equivalent-reviewed-$File"
+        $selected=& "$PSScriptRoot/New-ConformanceReviewedSource.ps1" -Manifest $ReviewedSourceManifest -Output $generated|
+            ConvertFrom-Json -AsHashtable -Depth 32
+        if((@($selected.excluded_obligations|Sort-Object)-join '|') -cne (@($evidence.excluded_obligations|Sort-Object)-join '|')){
+            throw 'Reviewed source selection differs from its exact approved exclusion set'
+        }
+        $evidence.reviewed_source=$selected;$evidence.execution_disposition=$selected.disposition;$arguments=@($generated)
     }
     if ($TAdaptationManifest -ne '') {
         $specification = Get-Content -LiteralPath $TAdaptationManifest -Raw | ConvertFrom-Json -AsHashtable -Depth 64
@@ -1013,6 +1035,13 @@ try {
                  $contract.exclusion_policy_sha256 -cne $evidence.exclusion_policy_sha256 -or
                  $contract.disposition -cne 'reviewed-t-adapted')) {
                 throw 'Execution contract does not identify the exact reviewed T transformation'
+            }
+            if($ReviewedSourceManifest -ne '' -and
+                ($contract.reviewed_source_manifest_sha256 -cne $evidence.reviewed_source.manifest_sha256 -or
+                 $contract.executed_sha256 -cne $evidence.reviewed_source.output_sha256 -or
+                 $contract.exclusion_policy_sha256 -cne $evidence.exclusion_policy_sha256 -or
+                 $contract.disposition -cne $evidence.execution_disposition)){
+                throw 'Execution contract does not identify the exact reviewed source selection'
             }
             $telemetryPath = $environment.LUA_ADA_CONFORMANCE_TELEMETRY +
                 '.' + $evidence.process.process_id + '.json'

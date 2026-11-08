@@ -87,7 +87,7 @@ try{
                 $_.context -ceq $Context -and $_.variant -ceq $operation.variant})
             if($selected.Count -gt 1){throw 'Duplicate execution selection'}
             if($selected.Count -eq 1){
-                foreach($field in @('EquivalentManifest','TAdaptationManifest','AggregateManifest','FileProtocolManifest','NativeApplicability')){
+                foreach($field in @('EquivalentManifest','TAdaptationManifest','ReviewedSourceManifest','AggregateManifest','FileProtocolManifest','NativeApplicability')){
                     if($selected[0].Contains($field) -and $null -ne $selected[0][$field]){
                         $identity=$selected[0][$field]
                         $arguments[$field]=Resolve-ReviewedFile -Root $root -Path $identity.path -Sha256 $identity.sha256
