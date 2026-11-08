@@ -8,6 +8,13 @@ AUnit cases per mode. Revalidate it at final head in all applicable contexts;
 local completion does not close its source ledger. Continue the pending C
 metadata/refusal, hook-ordering, table-storage safety and aggregate obligations.
 
+The [hook-mask checkpoint](sessions/2026-11-08-hook-mask-transitions.md)
+passes sixteen focused behaviors within 2,400 AUnit cases per local mode.
+Preserve captured instruction masks and real return PCs while continuing the
+reviewed API file at original line1306's T.testC child-state zero-allocation
+entry. Keep the failing whole-file/provider cleanup record and require fresh
+final-head, source/T and platform acceptance after the entry repair.
+
 The [parser stack checkpoint](sessions/2026-11-08-parser-stack-limits.md)
 passes sixteen focused cases within 2,384 AUnit cases per configuration.
 Continue unchanged errors.lua at original line768: excessive upvalues must
@@ -23,8 +30,9 @@ The [reader refusal/lifecycle follow-up](sessions/2026-11-08-reader-refusal-life
 completes its nine focused behaviors within 2,363 passing AUnit cases per
 configuration. Preserve the separately failed native partial-reader cleanup
 observations for final review; require Ada's zero selected-byte/block invariant.
-Continue the measured T API hook count/line sequence mismatch without changing
-the original source. Whole-source/T and platform acceptance remain open.
+The subsequent hook checkpoint repairs the T API count/line sequence without
+changing that original source block. Whole-source/T and platform acceptance
+remain open.
 
 The [Context failure-text migration](sessions/2026-11-08-runtime-failure-storage.md)
 is implemented and locally verified. Continue the actual C call metadata and

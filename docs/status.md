@@ -15,6 +15,14 @@ consumers and eight compiler/VM roles pass. Defining-function context and
 declaration-limit precedence are implemented. Global source and final matrix
 acceptance remain pending.
 
+The [hook-mask checkpoint](sessions/2026-11-08-hook-mask-transitions.md)
+preserves pending count/line phases, actual caller trace PCs and direct literal
+local stores. Both local configurations pass 2,400 AUnit cases; Lua controls
+match all producer/VM roles in both, and actual C hooks match all four T roles.
+The reviewed API source advances beyond original line1090 to original line1306's
+zero-allocation C-entry failure. That whole-file run and its interrupted child
+cleanup fail; final source, memory-refusal and platform acceptance remain open.
+
 The [parser stack checkpoint](sessions/2026-11-08-parser-stack-limits.md)
 preserves native runtime-error status/text and bounded Ada host quotas.
 Both local configurations pass 2,384 AUnit cases, all standalone C consumers
@@ -23,8 +31,8 @@ reaches original line768's upvalue diagnostic context; the file remains open.
 
 The [retained T replay](sessions/2026-11-08-retained-t-source-replay.md)
 completes the reviewed calls.lua equivalent locally with unchanged native
-stdout. The API lifecycle composition advances to original line1090's ordinary
-count/line-hook ordering assertion. Both original source parents and all final
+stdout. The later hook checkpoint advances the API lifecycle composition past
+its ordinary count/line assertion. Both original source parents and all final
 head/platform acceptance remain pending; source approval alone closes none.
 
 The [assert argument checkpoint](sessions/2026-11-08-assert-arguments.md)

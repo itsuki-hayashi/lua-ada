@@ -1752,6 +1752,10 @@ package body Lua.Engine.Machine is
       then
          if Item.Hook_PC /= Item.PC then
             Item.Hook_PC := Item.PC;
+            --  luaG_traceexec captures mask before invoking the count hook.
+            --  A replacement affects later instructions; this instruction's
+            --  pending line phase still follows its original mask.
+            Item.Hook_Line_Mask := Wants ('l');
             if Hooks.Enabled (State.Current) and then
               State.Current.Hook_Count > 0
             then
@@ -1772,14 +1776,25 @@ package body Lua.Engine.Machine is
             end if;
          end if;
          Line := Line_At (Item, Item.PC);
-         if not Item.Line_Hook_Checked and then
-           (Line /= Item.Hook_Line or else Item.PC <= Item.Last_Executed_PC)
-         then
+         if not Item.Line_Hook_Checked then
             Item.Line_Hook_Checked := True;
-            Item.Hook_Line := Line;
-            if not Suppressed and then Wants ('l') then
-               Hook_Event (Self, "line", Line);
-               return True;
+            if Item.Hook_Line_Mask then
+               declare
+                  Changed : constant Boolean := Line /= Item.Hook_Line or
+                    else Item.PC <= Item.Hook_Trace_PC;
+               begin
+                  --  Count-only instructions do not replace Lua's oldpc.
+                  --  The captured line phase does, even if a callback has
+                  --  changed the current mask or callbacks are suppressed.
+                  Item.Hook_Line := Line;
+                  Item.Hook_Trace_PC := Item.PC;
+                  if Changed and then not Suppressed and then
+                    Hooks.Enabled (State.Current)
+                  then
+                     Hook_Event (Self, "line", Line);
+                     return True;
+                  end if;
+               end;
             end if;
          end if;
       end if;
@@ -2306,6 +2321,40 @@ package body Lua.Engine.Machine is
 
    procedure Complete_Packet
      (Self : Driver; Result, Packet : Values.Vector);
+
+   procedure Restore_Caller_Trace
+     (State : in out World; Callee : not null Frame_Access);
+   procedure Restore_Caller_Trace
+     (State : in out World; Callee : not null Frame_Access)
+   is
+      Context : constant Context_Access := State.Current;
+      Caller : Frame_Access;
+      PC : Positive;
+   begin
+      if not Hooks.Enabled (Context) or else Callee.Logically_Unwound or else
+        Callee.Is_C_Hook_Transport or else Callee.Is_C_Collector_Transport or
+        else (Callee.Is_Native and then
+              (Length (Callee.Native_Name) = 0 or else
+               Element (Callee.Native_Name, 1) = '@'))
+      then
+         return;
+      end if;
+      Caller := Inspection.Caller_Frame (State, Context, Callee);
+      if Caller /= null and then not Caller.Is_Native then
+         --  ldo.c:rethook restores oldpc from the real Lua caller's savedpc.
+         --  A Lua function called by a hook returns to its still-pending
+         --  instruction; ordinary calls return after the executed CALL.
+         --  The actual C hook transport never creates such a function call,
+         --  so its own return cannot fabricate an oldpc transition.
+         PC :=
+           (if Context.Hook_Active and then Caller = Context.Hook_Frame
+            then Caller.PC
+            else Positive'Max (1, Caller.PC - 1));
+         Caller.Hook_Trace_PC := PC;
+         Caller.Hook_Line := Line_At (Caller, PC);
+      end if;
+   end Restore_Caller_Trace;
+
    procedure Complete_Packet
      (Self : Driver; Result, Packet : Values.Vector) is
       State : World renames Self.Universe.all;
@@ -2332,6 +2381,7 @@ package body Lua.Engine.Machine is
             Caller := State.Current.Stack
               (State.Current.Stack.Last_Index - 1);
          end if;
+         Restore_Caller_Trace (State, Activation);
          Retire_Stack_Window (Activation);
          if Caller /= null then
             if Policy = Deliver_Results then
@@ -2459,6 +2509,7 @@ package body Lua.Engine.Machine is
       --  Packet owns outgoing values independently of this activation. No
       --  collection occurs until the caller's destination owns them again.
       --  The outermost chunk has no consumer and intentionally discards it.
+      Restore_Caller_Trace (State, Activation);
       State.Current.Stack.Delete_Last;
       Release_Frame (State, Activation);
       if not State.Current.Stack.Is_Empty and then

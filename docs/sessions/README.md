@@ -4,6 +4,8 @@ Correction: [declaration activation](2026-11-08-declaration-activation-correctio
 
 Component: [compiler limit context](2026-11-08-compiler-limit-context.md).
 
+Component: [instruction hook-mask transitions](2026-11-08-hook-mask-transitions.md).
+
 Component: [parser stack limits](2026-11-08-parser-stack-limits.md).
 
 Observation: [retained T source replay](2026-11-08-retained-t-source-replay.md).

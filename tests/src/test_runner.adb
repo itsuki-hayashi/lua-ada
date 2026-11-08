@@ -112,6 +112,8 @@ with Reader_Portal_Tests;
 with Lua.Reader_Policy_Tests;
 with Lua.Reader_Refusal_Tests;
 with Lua.Reader_Lifecycle_Tests;
+with Hook_Transition_Tests;
+with Lua.C_Hook_Transition_Tests;
 with Incremental_Lexer_Tests;
 with Lua.Library_Codec_Tests;
 with Lua.String_Helper_Tests;
@@ -243,6 +245,8 @@ procedure Test_Runner is
       Lua.Reader_Policy_Tests.Register (Result);
       Lua.Reader_Refusal_Tests.Register (Result);
       Lua.Reader_Lifecycle_Tests.Register (Result);
+      Hook_Transition_Tests.Register (Result);
+      Lua.C_Hook_Transition_Tests.Register (Result);
       Incremental_Lexer_Tests.Register (Result);
       Lua.Library_Codec_Tests.Register (Result);
       Lua.String_Helper_Tests.Register (Result);

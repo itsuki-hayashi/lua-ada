@@ -695,6 +695,11 @@ private package Lua.Engine is
       --  Minus one means unseen; zero is a checked word without line data.
       --  Keeping them distinct preserves a stripped frame's first event.
       Hook_PC : Natural := 0;
+      Hook_Trace_PC : Natural := 0;
+      Hook_Line_Mask : Boolean := False;
+      --  Traceexec snapshots its line mask before a count callback can change
+      --  hooks. The last actually traced/caller-return PC remains separate
+      --  from the executed PC while count-only hooks do not trace lines.
       Last_Executed_PC : Natural := 0;
       Line_Hook_Checked : Boolean := False;
       Closers : Close_Lists.Vector;

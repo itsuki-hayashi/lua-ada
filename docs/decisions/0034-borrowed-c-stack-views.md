@@ -87,6 +87,24 @@ selects its existing close/error path. Write directly to the recipient's
 owned packet and charge actual pin/barrier/copy or discard passes. Host
 instruction/physical failures retain their typed abort behavior.
 
+Instruction hook phases retain the mask captured before the count callback,
+as pinned ldebug.c:luaG_traceexec does. Replacing the hook can change the
+callback invoked by the pending line phase; it cannot retroactively add or
+remove that phase. Removing the actual callback prevents invocation. Keep a
+separate trace PC because count-only instructions do not update oldpc. A
+real Lua or C function return restores the actual Lua caller's saved PC even
+when return hooks are off, following ldo.c:rethook. A direct C hook or
+collector transport is not another public function call and cannot invent
+that transition. The embedded scalar fields reset with the activation;
+completion changes neither result ownership nor transfer acknowledgement.
+
+The canonical compiler writes a single literal RHS directly into its sole
+local destination, following lcode.c:luaK_storevar. This removes an actual
+temporary MOVE, preserving the public count-hook event sequence. Keep
+varargs, multiple assignments, global/indexed stores and callback-bearing
+expressions on their existing evaluation paths. No listing transformation,
+hook suppression or reference opcode substitution supplies compatibility.
+
 Nine separately named public C regressions cover real scalar edits, hook
 removal/nested calls, protected and unprotected errors, blocked nested yield,
 direct hook yield, weak argument/upvalue release, and allocator reentry into

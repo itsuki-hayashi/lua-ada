@@ -1407,6 +1407,8 @@ package body Lua.Engine is
       Item.External_Return_Independent := False;
       Item.Hook_Line := -1;
       Item.Hook_PC := 0;
+      Item.Hook_Trace_PC := 0;
+      Item.Hook_Line_Mask := False;
       Item.Last_Executed_PC := 0;
       Item.Line_Hook_Checked := False;
       Item.Unwind := No_Unwind;

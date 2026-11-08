@@ -1488,6 +1488,28 @@ package body Lua.Canonical_Compiler is
                        Function_Expression
                      then
                         Expression (Fn, Item.Children.Last_Element, Left);
+                     elsif Targets.Length = 1 and then
+                       not Item.Flag and then not Targets (1).Is_Table and then
+                       Targets (1).Where.Kind = Stack_Place and then
+                       Fetch (Item.Children.Last_Element).Kind =
+                         Block_Statement and then
+                       Fetch (Item.Children.Last_Element).Children.Length =
+                         1 and then
+                       Fetch (Fetch (Item.Children.Last_Element).Children
+                         (1)).Kind = Literal and then
+                       Fetch (Fetch (Item.Children.Last_Element).Children
+                         (1)).Value.Kind /= Varargs
+                     then
+                        --  A constant has no intervening evaluation or
+                        --  callback. luaK_storevar writes it directly into
+                        --  the local's real destination register. Avoiding
+                        --  a temporary MOVE preserves actual count-hook
+                        --  instruction events without changing deferred
+                        --  table/global stores or multi-value conflicts.
+                        Left := Targets (1).Where.Index;
+                        Expression
+                          (Fn, Fetch (Item.Children.Last_Element).Children
+                             (1), Left);
                      else
                         Values (Fn, Item.Children.Last_Element, Left,
                           Integer (Targets.Length), Open_Last, Count);
