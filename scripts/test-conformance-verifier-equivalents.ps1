@@ -6,7 +6,13 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceVerifierEquivalents.psm1') -F
 Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceTransforms.psm1')
 $base='tests/conformance/targets/remaining-upstream-compatibility'
-$manifest=Get-Content (Join-Path $root "$base/memerr-verifier-allocation.equivalent.author-proposal.json") -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+$installed=Get-Content (Join-Path $root "$base/memerr-verifier-allocation.equivalent.json") -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+# First verify the real current independent decision. Disposable pending and
+# synthetic fixtures then clone those source identities, never silently renew
+# the dated author proposal or borrow its old implementation approvals.
+$current=Get-ConformanceVerifierReplay -Root $root -Specification $installed -Implementation Ada -Configuration upstream-test
+$manifest=$installed|ConvertTo-Json -Depth 48|ConvertFrom-Json -AsHashtable -Depth 48
+$manifest.review=@{status='pending';author='pending-fixture-author';reviewer=$null;artifact=$null;artifact_sha256=$null}
 $temporary=Join-Path $root ('reports/verifier-equivalent-selftest/'+[guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($temporary)
 $script:cases=0
@@ -76,7 +82,16 @@ Case 'pending source-only artifact reconstructs exactly one17byte insertion in m
     Assert ($text.Contains("  local stat, err = pcall(f, ...)`n  T.alloccount()`n  assert(not stat and string.find(err, msg))") -and
         $text.Contains("T.alloccount(10)`ncheckerr(MEMERRMSG, f)`nT.alloccount()          -- remove limit")) 'Protected call/assertion/original reset changed'
 }
-Case 'production pending artifact rejects default replay without exact independent review' {
+Case 'current installed review reconstructs source only without runtime authority' {
+    Assert ($current.review_status -ceq 'accepted' -and -not $current.diagnostic_only -and
+        -not $current.runtime_acceptance -and -not $current.coverage_authority -and
+        $current.excluded_obligations.Count -eq 0) 'Current source review supplied runtime authority'
+}
+Case 'dated pending proposal cannot inherit the current exact source review' {
+    $dated=Get-Content (Join-Path $root "$base/memerr-verifier-allocation.equivalent.author-proposal.json") -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+    Reject {Get-ConformanceVerifierReplay -Root $root -Specification $dated -Implementation Ada -Configuration upstream-test} 'Review file hash differs|lacks independent exact semantic review'
+}
+Case 'pending fixture rejects default replay without exact independent review' {
     Reject {Replay (New-Fixture)} 'lacks independent exact semantic review'
 }
 foreach($implementation in @('ReferenceC')){Case 'original native execution cannot use the Ada verifier equivalent' {

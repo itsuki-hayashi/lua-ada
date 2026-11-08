@@ -1,5 +1,7 @@
 # Session Records
 
+Source review: [memory-verifier binding refresh](2026-11-08-verifier-binding-refresh.md).
+
 Component: [intern-index refusal and collection](2026-11-08-intern-index-refusal.md).
 
 Feature review: [private string-table observations](2026-11-08-querystr-feature-review.md).

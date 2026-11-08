@@ -54,7 +54,7 @@
     },
     {
       "path": "tests/src/lua-conformance_adapter.adb",
-      "sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0"
+      "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3"
     },
     {
       "path": "tests/src/lua-conformance_allocator.adb",
@@ -86,10 +86,10 @@
   "runtime_acceptance": false,
   "coverage_authority": false,
   "review": {
-    "status": "accepted",
-    "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/memerr-verifier-allocation.approval.json",
     "reviewer": "Codex /root",
+    "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/memerr-verifier-allocation.resetci-approval.json",
     "author": "Codex /root/validation_delivery",
-    "artifact_sha256": "cfb9c1ef017a3f3e63dea53337bc6da3cd084eccf3eb0ec0b9225f4cd1a58556"
+    "artifact_sha256": "19b97307896f170ea424ebd4cc60b0867550cf69e71dcf0e5e6815ffe4fe35aa",
+    "status": "accepted"
   }
 }
