@@ -211,4 +211,29 @@ Case 'semantic hash ignores JSON object order without losing empty arrays' {
     $reordered.excluded_obligations=$null
     Assert ((Get-ConformanceVerifierSemanticHash $reordered) -cne $before) 'Null and explicit empty exclusions collapsed'
 }
-Write-Output "PASS: $script:cases verifier-equivalent source/security regressions; memory reconstruction and synthetic review fixtures only, no adapted file write or Lua execution"
+Case 'actual independent source review reconstructs bytes without runtime authority' {
+    $approvedPath=Join-Path $root "$base/memerr-verifier-allocation.equivalent.json"
+    $approved=Get-Content $approvedPath -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+    $replay=Get-ConformanceVerifierReplay -Root $root -Specification $approved -Implementation Ada -Configuration upstream-test
+    Assert (-not $replay.diagnostic_only -and $replay.review_status -ceq 'accepted' -and
+        -not $replay.runtime_acceptance -and -not $replay.coverage_authority -and
+        $replay.excluded_obligations.Count -eq 0) 'Exact source review became passing evidence'
+}
+Case 'verifier generator refuses a reference-tree output before writing' {
+    $source=Join-Path $root $manifest.source
+    $before=(Get-FileHash -LiteralPath $source).Hash
+    Reject {& (Join-Path $PSScriptRoot 'New-ConformanceVerifierEquivalent.ps1') `
+        -Manifest (Join-Path $root "$base/memerr-verifier-allocation.equivalent.json") `
+        -Output $source} 'disposable reports artifact'
+    Assert ((Get-FileHash -LiteralPath $source).Hash -ceq $before) 'Generator changed pinned reference bytes'
+}
+Case 'verifier generator emits exact approved disposable bytes and source-only receipt' {
+    $output=Join-Path $temporary 'approved-memerr.lua'
+    $receipt=& (Join-Path $PSScriptRoot 'New-ConformanceVerifierEquivalent.ps1') `
+        -Manifest (Join-Path $root "$base/memerr-verifier-allocation.equivalent.json") `
+        -Output $output|ConvertFrom-Json -AsHashtable
+    Assert ((Get-FileHash -LiteralPath $output).Hash.ToLowerInvariant() -ceq $manifest.output_sha256 -and
+        $receipt.review_status -ceq 'accepted' -and -not $receipt.runtime_acceptance -and
+        -not $receipt.coverage_authority -and $receipt.excluded_obligations.Count -eq 0) 'Generated verifier identity or authority differs'
+}
+Write-Output "PASS: $script:cases verifier-equivalent source/security regressions; approved disposable generation and synthetic rejection fixtures, no Lua execution"

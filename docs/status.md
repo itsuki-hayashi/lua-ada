@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [reviewed memory-verifier equivalent](sessions/2026-11-08-memerr-verifier.md)
+preserves actual application refusal and the original status/message assertion
+while restoring the test allocator before verification. It excludes no source
+obligation. Ada now reaches the later zero-allocation sweep; native Windows
+reaches a temporary-file permission failure. Both file results remain failing.
+
 Relevant T reader checks now use [actual Ada stack inspection](sessions/2026-11-08-stack-inspection.md).
 All 2,248 AUnit cases pass in both local configurations. Original calls.lua
 completes by default; its T run reaches private constant-pool identity

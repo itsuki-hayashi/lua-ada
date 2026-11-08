@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+The [exact memory-verifier equivalent](sessions/2026-11-08-memerr-verifier.md)
+has independent source approval and a bounded disposable generator. Implement
+allocation-safe T.testC entry under the later zero-growth sweep, then resolve
+the measured native Windows temporary-file applicability issue. Source review
+and generation supply no passing source or whole-file evidence.
+
 The [actual stack inspector](sessions/2026-11-08-stack-inspection.md) enables
 calls.lua's retained reader invariants. Review its remaining T constant-pool
 identity check with a retained three-function semantic witness. Private arena

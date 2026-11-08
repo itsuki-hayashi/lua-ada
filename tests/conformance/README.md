@@ -154,9 +154,17 @@ later failure campaign byte. This is a source-equivalent proposal with an
 explicit empty exclusion set. Its pinned whole-source hash, exact insertion,
 retained source spans and native/first-party configuration counterparts all
 bind a separate independent exact review. Pending or labelled synthetic review
-artifacts cannot authorize actual replay. The schema currently reconstructs
-memory for inspection only; it is not selected by any runner and installs no
-adapted source or passing evidence. Its focused regressions execute no Lua.
+artifacts cannot authorize actual replay. The separately approved
+`memerr-verifier-allocation.equivalent.json` binds the independently reviewed
+17-byte insertion and all seven current counterpart hashes.
+`scripts/New-ConformanceVerifierEquivalent.ps1` reconstructs approved bytes
+only under disposable `reports/` paths, with a source-only receipt. It exposes
+no diagnostic or synthetic approval switch. Global acceptance runners still
+require explicit integration and operation evidence; generation supplies no
+passing source/file evidence and excludes no obligation. Its focused security
+regressions execute no Lua. The current component campaign progresses beyond
+the original verifier but fails during the later allocation sweep; see the
+[session record](../../docs/sessions/2026-11-08-memerr-verifier.md).
 
 ## Resolution and evidence contract
 

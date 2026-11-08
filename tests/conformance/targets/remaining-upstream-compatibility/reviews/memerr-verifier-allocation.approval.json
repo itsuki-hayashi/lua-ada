@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "kind": "t-verifier-equivalent-approval",
+  "equivalent_id": "memerr-verifier-allocation",
+  "semantic_sha256": "1b8802bef5a560c241b8f50f46b876db7621b25c31243e16634a79c90f2b5d69",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "decision": "accepted",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "review_evidence": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/memerr-verifier-allocation.independent-review.json",
+    "sha256": "55bcb998aa2bc96333701db83745b94ed4ef0776288e5dbfc61bf64d3556548c"
+  }
+}
