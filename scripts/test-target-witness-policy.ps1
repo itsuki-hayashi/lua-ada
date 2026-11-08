@@ -137,7 +137,7 @@ Case 'new value auxiliary and scalar source routes remain proposals with no exec
     $relative=[IO.Path]::GetRelativePath($root,(Join-Path $path 'witness-policy.author-proposal.json')).Replace('\','/')
     $r=Read-TargetWitnessPolicy -Root $root -Path $relative
     $new=@($r.global_api.entries|Where-Object{ $_.Contains('proposed_classification') })
-    Assert-True ($r.consumer.cases.Count -eq 580 -and $r.aunit.entries.Count -eq 330 -and $new.Count -eq 124 -and
+    Assert-True ($r.consumer.cases.Count -eq 589 -and $r.aunit.entries.Count -eq 466 -and $new.Count -eq 124 -and
         @($new|Where-Object{ $_.classification -cne 'pending-semantic-review' -or $_.review_status -cne 'pending' -or
             $_.runtime_acceptance -or $_.execution_evidence.Count }).Count -eq 0 -and -not $r.source_reviewed -and -not $r.runtime_acceptance) 'Source routes invented acceptance'
     foreach($entry in $new){Assert-True ($entry.proposed_context_witnesses.Count -eq 26 -and -not $entry.Contains('context_witnesses')) 'A future route became an actual context observation'}
@@ -145,6 +145,15 @@ Case 'new value auxiliary and scalar source routes remain proposals with no exec
     foreach($route in $reset.proposed_context_witnesses){
         $warning='c_api/tests/thread_reset_api_contract.c#self-warning'
         Assert-True (($route.context.StartsWith('default/')) -eq ($warning -cin $route.named_c_cases)) 'Native warning-lock skip became a T pass or a missing default witness'
+    }
+    $foreign=@($r.consumer.cases|Where-Object case_id -CEQ foreign-hook-24)
+    Assert-True ($foreign.Count -eq 1 -and $foreign[0].contexts.Count -eq 19 -and
+        @($foreign[0].contexts|Where-Object{-not $_.StartsWith('default/',[StringComparison]::Ordinal)}).Count -eq 0) 'Native private-lock omission became an instrumented native C pass'
+    foreach($source in @('tests/src/argument_detail_tests.adb','tests/src/argument_label_tests.adb',
+        'tests/src/binary_source_tests.adb','tests/src/lua-line_baseline_tests.adb','tests/src/lua-string_result_tests.adb',
+        'tests/src/sort_argument_tests.adb','tests/src/string_argument_tests.adb')){
+        $entries=@($r.aunit.entries|Where-Object{$_.case.StartsWith($source+'#',[StringComparison]::Ordinal)})
+        Assert-True ($entries.Count -gt 0 -and @($entries|Where-Object{$_.runtime_acceptance -or $_.execution_evidence.Count}).Count -eq 0) 'Registered source candidate gained fabricated observation authority'
     }
     Reject {Read-TargetWitnessPolicy -Root $root -Path $relative -RequireReview} 'incomplete|independent review|function source'
 }

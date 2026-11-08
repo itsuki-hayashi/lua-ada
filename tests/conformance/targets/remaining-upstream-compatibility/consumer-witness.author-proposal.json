@@ -21,11 +21,11 @@
     },
     {
       "path": "tests/src/lua-foreign_hook_tests.adb",
-      "sha256": "c698a15c02b037937b9529880b5e2ca1df8267974eb1df06e687dab1f96ce4f6"
+      "sha256": "653ebe9493f76b0ff4c56466e9744e58c2502a7090301c706d1b797f563bc1c1"
     },
     {
       "path": "tests/c/foreign_hook_contract.c",
-      "sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929"
+      "sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679"
     },
     {
       "path": "tests/src/lua-math_reopen_tests.adb",
@@ -45,7 +45,7 @@
     },
     {
       "path": "c_api/tests/foreign_api_contract.c",
-      "sha256": "aac33164afc2f48007b9b919eece945b47606cc0bee4019dcc59dea42e457431"
+      "sha256": "c453e9f0950d1c06b48710e18206780afe6d1070040b968ee3f14fa3295b1283"
     },
     {
       "path": "c_api/tests/consumer_allocator.h",
@@ -153,19 +153,19 @@
     },
     {
       "path": "scripts/check.ps1",
-      "sha256": "81bc5fd6d8a6072d41ea630da2bdda6b2fc5cf291041a5195fa4e27d3b44e682"
+      "sha256": "232674e796e24459d9cc6690ce3b46cf2b352722bb22865a41a094d431910579"
     },
     {
       "path": "scripts/check-instrumented.ps1",
-      "sha256": "5a6867b3bc1f74a81d590b277aa0e890f49b896aca61fe8567bbf902f460cbad"
+      "sha256": "be764d4400a70c58b2eee5e43ccdfffa290a01fb442b464f37d6d40949351177"
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "9f3e71d920c92baaca2633308c8f7ba541ebba67081be4b2a1df66a6f3c1fa15"
+      "sha256": "25912c65326bad618937f7d8d019f9fb77ddd7cb8aab2abc8c9a23e98e183df8"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
-      "sha256": "7dd78afe0f556c6e6717e465a44c9dd95fb177dbbe49828e18a07eb1c8f034a7"
+      "sha256": "cf702134ec96f16d591aaeae23b12c48756e553eab8adf161b54909cccf8d437"
     },
     {
       "sha256": "4eb599a7ffde8dd13d5c723d1cda43cae7d31f4a4c29b0f0fb37a4bb157686e3",
@@ -1695,7 +1695,7 @@
     {
       "case_id": "foreign-hook-1",
       "source": "tests/c/foreign_hook_contract.c",
-      "source_sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
+      "source_sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679",
       "contract_function": "lua_ada_test_hook_contract",
       "contract_case_number": 1,
       "consumer": "foreign-api",
@@ -1717,7 +1717,7 @@
     {
       "case_id": "foreign-hook-2",
       "source": "tests/c/foreign_hook_contract.c",
-      "source_sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
+      "source_sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679",
       "contract_function": "lua_ada_test_hook_contract",
       "contract_case_number": 2,
       "consumer": "foreign-api",
@@ -1739,7 +1739,7 @@
     {
       "case_id": "foreign-hook-3",
       "source": "tests/c/foreign_hook_contract.c",
-      "source_sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
+      "source_sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679",
       "contract_function": "lua_ada_test_hook_contract",
       "contract_case_number": 3,
       "consumer": "foreign-api",
@@ -1761,7 +1761,7 @@
     {
       "case_id": "foreign-hook-4",
       "source": "tests/c/foreign_hook_contract.c",
-      "source_sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
+      "source_sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679",
       "contract_function": "lua_ada_test_hook_contract",
       "contract_case_number": 4,
       "consumer": "foreign-api",
@@ -1783,7 +1783,7 @@
     {
       "case_id": "foreign-hook-5",
       "source": "tests/c/foreign_hook_contract.c",
-      "source_sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
+      "source_sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679",
       "contract_function": "lua_ada_test_hook_contract",
       "contract_case_number": 5,
       "consumer": "foreign-api",
@@ -1805,7 +1805,7 @@
     {
       "case_id": "foreign-hook-7",
       "source": "tests/c/foreign_hook_contract.c",
-      "source_sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
+      "source_sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679",
       "contract_function": "lua_ada_test_hook_contract",
       "contract_case_number": 7,
       "consumer": "foreign-api",
@@ -1827,7 +1827,7 @@
     {
       "case_id": "foreign-hook-8",
       "source": "tests/c/foreign_hook_contract.c",
-      "source_sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
+      "source_sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679",
       "contract_function": "lua_ada_test_hook_contract",
       "contract_case_number": 8,
       "consumer": "foreign-api",
@@ -1849,7 +1849,7 @@
     {
       "case_id": "foreign-hook-9",
       "source": "tests/c/foreign_hook_contract.c",
-      "source_sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
+      "source_sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679",
       "contract_function": "lua_ada_test_hook_contract",
       "contract_case_number": 9,
       "consumer": "foreign-api",
@@ -1871,7 +1871,7 @@
     {
       "case_id": "foreign-hook-10",
       "source": "tests/c/foreign_hook_contract.c",
-      "source_sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
+      "source_sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679",
       "contract_function": "lua_ada_test_hook_contract",
       "contract_case_number": 10,
       "consumer": "foreign-api",
@@ -1893,7 +1893,7 @@
     {
       "case_id": "foreign-hook-14",
       "source": "tests/c/foreign_hook_contract.c",
-      "source_sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
+      "source_sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679",
       "contract_function": "lua_ada_test_hook_contract",
       "contract_case_number": 14,
       "consumer": "foreign-api",
@@ -1915,7 +1915,7 @@
     {
       "case_id": "foreign-hook-11",
       "source": "tests/c/foreign_hook_contract.c",
-      "source_sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
+      "source_sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679",
       "contract_function": "lua_ada_test_hook_contract",
       "contract_case_number": 11,
       "consumer": "foreign-api",
@@ -1937,7 +1937,7 @@
     {
       "case_id": "foreign-hook-12",
       "source": "tests/c/foreign_hook_contract.c",
-      "source_sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
+      "source_sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679",
       "contract_function": "lua_ada_test_hook_contract",
       "contract_case_number": 12,
       "consumer": "foreign-api",
@@ -1959,7 +1959,7 @@
     {
       "case_id": "foreign-hook-13",
       "source": "tests/c/foreign_hook_contract.c",
-      "source_sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
+      "source_sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679",
       "contract_function": "lua_ada_test_hook_contract",
       "contract_case_number": 13,
       "consumer": "foreign-api",
@@ -1981,7 +1981,7 @@
     {
       "case_id": "foreign-hook-15",
       "source": "tests/c/foreign_hook_contract.c",
-      "source_sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
+      "source_sha256": "c168ec9a4d4582ea135678cc9c70baf3a9c43eaa6cbb073cadd2404899074679",
       "contract_function": "lua_ada_test_hook_contract",
       "contract_case_number": 15,
       "consumer": "foreign-api",
@@ -9594,6 +9594,163 @@
       "runtime_acceptance": false,
       "coverage_authority": false,
       "source_sha256": "ebeb639c262e705682ccaa598175fd7c9771a67730c70d860ee46df4f2ef4560"
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-16",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-16"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": [],
+      "source_sha256": "c453e9f0950d1c06b48710e18206780afe6d1070040b968ee3f14fa3295b1283"
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-17",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-17"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": [],
+      "source_sha256": "c453e9f0950d1c06b48710e18206780afe6d1070040b968ee3f14fa3295b1283"
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-18",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-18"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": [],
+      "source_sha256": "c453e9f0950d1c06b48710e18206780afe6d1070040b968ee3f14fa3295b1283"
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-19",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-19"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": [],
+      "source_sha256": "c453e9f0950d1c06b48710e18206780afe6d1070040b968ee3f14fa3295b1283"
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-20",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-20"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": [],
+      "source_sha256": "c453e9f0950d1c06b48710e18206780afe6d1070040b968ee3f14fa3295b1283"
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-21",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-21"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": [],
+      "source_sha256": "c453e9f0950d1c06b48710e18206780afe6d1070040b968ee3f14fa3295b1283"
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-22",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-22"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": [],
+      "source_sha256": "c453e9f0950d1c06b48710e18206780afe6d1070040b968ee3f14fa3295b1283"
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-23",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-23"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": [],
+      "source_sha256": "c453e9f0950d1c06b48710e18206780afe6d1070040b968ee3f14fa3295b1283"
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-24",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-24"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": [],
+      "contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "default/windows/validation/static-pic"
+      ],
+      "applicability_rationale": "Native T private allocator-lock mode omits this native case. Complete Ada T remains separately mandatory in the raw foreign-full-api operation protocol; this pending C witness is not a native-T pass.",
+      "source_sha256": "c453e9f0950d1c06b48710e18206780afe6d1070040b968ee3f14fa3295b1283"
     }
   ],
   "entries": [

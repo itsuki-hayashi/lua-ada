@@ -6949,6 +6949,154 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-16",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-16"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-17",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-17"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-18",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-18"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-19",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-19"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-20",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-20"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-21",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-21"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-22",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-22"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-23",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-23"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-24",
+      "consumer": "foreign-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-24"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": [],
+      "contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "default/windows/validation/static-pic"
+      ],
+      "applicability_rationale": "Native T private allocator-lock mode omits this native case. Complete Ada T remains separately mandatory in the raw foreign-full-api operation protocol; this pending C witness is not a native-T pass."
     }
   ],
   "source_measurements": {

@@ -2039,6 +2039,1094 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false
+    },
+    {
+      "case": "tests/src/argument_detail_tests.adb#Number_Name",
+      "registered_label": "argument detail: raw number temporary",
+      "required_stdout_line": "OK argument detail: raw number temporary",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/argument_detail_tests.adb#Boolean_Name",
+      "registered_label": "argument detail: raw boolean temporary",
+      "required_stdout_line": "OK argument detail: raw boolean temporary",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/argument_detail_tests.adb#Table_Name",
+      "registered_label": "argument detail: raw table temporary",
+      "required_stdout_line": "OK argument detail: raw table temporary",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/argument_detail_tests.adb#Nul_Suffix",
+      "registered_label": "argument detail: short NUL prefix",
+      "required_stdout_line": "OK argument detail: short NUL prefix",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/argument_detail_tests.adb#Name_Scan_Quota",
+      "registered_label": "argument detail: owning name scan budget",
+      "required_stdout_line": "OK argument detail: owning name scan budget",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/argument_label_tests.adb#Nested_Keys",
+      "registered_label": "argument label: nested keys",
+      "required_stdout_line": "OK argument label: nested keys",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/argument_label_tests.adb#First_Nul",
+      "registered_label": "argument label: first key NUL suffixes",
+      "required_stdout_line": "OK argument label: first key NUL suffixes",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/argument_label_tests.adb#Global_Prefix",
+      "registered_label": "argument label: global prefix removal",
+      "required_stdout_line": "OK argument label: global prefix removal",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/argument_label_tests.adb#Empty_Label",
+      "registered_label": "argument label: empty stripped label",
+      "required_stdout_line": "OK argument label: empty stripped label",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/argument_label_tests.adb#Key_Scan_Quota",
+      "registered_label": "argument label: owning key scan budget",
+      "required_stdout_line": "OK argument label: owning key scan budget",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Simple_Roundtrip",
+      "registered_label": "binary runtime: simple roundtrip",
+      "required_stdout_line": "OK binary runtime: simple roundtrip",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Nested_Subtree",
+      "registered_label": "binary runtime: selected nested subtree",
+      "required_stdout_line": "OK binary runtime: selected nested subtree",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Initial_Upvalues",
+      "registered_label": "binary runtime: initial capture cells",
+      "required_stdout_line": "OK binary runtime: initial capture cells",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Explicit_Nil_Environment",
+      "registered_label": "binary runtime: explicit nil environment",
+      "required_stdout_line": "OK binary runtime: explicit nil environment",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Stripped_Metadata",
+      "registered_label": "binary runtime: stripped debug metadata",
+      "required_stdout_line": "OK binary runtime: stripped debug metadata",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Retained_Metadata",
+      "registered_label": "binary runtime: retained source identity",
+      "required_stdout_line": "OK binary runtime: retained source identity",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Fragmented_Reader",
+      "registered_label": "binary runtime: fragmented binary reader",
+      "required_stdout_line": "OK binary runtime: fragmented binary reader",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Mode_Selection",
+      "registered_label": "binary runtime: binary mode filtering",
+      "required_stdout_line": "OK binary runtime: binary mode filtering",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Version_Failure",
+      "registered_label": "binary runtime: invalid native version",
+      "required_stdout_line": "OK binary runtime: invalid native version",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Truncation_Failure",
+      "registered_label": "binary runtime: truncated native chunk",
+      "required_stdout_line": "OK binary runtime: truncated native chunk",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Native_Dump_Rejected",
+      "registered_label": "binary runtime: native function rejection",
+      "required_stdout_line": "OK binary runtime: native function rejection",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Dump_Type_Checked",
+      "registered_label": "binary runtime: dump argument type",
+      "required_stdout_line": "OK binary runtime: dump argument type",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Collection_Roundtrips",
+      "registered_label": "binary runtime: collection during roundtrips",
+      "required_stdout_line": "OK binary runtime: collection during roundtrips",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Shifted_Binary_Arguments",
+      "registered_label": "binary runtime: shifted arguments",
+      "required_stdout_line": "OK binary runtime: shifted arguments",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Malformed_Execution_Recovery",
+      "registered_label": "binary runtime: malformed recovery",
+      "required_stdout_line": "OK binary runtime: malformed recovery",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_runtime_tests.adb#Nested_Register_Quota",
+      "registered_label": "binary runtime: nested register quota",
+      "required_stdout_line": "OK binary runtime: nested register quota",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_source_tests.adb#Literal_Name",
+      "registered_label": "binary source: literal NUL display",
+      "required_stdout_line": "OK binary source: literal NUL display",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_source_tests.adb#File_Name",
+      "registered_label": "binary source: file NUL display",
+      "required_stdout_line": "OK binary source: file NUL display",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_source_tests.adb#Snippet_Name",
+      "registered_label": "binary source: snippet NUL display",
+      "required_stdout_line": "OK binary source: snippet NUL display",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/binary_source_tests.adb#Long_File_Tail",
+      "registered_label": "binary source: long file NUL tail",
+      "required_stdout_line": "OK binary source: long file NUL tail",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Light_Upvalues",
+      "registered_label": "API driver: light C upvalues",
+      "required_stdout_line": "OK API driver: light C upvalues",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Absent_Upvalue",
+      "registered_label": "API driver: acceptable absent upvalue",
+      "required_stdout_line": "OK API driver: acceptable absent upvalue",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Stack_Reordering",
+      "registered_label": "API driver: physical stack edits",
+      "required_stdout_line": "OK API driver: physical stack edits",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Raw_Table",
+      "registered_label": "API driver: raw pointer table keys",
+      "required_stdout_line": "OK API driver: raw pointer table keys",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Metatable_Delegation",
+      "registered_label": "API driver: real table handlers",
+      "required_stdout_line": "OK API driver: real table handlers",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Arithmetic_Commands",
+      "registered_label": "API driver: actual arithmetic",
+      "required_stdout_line": "OK API driver: actual arithmetic",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#C_Function_Identity",
+      "registered_label": "API driver: callable C identity",
+      "required_stdout_line": "OK API driver: callable C identity",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Length_Commands",
+      "registered_label": "API driver: length value and conversion",
+      "required_stdout_line": "OK API driver: length value and conversion",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Loaded_Source",
+      "registered_label": "API driver: actual loaded source",
+      "required_stdout_line": "OK API driver: actual loaded source",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Formatting_Commands",
+      "registered_label": "API driver: buffer and varargs",
+      "required_stdout_line": "OK API driver: buffer and varargs",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Userdata_Metatable",
+      "registered_label": "API driver: userdata metatable",
+      "required_stdout_line": "OK API driver: userdata metatable",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#References",
+      "registered_label": "API driver: actual references",
+      "required_stdout_line": "OK API driver: actual references",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Double_Bytes",
+      "registered_label": "API driver: native double bytes",
+      "required_stdout_line": "OK API driver: native double bytes",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Mutable_Upvalues",
+      "registered_label": "API driver: mutable captured cells",
+      "required_stdout_line": "OK API driver: mutable captured cells",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#New_Stack",
+      "registered_label": "API driver: actual new thread call",
+      "required_stdout_line": "OK API driver: actual new thread call",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#External_String",
+      "registered_label": "API driver: owned external bytes",
+      "required_stdout_line": "OK API driver: owned external bytes",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Warning_Fragments",
+      "registered_label": "API driver: warning fragments",
+      "required_stdout_line": "OK API driver: warning fragments",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Hook_Command",
+      "registered_label": "API driver: real command hook",
+      "required_stdout_line": "OK API driver: real command hook",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Stack_Reservation",
+      "registered_label": "API driver: stack reservation failures",
+      "required_stdout_line": "OK API driver: stack reservation failures",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Driver_Rejection",
+      "registered_label": "API driver: safe operand rejection",
+      "required_stdout_line": "OK API driver: safe operand rejection",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Shared_Cross_Budget",
+      "registered_label": "API driver: shared cross-context budget",
+      "required_stdout_line": "OK API driver: shared cross-context budget",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Coroutine_Cross_Budget",
+      "registered_label": "API driver: coroutine cross-context budget",
+      "required_stdout_line": "OK API driver: coroutine cross-context budget",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Nested_Cross_Budget",
+      "registered_label": "API driver: nested cross-context budget",
+      "required_stdout_line": "OK API driver: nested cross-context budget",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Not_False",
+      "registered_label": "Primitive NOT: false under refusal",
+      "required_stdout_line": "OK Primitive NOT: false under refusal",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Not_Nil",
+      "registered_label": "Primitive NOT: nil under refusal",
+      "required_stdout_line": "OK Primitive NOT: nil under refusal",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Not_Zero",
+      "registered_label": "Primitive NOT: zero under refusal",
+      "required_stdout_line": "OK Primitive NOT: zero under refusal",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Not_Empty_String",
+      "registered_label": "Primitive NOT: empty string under refusal",
+      "required_stdout_line": "OK Primitive NOT: empty string under refusal",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Not_Table",
+      "registered_label": "Primitive NOT: table under refusal",
+      "required_stdout_line": "OK Primitive NOT: table under refusal",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Not_Function",
+      "registered_label": "Primitive NOT: function under refusal",
+      "required_stdout_line": "OK Primitive NOT: function under refusal",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Scalar_Cells",
+      "registered_label": "C hooks: actual scalar cells and mutation",
+      "required_stdout_line": "OK C hooks: actual scalar cells and mutation",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Nested_Call",
+      "registered_label": "C hooks: nested call restores borrowed cells",
+      "required_stdout_line": "OK C hooks: nested call restores borrowed cells",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Protected_Error",
+      "registered_label": "C hooks: protected error restores view",
+      "required_stdout_line": "OK C hooks: protected error restores view",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Unprotected_Error",
+      "registered_label": "C hooks: unprotected error releases view",
+      "required_stdout_line": "OK C hooks: unprotected error releases view",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Blocks_Nested_Yield",
+      "registered_label": "C hooks: nested yield is nonyieldable",
+      "required_stdout_line": "OK C hooks: nested yield is nonyieldable",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Direct_Yield",
+      "registered_label": "C hooks: direct yield restores instruction",
+      "required_stdout_line": "OK C hooks: direct yield restores instruction",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Argument_Weak_Root",
+      "registered_label": "C hooks: replaced argument loses weak root",
+      "required_stdout_line": "OK C hooks: replaced argument loses weak root",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Hook_Upvalue_Weak_Root",
+      "registered_label": "C hooks: replaced upvalue loses weak root",
+      "required_stdout_line": "OK C hooks: replaced upvalue loses weak root",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#External_Release_Lua_View",
+      "registered_label": "C release: borrowed Lua cells and concat",
+      "required_stdout_line": "OK C release: borrowed Lua cells and concat",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-line_baseline_tests.adb#Empty_Root",
+      "registered_label": "line baseline: empty root",
+      "required_stdout_line": "OK line baseline: empty root",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-line_baseline_tests.adb#Interval_Boundaries",
+      "registered_label": "line baseline: interval boundaries",
+      "required_stdout_line": "OK line baseline: interval boundaries",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-line_baseline_tests.adb#Line_Jumps",
+      "registered_label": "line baseline: source jumps",
+      "required_stdout_line": "OK line baseline: source jumps",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-line_baseline_tests.adb#Child_Prototypes",
+      "registered_label": "line baseline: children",
+      "required_stdout_line": "OK line baseline: children",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-line_baseline_tests.adb#Encoded_Bases",
+      "registered_label": "line baseline: actual binary",
+      "required_stdout_line": "OK line baseline: actual binary",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-line_baseline_tests.adb#Stripped_Bases",
+      "registered_label": "line baseline: stripped binary",
+      "required_stdout_line": "OK line baseline: stripped binary",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Cold_Find",
+      "registered_label": "results: cold find",
+      "required_stdout_line": "OK results: cold find",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Cold_Empty_Byte",
+      "registered_label": "results: cold empty byte",
+      "required_stdout_line": "OK results: cold empty byte",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Warm_Find",
+      "registered_label": "results: warm find",
+      "required_stdout_line": "OK results: warm find",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Multiple_Status",
+      "registered_label": "results: multiple status",
+      "required_stdout_line": "OK results: multiple status",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Zero_Status",
+      "registered_label": "results: zero status",
+      "required_stdout_line": "OK results: zero status",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Xpcall_Status",
+      "registered_label": "results: xpcall status",
+      "required_stdout_line": "OK results: xpcall status",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Repeated_Status",
+      "registered_label": "results: repeated status",
+      "required_stdout_line": "OK results: repeated status",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Yield_Status",
+      "registered_label": "results: yield status",
+      "required_stdout_line": "OK results: yield status",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Protected_Error",
+      "registered_label": "results: protected error",
+      "required_stdout_line": "OK results: protected error",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Xpcall_Error",
+      "registered_label": "results: xpcall error",
+      "required_stdout_line": "OK results: xpcall error",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Weak_Output",
+      "registered_label": "results: weak output",
+      "required_stdout_line": "OK results: weak output",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Refused_Find",
+      "registered_label": "results: refused find",
+      "required_stdout_line": "OK results: refused find",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Refused_Length",
+      "registered_label": "results: refused length",
+      "required_stdout_line": "OK results: refused length",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Refused_Zero",
+      "registered_label": "results: refused zero",
+      "required_stdout_line": "OK results: refused zero",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-string_result_tests.adb#Refused_Error",
+      "registered_label": "results: refused error",
+      "required_stdout_line": "OK results: refused error",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Missing_Receiver",
+      "registered_label": "sort arguments: missing receiver",
+      "required_stdout_line": "OK sort arguments: missing receiver",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Nil_Receiver",
+      "registered_label": "sort arguments: nil receiver",
+      "required_stdout_line": "OK sort arguments: nil receiver",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Number_Receiver",
+      "registered_label": "sort arguments: number receiver",
+      "required_stdout_line": "OK sort arguments: number receiver",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Named_Receiver",
+      "registered_label": "sort arguments: named receiver",
+      "required_stdout_line": "OK sort arguments: named receiver",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Comparator_Type",
+      "registered_label": "sort arguments: comparator type",
+      "required_stdout_line": "OK sort arguments: comparator type",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Named_Comparator",
+      "registered_label": "sort arguments: named comparator",
+      "required_stdout_line": "OK sort arguments: named comparator",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Callable_Comparator",
+      "registered_label": "sort arguments: callable comparator",
+      "required_stdout_line": "OK sort arguments: callable comparator",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Nested_Sort",
+      "registered_label": "sort arguments: nested sort",
+      "required_stdout_line": "OK sort arguments: nested sort",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Array_Size",
+      "registered_label": "sort arguments: array size",
+      "required_stdout_line": "OK sort arguments: array size",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Method_Self",
+      "registered_label": "sort arguments: method self",
+      "required_stdout_line": "OK sort arguments: method self",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Trivial_Empty",
+      "registered_label": "sort arguments: trivial empty",
+      "required_stdout_line": "OK sort arguments: trivial empty",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Trivial_Single",
+      "registered_label": "sort arguments: trivial single",
+      "required_stdout_line": "OK sort arguments: trivial single",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Optional_Nil",
+      "registered_label": "sort arguments: optional nil",
+      "required_stdout_line": "OK sort arguments: optional nil",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Length_First",
+      "registered_label": "sort arguments: length first",
+      "required_stdout_line": "OK sort arguments: length first",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/sort_argument_tests.adb#Registry_Roots",
+      "registered_label": "sort arguments: registry roots",
+      "required_stdout_line": "OK sort arguments: registry roots",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Method_Self",
+      "registered_label": "arguments: method self",
+      "required_stdout_line": "OK arguments: method self",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Function_Second",
+      "registered_label": "arguments: function second",
+      "required_stdout_line": "OK arguments: function second",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Method_Second",
+      "registered_label": "arguments: method second",
+      "required_stdout_line": "OK arguments: method second",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Sub_Missing_Start",
+      "registered_label": "arguments: sub missing start",
+      "required_stdout_line": "OK arguments: sub missing start",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Sub_Nil_Start",
+      "registered_label": "arguments: sub nil start",
+      "required_stdout_line": "OK arguments: sub nil start",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Sub_First_Missing",
+      "registered_label": "arguments: sub first missing",
+      "required_stdout_line": "OK arguments: sub first missing",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Sub_Third_Type",
+      "registered_label": "arguments: sub third type",
+      "required_stdout_line": "OK arguments: sub third type",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Sub_Named_Subject",
+      "registered_label": "arguments: sub named subject",
+      "required_stdout_line": "OK arguments: sub named subject",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Sub_Named_Index",
+      "registered_label": "arguments: sub named index",
+      "required_stdout_line": "OK arguments: sub named index",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Len_Missing",
+      "registered_label": "arguments: len missing",
+      "required_stdout_line": "OK arguments: len missing",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Len_Named",
+      "registered_label": "arguments: len named",
+      "required_stdout_line": "OK arguments: len named",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Rep_Count_Type",
+      "registered_label": "arguments: rep count type",
+      "required_stdout_line": "OK arguments: rep count type",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Rep_Separator_Type",
+      "registered_label": "arguments: rep separator type",
+      "required_stdout_line": "OK arguments: rep separator type",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Find_Subject",
+      "registered_label": "arguments: find subject",
+      "required_stdout_line": "OK arguments: find subject",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Find_Pattern",
+      "registered_label": "arguments: find pattern",
+      "required_stdout_line": "OK arguments: find pattern",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Find_Start",
+      "registered_label": "arguments: find start",
+      "required_stdout_line": "OK arguments: find start",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Gmatch_Subject",
+      "registered_label": "arguments: gmatch subject",
+      "required_stdout_line": "OK arguments: gmatch subject",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Gmatch_Pattern",
+      "registered_label": "arguments: gmatch pattern",
+      "required_stdout_line": "OK arguments: gmatch pattern",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Gmatch_Start",
+      "registered_label": "arguments: gmatch start",
+      "required_stdout_line": "OK arguments: gmatch start",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Gmatch_Order",
+      "registered_label": "arguments: gmatch order",
+      "required_stdout_line": "OK arguments: gmatch order",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Gsub_Replacement",
+      "registered_label": "arguments: gsub replacement",
+      "required_stdout_line": "OK arguments: gsub replacement",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Gsub_Limit",
+      "registered_label": "arguments: gsub limit",
+      "required_stdout_line": "OK arguments: gsub limit",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Gsub_Validation_Order",
+      "registered_label": "arguments: gsub validation order",
+      "required_stdout_line": "OK arguments: gsub validation order",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Char_Representation",
+      "registered_label": "arguments: char representation",
+      "required_stdout_line": "OK arguments: char representation",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Char_Type",
+      "registered_label": "arguments: char type",
+      "required_stdout_line": "OK arguments: char type",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Char_Second",
+      "registered_label": "arguments: char second",
+      "required_stdout_line": "OK arguments: char second",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Char_Range",
+      "registered_label": "arguments: char range",
+      "required_stdout_line": "OK arguments: char range",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Dump_Type",
+      "registered_label": "arguments: dump type",
+      "required_stdout_line": "OK arguments: dump type",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Dump_C_Function",
+      "registered_label": "arguments: dump c function",
+      "required_stdout_line": "OK arguments: dump c function",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Format_Type",
+      "registered_label": "arguments: format type",
+      "required_stdout_line": "OK arguments: format type",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Format_Missing",
+      "registered_label": "arguments: format missing",
+      "required_stdout_line": "OK arguments: format missing",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/string_argument_tests.adb#Byte_Default",
+      "registered_label": "arguments: byte default",
+      "required_stdout_line": "OK arguments: byte default",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
     }
   ]
 }
