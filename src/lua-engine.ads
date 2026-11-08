@@ -547,6 +547,12 @@ private package Lua.Engine is
       Native_Captures : Values.Vector;
       Native_Self : Object_Access;
       Native_Buffer : Owned_Buffer;
+      Load_Reader_Portal : Boolean := False;
+      Load_Reader_Arguments : Natural := 0;
+      Load_Reader_Mode_Offset : Natural := 0;
+      --  A real base.load reader call runs above a C-owned guard after Step
+      --  returns. Its existing buffer owns NUL-terminated name/mode bytes;
+      --  no parser state, foreign stack or callback closure is saved here.
       Argument_Error_Index : Natural := 0;
       Argument_Error_Detail : Owned_Buffer;
       Argument_Error_Origin : Frame_Access;
@@ -717,7 +723,7 @@ private package Lua.Engine is
    --  scalar ID selects this same existing implementation.
 
    type Native_Action_Kind is
-     (Finished, Invoke, Continue_Step, Drain_Finalizers);
+     (Finished, Invoke, Continue_Step, Drain_Finalizers, Start_Reader_Portal);
    type Native_Action is record
       Kind : Native_Action_Kind := Finished;
       Results : Values.Vector;

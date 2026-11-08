@@ -19,6 +19,13 @@ The [managed diagnostic-text component](sessions/2026-11-08-managed-diagnostic-t
 passes fourteen focused ownership/refusal cases; both local configurations
 pass 2,281 AUnit cases. The private component is available, while actual engine
 failure-field migration and the complete allocation-path audit remain open.
+The [linear Lua reader checkpoint](sessions/2026-11-08-linear-lua-readers.md)
+uses the existing guarded streaming frontend once while preserving actual
+reader demand, C identities/cells, environment selection, hook results and
+typed host quotas. Forty-five focused cases pass within 2,312 AUnit cases in
+each configuration; all twenty-nine saved-builtin C cases match native in both.
+The shared multiple-closing declaration check now uses its consumed token line.
+Full unchanged-file/T, platform and final-head acceptance remain open.
 
 The [reviewed memory-verifier equivalent](sessions/2026-11-08-memerr-verifier.md)
 preserves actual application refusal and the original status/message assertion

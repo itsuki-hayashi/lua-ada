@@ -11,6 +11,7 @@ with Lua.Engine.Call_Names;
 with Lua.Engine.Inspection;
 with Lua.Engine.Native_Modules;
 with Lua.Engine.File_Inputs;
+with Lua.Engine.Stacks;
 with System;
 with Lua.Storage.Buffers;
 with Lua_Ada_Config;
@@ -48,6 +49,8 @@ package body Lua.Engine.Loaders is
       procedure Prepare_File (Source : in out Managed.Buffer);
       procedure Copy_Bytes
         (Item : Value; Output : in out Managed.Buffer; Appending : Boolean);
+      procedure Copy_Option
+        (Index : Positive; Output : in out Managed.Buffer);
       function Replace_All (Source, Pattern, Replacement : String)
                             return String;
       function Search_Path
@@ -301,6 +304,24 @@ package body Lua.Engine.Loaders is
             Write (Bytes (Item));
          end if;
       end Copy_Bytes;
+
+      procedure Copy_Option
+        (Index : Positive; Output : in out Managed.Buffer)
+      is
+         Item : Value := Arg (Index);
+      begin
+         if Item.Kind in Integer_Kind | Real_Kind then
+            --  luaL_optstring coerces the actual name/mode argument, not
+            --  just a private option copy. Reader callbacks can inspect or
+            --  replace these same C cells before the parser completes.
+            Item := New_String (State, Bytes (Item));
+            Replace_Root (State, Activation.Native_Arguments, Index, Item);
+            Stacks.Write
+              (State, Activation.Context, Activation.Stack_Base + Index,
+               Item);
+         end if;
+         Copy_Bytes (Item, Output, False);
+      end Copy_Option;
 
       function Replace_All (Source, Pattern, Replacement : String)
                             return String
@@ -644,11 +665,11 @@ package body Lua.Engine.Loaders is
             if Arg (3).Kind = Nil_Kind then
                Mode.Set_Value ("bt");
             else
-               Copy_Bytes (Arg (3), Mode, False);
+               Copy_Option (3, Mode);
             end if;
             Validate_Mode;
             if Arg (2).Kind /= Nil_Kind then
-               Copy_Bytes (Arg (2), Chunk_Name, False);
+               Copy_Option (2, Chunk_Name);
             end if;
             if Is_Function (Arg (1)) or else
               Arg (1).Kind not in String_Kind | Integer_Kind | Real_Kind
@@ -658,50 +679,26 @@ package body Lua.Engine.Loaders is
                if not Is_Function (Arg (1)) then
                   Fail (State, "bad argument #1 to load (function expected)");
                end if;
-               Activation.Native_Stage := 1;
-               --  C Lua requests readers inside its protected parser. Use
-               --  the VM's protected-call continuation to preserve that
-               --  boundary without entering the executor recursively.
-               return Call ((Native_Kind_Value, Pcall_Function),
-                            One_Value (State, Arg (1), 1));
+               if Arg (2).Kind = Nil_Kind then
+                  Chunk_Name.Set_Value ("=(load)");
+               end if;
+               --  The current activation owns these immutable C strings
+               --  throughout every reader callback. The actual streaming
+               --  parser starts only after Step returns to its C guard;
+               --  a generic reader never jumps through a live Ada parser.
+               Activation.Native_Buffer.Clear;
+               Activation.Native_Buffer.Append (Chunk_Name);
+               Activation.Native_Buffer.Append (ASCII.NUL);
+               Activation.Load_Reader_Mode_Offset :=
+                 Activation.Native_Buffer.Length;
+               Activation.Native_Buffer.Append (Mode);
+               Activation.Native_Buffer.Append (ASCII.NUL);
+               Activation.Load_Reader_Arguments :=
+                 Natural (Activation.Native_Arguments.Length);
+               Result.Kind := Start_Reader_Portal;
+               return Result;
             end if;
             Copy_Bytes (Arg (1), Activation.Native_Buffer, False);
-         elsif Activation.Native_Stage = 1 then
-            if not Truth (Returned (1)) then
-               --  Error values need not be strings. Keep the exact object
-               --  (including nil) as load's second result, without coercion.
-               Result.Results.Append (Nil_Value);
-               Result.Results.Append (Returned (2));
-               return Result;
-            end if;
-            Item := Returned (2);
-            if Item.Kind not in Nil_Kind | String_Kind | Integer_Kind |
-              Real_Kind
-            then
-               Result.Results.Append (Nil_Value);
-               Result.Results.Append
-                 (New_String (State, "reader function must return a string"));
-               return Result;
-            end if;
-            if Item.Kind /= Nil_Kind then
-               declare
-                  Size : constant Natural :=
-                    (if Item.Kind = String_Kind then
-                       Length (Item.Reference.Bytes) else Bytes (Item)'Length);
-               begin
-                  if Size > State.Bounds.Source_Bytes -
-                    Length (Activation.Native_Buffer)
-                  then
-                     Fail (State, "source byte limit exceeded",
-                           Resource => True);
-                  end if;
-                  if Size > 0 then
-                     Copy_Bytes (Item, Activation.Native_Buffer, True);
-                     return Call ((Native_Kind_Value, Pcall_Function),
-                                  One_Value (State, Arg (1), 1));
-                  end if;
-               end;
-            end if;
          end if;
          if Arg (2).Kind = Nil_Kind then
             Chunk_Name.Set_Value

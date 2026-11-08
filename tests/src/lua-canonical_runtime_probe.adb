@@ -9,7 +9,10 @@ with Lua.Canonical_Compiler;
 with Lua.Chunks;
 with Lua.Engine; use Lua.Engine;
 with Lua.Engine.Canonical;
+with Lua.Engine.External_Releases;
+with Lua.Engine.Foreign;
 with Lua.Engine.Machine;
+with Lua.Engine.Warnings;
 with Lua.Prototypes;
 with Lua.Sources;
 with Lua.Storage;
@@ -28,6 +31,7 @@ procedure Lua.Canonical_Runtime_Probe is
    Driver : VM.Driver;
    Callee : Value;
    Initialized : Boolean := False;
+   Driver_Active : Boolean := False;
 
    function Read_File (Path : String) return String;
    function Read_File (Path : String) return String is
@@ -86,7 +90,13 @@ procedure Lua.Canonical_Runtime_Probe is
    procedure Close;
    procedure Close is
    begin
-      VM.Finish (Driver);
+      if Driver_Active then
+         --  An exceptional host exit may leave a requested C callback. Its
+         --  unfinished borrow must be canceled before physical finalization;
+         --  Finish would mask the original diagnostic with a second error.
+         VM.Cancel (Driver);
+         Driver_Active := False;
+      end if;
       if Initialized then
          Finalize (State.all);
          Initialized := False;
@@ -146,9 +156,25 @@ begin
          end;
       end if;
    end;
+   Driver_Active := True;
    VM.Start (Driver, State, Callee, Values.Empty_Vector);
-   while not VM.Is_Complete (Driver) loop VM.Step (Driver); end loop;
+   while not VM.Is_Complete (Driver) or else
+     Lua.Engine.External_Releases.Pending (State.all)
+   loop
+      --  This is the same driver and C-owned portal used by production Ada
+      --  hosts. No VM Step spans a foreign callback, warning or deallocator;
+      --  native reader loads therefore retain their actual guarded parser.
+      if Lua.Engine.External_Releases.Pending (State.all) or else
+        VM.Needs_Foreign_Call (Driver) or else
+        Lua.Engine.Warnings.Pending (State.all)
+      then
+         Lua.Engine.Foreign.Invoke_Borrowed (State.all, Driver);
+      else
+         VM.Step (Driver);
+      end if;
+   end loop;
    VM.Finish (Driver);
+   Driver_Active := False;
    Write_Output;
    Close;
 exception

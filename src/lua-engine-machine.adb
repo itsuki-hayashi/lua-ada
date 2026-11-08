@@ -48,6 +48,10 @@ package body Lua.Engine.Machine is
    --  before its first scheduler step preserves public call/return hooks;
    --  guard ownership, real stack windows and native charging stay intact.
 
+   function Reader_Portal_Address return System.Address
+     with Import, Convention => C,
+          External_Name => "lua_ada_reader_portal_address";
+
    Warning_On : aliased constant String := "@on" & Character'Val (0);
    Warning_Off : aliased constant String := "@off" & Character'Val (0);
    GC_Warning_Start_Text : aliased constant String :=
@@ -1108,7 +1112,12 @@ package body Lua.Engine.Machine is
         (State, Activation.Context, Activation.Stack_Live_Top, Item);
    end Push_Native_Value;
 
-   procedure Prepare_Argument_Diagnostic
+   procedure Publish_Builtin_Window
+     (State : in out World; Owner : not null Frame_Access);
+   --  Move the hidden builtin's authoritative working prefix to its actual
+   --  public C owner without ending that owner's execution. The phase window
+   --  retires; any later success continuation must borrow the real cells.
+   procedure Publish_Builtin_Window
      (State : in out World; Owner : not null Frame_Access)
    is
       Context : constant Context_Access := State.Current;
@@ -1127,7 +1136,7 @@ package body Lua.Engine.Machine is
         else Phase.Previous_Stack_Window /= Window or else
         Phase.Stack_Base <= Owner.Stack_Base
       then
-         raise Program_Error with "invalid builtin diagnostic ownership";
+         raise Program_Error with "invalid builtin window ownership";
       end if;
       Count := Phase.Stack_Live_Top - Phase.Stack_Base;
       Last := Owner.Stack_Base + Count;
@@ -1157,6 +1166,15 @@ package body Lua.Engine.Machine is
       Retire_Stack_Window (Phase);
       Phase.Native_Arguments.Clear;
       Phase.Native_Captures.Clear;
+   end Publish_Builtin_Window;
+
+   procedure Prepare_Argument_Diagnostic
+     (State : in out World; Owner : not null Frame_Access) is
+   begin
+      --  Failure uses the same neutral physical transfer as a successful
+      --  reader portal. This wrapper retains its stricter contract: after
+      --  publishing the failing request, its old operation never resumes.
+      Publish_Builtin_Window (State, Owner);
    end Prepare_Argument_Diagnostic;
 
    procedure Release_Frame (State : in out World; Item : in out Frame_Access);
@@ -3359,7 +3377,7 @@ package body Lua.Engine.Machine is
          Activation.Warning_Failed := False;
          raise Language_Error;
       end if;
-      if Name = "foreign.callback" then
+      if Name = "foreign.callback" or else Activation.Load_Reader_Portal then
          if Activation.Native_Stage = 0 then
             if Activation.Foreign_Handler = System.Null_Address then
                raise Program_Error with "foreign callback has no handler";
@@ -3372,6 +3390,18 @@ package body Lua.Engine.Machine is
             end if;
             State.Next_Foreign_Ticket := State.Next_Foreign_Ticket + 1;
             Activation.Foreign_Ticket := State.Next_Foreign_Ticket;
+            if Activation.Load_Reader_Portal and then
+              Activation.Native_Builtin_Direct and then
+              State.Current.Foreign_Activation /= null
+            then
+               --  A saved builtin pointer is still executing its original
+               --  C body. Publish this hidden phase's current scalar prefix
+               --  into that actual owner before discarding duplicate roots.
+               --  The phase remains the genuine new portal guard/token;
+               --  it borrows the public owner's cells, not a copied window.
+               Publish_Builtin_Window
+                 (State, State.Current.Foreign_Activation);
+            end if;
             Activation.Foreign_Base := Activation.Stack_Base;
             Activation.Foreign_Previous_Base := State.Current.Foreign_Base;
             Activation.Foreign_Previous_Frame :=
@@ -3382,6 +3412,14 @@ package body Lua.Engine.Machine is
             State.Current.Foreign_Top := Activation.Stack_Live_Top;
             State.Current.Foreign_Activation := Activation;
             State.Current.Foreign_View := null;
+            if Activation.Load_Reader_Portal and then
+              Activation.Native_Builtin_Direct and then
+              not Activation.Has_Stack_Window
+            then
+               Stack_Views.Borrow
+                 (State, State.Current, State.Current.Stack_Window,
+                  Activation.Hook_View, Hook_View);
+            end if;
             --  Actual scalar slots now own every argument. Keeping a stale
             --  packet would retain C arguments removed/replaced by the host
             --  and invalidate weak observations during callback collection.
@@ -4300,6 +4338,13 @@ package body Lua.Engine.Machine is
          --  The requesting library already saved its result/resume phase.
          --  Optional inability to run a finalizer leaves that queue intact.
          if Try_Push_Finalizers (Self) then null; end if;
+         return;
+      elsif Action.Kind = Start_Reader_Portal then
+         --  Keep the real base.load identity, native charge and hook state.
+         --  The next scheduler step exposes an ordinary guarded C request;
+         --  it never enters a parser or invokes the reader from this Step.
+         Activation.Load_Reader_Portal := True;
+         Activation.Foreign_Handler := Reader_Portal_Address;
          return;
       elsif Action.Kind = Invoke then
          if Action.Operator /= End_Of_Input then
@@ -6395,8 +6440,9 @@ package body Lua.Engine.Machine is
      (Self.Universe /= null and then not Self.Done and then not Self.Failed
       and then not Self.Universe.Current.Stack.Is_Empty and then
       Self.Universe.Current.Stack.Last_Element.Is_Native and then
-      Self.Universe.Current.Stack.Last_Element.Native_Name =
-        "foreign.callback" and then
+      (Self.Universe.Current.Stack.Last_Element.Native_Name =
+         "foreign.callback" or else
+       Self.Universe.Current.Stack.Last_Element.Load_Reader_Portal) and then
       Self.Universe.Current.Stack.Last_Element.Native_Stage = 1);
 
    function Foreign_Handler (Self : Driver) return System.Address is
@@ -6591,6 +6637,13 @@ package body Lua.Engine.Machine is
       end if;
       --  The live activation owns every result before the C window is
       --  truncated. No extra temporary pin or controlled copy is required.
+      if Activation.Load_Reader_Portal then
+         --  A direct saved builtin borrowed its actual C caller's window.
+         --  Its completed results now have an independent rooted packet;
+         --  restore the lease only after the real portal guard acknowledged
+         --  that return, before restoring the preceding public C view.
+         Stack_Views.Restore (State, Activation.Hook_View);
+      end if;
       Context.Foreign_Top := Activation.Saved_Foreign_Top;
       Context.Foreign_Base := Activation.Foreign_Previous_Base;
       Context.Foreign_Activation := Activation.Foreign_Previous_Frame;

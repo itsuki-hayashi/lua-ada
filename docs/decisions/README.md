@@ -63,6 +63,9 @@ Add numbered records for consequential choices. Include date, status, context,
 decision, alternatives, consequences, and verification implications. Supersede
 records explicitly instead of silently rewriting historical rationale.
 
+ADR 0036 records [linear Lua reader loading](0036-linear-lua-readers.md),
+actual guarded reader activations and reuse of the shared streaming frontend.
+
 ADR 0026 records [real base C closing ownership](0026-base-c-closing-ownership.md)
 and stack-reserved closing links without registration allocation.
 

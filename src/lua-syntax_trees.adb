@@ -979,8 +979,11 @@ package body Lua.Syntax_Trees is
                      Error ("global variables cannot be to-be-closed",
                             Near_Token => False);
                   elsif Closing then
+                     --  luaK_semerror attributes this completed declaration
+                     --  check to its last consumed name/attribute token, not
+                     --  a following comment, delimiter or EOF lookahead.
                      Error ("multiple to-be-closed variables in local list",
-                            Near_Token => False);
+                            Near_Token => False, At_Line => Last_Line);
                   end if;
                   Closing := True;
                   Unit.Unsupported := Result;

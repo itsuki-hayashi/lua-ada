@@ -1181,6 +1181,13 @@ package body Lua.Engine.Foreign is
      (State : in out World; Context : not null Context_Access;
       Input : Request; Output : in out Response) is separate;
 
+   procedure Reader_API
+     (State : in out World; Context : not null Context_Access;
+      Input : Request; Output : in out Response);
+   procedure Reader_API
+     (State : in out World; Context : not null Context_Access;
+      Input : Request; Output : in out Response) is separate;
+
    function Dispatch
      (State : System.Address; Input : not null access constant Request;
       Output : not null access Response) return Action_Status
@@ -1893,6 +1900,9 @@ package body Lua.Engine.Foreign is
       --  when it is an inactive coroutine. Borrowing it never resets budgets
       --  or resumes Lua execution, and the caller's context is restored below.
       case Input.Operation is
+         when Prepare_Lua_Reader | Observe_Lua_Reader_Piece |
+           Finish_Lua_Reader =>
+            Reader_API (Owner.Universe.all, Context, Input.all, Output.all);
          when Begin_Hook_View =>
             VM.Begin_Hook_View
               (Owner.Universe.all, Context, Input.Callback_Token);

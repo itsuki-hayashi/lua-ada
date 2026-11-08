@@ -43,6 +43,8 @@ enum lua_ada_operation {
     ADA_COMPLETE_SELF_CLOSE = 107,
     ADA_PREPARE_PANIC = 108,
     ADA_BEGIN_HOOK_VIEW = 109, ADA_END_HOOK_VIEW,
+    ADA_PREPARE_LUA_READER = 111, ADA_OBSERVE_LUA_READER_PIECE,
+    ADA_FINISH_LUA_READER,
     ADA_CREATE_FORMATTER = 120, ADA_APPEND_FORMAT_VALUE,
     ADA_APPEND_FORMAT_UTF8, ADA_FINISH_FORMATTER,
     ADA_RELEASE_FORMATTER, ADA_CHARGE_AUX_WORK,
@@ -178,6 +180,7 @@ void lua_ada_hook_view(lua_State *state, int begin);
 /* Identity of the real private finalizer-pump transport, not a callable Lua
  * API. Its lifetime is the loaded library; no Lua allocation is involved. */
 void *lua_ada_collector_drain_address(void);
+void *lua_ada_reader_portal_address(void);
 void lua_ada_drain_external_releases(lua_State *state);
 
 /* Test-only C guard probe. It demonstrates that a failing exported operation

@@ -18,6 +18,13 @@ into failure delivery after the pending return/close checkpoint. Preserve
 original Lua error values, allocation-free propagation/recovery and selected
 ownership across contexts; replace input-sized temporary formatting views.
 Fourteen component cases and 2,281 local AUnit passes do not close that audit.
+The [linear Lua reader checkpoint](sessions/2026-11-08-linear-lua-readers.md)
+repairs the multiple-closing declaration's consumed-token line and actual
+reader early stop, with forty-five focused cases and 2,312 passing AUnit cases
+per configuration. Resume bounded unchanged errors.lua diagnostics after
+integration, after separately proving the new Lua portal's reader-injected
+permanent refusal and self-close paths. Preserve source/T and platform gates;
+the measured one-byte campaign supplies no full-file acceptance.
 
 The [exact memory-verifier equivalent](sessions/2026-11-08-memerr-verifier.md)
 has independent source approval and a bounded disposable generator. Implement
@@ -33,8 +40,8 @@ platform acceptance remain open despite both local 2,248-case AUnit passes.
 Label diagnostics have [semantic-boundary evidence](sessions/2026-11-08-label-semantic-boundaries.md):
 nineteen native-paired behaviors, four-way compiler/VM control paths in each
 matching configuration and 2,263 passing AUnit cases per configuration.
-Continue unchanged errors.lua from local <close> a, b at its trailing LF/EOF
-boundary. Keep full T memerr.lua's cold scalar output refusal and all other
+The subsequent reader checkpoint repairs the closing-declaration boundary.
+Keep full T memerr.lua's cold scalar output refusal and all other
 remaining full-target obligations open.
 
 Public C seti/setfield self assignments have [focused evidence](sessions/2026-11-08-c-api-self-values.md).

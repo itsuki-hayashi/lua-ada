@@ -589,6 +589,52 @@ int lua_load(lua_State *state, lua_Reader reader, void *data,
     return status;
 }
 
+struct lua_reader_portal { int first_call; };
+
+static const char *invoke_lua_reader(lua_State *state, void *data,
+                                    size_t *length) {
+    struct lua_reader_portal *reader = data;
+    struct lua_ada_request input = request(ADA_PREPARE_LUA_READER);
+    struct lua_ada_response output;
+    /* The waiting Ada parser called lua_ada_read_guarded immediately above
+     * itself. Every error/yield from this real Lua call reaches that C guard
+     * and returns a typed status; it cannot jump through the parser's Ada. */
+    input.count = 1;
+    dispatch(state, input);
+    if (reader->first_call) reader->first_call = 0;
+    else lua_pop(state, 1);
+    lua_pushvalue(state, 1);
+    lua_call(state, 0, 1);
+    output = dispatch(state, request(ADA_OBSERVE_LUA_READER_PIECE));
+    *length = output.length;
+    return (const char *)output.pointer;
+}
+
+static int run_lua_reader_portal(lua_State *state) {
+    struct lua_reader_portal reader = {1};
+    struct lua_ada_response options =
+        dispatch(state, request(ADA_PREPARE_LUA_READER));
+    struct lua_ada_request finish = request(ADA_FINISH_LUA_READER);
+    /* Ada owns mode/name bytes, source selection, type conversion, status
+     * policy and environment publication. This C body only establishes the
+     * public streaming call and transports its callback and result status.
+     * It runs after the requesting Native_Step returned to its live guard. */
+    finish.index = lua_load(state, invoke_lua_reader, &reader,
+        (const char *)options.pointer,
+        (const char *)options.pointer + options.length);
+    return (int)dispatch(state, finish).integer_data;
+}
+
+void *lua_ada_reader_portal_address(void) {
+    typedef char pointer_sizes_match[
+        sizeof(lua_CFunction) == sizeof(void *) ? 1 : -1];
+    lua_CFunction function = run_lua_reader_portal;
+    void *address;
+    (void)sizeof(pointer_sizes_match);
+    memcpy(&address, &function, sizeof address);
+    return address;
+}
+
 int lua_dump(lua_State *state, lua_Writer writer, void *data, int strip) {
     struct lua_ada_request input = request(ADA_DUMP_FUNCTION);
     struct lua_ada_response output;

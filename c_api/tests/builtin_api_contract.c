@@ -15,6 +15,7 @@ static struct allocation_counts counts;
 static lua_CFunction degrees, direct_pairs, direct_yield, direct_error;
 static lua_CFunction direct_pcall;
 static lua_CFunction direct_sin;
+static lua_CFunction direct_load;
 static int after_direct;
 
 static void run(lua_State *L, const char *source) {
@@ -292,6 +293,69 @@ static void registry_callback_prefix(lua_State *L) {
     registry_contract(L, 4);
 }
 
+static int forward_load(lua_State *L) { return direct_load(L); }
+
+static void reader_direct_host(lua_State *L) {
+    /* Calling a saved builtin pointer directly adds no public Lua frame.
+       Its real host base prefix still receives the returned closure. */
+    direct_load = field(L, NULL, "load"); lua_pop(L, 1);
+    run(L, "local n=0;return function()"
+           "assert(debug.getinfo(2)==nil);n=n+1;"
+           "if n==1 then return 'return 37,nil,41' end end");
+    assert(lua_gettop(L) == 1 && direct_load(L) == 1);
+    assert(lua_gettop(L) == 2 && lua_isfunction(L, -1));
+    lua_call(L, 0, 3);
+    assert(lua_tointeger(L, -3) == 37 && lua_isnil(L, -2));
+    assert(lua_tointeger(L, -1) == 41);
+    lua_settop(L, 0);
+}
+
+static void reader_direct_owner(lua_State *L) {
+    /* The load body is directly borrowed by this actual forward_load C
+       activation. The reader observes that owner and its mutable env cell. */
+    lua_pushcfunction(L, forward_load); lua_setglobal(L, "forward_load");
+    run(L, "local n=0;local f,e=forward_load(function()"
+           "local i=debug.getinfo(2,'fSu');"
+           "assert(i.func==forward_load and i.what=='C' and i.nparams==0);"
+           "n=n+1;if n==1 then assert(debug.setlocal(2,4,{value=47}));"
+           "return 'return value' end end,'=direct-reader','t',{value=7});"
+           "assert(f and f()==47 and n==2,tostring(e))");
+    lua_getglobal(L, "load"); assert(lua_tocfunction(L, -1) == direct_load);
+    lua_pop(L, 1);
+}
+
+static void reader_direct_roots(lua_State *L) {
+    /* Replacing argument one changes the next refill and retires the old
+       reader root. A private continuation cannot retain an obsolete copy. */
+    run(L, "local weak=setmetatable({},{__mode='v'});"
+           "local function make_reader() local function old()"
+           "assert(debug.setlocal(2,1,function()collectgarbage();"
+           "assert(weak[1]==nil);return nil end));return 'return 53' end;"
+           "weak[1]=old;return old end;"
+           "local f,e=forward_load(make_reader());"
+           "assert(f and f()==53,tostring(e))");
+}
+
+static void reader_direct_error(lua_State *L) {
+    /* Its protected parser preserves the actual reader's error object,
+       and a failed streaming call leaves this same C body reusable. */
+    run(L, "local marker={};local ok,f,e=pcall(forward_load,function()"
+           "error(marker,0)end);assert(ok and f==nil and e==marker);"
+           "local n=0;local g=assert(forward_load(function()"
+           "n=n+1;if n==1 then return 'return 59' end end));assert(g()==59)");
+}
+
+static void reader_direct_extra_root(lua_State *L) {
+    /* An unused fifth argument still belongs to the actual C stack. Once
+       the reader replaces it, no hidden phase may retain the old object. */
+    run(L, "local weak=setmetatable({},{__mode='v'});"
+           "local function make_extra()local v={};weak[1]=v;return v end;"
+           "local n=0;local f,e=forward_load(function()n=n+1;"
+           "if n==1 then assert(debug.setlocal(2,5,nil));collectgarbage();"
+           "assert(weak[1]==nil);return 'return 61' end end,"
+           "nil,'t',_ENV,make_extra());assert(f and f()==61,tostring(e))");
+}
+
 static void check(const char *name, void (*body)(lua_State *), lua_State *L) {
     assert(lua_gettop(L) == 0); body(L); assert(lua_gettop(L) == 0);
     printf("PASS: builtin-%s\n", name); fflush(stdout);
@@ -324,6 +388,11 @@ int main(void) {
     check("registry-callback-error-guard", registry_callback_guard, L);
     check("registry-callback-original-captures", registry_callback_captures, L);
     check("registry-callback-extra-temporaries", registry_callback_prefix, L);
+    check("reader-direct-host", reader_direct_host, L);
+    check("reader-direct-owner", reader_direct_owner, L);
+    check("reader-direct-roots", reader_direct_roots, L);
+    check("reader-direct-error", reader_direct_error, L);
+    check("reader-direct-extra-root", reader_direct_extra_root, L);
     lua_close(L); assert(counts.bytes == 0 && counts.blocks == 0);
     puts("PASS: public builtin contract");
     return 0;

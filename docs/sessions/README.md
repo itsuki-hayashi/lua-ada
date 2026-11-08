@@ -4,6 +4,7 @@ Component: [runtime failure storage](2026-11-08-runtime-failure-storage.md).
 Component: [coroutine result portals](2026-11-08-coroutine-result-portals.md).
 
 Component: [managed diagnostic text](2026-11-08-managed-diagnostic-text.md).
+Component: [linear Lua readers and declaration lines](2026-11-08-linear-lua-readers.md).
 
 Component: [memory-verifier ordering](2026-11-08-memerr-verifier.md).
 
