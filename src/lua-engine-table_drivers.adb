@@ -3,6 +3,7 @@ with Ada.Unchecked_Conversion;
 with Interfaces;
 with Interfaces.C;
 with Lua.Engine.Core_Libraries;
+with Lua.Engine.Diagnostics;
 with Lua.Engine.Machine;
 with Lua.Engine.Stacks;
 with Lua.Integers;
@@ -37,7 +38,9 @@ package body Lua.Engine.Table_Drivers is
       procedure Save (Index : Positive; Item : Value);
       function Integral
         (Item : Value; Length_Result : Boolean := False) return Integer_Value;
-      function Text (Item : Value) return String;
+      function Text
+        (Item : Value; Index : Integer_Value := 0;
+         Table_Item : Boolean := False) return String;
       procedure Check_Table
         (Item : Value; Readable, Writable, Sized : Boolean);
       function Request (Helper : String; Args : Values.Vector)
@@ -97,14 +100,28 @@ package body Lua.Engine.Table_Drivers is
          return 0;
       end Integral;
 
-      function Text (Item : Value) return String is
+      function Text
+        (Item : Value; Index : Integer_Value := 0;
+         Table_Item : Boolean := False) return String
+      is
       begin
          if Item.Kind = String_Kind then
             return To_String (Item.Reference.Bytes);
          elsif Item.Kind in Integer_Kind | Real_Kind then
             return Image (State.Current.Memory, Item);
          end if;
-         Fail (State, "invalid value in table for concat");
+         --  Resumed __index results obey the same diagnostics as raw table
+         --  entries. Keep the traced integer cursor, rather than narrowing
+         --  it to a host Natural or treating it as a separator argument.
+         if Table_Item then
+            Diagnostics.Raise_Error
+              (State, "invalid value (" & Type_Name (Item) &
+               ") at index " &
+               Image (State.Current.Memory, (Integer_Kind, Index)) &
+               " in table for 'concat'");
+         else
+            Diagnostics.Type_Error (State, 2, "string", Item);
+         end if;
          return "";
       end Text;
 
@@ -359,7 +376,8 @@ package body Lua.Engine.Table_Drivers is
          when 3 =>
             if Name = "table.concat" then
                declare
-                  Part : constant String := Text (Returned);
+                  Part : constant String :=
+                    Text (Returned, Number (3), Table_Item => True);
                   Separator : constant String := Text (Capture (8));
                   Added : constant Natural := Part'Length +
                     (if Number (3) = Number (5) then 0 else Separator'Length);

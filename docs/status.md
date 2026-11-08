@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [table diagnostic correction](sessions/2026-11-08-table-error-arguments.md)
+retains full integer indices in concat errors and argument identity for missing
+pairs/ipairs receivers. Seven focused cases pass within2,556 AUnit cases in
+each local configuration; eight binary compiler/VM roles agree. Original
+default nextvar now completes. Original strings advances to its locale
+collation assertion; private table-inspection and final matrix gates remain.
+
 The [marked-slot correction](sessions/2026-11-08-marked-closing-mutation.md)
 preserves a scalar closing obligation after a debugger writes nil/false.
 Four ordinary native-paired cases cover type closers, actual replacement

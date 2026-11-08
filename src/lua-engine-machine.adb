@@ -5002,7 +5002,7 @@ package body Lua.Engine.Machine is
          --  Presence is checked before metamethod lookup: an installed nil
          --  type metatable cannot turn pairs() into pairs(nil).
          if Activation.Native_Arguments.Is_Empty then
-            Fail (State, "value expected");
+            Diagnostics.Argument_Error (State, 1, "value expected");
          end if;
          if Activation.Native_Stage = 1 then
             Packet := Activation.Native_Results;
@@ -5020,7 +5020,7 @@ package body Lua.Engine.Machine is
          Complete (Self, Packet);
       elsif Name = "base.ipairs" then
          if Activation.Native_Arguments.Is_Empty then
-            Fail (State, "value expected");
+            Diagnostics.Argument_Error (State, 1, "value expected");
          end if;
          Packet.Append (New_Native (State, "ipairs.iterator"));
          Packet.Append (Left);
