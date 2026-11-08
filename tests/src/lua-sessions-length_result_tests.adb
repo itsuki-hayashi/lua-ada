@@ -28,12 +28,18 @@ package body Lua.Sessions.Length_Result_Tests is
       Conformance_Allocator.Attach (Lua.Storage.Reference (Self.State.Memory));
       if Refusal then Conformance_Adapter.Install (Self.State.all); end if;
       Result := Self.Execute
-        ((if Refusal then
+        ((if Name = "empty-refusal" then
+             "assert(loadfile('tests/lua/length_empty_result_refusal.lua'))()"
+          elsif Refusal then
              "assert(loadfile('tests/lua/length_result_refusal.lua'))()"
           else "assert(loadfile('tests/lua/length_result_semantics.lua'))('" &
             Name & "')"), "=length-result");
       Assert (Result.Status = Succeeded, To_String (Result.Error.Message));
-      Assert (Index (Result.Output, "PASS: length-result-" & Name) > 0,
+      Assert (Index
+                (Result.Output,
+                 (if Name = "empty-refusal" then
+                     "PASS: length-empty-result-refusal"
+                  else "PASS: length-result-" & Name)) > 0,
               "length result did not complete its actual fixture");
       Close_Checked;
    exception
@@ -68,6 +74,14 @@ package body Lua.Sessions.Length_Result_Tests is
       Check ("refusal", Refusal => True);
    end Actual_Refusal;
 
+   procedure Empty_Refusal;
+   procedure Empty_Refusal is
+   begin
+      --  No returned value means a real nil result, even when the consumed
+      --  argument arena is the only already allocated empty packet available.
+      Check ("empty-refusal", Refusal => True);
+   end Empty_Refusal;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "length result: first only",
@@ -78,5 +92,7 @@ package body Lua.Sessions.Length_Result_Tests is
                         Error_Recovery'Access);
       Test_Support.Add (Suite, "length result: callback leaves M0",
                         Actual_Refusal'Access);
+      Test_Support.Add (Suite, "length result: empty callback leaves M0",
+                        Empty_Refusal'Access);
    end Register;
 end Lua.Sessions.Length_Result_Tests;

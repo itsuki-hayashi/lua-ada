@@ -4798,6 +4798,18 @@ package body Lua.Engine.Machine is
                   State.Steps := State.Steps + Natural (Work);
                end;
             end if;
+            if Activation.Native_Results.Capacity = 0 and then
+              Activation.Native_Arguments.Is_Empty and then
+              Activation.Native_Arguments.Capacity >= 1
+            then
+               --  A zero-result handler can leave no result arena, while
+               --  its consumed input still owns reusable empty capacity.
+               --  Transfer that actual allocation before publishing nil;
+               --  never move live arguments or allocate a synthetic result.
+               Move_Roots
+                 (State, Activation.Native_Results,
+                  Activation.Native_Arguments);
+            end if;
             Activation.Native_Results.Reserve_Capacity (1);
             Activation.Native_Results.Clear;
             Activation.Native_Results.Append (Left);
