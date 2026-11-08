@@ -4,6 +4,8 @@ param(
     [Parameter(Mandatory)][ValidateSet('default','upstream-test')][string]$Configuration,
     [Parameter(Mandatory)][string]$RuntimeDirectory,
     [Parameter(Mandatory)][string]$ReferenceLibraryDirectory,
+    [ValidateSet('development','validation','release')][string]$Profile='validation',
+    [ValidateSet('static','static-pic','relocatable')][string]$LibraryType='static',
     [string]$Report=''
 )
 Set-StrictMode -Version Latest
@@ -11,7 +13,7 @@ $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'ConfiguredFixtureEvidence.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
-if($Report -eq ''){$Report=Join-Path $root ('reports/configured-fixtures/'+[guid]::NewGuid().ToString('N')+'/report.json')}
+if($Report -eq ''){$Report=Join-Path $root ('reports/core-image/configured-'+[guid]::NewGuid().ToString('N')+'/result.json')}
 $Report=[IO.Path]::GetFullPath($Report)
 if(-not ([IO.Path]::GetRelativePath($root,$Report).Replace('\','/')).StartsWith('reports/',[StringComparison]::Ordinal) -or
     (Test-Path -LiteralPath $Report)){throw 'Configured fixture report must be a new first-party observation under reports'}
@@ -20,10 +22,12 @@ $revision=(&git -C $root rev-parse HEAD).Trim()
 if($LASTEXITCODE -ne 0){throw 'Configured fixture source revision is unknown'}
 $dirty=@(&git -C $root status --porcelain=v1 --untracked-files=normal).Count -ne 0
 $raw=[ordered]@{schema_version=1;kind='configured-fixture-observations';configuration=$Configuration;
+    repository_root=$root;platform=$(if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'});profile=$Profile;library_type=$LibraryType;
     repository_revision=$revision;repository_dirty=$dirty;reference_revision='7579fc9d7ed90240487251dfb69168f8e64e9294';
     runtime_acceptance=$false;coverage_authority=$false;synthetic_fixture=$false;
     source_bindings=@(Get-ConfiguredFixtureSources $Configuration|ForEach-Object{@{path=$_;sha256=(Get-FileHash (Join-Path $root $_)).Hash.ToLowerInvariant()}});
     runtimes=@();processes=@()}
+$raw.context=$Configuration+'/'+$raw.platform+'/'+$Profile+'/'+$(if($LibraryType -ceq 'relocatable'){'shared'}else{$LibraryType})
 $definitions=@(Get-ConfiguredFixtureDefinitions $Configuration)
 try{
     foreach($role in @('ReferenceC','Ada')){

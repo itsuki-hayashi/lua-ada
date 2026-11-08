@@ -71,7 +71,8 @@ $buildLogPath=Join-Path $buildDirectory 'build-log.json'
 $buildLog=@{schema_version=1;kind='target-context-build-log';context=$Context;revision=(& git -C $root rev-parse HEAD).Trim();
     process=$build;source_bindings=@(foreach($file in @('scripts/build-target-context.ps1',('scripts/'+$scriptName),
         'scripts/check-core-image.ps1','scripts/check-aunit-evidence.ps1','scripts/TargetWitnessPolicy.psm1',
-        'scripts/AUnitLaunch.psm1','scripts/run-aunit-in-context.ps1','scripts/ForeignContractEvidence.psm1')){
+        'scripts/AUnitLaunch.psm1','scripts/run-aunit-in-context.ps1','scripts/ForeignContractEvidence.psm1',
+        'scripts/ConfiguredFixtureEvidence.psm1','scripts/check-configured-fixtures.ps1','scripts/compare.ps1')){
         @{path=$file;sha256=(Get-FileHash -LiteralPath (Join-Path $root $file)).Hash.ToLowerInvariant()}
     });runtime_acceptance=$false;coverage_authority=$false}
 [IO.File]::WriteAllText($buildLogPath,(ConvertTo-Json -InputObject $buildLog -Depth 48).Replace("`r`n","`n")+"`n",[Text.UTF8Encoding]::new($false))
@@ -130,6 +131,6 @@ if ($IsWindows) {
     $toolchain.nm_sha256 = (Get-FileHash -LiteralPath $nm).Hash.ToLowerInvariant()
 }
 $image = New-TargetContextImage -Root $root -Context $Context -OutputDirectory $imageDirectory -Paths $paths `
-    -Directories $directories -WitnessReports @($receiptPath,$receipt.consumer.path,$receipt.aunit.path,$buildLogPath) `
+    -Directories $directories -WitnessReports @($receiptPath,$receipt.consumer.path,$receipt.aunit.path,$buildLogPath,$receipt.configured_fixtures.path) `
     -Toolchain $toolchain
 Write-Output "FROZEN: $Context image=$imageDirectory sha256=$($image.sha256); target acceptance=False"

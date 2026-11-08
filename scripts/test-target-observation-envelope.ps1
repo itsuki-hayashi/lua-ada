@@ -168,7 +168,7 @@ Case 'non-synthetic and clean labels cannot replace empty or fabricated image bu
             ada_runtime='lib/validation/static';c_runtime='build/conformance/default/lib'}}
     $null=Save (Join-Path $directory 'image.json') $image
     Reject {Test-TargetImageBuildWitnesses -Root $root -ImageDirectory $directory -Context $image.context -Revision $image.revision -WitnessPolicy @{}} 'lacks actual source-bound'
-    for($i=0;$i -lt 4;$i++){
+    for($i=0;$i -lt 5;$i++){
         $path="reports/core-image/counterfeit-$i/result.json";$full=Join-Path $directory ('payload/'+$path)
         $hash=Save $full @{schema_version=1;kind='fabricated-pass';runtime_observed=$true}
         $image.files+=@{path=$path;sha256=$hash;bytes=(Get-Item $full).Length;

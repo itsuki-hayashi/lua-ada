@@ -125,14 +125,14 @@ try {
     }
     Set-Location $projectRoot
     $configuredRunner=Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"
-    $configuredReport=Join-Path $projectRoot ('reports/configured-fixtures/'+[guid]::NewGuid().ToString('N')+'/report.json')
+    $configuredReport=Join-Path $projectRoot ('reports/core-image/configured-'+[guid]::NewGuid().ToString('N')+'/result.json')
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-configured-fixtures.ps1'),
         '-Interpreter',$configuredRunner,'-ReferenceInterpreter',
         (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
         '-Configuration','default','-RuntimeDirectory',$runtimePath,
         '-ReferenceLibraryDirectory',(Join-Path $projectRoot 'build/conformance/default/lib'),
-        '-Report',$configuredReport)
+        '-Profile',$Profile,'-LibraryType',$LibraryType,'-Report',$configuredReport)
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'compare.ps1'), '-Interpreter', $absoluteCli,
         '-ConfiguredWitnessReport',$configuredReport,'-ConfiguredInterpreter',$configuredRunner)
@@ -172,7 +172,7 @@ try {
         $platform = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
         $link = if ($LibraryType -ceq 'relocatable') { 'shared' } else { $LibraryType }
         $null = Write-TargetBuildWitnesses -Root $projectRoot -Policy $targetWitnesses `
-            -Context "default/$platform/$Profile/$link" -PreviousReports $previousTargetReports
+            -Context "default/$platform/$Profile/$link" -PreviousReports $previousTargetReports -ConfiguredReport $configuredReport
         Write-Output 'Target build phase completed; File/Aggregate/Heavy executions belong to immutable-image partition jobs; target acceptance=False'
     }
 

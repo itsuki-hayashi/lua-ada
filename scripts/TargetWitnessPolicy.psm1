@@ -418,7 +418,8 @@ function Assert-TargetGlobalApiRoutes {
 
 function Write-TargetBuildWitnesses {
     param([Parameter(Mandatory)][string] $Root,[Parameter(Mandatory)][Collections.IDictionary] $Policy,
-          [Parameter(Mandatory)][string] $Context,[string[]] $PreviousReports=@())
+          [Parameter(Mandatory)][string] $Context,[string[]] $PreviousReports=@(),
+          [Parameter(Mandatory)][string]$ConfiguredReport)
     $revision = (& git -C $Root rev-parse HEAD).Trim()
     if ($LASTEXITCODE -ne 0) { throw 'Cannot identify target build witness revision' }
     $parts = $Context.Split('/')
@@ -435,6 +436,14 @@ function Write-TargetBuildWitnesses {
     if ($consumerPaths.Count -ne 1 -or $unitPaths.Count -ne 1) { throw 'Target build requires exactly one fresh C consumer and AUnit capture for its context' }
     $result = Test-TargetNamedContextEvidence -Root $Root -Policy $Policy -ConsumerReport $consumerPaths[0] `
         -AUnitReport $unitPaths[0] -Context $Context -Revision $revision
+    Import-Module (Join-Path $PSScriptRoot 'ConfiguredFixtureEvidence.psm1')
+    $configured=Get-Content -LiteralPath $ConfiguredReport -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+    if($configured.repository_revision -cne $revision -or $configured.repository_dirty -isnot [bool] -or $configured.repository_dirty -or
+        $configured.context -cne $Context){throw 'Target configured fixture report is stale dirty or from another context'}
+    $configuredObserved=Assert-ConfiguredFixtureReport -Root $Root -Report $configured -Configuration $parts[0] `
+        -Interpreter @($configured.runtimes|Where-Object role -CEQ Ada)[0].executable
+    $result['configured_fixtures']=@{path=[IO.Path]::GetFullPath($ConfiguredReport);sha256=(Get-FileHash $ConfiguredReport).Hash.ToLowerInvariant()}
+    $result['configured_fixture_operations']=$configuredObserved.operations
     $directory = Join-Path $Root ('reports/target-builds/' + $Context.Replace('/','-'))
     [void][IO.Directory]::CreateDirectory($directory)
     $result['schema_version'] = 1; $result['kind'] = 'target-build-named-witnesses'

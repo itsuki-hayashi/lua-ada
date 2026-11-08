@@ -151,10 +151,11 @@ try {
     # These files need actual selected stack constants and a real T table.
     # Running their source through the default glob without setup would either
     # fail before the operation or silently miss the instrumented obligation.
+    $configuredReport=Join-Path $root ('reports/core-image/configured-'+[guid]::NewGuid().ToString('N')+'/result.json')
     & "$PSScriptRoot/check-configured-fixtures.ps1" -Interpreter $runner `
         -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
         -Configuration upstream-test -RuntimeDirectory $library `
-        -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib"
+        -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib" -LibraryType $LibraryType -Report $configuredReport
     if ($IsWindows) {
         & "$PSScriptRoot/check-windows-buffered-failure.ps1" -Interpreter $runner `
             -Configuration upstream-test -LibraryType $LibraryType `
@@ -188,7 +189,7 @@ try {
         $platform = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
         $link = if ($LibraryType -ceq 'relocatable') { 'shared' } else { $LibraryType }
         $null = Write-TargetBuildWitnesses -Root $root -Policy $targetWitnesses `
-            -Context "upstream-test/$platform/validation/$link" -PreviousReports $previousTargetReports
+            -Context "upstream-test/$platform/validation/$link" -PreviousReports $previousTargetReports -ConfiguredReport $configuredReport
         Write-Output 'Target build phase completed; File/Aggregate/Heavy executions belong to immutable-image partition jobs; target acceptance=False'
     }
     Write-Output "PASS: instrumented validation/$LibraryType regressions; scope acceptance remains pending"

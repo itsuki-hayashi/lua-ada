@@ -103,6 +103,11 @@ comparison requires the dedicated report and its Ada runner explicitly. Raw
 reports preserve sources, executables, libraries, arguments, configuration
 captures and balanced allocator telemetry. Rejection regressions mutate copies
 of actual observations; they do not execute or certify their fabricated data.
+Full-target build receipts must reference this separate report. The immutable
+image captures it and its raw sidecars as a fifth mandatory build witness;
+final replay checks its revision/context and every executable, runtime library
+and capture against the frozen file identities. A build log or matching final
+marker cannot replace the configured process set.
 
 ## Candidate anchors and manual coverage
 
