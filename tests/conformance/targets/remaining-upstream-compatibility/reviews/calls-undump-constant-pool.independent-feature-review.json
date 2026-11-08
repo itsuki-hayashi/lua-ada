@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "kind": "t-equivalent-feature-review",
+  "candidate_id": "calls-undump-constant-pool",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "decision": "accepted-feature-only",
+  "source": {
+    "path": "references/lua/testes/calls.lua",
+    "sha256": "e0331ba5557c09ba844c11a54810ca7cc01998638316d5192e252a2ab0a2d407"
+  },
+  "configuration": "upstream-test",
+  "original_anchor": {
+    "id": "LUA-CALLS-ASSERT-CALL-0097",
+    "kind": "assert-call",
+    "byte_offset": 14425,
+    "byte_length": 6,
+    "line": 586,
+    "end_line": 586,
+    "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+    "status": "pending",
+    "disposition": "pending",
+    "invariant": null,
+    "configurations": [],
+    "evidence": [],
+    "review": null
+  },
+  "original_assertion": {
+    "original_bytes": "assert(string.format(\"%p\", T.listk(funcs[1])[1]) ==\n           string.format(\"%p\", T.listk(funcs[3])[1]))",
+    "byte_length": 105,
+    "anchor_sha256": "d350bbaa91f6e9d428a04e5507d4eb0cfb3596e882bffdbf5c30655054063c8e",
+    "byte_offset": 14425
+  },
+  "permitted_resolution": "ada-internal-equivalent",
+  "source_exclusions": [],
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "rationale": "T.listk directly enumerates native Proto.k, and the assertion imposes cross-prototype sharing of a decoded long-string allocation. Pinned public string equality is by value; lua_topointer/percent-p must identify each actual held object faithfully, but no contract prescribes sharing one allocation between sibling prototype constants. Equivalent must execute all three functions with exact cardinality, datatype and full string bytes, retain dumpcount2, binary load/redump/load and stable percent-p of each held value through GC. Do not fabricate constant-pool pointers or weaken public pointer APIs.",
+  "retained_requirements": [
+    "Original assert anchor remains pending and required as an actual reviewed equivalent; no exclusion.",
+    "Original ifT guard, load(dump)(), source/dump construction and exact count==2 assertion remain unchanged.",
+    "Execute all3 actual functions; exactly1 string result each, complete52-byte value and string type.",
+    "Public percent-p stable identifier per held object, public C pointer contract and meaningful GC lifetimes.",
+    "Exact patch/span/configuration/counterpart review and fresh runtime evidence still required."
+  ],
+  "author_proposal": {
+    "sha256": "df415cceb5054f49c680d98cfdce8771a412018c95ea5e5b827dd0ea9de489ab",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/calls-undump-constant-pool.author-proposal.json"
+  },
+  "public_contract_sources": [
+    {
+      "span": {
+        "original_bytes": "The specifier @id{p} formats the pointer\nreturned by @Lid{lua_topointer}.\nThat gives a unique string identifier for tables, userdata,\nthreads, strings, and functions.\nFor other values (numbers, nil, booleans),\nthis specifier results in a string representing\nthe pointer @id{NULL}.",
+        "byte_length": 280,
+        "anchor_sha256": "12650f109a909895f8e9d6d3adc7f9fef99d85f51ec0718d6b136c56227bea2d",
+        "byte_offset": 237986
+      },
+      "source_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+      "interpretation": "Percent-p uses lua_topointer and provides an identifier. This operation remains required; the documentation does not prescribe an undumper constant-pool layout.",
+      "path": "references/lua/manual/manual.of"
+    },
+    {
+      "span": {
+        "original_bytes": "Although strings are subject to garbage collection,\nthey do not have an explicit construction and\ntheir equality is by value;\nthey behave more like values than like objects.\nTherefore, they are not removed from weak tables.",
+        "byte_length": 223,
+        "anchor_sha256": "f571737096bb74de33d6360f158746d3402f80862df5de27c96c53b1793fc5e5",
+        "byte_offset": 34145
+      },
+      "source_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+      "interpretation": "Strings compare by value and have no explicit construction. Allocation sharing is distinct from returned bytes, datatype and held-value identifier behavior.",
+      "path": "references/lua/manual/manual.of"
+    }
+  ],
+  "counterpart_source": {
+    "sha256": "d1ef08edca513407c8906b7f2542a274e00d6e3c46b1091de04620f34ada8795",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/calls-undump-string-values.author.lua"
+  },
+  "observation_limits": "Author observations are diagnostics; this decision reviewed feature relevance and exact original/manual/counterpart bytes. It does not certify the author runtime images or final source/file/platform acceptance."
+}
