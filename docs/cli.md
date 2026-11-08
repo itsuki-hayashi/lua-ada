@@ -65,8 +65,13 @@ diagnostic, and `os.exit` preserves its typed exit code/close request. The
 actual anonymous C callback frame without a Lua shim. The separate
 `debug.debug()` console reads native stdin in fixed-size commands and uses
 the [protected scheduler](decisions/0043-debug-console-continuations.md),
-reporting prompts and errors to stderr. Readline, SIGINT/hook interruption
-and tracebacks in REPL errors remain deferred.
+reporting prompts and errors to stderr. The
+[native readline transport](decisions/0044-cli-native-readline.md) uses optional
+Linux dynamic loading, macOS system readline and Windows fixed-size stdio
+fallback. Linux honors `LUA_READLINELIB` unless `-E` is selected; failed loading
+emits warnings through the current warning policy. Commands enter history once
+after multiline assembly. Local paired Windows pipe observations pass;
+Unix/TTY observations, SIGINT and REPL error tracebacks remain pending.
 
 `--check` validates each requested chunk without executing it, creating globals,
 or loading modules. It accepts the same files, snippets, explicit stdin, `--`,
@@ -96,7 +101,7 @@ CLI --check remains text-only. Package loading includes binary Lua modules,
 native searchers and `package.loadlib`; native handles remain owned through
 state cleanup. Host-specific module and loader validation is recorded in
 [status](status.md) and does not establish ecosystem-module acceptance.
-Readline and signal handling remain deferred. The CLI host applies the path
+Signal handling remains pending. The CLI host applies the path
 environment variables described above through the shared package operation.
 
 The dedicated upstream test runner is separate from the product CLI. Its

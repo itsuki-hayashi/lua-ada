@@ -68,15 +68,8 @@ procedure Lua_CLI is
       Count : Interfaces.C.size_t; Error : access Interfaces.C.int)
       return Interfaces.C.size_t
      with Import, Convention => C, External_Name => "lua_ada_stream_read";
-   function Raw_Get
-     (File : System.Address; Error : access Interfaces.C.int)
-      return Interfaces.C.int
-     with Import, Convention => C, External_Name => "lua_ada_stream_get";
    function Stream_Failed (File : System.Address) return Interfaces.C.int
      with Import, Convention => C, External_Name => "lua_ada_stream_error";
-   function End_Marker return Interfaces.C.int
-     with Import, Convention => C,
-          External_Name => "lua_ada_stream_end_marker";
    function Is_Terminal (File : System.Address) return Interfaces.C.int
      with Import, Convention => C,
           External_Name => "lua_ada_stream_is_terminal";
@@ -92,7 +85,6 @@ procedure Lua_CLI is
    function Read_Source (Path : String) return String;
    function Read_Stdin return String;
    procedure Prepare_Stdin;
-   function Read_Line (Line : out Unbounded_String) return Boolean;
    function Check_Source
      (Source, Name : String) return Lua.Syntax.Check_Result;
    function Incomplete (Result : Lua.Syntax.Check_Result) return Boolean;
@@ -118,8 +110,7 @@ procedure Lua_CLI is
       Ada.Text_IO.Put_Line
         ("--check validates complete Lua syntax without executing source.");
       Ada.Text_IO.Put_Line
-        ("Lua 5.5 subset; native binary files supported. Native modules, "
-         & "readline and signal handling are deferred.");
+        ("Lua 5.5 compatibility is in progress; see docs/status.md.");
    end Usage;
 
    procedure Version is
@@ -303,29 +294,6 @@ procedure Lua_CLI is
       end if;
       return To_String (Text);
    end Read_Stdin;
-
-   function Read_Line (Line : out Unbounded_String) return Boolean
-   is
-      Error : aliased Interfaces.C.int := 0;
-      Byte : Interfaces.C.int;
-   begin
-      --  The CLI child already resolved, wrote and flushed the rooted prompt.
-      --  Read bytes up to LF or end of input, as fgets-based lua_readline
-      --  does without the readline library. A
-      --  final unterminated line is still a line; end of input with no
-      --  bytes yields False. The LF itself is not part of the result.
-      Prepare_Stdin;
-      Line := Null_Unbounded_String;
-      loop
-         Byte := Raw_Get (Standard_Stream (0), Error'Access);
-         if Byte = End_Marker then
-            return Length (Line) > 0;
-         elsif Byte = Character'Pos (Ada.Characters.Latin_1.LF) then
-            return True;
-         end if;
-         Append (Line, Character'Val (Byte));
-      end loop;
-   end Read_Line;
 
    function Check_Source
      (Source, Name : String) return Lua.Syntax.Check_Result is
@@ -612,6 +580,18 @@ begin
                Line, Next : Unbounded_String;
                Prompt_Failed : Boolean := False;
 
+               procedure Save_And_Evaluate (History, Source : String);
+               procedure Save_And_Evaluate (History, Source : String) is
+                  Saved : constant Execution_Result :=
+                    Lua.Sessions.CLI.Save_REPL_Line (Universe, History);
+               begin
+                  if Saved.Status = Succeeded then
+                     Evaluate (Source);
+                  else
+                     Report (Saved, Fail_Process => False);
+                  end if;
+               end Save_And_Evaluate;
+
                function Read_Prompted_Line
                  (First_Line : Boolean; Text : out Unbounded_String)
                   return Boolean;
@@ -619,12 +599,14 @@ begin
                  (First_Line : Boolean; Text : out Unbounded_String)
                   return Boolean
                is
+                  Available : Boolean;
                   Prompt : constant Execution_Result :=
-                    Lua.Sessions.CLI.Write_Prompt (Universe, First_Line);
+                    Lua.Sessions.CLI.Read_REPL_Line
+                      (Universe, First_Line, Text, Available);
                begin
                   if Prompt.Status = Succeeded then
                      Report (Prompt, Fail_Process => False);
-                     return Read_Line (Text);
+                     return Available;
                   elsif Prompt.Status = Exit_Requested then
                      Report (Prompt);
                   else
@@ -642,12 +624,22 @@ begin
                   return False;
                end Read_Prompted_Line;
             begin
+               declare
+                  Initialized : constant Execution_Result :=
+                    Lua.Sessions.CLI.Initialize_Readline
+                      (Universe, Ignore_Environment);
+               begin
+                  Report (Initialized);
+                  if Initialized.Status /= Succeeded then return; end if;
+               end;
                --  Host read-eval-print loop (lua.c doREPL). Each entry is
                --  a separate chunk, so locals never survive a line. Results
                --  are printed by the real global print after the chunk has
                --  returned; there is no bootstrap Lua loop and no extra Lua
                --  frame. Prompt lookup/conversion uses the CLI-only child and
-               --  real C activation; readline and SIGINT remain separate.
+               --  real C activation. The native input backend holds that
+               --  rooted string through synchronous input and releases its
+               --  own line after the Ada child has copied the bytes.
                while not Process_Exit_Requested
                  and then Read_Prompted_Line (True, Line)
                loop
@@ -660,7 +652,7 @@ begin
                        Lua.Syntax.Success
                      then
                         --  Expression form first, exactly as addreturn.
-                        Evaluate (Expression);
+                        Save_And_Evaluate (Text, Expression);
                      else
                         declare
                            Accumulated : Unbounded_String := Line;
@@ -699,7 +691,9 @@ begin
                            --  Complete code runs; a real syntax error (or
                            --  end of input mid-statement) is reported by
                            --  the same execution path as any other error.
-                           Evaluate (To_String (Accumulated));
+                           Save_And_Evaluate
+                             (To_String (Accumulated),
+                              To_String (Accumulated));
                         end;
                      end if;
                   end;

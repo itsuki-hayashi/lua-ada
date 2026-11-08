@@ -4,6 +4,10 @@ with "config/lua_ada_cli_config.gpr";
 project Lua_Ada_Cli is
    C_Import_Defines := ();
    case Lua_Ada_Cli_Config.Alire_Host_OS is
+      when "linux" =>
+         C_Import_Defines := ("-DLUA_ADA_CLI_LINUX");
+      when "macos" =>
+         C_Import_Defines := ("-DLUA_ADA_CLI_MACOS");
       when "windows" =>
          case Lua_Ada.Library_Mode is
             when "relocatable" =>
@@ -39,4 +43,13 @@ project Lua_Ada_Cli is
       --  Character above 127, corrupting print output and stdin source.
       for Switches ("Ada") use ("-Wb");
    end Binder;
+   package Linker is
+      case Lua_Ada_Cli_Config.Alire_Host_OS is
+         when "linux" =>
+            for Default_Switches ("Ada") use ("-ldl");
+         when "macos" =>
+            for Default_Switches ("Ada") use ("-lreadline");
+         when others => null;
+      end case;
+   end Linker;
 end Lua_Ada_Cli;

@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+Validate the [native readline component](sessions/2026-11-08-cli-native-readline.md)
+on Linux/macOS and real TTYs. Reconcile actual optional-backend selection,
+library warnings/-E, raw input, history and final-context report identities.
+Retain the Windows fixed-buffer/NUL/text-mode witnesses and actual history
+provider refusal; pipe comparisons alone do not establish TTY behavior.
+
 Reconcile the [local Code observations](sessions/2026-11-08-code-local-execution.md)
 with fresh final immutable contexts. Retain separate original native optimizer
 execution, adapted Ada semantic execution and source-only exclusion accounting.

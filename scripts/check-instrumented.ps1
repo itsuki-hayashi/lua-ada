@@ -162,6 +162,11 @@ try {
         -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
         -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib" `
         -RuntimeDirectory $library -Configuration upstream-test -OutputDirectory (Join-Path $consoleDirectory 'lua')
+    & "$PSScriptRoot/check-cli-readline.ps1" -Interpreter "$root/cli/bin/upstream-test/$LibraryType/lua_ada$suffix" `
+        -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
+        -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib" `
+        -RuntimeDirectory $library -Configuration upstream-test `
+        -OutputDirectory (Join-Path $root ('reports/core-image/readline-'+[guid]::NewGuid().ToString('N')))
     $cliPairReport=Join-Path $root ('reports/core-image/cli-'+[guid]::NewGuid().ToString('N')+'/pair.json')
     & "$PSScriptRoot/check-configured-cli.ps1" -Interpreter "$root/cli/bin/upstream-test/$LibraryType/lua_ada$suffix" `
         -RuntimeDirectory $library `
