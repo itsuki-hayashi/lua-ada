@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [intern-index refusal and collection](2026-11-08-intern-index-refusal.md).
+
 Feature review: [private string-table observations](2026-11-08-querystr-feature-review.md).
 
 Correction: [resetCI owning release](2026-11-08-resetci-owning-release.md).

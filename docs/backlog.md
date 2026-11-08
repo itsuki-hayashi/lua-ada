@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+The [intern-index fault cases](sessions/2026-11-08-intern-index-refusal.md)
+pass actual provider refusal/retry, live-root and dead-header checks in both
+local configurations. Continue independent exact API string-table source
+review, retained fresh-child workload execution, current-head named evidence
+and final context reconciliation; no querystr source obligation is closed.
+
 The [resetCI owning-release follow-up](sessions/2026-11-08-resetci-owning-release.md)
 passes actual warmed-cache capacity/release, outstanding-guard and permanent
 refusal controls within 2,507 AUnit cases per local mode. Preserve its physical

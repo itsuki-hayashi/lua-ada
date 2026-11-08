@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+Three [intern-index fault witnesses](sessions/2026-11-08-intern-index-refusal.md)
+check actual provider-refused replacement, live roots under disabled-growth
+collection and dead-header disposal. The combined local checkout passes 2,510
+AUnit cases in each mode and both configured fixture campaigns. Original API
+source adaptation, final immutable image replay and whole-target acceptance
+remain pending; these cases supply no passing private C geometry assertion.
+
 The [resetCI ownership correction](sessions/2026-11-08-resetci-owning-release.md)
 uses the checked private frame release and retires unused metadata reservations.
 Both local configurations pass 2,507 AUnit cases and all ordinary C consumers;
