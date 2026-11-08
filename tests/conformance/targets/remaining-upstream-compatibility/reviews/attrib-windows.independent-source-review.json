@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "kind": "attrib-windows-independent-exact-source-review",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "review_date": "2026-11-08",
+  "decision": "accepted-source-equivalent-only",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "inputs": [
+    {
+      "path": "references/lua/testes/attrib.lua",
+      "sha256": "dd2eb13be29628ac0268cddfafdc6a816edcba6552ae15e8637afc6a79742e52"
+    },
+    {
+      "path": "tests/conformance/platform/windows-package-paths.lua",
+      "sha256": "d3700e1babb78724741101d2a2ce66a0add4525455ff40d6bc9047d5fd0337f4"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/attrib-windows-equivalence.author-proposal.json",
+      "sha256": "209d700a354964c47507b4b6edbdf2388165e5892988e49d6d7614667b710bb6"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/attrib-windows.source.author-proposal.json",
+      "sha256": "ff299377a063469525b76ab23ff838e2198178b3ebc0c717d08344df778e4beb"
+    }
+  ],
+  "findings": [
+    "Read the unchanged original D/DC/try helpers, all ten original expected path literals, surrounding searchpath/require/cache/reload/native prefix assertions and complete named Windows counterpart. The template substitutes the native directory separator; original hardcoded slash expectations disagree with the same-host C baseline before the later body.",
+    "Use D only where the original template contains that native separator. The P1 init template deliberately retains its literal slash suffix: libs..dirsep..P1/init.lua. Never normalize the actual loader output. Both exact loader data and module values remain required.",
+    "All ten changes affect only expected platform path literals. No assertion, port guard, T call, module function or cleanup is removed. Binary Lua-module loading, native entry-name resolution, cached truthy modules and repeated false-result loading remain actual behavior under test.",
+    "The standalone .lc counterpart uses text to exercise path selection only. It does not replace original attrib binary-chunk assertions; the full transformed file and actual C fixtures remain mandatory.",
+    "Approve source generation in disposable directories for Windows only, in both configurations. This decision supplies no native applicability or passing execution evidence. Each final context requires unchanged original C failure capture, actual same-image fixture/linkage counterpart, complete transformed C/Ada return27 protocol, cleanup and separately reviewed applicability.",
+    "No exemption applies to Linux/macOS; their original source remains required. Final whole-target authority cannot be inferred from this source-only mapping."
+  ],
+  "generated_sha256": "a56021013a850cf69feb421e5385ac0e5f8e6b5841d107c9c7a55ed5ea172dca",
+  "exact_replacement_count": 10,
+  "source_emitted": false,
+  "decisions": [
+    {
+      "id": "windows-path-require-b-lua",
+      "start_byte": 4388,
+      "length_bytes": 12,
+      "source_sha256": "82d58eff6dc00f7d37a2e6ce3cf4ca7acf9a8e31db579b6c03d5c994606b184a",
+      "replacement_sha256": "6fa56434429eb5448fa829af33269aa687efbabafa02ffadf12ad27cd623b5a2",
+      "decision": "accepted-source-only"
+    },
+    {
+      "id": "windows-path-require-a-lua",
+      "start_byte": 4607,
+      "length_bytes": 12,
+      "source_sha256": "d0ba414494faa28458c8d6de8f799bbfea510d62c1b063a5d56a02b31a225e1e",
+      "replacement_sha256": "9b4cb6b1f34ce2b588575790e2ece7533df32fba62690096f92e1a22282d2a58",
+      "decision": "accepted-source-only"
+    },
+    {
+      "id": "windows-path-require-a-lc",
+      "start_byte": 4693,
+      "length_bytes": 11,
+      "source_sha256": "d212c0d7fffc2d987148a86cd0049401615994d4190b8fca85f8a420eabd57c8",
+      "replacement_sha256": "e73e3d2019ae4824ffb7894e8b5661cbf4390ddf7859cd9663b25244b12f8312",
+      "decision": "accepted-source-only"
+    },
+    {
+      "id": "windows-path-fallback-l-first",
+      "start_byte": 4854,
+      "length_bytes": 8,
+      "source_sha256": "fcc1121c77338e326263978da0cbe2ee273f88a73ccdbc2c07dd0d807c7329a0",
+      "replacement_sha256": "0ef3c20bb44cf495d35898a940407dde74dee703bf69256f4870c06a60ee6110",
+      "decision": "accepted-source-only"
+    },
+    {
+      "id": "windows-path-fallback-l-reload",
+      "start_byte": 4907,
+      "length_bytes": 8,
+      "source_sha256": "fcc1121c77338e326263978da0cbe2ee273f88a73ccdbc2c07dd0d807c7329a0",
+      "replacement_sha256": "0ef3c20bb44cf495d35898a940407dde74dee703bf69256f4870c06a60ee6110",
+      "decision": "accepted-source-only"
+    },
+    {
+      "id": "windows-path-require-xx-x",
+      "start_byte": 5032,
+      "length_bytes": 11,
+      "source_sha256": "e886ba50850ab30a42967aab7231d673f3dd7af99edef00ca17d6ded279a92c5",
+      "replacement_sha256": "5752f8e2bfc260710c87f1b000baafa72167f467c096f0f92207a6ce7b10bd3c",
+      "decision": "accepted-source-only"
+    },
+    {
+      "id": "windows-path-mixed-subpackage-template",
+      "start_byte": 5395,
+      "length_bytes": 18,
+      "source_sha256": "95946e9901cc6d2bb12a7f53e20f2d12d851be1e9ed862a53cd34cf4f137aa6b",
+      "replacement_sha256": "bb60c2cd06e7058183634fec106404020cc4aa37275e727bfc444f5ff525efb8",
+      "decision": "accepted-source-only"
+    },
+    {
+      "id": "windows-path-subpackage-separator",
+      "start_byte": 5656,
+      "length_bytes": 18,
+      "source_sha256": "4a72755310afbe912134ef41b2c8184a77b03e641cc9946486ac620408cfbaf4",
+      "replacement_sha256": "2b7f4497aa4675f42039a8ac22c130952f70751e7970c1f3f2e26b0cc99d230a",
+      "decision": "accepted-source-only"
+    },
+    {
+      "id": "windows-path-hyphen-native-prefix",
+      "start_byte": 7894,
+      "length_bytes": 14,
+      "source_sha256": "0513b5871134bdad12d3de6e3dd2fefd7051e00e127d8be83fcaa62212e205c2",
+      "replacement_sha256": "47d077529e8f45324b6bac898b86916754c1a7b47f63d2ab53851477e91f06f7",
+      "decision": "accepted-source-only"
+    },
+    {
+      "id": "windows-path-c-root-native-prefix",
+      "start_byte": 8260,
+      "length_bytes": 11,
+      "source_sha256": "3a8a80127c8339d5ba05fc2460919fb3c4b8ae9b15eb4bf9f8f62208089cd98a",
+      "replacement_sha256": "ea9d03a3f79d239f36ee7ab4ce37fccd667b78a6ad21454ea9d773d49b09088a",
+      "decision": "accepted-source-only"
+    }
+  ]
+}

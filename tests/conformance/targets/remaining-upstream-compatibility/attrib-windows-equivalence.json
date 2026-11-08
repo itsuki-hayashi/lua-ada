@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "id": "attrib-windows-paths",
+  "source": "references/lua/testes/attrib.lua",
+  "source_sha256": "dd2eb13be29628ac0268cddfafdc6a816edcba6552ae15e8637afc6a79742e52",
+  "disposition": "native-platform-equivalent",
+  "platform": "windows",
+  "configuration": "default-and-upstream-test",
+  "target": "remaining-upstream-compatibility",
+  "review": {
+    "status": "accepted",
+    "author": "Codex /root/validation_delivery",
+    "reviewer": "Codex /root",
+    "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/attrib-windows.equivalence-approval.json",
+    "artifact_sha256": "2fe7d93c636eb8308e061e534230d41d98432af7b298b265cfdbfd8ece4a56c6"
+  },
+  "replacements": [
+    {
+      "id": "windows-path-require-b-lua",
+      "start_byte": 4388,
+      "length_bytes": 12,
+      "start_line": 169,
+      "end_line": 169,
+      "source_sha256": "82d58eff6dc00f7d37a2e6ce3cf4ca7acf9a8e31db579b6c03d5c994606b184a",
+      "original_text": "\"libs/B.lua\"",
+      "invariant": "Retain exact searchpath/require filename and loader-data equality using the original D helper; preserve all assertions and cache/reload behavior.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-package-paths.lua#require-b-lua"
+      ],
+      "replacement": "D\"B.lua\""
+    },
+    {
+      "id": "windows-path-require-a-lua",
+      "start_byte": 4607,
+      "length_bytes": 12,
+      "start_line": 176,
+      "end_line": 176,
+      "source_sha256": "d0ba414494faa28458c8d6de8f799bbfea510d62c1b063a5d56a02b31a225e1e",
+      "original_text": "\"libs/A.lua\"",
+      "invariant": "Retain exact searchpath/require filename and loader-data equality using the original D helper; preserve all assertions and cache/reload behavior.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-package-paths.lua#require-a-lua"
+      ],
+      "replacement": "D\"A.lua\""
+    },
+    {
+      "id": "windows-path-require-a-lc",
+      "start_byte": 4693,
+      "length_bytes": 11,
+      "start_line": 180,
+      "end_line": 180,
+      "source_sha256": "d212c0d7fffc2d987148a86cd0049401615994d4190b8fca85f8a420eabd57c8",
+      "original_text": "\"libs/A.lc\"",
+      "invariant": "Retain exact searchpath/require filename and loader-data equality using the original D helper; preserve all assertions and cache/reload behavior.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-package-paths.lua#require-a-lc"
+      ],
+      "replacement": "D\"A.lc\""
+    },
+    {
+      "id": "windows-path-fallback-l-first",
+      "start_byte": 4854,
+      "length_bytes": 8,
+      "start_line": 184,
+      "end_line": 184,
+      "source_sha256": "fcc1121c77338e326263978da0cbe2ee273f88a73ccdbc2c07dd0d807c7329a0",
+      "original_text": "\"libs/L\"",
+      "invariant": "Retain exact searchpath/require filename and loader-data equality using the original D helper; preserve all assertions and cache/reload behavior.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-package-paths.lua#fallback-l-first"
+      ],
+      "replacement": "D\"L\""
+    },
+    {
+      "id": "windows-path-fallback-l-reload",
+      "start_byte": 4907,
+      "length_bytes": 8,
+      "start_line": 185,
+      "end_line": 185,
+      "source_sha256": "fcc1121c77338e326263978da0cbe2ee273f88a73ccdbc2c07dd0d807c7329a0",
+      "original_text": "\"libs/L\"",
+      "invariant": "Retain exact searchpath/require filename and loader-data equality using the original D helper; preserve all assertions and cache/reload behavior.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-package-paths.lua#fallback-l-reload"
+      ],
+      "replacement": "D\"L\""
+    },
+    {
+      "id": "windows-path-require-xx-x",
+      "start_byte": 5032,
+      "length_bytes": 11,
+      "start_line": 189,
+      "end_line": 189,
+      "source_sha256": "e886ba50850ab30a42967aab7231d673f3dd7af99edef00ca17d6ded279a92c5",
+      "original_text": "\"libs/XXxX\"",
+      "invariant": "Retain exact searchpath/require filename and loader-data equality using the original D helper; preserve all assertions and cache/reload behavior.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-package-paths.lua#require-xx-x"
+      ],
+      "replacement": "D\"XXxX\""
+    },
+    {
+      "id": "windows-path-mixed-subpackage-template",
+      "start_byte": 5395,
+      "length_bytes": 18,
+      "start_line": 211,
+      "end_line": 211,
+      "source_sha256": "95946e9901cc6d2bb12a7f53e20f2d12d851be1e9ed862a53cd34cf4f137aa6b",
+      "original_text": "\"libs/P1/init.lua\"",
+      "invariant": "Retain exact require loader data from the original mixed-separator package template; preserve the literal /init.lua suffix.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-package-paths.lua#mixed-subpackage-template"
+      ],
+      "replacement": "(\"libs\"..dirsep..\"P1/init.lua\")"
+    },
+    {
+      "id": "windows-path-subpackage-separator",
+      "start_byte": 5656,
+      "length_bytes": 18,
+      "start_line": 219,
+      "end_line": 219,
+      "source_sha256": "4a72755310afbe912134ef41b2c8184a77b03e641cc9946486ac620408cfbaf4",
+      "original_text": "\"libs/P1/xuxu.lua\"",
+      "invariant": "Retain exact searchpath/require filename and loader-data equality using the original D helper; preserve all assertions and cache/reload behavior.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-package-paths.lua#subpackage-separator"
+      ],
+      "replacement": "D\"P1/xuxu.lua\""
+    },
+    {
+      "id": "windows-path-hyphen-native-prefix",
+      "start_byte": 7894,
+      "length_bytes": 14,
+      "start_line": 297,
+      "end_line": 297,
+      "source_sha256": "0513b5871134bdad12d3de6e3dd2fefd7051e00e127d8be83fcaa62212e205c2",
+      "original_text": "\"libs/lib2-v2\"",
+      "invariant": "Retain the native C-module path-prefix assertion and every loader/function/argument assertion, using the original D helper for the Windows separator.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-package-paths.lua#hyphen-native-prefix"
+      ],
+      "replacement": "D\"lib2-v2\""
+    },
+    {
+      "id": "windows-path-c-root-native-prefix",
+      "start_byte": 8260,
+      "length_bytes": 11,
+      "start_line": 306,
+      "end_line": 306,
+      "source_sha256": "3a8a80127c8339d5ba05fc2460919fb3c4b8ae9b15eb4bf9f8f62208089cd98a",
+      "original_text": "\"libs/lib1\"",
+      "invariant": "Retain the native C-module path-prefix assertion and every loader/function/argument assertion, using the original D helper for the Windows separator.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-package-paths.lua#c-root-native-prefix"
+      ],
+      "replacement": "D\"lib1\""
+    }
+  ],
+  "output_sha256": "a56021013a850cf69feb421e5385ac0e5f8e6b5841d107c9c7a55ed5ea172dca",
+  "authoring_observation": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/attrib-windows.source.author-proposal.json",
+    "sha256": "ff299377a063469525b76ab23ff838e2198178b3ebc0c717d08344df778e4beb"
+  },
+  "independent_review_status": "accepted-source-only",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "kind": "native-platform-source-equivalent",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "synthetic_fixture": false,
+  "execution_evidence": [],
+  "source_exclusions": []
+}
