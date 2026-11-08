@@ -152,6 +152,7 @@ library project Lua_Ada is
       "lua-engine-warnings.ads",
       "lua-engine.ads",
       "lua-frontend_text.ads",
+      "lua-diagnostic_text.ads",
       "lua-integers.ads",
       "lua-inputs.ads",
       "lua-lexer_core.ads",

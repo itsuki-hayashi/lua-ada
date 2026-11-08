@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [managed diagnostic text](2026-11-08-managed-diagnostic-text.md).
+
 Component: [memory-verifier ordering](2026-11-08-memerr-verifier.md).
 
 Component: [actual stack inspection](2026-11-08-stack-inspection.md).

@@ -2,6 +2,11 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [managed diagnostic-text component](sessions/2026-11-08-managed-diagnostic-text.md)
+passes fourteen focused ownership/refusal cases; both local configurations
+pass 2,281 AUnit cases. The private component is available, while actual engine
+failure-field migration and the complete allocation-path audit remain open.
+
 The [reviewed memory-verifier equivalent](sessions/2026-11-08-memerr-verifier.md)
 preserves actual application refusal and the original status/message assertion
 while restoring the test allocator before verification. It excludes no source

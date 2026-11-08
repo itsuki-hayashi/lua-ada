@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+Integrate the [managed diagnostic-text component](sessions/2026-11-08-managed-diagnostic-text.md)
+into failure delivery after the pending return/close checkpoint. Preserve
+original Lua error values, allocation-free propagation/recovery and selected
+ownership across contexts; replace input-sized temporary formatting views.
+Fourteen component cases and 2,281 local AUnit passes do not close that audit.
+
 The [exact memory-verifier equivalent](sessions/2026-11-08-memerr-verifier.md)
 has independent source approval and a bounded disposable generator. Implement
 allocation-safe T.testC entry under the later zero-growth sweep, then resolve

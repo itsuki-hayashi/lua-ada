@@ -1,5 +1,9 @@
 # Architecture Decision Log
 
+ADR 0035 records [managed immutable diagnostic text](0035-managed-diagnostic-text.md),
+selected shared storage and allocation-free emergency/copy behavior. Engine
+failure-field migration remains pending.
+
 ADR 0034 records [borrowed C stack views](0034-borrowed-c-stack-views.md),
 real interrupted scalar ownership and independently retained C guards.
 
