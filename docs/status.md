@@ -3,8 +3,9 @@
 The maintainer requested a
 [CI-verified interim checkpoint](sessions/2026-11-08-interim-compatibility-checkpoint.md)
 on 2026-11-08 and paused the remaining implementation. Completed runtime and
-tooling progress is being prepared for review/merge; full upstream acceptance
-is not claimed. The unfinished CLI host-main/message-handler/interrupt and
+tooling progress is cut for [PR #11](https://github.com/itsuki-hayashi/lua-ada/pull/11),
+whose checks and review record own checkpoint verification; full upstream
+acceptance is not claimed. The unfinished CLI host-main/message-handler/interrupt and
 host-receiver drafts are preserved on separate remote backup branches.
 Checkpoint CI is separate from the unchanged 26-context full-target contract.
 

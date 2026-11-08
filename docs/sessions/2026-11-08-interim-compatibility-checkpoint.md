@@ -41,12 +41,20 @@ backup also preserves 433 verified raw report blobs. Local worktrees are kept.
 The independently useful C-call arena change 30c6185 is included as 6d52343.
 Its author's 2,679-case combined-draft runs include excluded interrupt tests
 and must not be reported as the checkpoint's AUnit count. The clean cut has
-2,665 AUnit cases before CI, plus three appended public C cases (33 builtin
-cases). Root independently read the lending/return paths and regressions;
-current-head checkpoint CI must validate the integrated cut.
+2,665 Windows AUnit cases before CI (2,660 on Unix, which omits five Windows
+platform cases), plus three appended public C cases (33 builtin cases). Root
+independently read the lending/return paths and regressions; current-head
+checkpoint CI must validate the integrated cut.
 
-Verification and PR/merge identities will be recorded after the new checkpoint
-campaign completes. At this handoff's initial revision they remain pending.
+The delivery is [PR #11](https://github.com/itsuki-hayashi/lua-ada/pull/11).
+Its checks, automatic review and merge record own the final verification and
+merge identities. The first automatic Codex review completed against 0af518b
+with no findings; both ordinary comments and inline threads were inspected.
+Initial checkpoint run 42482008016 passed Linux strict builds, C/native fixture
+checks, 2,660 AUnit cases and the frontend/opcode campaign, then failed because
+the new checkpoint script had not built the separate native oracle executable.
+That failed run is retained as failed evidence; a fresh run must validate the
+corrected dependency and all remaining gates before merge.
 The full-target workflow remains manually available and its validators reject
 incomplete receipts, stale approvals and missing global reconciliation. All
 remaining work is retained in the owning backlog and M3 contract.
