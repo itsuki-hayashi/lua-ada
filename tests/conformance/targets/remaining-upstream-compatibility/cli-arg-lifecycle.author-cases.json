@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "kind": "cli-arg-lifecycle-author-cases",
+  "author": "Codex /root/runtime_gaps",
+  "date": "2026-11-08",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "independent_feature_review": "pending",
+  "retained_base": "tests/conformance/targets/remaining-upstream-compatibility/cli-dynamic-arg.author-cases.json",
+  "selected_name": "selected script.lua",
+  "wrong_script": "error(\"ARG RETARGETED SCRIPT\",0)\n",
+  "cases": [
+    {
+      "id": "length-real-c-frame",
+      "setup": "case_name=\"length-real-c-frame\";length_ran=false;arg=setmetatable({31,false},{__len=function(self)local d=debug.getinfo(2,'Sfn');assert(d.what=='C' and type(d.func)=='function' and d.namewhat=='');local found_code,found_self=false,false;local kinds={};for i=1,100 do local n,v=debug.getlocal(2,i);if not n then break end;kinds[#kinds+1]=type(v);if type(v)=='function' and debug.getinfo(v,'S').source=='@selected script.lua' then found_code=true end;if v==self then found_self=true end end;assert(found_code and found_self);io.write('FRAME length: C, compiled=',tostring(found_code),', original=',tostring(found_self),'; cells=',table.concat(kinds,','),'\\n');length_ran=true;return 2 end});check_dynamic_arg=function(v) assert(length_ran and v.n==2 and v[1]==31 and v[2]==false) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "purpose": "Real C caller and compiled-function/original-table temporaries; record actual kinds, never require fixed backing positions.",
+      "script": "tests/conformance/platform/cli-dynamic-arg.lua",
+      "create_selected_source": true,
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout_suffix": "PASS: cli-dynamic-arg-length-real-c-frame\r\n",
+        "stdout_contains": "FRAME length: C, compiled=true, original=true;",
+        "stderr": ""
+      }
+    },
+    {
+      "id": "global-real-c-frame",
+      "setup": "case_name=\"global-real-c-frame\";lookup_ran=false;local original=_G;arg=nil;setmetatable(_G,{__index=function(self,key)assert(self==original and key=='arg');local d=debug.getinfo(2,'Sfn');assert(d.what=='C' and type(d.func)=='function' and d.namewhat=='');local found_code,found_self=false,false;local kinds={};for i=1,100 do local n,v=debug.getlocal(2,i);if not n then break end;kinds[#kinds+1]=type(v);if type(v)=='function' and debug.getinfo(v,'S').source=='@selected script.lua' then found_code=true end;if v==self then found_self=true end end;assert(found_code);io.write('FRAME global: C, compiled=',tostring(found_code),', original=',tostring(found_self),'; cells=',table.concat(kinds,','),'\\n');lookup_ran=true;return {43,false}end});check_dynamic_arg=function(v) assert(lookup_ran and v.n==2 and v[1]==43 and v[2]==false) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "purpose": "Global lookup sees actual anonymous C caller and already loaded compiled function.",
+      "script": "tests/conformance/platform/cli-dynamic-arg.lua",
+      "create_selected_source": true,
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout_suffix": "PASS: cli-dynamic-arg-global-real-c-frame\r\n",
+        "stdout_contains": "FRAME global: C, compiled=true,",
+        "stderr": ""
+      }
+    },
+    {
+      "id": "syntax-before-length",
+      "setup": "case_name=\"syntax-before-length\";arg=setmetatable({},{__len=function()io.write('LENGTH CALLBACK RAN\\n');error('BAD LENGTH ORDER',0)end});check_dynamic_arg=function(v) error('SYNTAX SCRIPT ENTERED',0) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "purpose": "Load syntax rejection precedes any argument length callback.",
+      "script": "tests/conformance/platform/cli-dynamic-arg.lua",
+      "create_selected_source": true,
+      "expected": {
+        "kind": "script-not-entered-error",
+        "exit_nonzero": true,
+        "stderr_contains": "expected",
+        "stdout": ""
+      },
+      "source_text": "local =\n"
+    },
+    {
+      "id": "missing-file-before-length",
+      "setup": "case_name=\"missing-file-before-length\";arg=setmetatable({},{__len=function()io.write('LENGTH CALLBACK RAN\\n');error('BAD LENGTH ORDER',0)end});check_dynamic_arg=function(v) error('MISSING SCRIPT ENTERED',0) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "purpose": "Opening chosen path precedes any length callback.",
+      "script": "tests/conformance/platform/cli-dynamic-arg.lua",
+      "create_selected_source": false,
+      "expected": {
+        "kind": "script-not-entered-error",
+        "exit_nonzero": true,
+        "stderr_contains": "missing-script.lua",
+        "stdout": ""
+      },
+      "selected_name": "missing-script.lua"
+    },
+    {
+      "id": "loaded-initial-environment",
+      "setup": "case_name=\"loaded-initial-environment\";local old=_G;environment_switched=false;arg=setmetatable({51,false},{__len=function(self)local r=debug.getregistry();r[2]=setmetatable({},{__index=function(_,k)error('WRONG NEW ENV '..k,0)end});environment_switched=true;collectgarbage();return 2 end});check_dynamic_arg=function(v) assert(environment_switched and _G==old and v.n==2 and v[1]==51 and v[2]==false) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "purpose": "Loaded closure keeps initial environment if __len replaces registry global table and collects.",
+      "script": "tests/conformance/platform/cli-dynamic-arg.lua",
+      "create_selected_source": true,
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout_suffix": "PASS: cli-dynamic-arg-loaded-initial-environment\r\n",
+        "stderr": ""
+      }
+    },
+    {
+      "id": "length-exit-close",
+      "setup": "case_name=\"length-exit-close\";arg=setmetatable({},{__len=function()local c <close> = setmetatable({},{__close=function()io.write('PASS: cli-dynamic-arg-length-exit-close\\n')end});os.exit(37,true)end});check_dynamic_arg=function(v) error('EXIT CALLBACK WAS NOT CALLED',0) end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "purpose": "Actual length callback exit closes lexical value and never enters selected script.",
+      "script": "tests/conformance/platform/cli-dynamic-arg.lua",
+      "create_selected_source": true,
+      "expected": {
+        "kind": "typed-exit",
+        "exit_code": 37,
+        "stdout": "PASS: cli-dynamic-arg-length-exit-close\r\n",
+        "stderr": ""
+      },
+      "native_telemetry_expected": false
+    },
+    {
+      "id": "length-refusal-recovery",
+      "setup": "case_name=\"length-refusal-recovery\";assert(type(T)=='table','REAL T REQUIRED');local function deep(n)if n>0 then return 1+deep(n-1)end;return 0 end;assert(deep(8)==8);local function allocate()return{}end;assert(pcall(allocate));fault_seen=false;arg=setmetatable({71,false},{__len=function(self)T.alloccount(0);local ok,msg=pcall(allocate);T.alloccount();assert(not ok and msg=='not enough memory');fault_seen=true;collectgarbage();self[1]=72;return 2 end});check_dynamic_arg=function(v) assert(fault_seen and v.n==2 and v[1]==72 and v[2]==false);assert(type({})=='table') end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "purpose": "Real T count refusal is caught inside callback; original arguments remain valid and healthy allocation recovers.",
+      "script": "tests/conformance/platform/cli-dynamic-arg.lua",
+      "create_selected_source": true,
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout_suffix": "PASS: cli-dynamic-arg-length-refusal-recovery\r\n",
+        "stderr": ""
+      },
+      "requires_real_T": true,
+      "requires_managed_refusal": true
+    },
+    {
+      "id": "refused-script-entry",
+      "setup": "case_name=\"refused-script-entry\";assert(type(T)=='table','REAL T REQUIRED');local function deep(n)if n>0 then return 1+deep(n-1)end;return 0 end;assert(deep(8)==8);length_ran=false;arg=setmetatable({81,false},{__len=function(self)length_ran=true;T.alloccount(0);return 2 end});check_dynamic_arg=function(v) assert(length_ran and v.n==2 and v[1]==81 and v[2]==false);assert(type({})=='table') end",
+      "script_arguments": [
+        "a",
+        "b",
+        "c"
+      ],
+      "purpose": "After warmed stack, callback leaves M0 armed until actual selected script restores it; preserved typed args then recover.",
+      "script": "tests/conformance/platform/cli-dynamic-arg-refused-entry.lua",
+      "create_selected_source": true,
+      "expected": {
+        "kind": "script-completed",
+        "exit_code": 0,
+        "stdout_suffix": "PASS: cli-dynamic-arg-refused-script-entry\r\n",
+        "stderr": ""
+      },
+      "requires_real_T": true
+    }
+  ]
+}
