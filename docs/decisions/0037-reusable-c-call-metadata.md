@@ -37,7 +37,10 @@ cross-context calls, frame retirement, suspension, host abort and self-close.
 Only genuine C guard completion/discard returns it. Frame shrink frees unused
 nodes above the current capacity; live nodes defer trimming until ACK. Physical
 control disposal requires zero outstanding records and releases every unused
-node before freeing its owner. No waiting Ada frame permits a foreign jump.
+node before freeing its owner. All physical frame deletion, including the
+test-only resetCI cache command, delegates to the same checked private engine
+release so actual capacity and metadata trimming cannot diverge. No waiting
+Ada frame permits a foreign jump.
 
 The same public zero-growth witness exposed independent private return copies:
 a fresh canonical Unwind_Results packet, three controlled Action copies and

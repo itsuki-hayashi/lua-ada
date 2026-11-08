@@ -88,6 +88,21 @@ local cases={
     assert(coroutine.close(co))
     assert(T.testC('call 0 1;return 1',function()return 43 end)==43)
   end},
+  {'ResetCI_Outstanding',function()
+    deep(48)
+    local a,b=T.testC(code,function()
+      T.resetCI();error(17)
+    end)
+    assert(a==17 and b=='ERRRUN')
+    assert(T.testC('call 0 1;return 1',function()return 37 end)==37)
+  end},
+  {'ResetCI_Refusal',function()
+    deep(48)
+    T.alloccount(0)
+    T.resetCI()
+    T.alloccount()
+    assert(T.testC('call 0 1;return 1',function()return 41 end)==41)
+  end},
   {'Primitive_Strings',function()
     local a=string.rep('x',4096)
     local b=string.rep('x',4096)

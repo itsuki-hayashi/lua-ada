@@ -2,6 +2,8 @@
 
 Feature review: [private string-table observations](2026-11-08-querystr-feature-review.md).
 
+Correction: [resetCI owning release](2026-11-08-resetci-owning-release.md).
+
 Source review: [fixed-buffer binding refresh](2026-11-08-api18-binding-refresh.md).
 
 Component: [public optimizer semantics witnesses](2026-11-08-code-public-semantics.md).

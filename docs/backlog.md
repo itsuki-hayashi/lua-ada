@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+The [resetCI owning-release follow-up](sessions/2026-11-08-resetci-owning-release.md)
+passes actual warmed-cache capacity/release, outstanding-guard and permanent
+refusal controls within 2,507 AUnit cases per local mode. Preserve its physical
+frame-count/metadata-trim invariant while continuing the reviewed memory/API
+sources and final matrix; no source obligation is closed by this component.
+
 The [source-linked optimizer witnesses](sessions/2026-11-08-code-public-semantics.md)
 pass 29 new cases within 2,468 AUnit cases in each local mode and all eight
 compiler/VM roles. Independently review their source bindings and the revised

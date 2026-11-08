@@ -1231,6 +1231,15 @@ private package Lua.Engine is
    --  reserved capacity, then cache it in Item.Context. Null is a no-op;
    --  double retirement is internal misuse and raises Program_Error.
 
+   procedure Free_Frame (Item : in out Frame_Access);
+   --  Physically release one detached activation through its owning context.
+   --  The caller must unlink it from every active/cache/reset list and finish
+   --  all execution/borrow obligations first. This decrements actual frame
+   --  capacity and trims unused C metadata; outstanding records stay owned
+   --  until their genuine guard ACK. Context and memory outlive the call.
+   --  Null is a no-op; invalid owner/capacity raises Program_Error. This is
+   --  an internal lifecycle primitive, never a public embedding operation.
+
    procedure Destroy_Frames
      (State : in out World; Context : not null Context_Access);
    --  Teardown only: destroy active and cached activations exactly once.

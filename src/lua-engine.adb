@@ -113,7 +113,6 @@ package body Lua.Engine is
      (Prototype, Prototype_Access);
    procedure Free_Frame_Storage is new Ada.Unchecked_Deallocation
      (Frame, Frame_Access);
-   procedure Free_Frame (Item : in out Frame_Access);
    procedure Free_Frame (Item : in out Frame_Access) is
       Context : Context_Access;
    begin

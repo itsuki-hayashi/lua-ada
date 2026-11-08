@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [resetCI ownership correction](sessions/2026-11-08-resetci-owning-release.md)
+uses the checked private frame release and retires unused metadata reservations.
+Both local configurations pass 2,507 AUnit cases and all ordinary C consumers;
+twenty-one metadata witnesses match all four T producer/VM roles. Whole-source
+memory/API and final platform acceptance remain open.
+
 The [public optimizer witnesses](sessions/2026-11-08-code-public-semantics.md)
 preserve numeric values/kinds, exact result counts, callback/assignment order,
 constant dump/load and constructor boundaries. Both local modes pass 2,468

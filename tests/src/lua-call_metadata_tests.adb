@@ -46,6 +46,9 @@ package body Lua.Call_Metadata_Tests is
    procedure Error_After_Shrink;
    procedure Cross_Context_Return;
    procedure Cross_Context_Error;
+   procedure ResetCI_Capacity;
+   procedure ResetCI_Outstanding;
+   procedure ResetCI_Refusal;
 
    procedure Check (Name : String) is
       State : World;
@@ -474,6 +477,57 @@ package body Lua.Call_Metadata_Tests is
       Check ("Cross_Context_Error");
    end Cross_Context_Error;
 
+   procedure ResetCI_Capacity is
+      State : World;
+      Before_Capacity : Natural;
+      Before_Bytes : Lua.Storage.Byte_Count;
+      Expected : Natural;
+   begin
+      Initialize (State, (others => <>));
+      Prepare (State);
+      --  Warm actual recursive VM depth, then stop automatic collection so
+      --  resetCI itself owns the physical cache deletion being measured.
+      Assert (Execute
+        (State, "collectgarbage('stop');local function deep(n)" &
+         "if n>0 then deep(n-1)end end;deep(48)", "=reset-cache-warm"),
+        Failure_Image (State.Current));
+      Assert (State.Current.Cache_Count > 16,
+              "resetCI fixture did not warm real cached frames");
+      Before_Capacity := State.Current.Frame_Capacity;
+      Before_Bytes := Lua.Storage.Statistics (State.Memory).Raw_Bytes;
+      Assert (Execute (State, "T.resetCI()", "=reset-cache"),
+              Failure_Image (State.Current));
+      Expected := State.Current.Cache_Count + State.Current.Reset_Frame_Count +
+        Natural (State.Current.Stack.Length) +
+        (if State.Current.Base_C_Frame = null then 0 else 1);
+      Assert (State.Current.Frame_Capacity = Expected and then
+              State.Current.Frame_Capacity < Before_Capacity,
+              "resetCI retained deleted physical frame reservations");
+      Assert (Lua.Storage.Statistics (State.Memory).Raw_Bytes < Before_Bytes,
+              "resetCI did not release warmed physical owner allocations");
+      Assert (Execute (State, "assert(37==37)", "=reset-cache-recovery"),
+              Failure_Image (State.Current));
+      Finalize (State);
+      Assert (Lua.Storage.Statistics (State.Memory).Live_Blocks = 0,
+              "resetCI owning release retained selected provider blocks");
+   exception
+      when others => Finalize (State); raise;
+   end ResetCI_Capacity;
+
+   procedure ResetCI_Outstanding is
+   begin
+      --  resetCI physically frees only cached owners while this real outer
+      --  C call still needs its metadata through numeric-error guard ACK.
+      Check ("ResetCI_Outstanding");
+   end ResetCI_Outstanding;
+
+   procedure ResetCI_Refusal is
+   begin
+      --  Cache and unused metadata deletion allocate nothing, even after
+      --  the actual provider refuses growth; a following call stays healthy.
+      Check ("ResetCI_Refusal");
+   end ResetCI_Refusal;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "C metadata: pure Ada frame capacity",
@@ -536,5 +590,11 @@ package body Lua.Call_Metadata_Tests is
                         Cross_Context_Return'Access);
       Test_Support.Add (Suite, "C metadata: cross-context error after shrink",
                         Cross_Context_Error'Access);
+      Test_Support.Add (Suite, "C metadata: resetCI physical capacity release",
+                        ResetCI_Capacity'Access);
+      Test_Support.Add (Suite, "C metadata: resetCI outstanding guard",
+                        ResetCI_Outstanding'Access);
+      Test_Support.Add (Suite, "C metadata: resetCI actual growth refusal",
+                        ResetCI_Refusal'Access);
    end Register;
 end Lua.Call_Metadata_Tests;

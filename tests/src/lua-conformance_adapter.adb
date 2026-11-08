@@ -1,5 +1,4 @@
 with Ada.Unchecked_Conversion;
-with Ada.Unchecked_Deallocation;
 with Interfaces.C;
 with Interfaces;
 with Lua.Engine.Foreign;
@@ -23,8 +22,6 @@ package body Lua.Conformance_Adapter is
    use type Lua.Storage.Byte_Count;
    use type Foreign.C_Function;
    use type System.Address;
-   procedure Free_Frame is new Ada.Unchecked_Deallocation
-     (Frame, Frame_Access);
 
    procedure Verify_Collector_Lists (State : World) is
       Live, Generations, Gray_Count, Remembered_Count : Natural := 0;
@@ -537,7 +534,10 @@ package body Lua.Conformance_Adapter is
                   Context.Cache_Head := Discarded.Cache_Next;
                   Context.Cache_Count := Context.Cache_Count - 1;
                   Discarded.Cache_Next := null;
-                  Free_Frame (Discarded);
+                  --  Physical deletion must also retire the actual frame
+                  --  reservation. The owning engine keeps live C records
+                  --  until ACK while trimming only unused metadata nodes.
+                  Lua.Engine.Free_Frame (Discarded);
                end loop;
             end;
          when 10 =>
