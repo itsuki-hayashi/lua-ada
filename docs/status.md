@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [retained T replay](sessions/2026-11-08-retained-t-source-replay.md)
+completes the reviewed calls.lua equivalent locally with unchanged native
+stdout. The API lifecycle composition advances to original line1090's ordinary
+count/line-hook ordering assertion. Both original source parents and all final
+head/platform acceptance remain pending; source approval alone closes none.
+
 The [assert argument checkpoint](sessions/2026-11-08-assert-arguments.md)
 preserves missing-versus-nil diagnostics, collecting argument-name callbacks
 and successful tuples. Both local configurations pass 2,359 AUnit cases and

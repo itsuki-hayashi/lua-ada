@@ -1,5 +1,7 @@
 # Session Records
 
+Observation: [retained T source replay](2026-11-08-retained-t-source-replay.md).
+
 Source review: [exact API/calls equivalents](2026-11-08-exact-api-calls-equivalents.md).
 
 Component: [assert argument presence](2026-11-08-assert-arguments.md).
