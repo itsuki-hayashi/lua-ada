@@ -7,6 +7,11 @@ is implemented and locally verified. Continue the actual C call metadata and
 canonical return-packet refusal paths, legacy input-sized builders, registry
 traceback callbacks and linear reader integration. Both local 2,300-case AUnit
 passes and focused C/binary witnesses leave all final target gates required.
+The [coroutine result portal](sessions/2026-11-08-coroutine-result-portals.md)
+checkpoint passes six focused cases and original unchanged coroutine.lua in
+both local configurations. Continue the thin T traceback command, exact
+unreduced testC memory-refusal entry diagnosis, reader portal and integrated
+remote/aggregate acceptance. No source gate is omitted by this checkpoint.
 
 Integrate the [managed diagnostic-text component](sessions/2026-11-08-managed-diagnostic-text.md)
 into failure delivery after the pending return/close checkpoint. Preserve

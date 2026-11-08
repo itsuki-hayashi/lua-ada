@@ -8,6 +8,12 @@ Both local configurations pass 2,300 AUnit cases, all standalone C consumers
 and the eight compiler/VM roles for its public fixture. Long C-prefix mode
 errors and instruction-policy distinctions have focused regressions. The
 complete allocation audit and final source/platform acceptance remain open.
+The [coroutine portal checkpoint](sessions/2026-11-08-coroutine-result-portals.md)
+returns native false/error behavior when a parent cannot hold child results,
+while preserving yielded/wrapped children and host-budget policy. Six new
+cases pass within 2,298 AUnit cases per isolated configuration. Unchanged
+coroutine.lua now matches native stdout with no _soft in both local modes,
+including its T API sections. Remote replay and full-target gates remain open.
 
 The [managed diagnostic-text component](sessions/2026-11-08-managed-diagnostic-text.md)
 passes fourteen focused ownership/refusal cases; both local configurations

@@ -4119,6 +4119,15 @@ package body Lua.Engine.Machine is
                      Packet := Activation.Native_Results;
                      if Name = "coroutine.wrapped" then
                         if not Packet (1).Boolean_Data then
+                           if Activation.Result_Failure_Class = No_Failure
+                           then
+                              --  auxresume could not reserve the caller's
+                              --  result area. The child itself succeeded or
+                              --  yielded; wrapping must raise this message
+                              --  without closing a healthy suspended body.
+                              Raise_Value (Self, Packet (2));
+                              return;
+                           end if;
                            Activation.Unwind_Error := Packet (2);
                            Root_Barrier (State, Activation.Unwind_Error);
                            Activation.Native_Stage := 2;
@@ -5441,19 +5450,74 @@ package body Lua.Engine.Machine is
             Child : constant Context_Access := State.Current;
             Kind : constant Transfer_Kind := Child.Transfer.Kind;
             Parent : constant Context_Access := Child.Resumer;
-            Packet : Values.Vector := Owned_Values (State);
+            Reset_Error : constant Boolean := Child.C_Reset_Error;
+            Receiver : Frame_Access;
+            Delivery_Error : Boolean := False;
+
+            function Can_Return_Results return Boolean;
+            function Can_Return_Results return Boolean is
+               Name : constant String := Native_Operation_Name (Receiver);
+               Window : constant Frame_Access :=
+                 (if Receiver.Has_Stack_Window then Receiver else
+                    Stack_Views.Physical_Owner (Parent));
+               Base : constant Natural :=
+                 (if Window = null then Parent.Foreign_Base
+                  else Window.Stack_Base);
+               Extra : constant Positive :=
+                 (if Name = "coroutine.resume" then 2 else 1);
+               Count : constant Natural :=
+                 Natural (Child.Transfer.Results.Length);
+               Last : Natural;
+            begin
+               if Kind = Lua_Raised or else Reset_Error or else
+                 Name not in "coroutine.resume" | "coroutine.wrapped"
+               then
+                  return True;
+               end if;
+               --  auxresume checks nres+1 above the C function's remaining
+               --  prefix before moving any values. resume retains its thread
+               --  argument; wrapped has consumed all ordinary arguments.
+               --  This is the real recipient reservation, including a direct
+               --  builtin call borrowing a C/Lua view, not the child's room.
+               if Base > Natural'Last - Extra or else
+                 Count > Natural'Last - Base - Extra
+               then
+                  return False;
+               end if;
+               Last := Base + Count + Extra;
+               if not Ensure_Stack
+                 (State, Parent, Last, Raise_Error => False)
+               then
+                  return False;
+               end if;
+               if Window /= null then
+                  Resize_Stack_Window
+                    (State, Window, Natural'Max
+                       (Window.Stack_Window_Length, Last - Base));
+               else
+                  Parent.Stack_Used := Natural'Max
+                    (Parent.Stack_Used, Last);
+               end if;
+               return True;
+            end Can_Return_Results;
          begin
             if Parent /= null then
+               if Parent.Stack.Is_Empty then
+                  raise Program_Error with "coroutine recipient is missing";
+               end if;
+               Receiver := Parent.Stack.Last_Element;
+               Delivery_Error := not Can_Return_Results;
                if State.Policy = Bounded then
                   declare
                      Raw_Count : constant Ada.Containers.Count_Type :=
                        Child.Transfer.Results.Length;
                      Published_Count : constant Ada.Containers.Count_Type :=
-                       (if Child.C_Reset_Error then 2 else Raw_Count + 1);
+                       (if Reset_Error or else Delivery_Error then 2
+                        else Raw_Count + 1);
                      Work : constant Ada.Containers.Count_Type :=
-                       Raw_Count + 3 * Published_Count;
+                       Raw_Count + 2 * Published_Count;
                   begin
-                     --  Meter the real pin/packet/receiver passes, not the
+                     --  Meter the real pin/barrier/receiver passes, not the
                      --  eliminated controlled-record snapshot. Keep the
                      --  original transfer intact if this quota rejects it.
                      if Work > Ada.Containers.Count_Type
@@ -5465,7 +5529,9 @@ package body Lua.Engine.Machine is
                      State.Steps := State.Steps + Natural (Work);
                   end;
                end if;
-               Pin (State, Child.Transfer.Results);
+               if not Delivery_Error then
+                  Pin (State, Child.Transfer.Results);
+               end if;
                Child.Transfer.Kind := No_Transfer;
                Child.Transfer.Target := 0;
             end if;
@@ -5508,19 +5574,36 @@ package body Lua.Engine.Machine is
             Child.Resumer := null;
             State.Current := Parent;
             Parent.Status := Running_Context;
-            Packet.Append
-              (Value'(Boolean_Kind, Kind /= Lua_Raised));
-            if Child.C_Reset_Error then
-               Packet.Append (Child.Failure);
+            --  Publish directly into the real receiver's retained packet.
+            --  The child remains an owner until this publication finishes;
+            --  a separate controlled transfer/temporary vector is needless.
+            Receiver.Native_Results.Reserve_Capacity
+              ((if Reset_Error or else Delivery_Error then 2
+                else Child.Transfer.Results.Length + 1));
+            Receiver.Native_Results.Clear;
+            Append_Root
+              (State, Receiver.Native_Results,
+               (Boolean_Kind, Kind /= Lua_Raised and then not Delivery_Error));
+            if Delivery_Error then
+               Child.Transfer.Results.Clear;
+               Append_Root
+                 (State, Receiver.Native_Results,
+                  New_String (State, "too many results to resume"));
+            elsif Reset_Error then
+               Append_Root (State, Receiver.Native_Results, Child.Failure);
                Child.C_Reset_Error := False;
             else
-               for Item of Child.Transfer.Results loop
-                  Packet.Append (Item);
-               end loop;
+               Append_Root
+                 (State, Receiver.Native_Results, Child.Transfer.Results);
             end if;
-            Copy_Roots
-              (State, Parent.Stack.Last_Element.Native_Results,
-               Packet);
+            Receiver.Result_Failure_Class :=
+              (if not Delivery_Error and then
+                   (Kind = Lua_Raised or else Reset_Error)
+               then Child.Failure_Class else No_Failure);
+            Receiver.Result_Handler_Called :=
+              not Delivery_Error and then
+              (Kind = Lua_Raised or else Reset_Error) and then
+              Child.Failure_Handled;
             --  Preserve the original child packet until the actual receiver
             --  owns every result. Only scalar transfer metadata is snapshotted
             --  above; the ordinary root path needs no duplicate value buffer.

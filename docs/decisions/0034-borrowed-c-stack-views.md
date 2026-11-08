@@ -77,6 +77,16 @@ existing native publication bit to Return_Window_Published so callback,
 canonical and native-tail returns preserve actual counts across closing,
 return hooks and external-release deferral.
 
+Coroutine handoff reserves the actual resumer's result area before copying
+successful/yielded values. Follow pinned lcorolib.c auxresume: a missing
+result area returns false and "too many results to resume", rather than
+escaping coroutine.resume as stack overflow. Keep a yielded child suspended
+and resumable after discarding that delivery. A wrapper raises the portal
+message without closing a healthy child; actual child failure metadata still
+selects its existing close/error path. Write directly to the recipient's
+owned packet and charge actual pin/barrier/copy or discard passes. Host
+instruction/physical failures retain their typed abort behavior.
+
 Nine separately named public C regressions cover real scalar edits, hook
 removal/nested calls, protected and unprotected errors, blocked nested yield,
 direct hook yield, weak argument/upvalue release, and allocator reentry into

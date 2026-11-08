@@ -10,6 +10,7 @@ with Lua.Failure_Storage_Tests;
 with Lua.Conformance_Adapter_Tests;
 with Lua.API_Command_Tests;
 with Lua.Foreign_Hook_Tests;
+with Lua.Coroutine_Portal_Tests;
 with Lua.Foreign_Continuation_Tests;
 with Lua.Math_Reopen_Tests;
 with Lua.Library_Opener_Tests;
@@ -185,6 +186,7 @@ procedure Test_Runner is
       Lua.Conformance_Adapter_Tests.Register (Result);
       Lua.API_Command_Tests.Register (Result);
       Lua.Foreign_Hook_Tests.Register (Result);
+      Lua.Coroutine_Portal_Tests.Register (Result);
       Lua.Foreign_Continuation_Tests.Register (Result);
       Lua.Math_Reopen_Tests.Register (Result);
       Lua.Library_Opener_Tests.Register (Result);
