@@ -23,16 +23,16 @@
     "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.author-proposal.json",
     "sha256": "6cd1e2c1e912d22c4bcdbaee0c9587d47be903c27668fa7a5fd22f199574cab8"
   },
-  "policy_binding_status": "Bound to the installed exact private child exclusion. Transformation semantic approval remains pending; original mixed parent and whole-file/runtime acceptance remain required.",
-  "independent_review_status": "pending-exact-transform-review",
+  "policy_binding_status": "Exact private child and disposable transformation independently reviewed; runtime, mixed parent and whole-target acceptance remain required.",
+  "independent_review_status": "accepted-exact-transform-only",
   "runtime_acceptance": false,
   "coverage_authority": false,
   "review": {
-    "reviewer": null,
-    "artifact_sha256": null,
-    "artifact": null,
-    "status": "pending",
-    "author": "Codex /root/validation_delivery"
+    "author": "Codex /root/validation_delivery",
+    "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.transform-approval.json",
+    "status": "accepted",
+    "artifact_sha256": "0c756a649ecc78a6e3b2490e35a06361ced41abb5fe7373f5214e63f5969aaef",
+    "reviewer": "Codex /root"
   },
   "source_feature_review": {
     "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json",

@@ -470,11 +470,16 @@ Case 'installed API feature approval excludes only its derived child and grants 
     $spec=Get-Content (Join-Path $root "$base/api-fixed-buffer-private-bound.transform.json") -Raw|ConvertFrom-Json -AsHashtable -Depth 64
     $hash=(Get-FileHash (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility.exclusions.json')).Hash.ToLowerInvariant()
     $resolved=@{};$resolved[$target.Exclusions[0].id]=$target.Exclusions[0]
-    Assert-Rejected {Get-ConformanceTReplay -Root $root -Specification $spec -PolicySha256 $hash -ResolvedExclusions $resolved} 'lacks independent semantic approval'
-    $replay=Get-ConformanceTReplay -Root $root -Specification $spec -PolicySha256 $hash -ResolvedExclusions $resolved -AllowUnreviewedDiagnostics
+    $pending=$spec|ConvertTo-Json -Depth 64|ConvertFrom-Json -AsHashtable -Depth 64
+    $pending.review.status='pending'
+    Assert-Rejected {Get-ConformanceTReplay -Root $root -Specification $pending -PolicySha256 $hash -ResolvedExclusions $resolved} 'lacks independent semantic approval'
+    $replay=Get-ConformanceTReplay -Root $root -Specification $pending -PolicySha256 $hash -ResolvedExclusions $resolved -AllowUnreviewedDiagnostics
     $text=[Text.Encoding]::UTF8.GetString($replay.bytes)
     Assert-True ($replay.diagnostic_only -and $replay.sha256 -ceq '51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc' -and
         $text.Contains('assert(m2 > m1)') -and $text.Contains('checkerr(":301:", code)')) 'Pending transform changed retained behavior or acquired acceptance'
+    $approved=Get-ConformanceTReplay -Root $root -Specification $spec -PolicySha256 $hash -ResolvedExclusions $resolved
+    Assert-True (-not $approved.diagnostic_only -and $approved.sha256 -ceq $replay.sha256 -and
+        $parent[0].status -ceq 'pending' -and @($parent[0].evidence).Count -eq 0) 'Exact transform review became runtime evidence'
 }
 
 Case 'target overlay resolves one cited obligation without rewriting its ledger' {
