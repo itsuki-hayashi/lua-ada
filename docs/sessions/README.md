@@ -219,3 +219,7 @@ review; it grants no original main.lua coverage.
 The [Windows real-signal broker observation](2026-11-08-windows-real-signals.md)
 preserves real native Ctrl-C delivery and the failing abrupt T teardown; its
 complete native-positive gate remains false.
+
+The [Windows signal exit-class correction](2026-11-08-windows-signal-exit-class.md)
+requires the actual control-C exit status and checked OS cleanup while retaining
+the failing abrupt T teardown.

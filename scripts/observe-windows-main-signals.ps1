@@ -14,6 +14,7 @@ $dir = Join-Path $root ('reports/windows-main-signals/' +
     [guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($dir)
 $utf8 = [Text.UTF8Encoding]::new($false)
+$controlCExit = [Convert]::ToUInt32('C000013A', 16)
 
 function Hash([string] $Path) {
     (Get-FileHash -LiteralPath $Path).Hash.ToLowerInvariant()
@@ -214,7 +215,8 @@ $failed = $false
                 [IO.File]::ReadAllText($childOut) -ceq "12`r`n42`r`n" -and
                 (Get-Item -LiteralPath $childErr).Length -eq 0 -and $sidecars.Count -eq 1
         } else {
-            $ok = $ok -and $requests.Count -ge 2 -and $exitEvents[0].value -ne 0 -and
+            $ok = $ok -and $requests.Count -ge 2 -and
+                $exitEvents[0].value -eq $controlCExit -and
                 [IO.File]::ReadAllText($childOut) -ceq "15`r`n" -and
                 (Get-Item -LiteralPath $childErr).Length -eq 0
         }

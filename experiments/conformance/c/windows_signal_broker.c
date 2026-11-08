@@ -15,6 +15,9 @@
 #define CHILD_DEADLINE_MS 25000
 #define DRAIN_DEADLINE_MS 1000
 #define REQUEST_LIMIT 100
+/* A different nonzero status (for example an access violation) is not
+ * evidence of Ctrl-C termination, even after successful delivery requests. */
+#define EXPECTED_CONTROL_C_EXIT ((DWORD)0xC000013AUL)
 
 typedef struct {
     HANDLE pipe;
@@ -28,6 +31,8 @@ typedef struct {
 static FILE *events;
 static ULONGLONG started;
 static DWORD child_pid;
+static int cleanup_ok = 1;
+static unsigned long closed_handles;
 
 static void event(const char *name, int ok, DWORD error, ULONGLONG value) {
     fprintf(events,
@@ -42,7 +47,12 @@ static void event(const char *name, int ok, DWORD error, ULONGLONG value) {
 
 static void close_handle(HANDLE *handle) {
     if (*handle != NULL && *handle != INVALID_HANDLE_VALUE) {
-        CloseHandle(*handle);
+        if (!CloseHandle(*handle)) {
+            cleanup_ok = 0;
+            event("close-owned-handle-failed", 0, GetLastError(), 0);
+        } else {
+            closed_handles++;
+        }
         *handle = NULL;
     }
 }
@@ -125,10 +135,11 @@ static int source_argument(const wchar_t *path, wchar_t *source) {
         size.QuadPart > SOURCE_LIMIT ||
         !ReadFile(input, bytes, (DWORD)size.QuadPart, &count, NULL) ||
         count != (DWORD)size.QuadPart) {
-        CloseHandle(input);
+        close_handle(&input);
         return 0;
     }
-    CloseHandle(input);
+    close_handle(&input);
+    if (!cleanup_ok) return 0;
     if (memchr(bytes, '\0', count) != NULL) return 0;
     length = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, bytes,
                                 (int)count, source, SOURCE_LIMIT);
@@ -245,7 +256,9 @@ int wmain(int argc, wchar_t **argv) {
     /* Only this subprocess detaches. Its parent is never attached/detached
      * or signalled. The new child console exists independently of stdio. */
     result = FreeConsole();
-    event("detach-broker", result != 0, result ? 0 : GetLastError(), 0);
+    attach_error = result ? 0 : GetLastError();
+    event("detach-broker", result != 0, attach_error, 0);
+    if (!result && attach_error != ERROR_INVALID_HANDLE) goto cleanup;
     expected = search ? "15\r\n" : "12\r\n";
     while (GetTickCount64() - started < CHILD_DEADLINE_MS) {
         if (!drain(&output) || !drain(&errors)) goto cleanup;
@@ -325,7 +338,7 @@ int wmain(int argc, wchar_t **argv) {
         goto cleanup;
     }
     if (search) {
-        success = ready && requests >= 2 && status != 0 &&
+        success = ready && requests >= 2 && status == EXPECTED_CONTROL_C_EXIT &&
                   output.bytes == 4 && errors.bytes == 0;
     } else {
         success = ready && requests == 1 && status == 0 && errors.bytes == 0 &&
@@ -345,7 +358,10 @@ cleanup:
         event("cleanup-child-wait", result == WAIT_OBJECT_0,
               result == WAIT_FAILED ? GetLastError() : 0, result);
     }
-    if (attached) FreeConsole();
+    if (attached && !FreeConsole()) {
+        cleanup_ok = 0;
+        event("detach-child-console-failed", 0, GetLastError(), 0);
+    }
     close_handle(&process.hThread);
     close_handle(&process.hProcess);
     close_handle(&out_write);
@@ -355,10 +371,15 @@ cleanup:
     close_handle(&output.pipe);
     close_handle(&errors.pipe);
     if (attributes_ready) DeleteProcThreadAttributeList(startup.lpAttributeList);
-    if (startup.lpAttributeList != NULL)
-        HeapFree(GetProcessHeap(), 0, startup.lpAttributeList);
+    if (startup.lpAttributeList != NULL &&
+        !HeapFree(GetProcessHeap(), 0, startup.lpAttributeList)) {
+        cleanup_ok = 0;
+        event("free-attribute-storage-failed", 0, GetLastError(), 0);
+    }
     if (output.file != NULL && fclose(output.file) != 0) success = 0;
     if (errors.file != NULL && fclose(errors.file) != 0) success = 0;
+    event("cleanup-complete", cleanup_ok, 0, closed_handles);
+    if (!cleanup_ok || ferror(events)) success = 0;
     event("final-result", success && !forced, 0, requests);
     if (fclose(events) != 0) success = 0;
     return success && !forced ? 0 : 1;

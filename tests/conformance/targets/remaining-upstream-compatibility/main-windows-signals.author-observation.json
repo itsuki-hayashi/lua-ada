@@ -3,7 +3,7 @@
   "kind": "windows-main-real-sigint-author-observation",
   "author": "Codex /root/runtime_gaps",
   "date": "2026-11-08",
-  "base_revision": "7a987882dfe73f0d4b5b793e5de46025345177b0",
+  "base_revision": "1c4c92af27956288b27406fc8254ffd4854c320f",
   "author_only": true,
   "independent_review": "pending",
   "source_approval": false,
@@ -32,12 +32,14 @@
     "group_id": 0,
     "terminate_cleanup_is_failure": true,
     "attach_retry_max_ms": 2000,
-    "new_child_console": true
+    "new_child_console": true,
+    "expected_search_exit_status": 3221225786,
+    "checked_cleanup_required": true
   },
   "source_bindings": [
     {
       "path": "experiments/conformance/c/windows_signal_broker.c",
-      "sha256": "35ca607c68df98ca8688a6a1d200213767b6494ff0f10ba01aedde78514c8306"
+      "sha256": "3ba9ef3e37887a7692fabfe4202e29af12baca893bdfec050184c65b936d3f5b"
     },
     {
       "path": "tests/conformance/platform/windows-main-sigint-protected.lua",
@@ -49,7 +51,7 @@
     },
     {
       "path": "scripts/observe-windows-main-signals.ps1",
-      "sha256": "755df213a52bb2ebb035d5c41f49135f489ccdd770bb9633bdc2de9d8b897116"
+      "sha256": "80c8e6c77c2de1ad48ffb3901dc8b3b8a0e298f5c2869ce7770cbc6561dea725"
     },
     {
       "path": "scripts/ConformanceRunner.psm1",
@@ -64,8 +66,8 @@
       "sha256": "17ce8e73dd3586b84076ceaad9d638887723a1c60945c6ee086d723a6e61453f"
     },
     {
-      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199",
-      "path": "references/lua/ltests.c"
+      "path": "references/lua/ltests.c",
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
     }
   ],
   "source_anchors": [
@@ -144,57 +146,59 @@
   ],
   "results": [
     {
-      "request_count": 1,
+      "normal_return_telemetry": true,
+      "abrupt_missing_telemetry": false,
+      "kind": "protected",
+      "configuration": "default",
+      "actual_exit_code": 0,
       "classification": "PASS-authored-native-control",
       "strict_pass": true,
-      "abrupt_missing_telemetry": false,
       "accounting_claim": "actual-normal-return-balanced",
-      "configuration": "default",
-      "kind": "protected",
-      "actual_exit_code": 0,
-      "normal_return_telemetry": true
+      "request_count": 1
     },
     {
-      "request_count": 2,
-      "classification": "PASS-authored-native-control",
-      "strict_pass": true,
+      "normal_return_telemetry": false,
       "abrupt_missing_telemetry": true,
-      "accounting_claim": "unavailable-no-normal-return-telemetry",
-      "configuration": "default",
       "kind": "search",
+      "configuration": "default",
       "actual_exit_code": 3221225786,
-      "normal_return_telemetry": false
-    },
-    {
-      "request_count": 1,
       "classification": "PASS-authored-native-control",
       "strict_pass": true,
-      "abrupt_missing_telemetry": false,
-      "accounting_claim": "actual-normal-return-balanced",
-      "configuration": "upstream-test",
-      "kind": "protected",
-      "actual_exit_code": 0,
-      "normal_return_telemetry": true
+      "accounting_claim": "unavailable-no-normal-return-telemetry",
+      "request_count": 2
     },
     {
-      "request_count": 5,
+      "normal_return_telemetry": true,
+      "abrupt_missing_telemetry": false,
+      "kind": "protected",
+      "configuration": "upstream-test",
+      "actual_exit_code": 0,
+      "classification": "PASS-authored-native-control",
+      "strict_pass": true,
+      "accounting_claim": "actual-normal-return-balanced",
+      "request_count": 1
+    },
+    {
+      "normal_return_telemetry": false,
+      "abrupt_missing_telemetry": true,
+      "kind": "search",
+      "configuration": "upstream-test",
+      "actual_exit_code": 3221225786,
       "classification": "FAIL-native-T-abrupt-teardown-assertion",
       "strict_pass": false,
-      "abrupt_missing_telemetry": true,
       "accounting_claim": "unavailable-no-normal-return-telemetry",
-      "configuration": "upstream-test",
-      "kind": "search",
-      "actual_exit_code": 3221225786,
-      "normal_return_telemetry": false
+      "request_count": 5
     }
   ],
   "current_observation": {
+    "path": "reports/windows-main-signals/6b2d43bcc8904d50a5b22a66f84ff9ed/observation.json",
+    "sha256": "2a3c4fcdca53b181999fbbdbdfd5c597e30416f333af70a629b901030699b05c",
     "data": {
       "schema_version": 1,
       "kind": "windows-main-real-sigint-native-author-observation",
       "author": "Codex /root/runtime_gaps",
       "date": "2026-11-08",
-      "base_revision": "7a987882dfe73f0d4b5b793e5de46025345177b0",
+      "base_revision": "1c4c92af27956288b27406fc8254ffd4854c320f",
       "source_approval": false,
       "adaptation_approval": false,
       "native_applicability_approval": false,
@@ -210,7 +214,7 @@
       "source_bindings": [
         {
           "path": "experiments/conformance/c/windows_signal_broker.c",
-          "sha256": "35ca607c68df98ca8688a6a1d200213767b6494ff0f10ba01aedde78514c8306"
+          "sha256": "3ba9ef3e37887a7692fabfe4202e29af12baca893bdfec050184c65b936d3f5b"
         },
         {
           "path": "tests/conformance/platform/windows-main-sigint-protected.lua",
@@ -222,7 +226,7 @@
         },
         {
           "path": "scripts/observe-windows-main-signals.ps1",
-          "sha256": "755df213a52bb2ebb035d5c41f49135f489ccdd770bb9633bdc2de9d8b897116"
+          "sha256": "80c8e6c77c2de1ad48ffb3901dc8b3b8a0e298f5c2869ce7770cbc6561dea725"
         },
         {
           "path": "scripts/ConformanceRunner.psm1",
@@ -239,24 +243,26 @@
       ],
       "original_payloads": [
         {
-          "kind": "protected",
-          "text": "pcall(function () print(12); while true do end end); print(42)",
+          "original_byte_offset": 15227,
           "original_byte_length": 62,
-          "original_byte_offset": 15227
+          "text": "pcall(function () print(12); while true do end end); print(42)",
+          "kind": "protected"
         },
         {
-          "kind": "search",
-          "text": "print(15); string.find(string.rep('a', 100000), '.*b')",
+          "original_byte_offset": 15642,
           "original_byte_length": 54,
-          "original_byte_offset": 15642
+          "text": "print(15); string.find(string.rep('a', 100000), '.*b')",
+          "kind": "search"
         }
       ],
       "build": {
-        "compiler_sha256": "1821ef75f8846caa271bbe53a7481b75fae5bac87bcebfe9a179800d2579f44d",
-        "source_snapshot": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\broker-source.c",
+        "source_sha256": "3ba9ef3e37887a7692fabfe4202e29af12baca893bdfec050184c65b936d3f5b",
+        "broker_sha256": "769c7c0777d1def5f261b7cdf3692b712549199de6c0d5544c7d8563274f8819",
+        "source_snapshot": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\broker-source.c",
+        "compiler": "C:\\Users\\Itsuki\\AppData\\Local\\alire\\cache\\toolchains\\gnat_native_16.1.0_bbd69633\\bin\\gcc.exe",
         "process": {
           "executable": "C:\\Users\\Itsuki\\AppData\\Local\\alire\\cache\\toolchains\\gnat_native_16.1.0_bbd69633\\bin\\gcc.exe",
-          "process_id": 25716,
+          "process_id": 4192,
           "executable_sha256": "1821ef75f8846caa271bbe53a7481b75fae5bac87bcebfe9a179800d2579f44d",
           "arguments": [
             "-std=c11",
@@ -266,12 +272,12 @@
             "-pedantic",
             "-municode",
             "-o",
-            "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\windows_signal_broker.exe",
-            "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\broker-source.c"
+            "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\windows_signal_broker.exe",
+            "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\broker-source.c"
           ],
           "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada",
-          "started_utc": "2026-11-08T10:34:39.9843776Z",
-          "elapsed_milliseconds": 824,
+          "started_utc": "2026-11-08T10:46:22.8908477Z",
+          "elapsed_milliseconds": 519,
           "timeout_seconds": 30,
           "exit_code": 0,
           "abnormal_exit_kind": null,
@@ -283,16 +289,13 @@
           "input_write_failed": false,
           "early_input_close_requested": false,
           "process_tree_kill_error": null,
-          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\compile.stdout",
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\compile.stdout",
           "stdout_bytes": 0,
           "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\compile.stderr",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\compile.stderr",
           "stderr_bytes": 0,
           "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         },
-        "compiler": "C:\\Users\\Itsuki\\AppData\\Local\\alire\\cache\\toolchains\\gnat_native_16.1.0_bbd69633\\bin\\gcc.exe",
-        "source_sha256": "35ca607c68df98ca8688a6a1d200213767b6494ff0f10ba01aedde78514c8306",
-        "broker_sha256": "8dc7ca2c7495fd594474e4793411b678ee575e7ba7704dba5cc8cf4a1994f694",
         "arguments": [
           "-std=c11",
           "-Wall",
@@ -301,49 +304,22 @@
           "-pedantic",
           "-municode",
           "-o",
-          "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\windows_signal_broker.exe",
-          "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\broker-source.c"
-        ]
+          "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\windows_signal_broker.exe",
+          "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\broker-source.c"
+        ],
+        "compiler_sha256": "1821ef75f8846caa271bbe53a7481b75fae5bac87bcebfe9a179800d2579f44d"
       },
       "roles": [
         {
-          "completed": true,
-          "events_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\protected-events.jsonl",
-          "config": {
-            "schema_version": 1,
-            "configuration": "default",
-            "implementation": "C Lua",
-            "test_adapter": false,
-            "lua_version": "Lua 5.5",
-            "lua_release": "Lua 5.5.1",
-            "integer_bytes": 8,
-            "number_bytes": 8,
-            "compat_global": 1,
-            "extra_space_bytes": 8,
-            "expected_extra_space_bytes": 8,
-            "pointer_bytes": 8,
-            "max_stack": 1000000,
-            "max_c_calls": 200,
-            "aux_buffer_bytes": 1024,
-            "rand32": false,
-            "compat_math": false,
-            "allocator_limit_bytes": 2147483648,
-            "allocator_accounting": "lua-managed-payload-bytes"
-          },
-          "child_stdout": {
-            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\protected-child.stdout",
-            "sha256": "58e790f8d98cfc2e5ce82582946d817d294375805b4445e79c322ed0ccf020fd"
-          },
-          "forced_cleanup": false,
-          "events_sha256": "f33af7e5b4f59b1b28e3ea536558ea3494985294b6be4a1d316158bb1c0eae9f",
+          "events_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\protected-events.jsonl",
           "sidecars": [
             {
-              "sha256": "1e7b6e7c5c7f34f05f682020dabe869c068a4848f15698379a1682e97669b21e",
-              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\protected-allocator.15404.json",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\protected-allocator.86588.json",
+              "sha256": "42fa2c8a4a406f50155f76ca3bbd5fef99045dd52a64a67bd283c11a85431313",
               "data": {
                 "schema_version": 1,
-                "run_id": "44619a41c693489c951c004595a2366e",
-                "process_id": 15404,
+                "run_id": "27e6615aebcb474eb0dbcfff3c4a5b56",
+                "process_id": 86588,
                 "allocator_limit_bytes": 2147483648,
                 "configuration": "default",
                 "managed_refusals": 0,
@@ -353,29 +329,35 @@
             }
           ],
           "kind": "protected",
-          "environment": {
-            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\protected-allocator",
-            "LUA_ADA_CONFORMANCE_RUN_ID": "44619a41c693489c951c004595a2366e",
-            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\runtime image;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources",
-            "MEMLIMIT": "2147483648",
-            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648"
+          "configuration": "default",
+          "child_stdout": {
+            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\protected-child.stdout",
+            "sha256": "58e790f8d98cfc2e5ce82582946d817d294375805b4445e79c322ed0ccf020fd"
           },
+          "environment": {
+            "LUA_ADA_CONFORMANCE_RUN_ID": "27e6615aebcb474eb0dbcfff3c4a5b56",
+            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648",
+            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\runtime image;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources",
+            "MEMLIMIT": "2147483648",
+            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\protected-allocator"
+          },
+          "telemetry_limit": "Abrupt default-signal death may bypass normal-return Lua telemetry; absent sidecars are not invented or called balanced shutdown.",
           "process": {
-            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\windows_signal_broker.exe",
-            "process_id": 86520,
-            "executable_sha256": "8dc7ca2c7495fd594474e4793411b678ee575e7ba7704dba5cc8cf4a1994f694",
+            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\windows_signal_broker.exe",
+            "process_id": 76284,
+            "executable_sha256": "769c7c0777d1def5f261b7cdf3692b712549199de6c0d5544c7d8563274f8819",
             "arguments": [
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\runtime image\\lua.exe",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\disposable cwd\\protected.lua",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\disposable cwd",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\protected-child.stdout",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\protected-child.stderr",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\protected-events.jsonl",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\runtime image\\lua.exe",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\disposable cwd\\protected.lua",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\disposable cwd",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\protected-child.stdout",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\protected-child.stderr",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\protected-events.jsonl",
               "protected"
             ],
-            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\disposable cwd",
-            "started_utc": "2026-11-08T10:34:40.9463362Z",
-            "elapsed_milliseconds": 111,
+            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\disposable cwd",
+            "started_utc": "2026-11-08T10:46:23.544738Z",
+            "elapsed_milliseconds": 108,
             "timeout_seconds": 30,
             "exit_code": 0,
             "abnormal_exit_kind": null,
@@ -387,200 +369,172 @@
             "input_write_failed": false,
             "early_input_close_requested": false,
             "process_tree_kill_error": null,
-            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\protected.stdout",
+            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\protected.stdout",
             "stdout_bytes": 0,
             "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\protected.stderr",
+            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\protected.stderr",
             "stderr_bytes": 0,
             "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
           },
-          "config_process": {
-            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\runtime image\\lua.exe",
-            "process_id": 71096,
-            "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
-            "arguments": [
-              "--conformance-config"
-            ],
-            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\disposable cwd",
-            "started_utc": "2026-11-08T10:34:40.899627Z",
-            "elapsed_milliseconds": 31,
-            "timeout_seconds": 5,
-            "exit_code": 0,
-            "abnormal_exit_kind": null,
-            "timed_out": false,
-            "capture_limit_bytes": 1048576,
-            "capture_exceeded": false,
-            "pipe_drain_failed": false,
-            "output_drain_failed": false,
-            "input_write_failed": false,
-            "early_input_close_requested": false,
-            "process_tree_kill_error": null,
-            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\config.stdout",
-            "stdout_bytes": 451,
-            "stdout_sha256": "6c63f956109c778efd508539cfdb94eabe3d06a41a56c2a6a1fae68983e20295",
-            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\config.stderr",
-            "stderr_bytes": 0,
-            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-          },
+          "artifacts": [
+            {
+              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\runtime image\\lua.exe",
+              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\bin\\lua.exe",
+              "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+              "pe_header": {
+                "machine": 34404,
+                "optional_header_magic": 523,
+                "subsystem": 3
+              }
+            },
+            {
+              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\runtime image\\libconformance_lua.dll",
+              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\lib\\libconformance_lua.dll",
+              "sha256": "6fd51198bee9770aab18cf42ebaf7ccc133a26d4e3dedb22770c41aba84500b3"
+            }
+          ],
           "events": [
             {
               "event": "create-child-new-console-hidden",
               "elapsed_ms": 0,
-              "broker_pid": 86520,
-              "child_pid": 15404,
+              "broker_pid": 76284,
+              "child_pid": 86588,
               "ok": true,
               "win32_error": 0,
-              "value": 15404
+              "value": 86588
             },
             {
               "event": "detach-broker",
               "elapsed_ms": 0,
-              "broker_pid": 86520,
-              "child_pid": 15404,
+              "broker_pid": 76284,
+              "child_pid": 86588,
               "ok": true,
               "win32_error": 0,
               "value": 0
             },
             {
               "event": "actual-stdout-readiness",
-              "elapsed_ms": 46,
-              "broker_pid": 86520,
-              "child_pid": 15404,
+              "elapsed_ms": 47,
+              "broker_pid": 76284,
+              "child_pid": 86588,
               "ok": true,
               "win32_error": 0,
               "value": 12
             },
             {
               "event": "attach-child-console-attempt",
-              "elapsed_ms": 46,
-              "broker_pid": 86520,
-              "child_pid": 15404,
+              "elapsed_ms": 47,
+              "broker_pid": 76284,
+              "child_pid": 86588,
               "ok": true,
               "win32_error": 0,
               "value": 0
             },
             {
               "event": "console-member",
-              "elapsed_ms": 46,
-              "broker_pid": 86520,
-              "child_pid": 15404,
+              "elapsed_ms": 47,
+              "broker_pid": 76284,
+              "child_pid": 86588,
               "ok": true,
               "win32_error": 0,
-              "value": 86520
+              "value": 76284
             },
             {
               "event": "console-member",
-              "elapsed_ms": 46,
-              "broker_pid": 86520,
-              "child_pid": 15404,
+              "elapsed_ms": 47,
+              "broker_pid": 76284,
+              "child_pid": 86588,
               "ok": true,
               "win32_error": 0,
-              "value": 15404
+              "value": 86588
             },
             {
               "event": "console-membership",
-              "elapsed_ms": 46,
-              "broker_pid": 86520,
-              "child_pid": 15404,
+              "elapsed_ms": 47,
+              "broker_pid": 76284,
+              "child_pid": 86588,
               "ok": true,
               "win32_error": 0,
               "value": 2
             },
             {
               "event": "attach-isolated-child-console",
-              "elapsed_ms": 46,
-              "broker_pid": 86520,
-              "child_pid": 15404,
+              "elapsed_ms": 47,
+              "broker_pid": 76284,
+              "child_pid": 86588,
               "ok": true,
               "win32_error": 0,
-              "value": 15404
+              "value": 86588
             },
             {
               "event": "console-member",
-              "elapsed_ms": 46,
-              "broker_pid": 86520,
-              "child_pid": 15404,
+              "elapsed_ms": 47,
+              "broker_pid": 76284,
+              "child_pid": 86588,
               "ok": true,
               "win32_error": 0,
-              "value": 86520
+              "value": 76284
             },
             {
               "event": "console-member",
-              "elapsed_ms": 46,
-              "broker_pid": 86520,
-              "child_pid": 15404,
+              "elapsed_ms": 47,
+              "broker_pid": 76284,
+              "child_pid": 86588,
               "ok": true,
               "win32_error": 0,
-              "value": 15404
+              "value": 86588
             },
             {
               "event": "console-membership",
-              "elapsed_ms": 46,
-              "broker_pid": 86520,
-              "child_pid": 15404,
+              "elapsed_ms": 47,
+              "broker_pid": 76284,
+              "child_pid": 86588,
               "ok": true,
               "win32_error": 0,
               "value": 2
             },
             {
               "event": "request-real-ctrl-c-group-zero",
-              "elapsed_ms": 46,
-              "broker_pid": 86520,
-              "child_pid": 15404,
+              "elapsed_ms": 47,
+              "broker_pid": 76284,
+              "child_pid": 86588,
               "ok": true,
               "win32_error": 0,
               "value": 1
             },
             {
               "event": "child-exited",
-              "elapsed_ms": 62,
-              "broker_pid": 86520,
-              "child_pid": 15404,
+              "elapsed_ms": 63,
+              "broker_pid": 76284,
+              "child_pid": 86588,
               "ok": true,
               "win32_error": 0,
               "value": 0
             },
             {
+              "event": "cleanup-complete",
+              "elapsed_ms": 78,
+              "broker_pid": 76284,
+              "child_pid": 86588,
+              "ok": true,
+              "win32_error": 0,
+              "value": 9
+            },
+            {
               "event": "final-result",
               "elapsed_ms": 78,
-              "broker_pid": 86520,
-              "child_pid": 15404,
+              "broker_pid": 76284,
+              "child_pid": 86588,
               "ok": true,
               "win32_error": 0,
               "value": 1
             }
           ],
-          "artifacts": [
-            {
-              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\runtime image\\lua.exe",
-              "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
-              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\bin\\lua.exe",
-              "pe_header": {
-                "optional_header_magic": 523,
-                "machine": 34404,
-                "subsystem": 3
-              }
-            },
-            {
-              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\runtime image\\libconformance_lua.dll",
-              "sha256": "6fd51198bee9770aab18cf42ebaf7ccc133a26d4e3dedb22770c41aba84500b3",
-              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\lib\\libconformance_lua.dll"
-            }
-          ],
-          "child_stderr": {
-            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\protected-child.stderr",
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-          },
-          "telemetry_limit": "Abrupt default-signal death may bypass normal-return Lua telemetry; absent sidecars are not invented or called balanced shutdown.",
+          "forced_cleanup": false,
           "fixture": {
-            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\disposable cwd\\protected.lua",
+            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\disposable cwd\\protected.lua",
             "sha256": "27cb72fd96e7f2a2f93a27fb67ced5cfac3f7efd16fc2f035113073ac2009b36"
           },
-          "configuration": "default"
-        },
-        {
-          "completed": true,
-          "events_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\search-events.jsonl",
           "config": {
             "schema_version": 1,
             "configuration": "default",
@@ -602,64 +556,20 @@
             "allocator_limit_bytes": 2147483648,
             "allocator_accounting": "lua-managed-payload-bytes"
           },
-          "child_stdout": {
-            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\search-child.stdout",
-            "sha256": "e2bb232cac786f7284bb237d193407e94f32ee0fbf64d27d0ae8b1642de44923"
+          "child_stderr": {
+            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\protected-child.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
           },
-          "forced_cleanup": false,
-          "events_sha256": "d93ff3997cb9d88cef81136a89ce31c9515ceba626f786f899e5051667585c60",
-          "sidecars": [],
-          "kind": "search",
-          "environment": {
-            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\search-allocator",
-            "LUA_ADA_CONFORMANCE_RUN_ID": "d3c21a74185b4d97a8a485177e3ace70",
-            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\runtime image;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources",
-            "MEMLIMIT": "2147483648",
-            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648"
-          },
-          "process": {
-            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\windows_signal_broker.exe",
-            "process_id": 68712,
-            "executable_sha256": "8dc7ca2c7495fd594474e4793411b678ee575e7ba7704dba5cc8cf4a1994f694",
-            "arguments": [
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\runtime image\\lua.exe",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\disposable cwd\\search.lua",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\disposable cwd",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\search-child.stdout",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\search-child.stderr",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\search-events.jsonl",
-              "search"
-            ],
-            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\disposable cwd",
-            "started_utc": "2026-11-08T10:34:41.0922807Z",
-            "elapsed_milliseconds": 1171,
-            "timeout_seconds": 30,
-            "exit_code": 0,
-            "abnormal_exit_kind": null,
-            "timed_out": false,
-            "capture_limit_bytes": 1048576,
-            "capture_exceeded": false,
-            "pipe_drain_failed": false,
-            "output_drain_failed": false,
-            "input_write_failed": false,
-            "early_input_close_requested": false,
-            "process_tree_kill_error": null,
-            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\search.stdout",
-            "stdout_bytes": 0,
-            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\search.stderr",
-            "stderr_bytes": 0,
-            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-          },
+          "completed": true,
           "config_process": {
-            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\runtime image\\lua.exe",
-            "process_id": 71096,
+            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\runtime image\\lua.exe",
+            "process_id": 70768,
             "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
             "arguments": [
               "--conformance-config"
             ],
-            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\disposable cwd",
-            "started_utc": "2026-11-08T10:34:40.899627Z",
+            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\disposable cwd",
+            "started_utc": "2026-11-08T10:46:23.5010408Z",
             "elapsed_milliseconds": 31,
             "timeout_seconds": 5,
             "exit_code": 0,
@@ -672,28 +582,98 @@
             "input_write_failed": false,
             "early_input_close_requested": false,
             "process_tree_kill_error": null,
-            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\config.stdout",
+            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\config.stdout",
             "stdout_bytes": 451,
             "stdout_sha256": "6c63f956109c778efd508539cfdb94eabe3d06a41a56c2a6a1fae68983e20295",
-            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\config.stderr",
+            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\config.stderr",
             "stderr_bytes": 0,
             "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
           },
+          "events_sha256": "e9f0fb3637980243db43ea61d513189a4d802955bf46aeed587a962333c9b4f2"
+        },
+        {
+          "events_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\search-events.jsonl",
+          "sidecars": [],
+          "kind": "search",
+          "configuration": "default",
+          "child_stdout": {
+            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\search-child.stdout",
+            "sha256": "e2bb232cac786f7284bb237d193407e94f32ee0fbf64d27d0ae8b1642de44923"
+          },
+          "environment": {
+            "LUA_ADA_CONFORMANCE_RUN_ID": "f69a972f2e194a3293f45a00e3077993",
+            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648",
+            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\runtime image;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources",
+            "MEMLIMIT": "2147483648",
+            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\search-allocator"
+          },
+          "telemetry_limit": "Abrupt default-signal death may bypass normal-return Lua telemetry; absent sidecars are not invented or called balanced shutdown.",
+          "process": {
+            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\windows_signal_broker.exe",
+            "process_id": 69500,
+            "executable_sha256": "769c7c0777d1def5f261b7cdf3692b712549199de6c0d5544c7d8563274f8819",
+            "arguments": [
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\runtime image\\lua.exe",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\disposable cwd\\search.lua",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\disposable cwd",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\search-child.stdout",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\search-child.stderr",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\search-events.jsonl",
+              "search"
+            ],
+            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\disposable cwd",
+            "started_utc": "2026-11-08T10:46:23.6925118Z",
+            "elapsed_milliseconds": 1167,
+            "timeout_seconds": 30,
+            "exit_code": 0,
+            "abnormal_exit_kind": null,
+            "timed_out": false,
+            "capture_limit_bytes": 1048576,
+            "capture_exceeded": false,
+            "pipe_drain_failed": false,
+            "output_drain_failed": false,
+            "input_write_failed": false,
+            "early_input_close_requested": false,
+            "process_tree_kill_error": null,
+            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\search.stdout",
+            "stdout_bytes": 0,
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\search.stderr",
+            "stderr_bytes": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "artifacts": [
+            {
+              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\runtime image\\lua.exe",
+              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\bin\\lua.exe",
+              "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+              "pe_header": {
+                "machine": 34404,
+                "optional_header_magic": 523,
+                "subsystem": 3
+              }
+            },
+            {
+              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\runtime image\\libconformance_lua.dll",
+              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\lib\\libconformance_lua.dll",
+              "sha256": "6fd51198bee9770aab18cf42ebaf7ccc133a26d4e3dedb22770c41aba84500b3"
+            }
+          ],
           "events": [
             {
               "event": "create-child-new-console-hidden",
-              "elapsed_ms": 16,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "elapsed_ms": 15,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
-              "value": 87304
+              "value": 82732
             },
             {
               "event": "detach-broker",
-              "elapsed_ms": 16,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "elapsed_ms": 15,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
               "value": 0
@@ -701,8 +681,8 @@
             {
               "event": "actual-stdout-readiness",
               "elapsed_ms": 47,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
               "value": 15
@@ -710,8 +690,8 @@
             {
               "event": "attach-child-console-attempt",
               "elapsed_ms": 47,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
               "value": 0
@@ -719,26 +699,26 @@
             {
               "event": "console-member",
               "elapsed_ms": 47,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
-              "value": 68712
+              "value": 69500
             },
             {
               "event": "console-member",
               "elapsed_ms": 47,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
-              "value": 87304
+              "value": 82732
             },
             {
               "event": "console-membership",
               "elapsed_ms": 47,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
               "value": 2
@@ -746,35 +726,35 @@
             {
               "event": "attach-isolated-child-console",
               "elapsed_ms": 47,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
-              "value": 87304
+              "value": 82732
             },
             {
               "event": "console-member",
               "elapsed_ms": 1047,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
-              "value": 68712
+              "value": 69500
             },
             {
               "event": "console-member",
               "elapsed_ms": 1047,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
-              "value": 87304
+              "value": 82732
             },
             {
               "event": "console-membership",
               "elapsed_ms": 1047,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
               "value": 2
@@ -782,8 +762,8 @@
             {
               "event": "request-real-ctrl-c-group-zero",
               "elapsed_ms": 1047,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
               "value": 1
@@ -791,26 +771,26 @@
             {
               "event": "console-member",
               "elapsed_ms": 1156,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
-              "value": 68712
+              "value": 69500
             },
             {
               "event": "console-member",
               "elapsed_ms": 1156,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
-              "value": 87304
+              "value": 82732
             },
             {
               "event": "console-membership",
               "elapsed_ms": 1156,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
               "value": 2
@@ -818,8 +798,8 @@
             {
               "event": "request-real-ctrl-c-group-zero",
               "elapsed_ms": 1156,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
               "value": 2
@@ -827,88 +807,102 @@
             {
               "event": "child-exited",
               "elapsed_ms": 1172,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
               "value": 3221225786
             },
             {
+              "event": "cleanup-complete",
+              "elapsed_ms": 1172,
+              "broker_pid": 69500,
+              "child_pid": 82732,
+              "ok": true,
+              "win32_error": 0,
+              "value": 9
+            },
+            {
               "event": "final-result",
               "elapsed_ms": 1172,
-              "broker_pid": 68712,
-              "child_pid": 87304,
+              "broker_pid": 69500,
+              "child_pid": 82732,
               "ok": true,
               "win32_error": 0,
               "value": 2
             }
           ],
-          "artifacts": [
-            {
-              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\runtime image\\lua.exe",
-              "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
-              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\bin\\lua.exe",
-              "pe_header": {
-                "optional_header_magic": 523,
-                "machine": 34404,
-                "subsystem": 3
-              }
-            },
-            {
-              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\runtime image\\libconformance_lua.dll",
-              "sha256": "6fd51198bee9770aab18cf42ebaf7ccc133a26d4e3dedb22770c41aba84500b3",
-              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\lib\\libconformance_lua.dll"
-            }
-          ],
-          "child_stderr": {
-            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\search-child.stderr",
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-          },
-          "telemetry_limit": "Abrupt default-signal death may bypass normal-return Lua telemetry; absent sidecars are not invented or called balanced shutdown.",
+          "forced_cleanup": false,
           "fixture": {
-            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\default\\disposable cwd\\search.lua",
+            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\disposable cwd\\search.lua",
             "sha256": "222c3169804d14b329a2d1383e4b5653be09896abc46f52cc511a51c8c8334f8"
           },
-          "configuration": "default"
-        },
-        {
-          "completed": true,
-          "events_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\protected-events.jsonl",
           "config": {
             "schema_version": 1,
-            "configuration": "upstream-test",
+            "configuration": "default",
             "implementation": "C Lua",
-            "test_adapter": true,
+            "test_adapter": false,
             "lua_version": "Lua 5.5",
             "lua_release": "Lua 5.5.1",
             "integer_bytes": 8,
             "number_bytes": 8,
-            "compat_global": 0,
-            "extra_space_bytes": 16,
-            "expected_extra_space_bytes": 16,
+            "compat_global": 1,
+            "extra_space_bytes": 8,
+            "expected_extra_space_bytes": 8,
             "pointer_bytes": 8,
-            "max_stack": 68000,
-            "max_c_calls": 180,
-            "aux_buffer_bytes": 23,
-            "rand32": true,
-            "compat_math": true,
+            "max_stack": 1000000,
+            "max_c_calls": 200,
+            "aux_buffer_bytes": 1024,
+            "rand32": false,
+            "compat_math": false,
             "allocator_limit_bytes": 2147483648,
-            "allocator_accounting": "debug-allocator-backing-bytes"
+            "allocator_accounting": "lua-managed-payload-bytes"
           },
-          "child_stdout": {
-            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\protected-child.stdout",
-            "sha256": "58e790f8d98cfc2e5ce82582946d817d294375805b4445e79c322ed0ccf020fd"
+          "child_stderr": {
+            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\search-child.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
           },
-          "forced_cleanup": false,
-          "events_sha256": "277cfff6f416f7ccf2d2b7d353d52c943fed4ffdbafa635a4612cdfe42472af6",
+          "completed": true,
+          "config_process": {
+            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\runtime image\\lua.exe",
+            "process_id": 70768,
+            "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+            "arguments": [
+              "--conformance-config"
+            ],
+            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\disposable cwd",
+            "started_utc": "2026-11-08T10:46:23.5010408Z",
+            "elapsed_milliseconds": 31,
+            "timeout_seconds": 5,
+            "exit_code": 0,
+            "abnormal_exit_kind": null,
+            "timed_out": false,
+            "capture_limit_bytes": 1048576,
+            "capture_exceeded": false,
+            "pipe_drain_failed": false,
+            "output_drain_failed": false,
+            "input_write_failed": false,
+            "early_input_close_requested": false,
+            "process_tree_kill_error": null,
+            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\config.stdout",
+            "stdout_bytes": 451,
+            "stdout_sha256": "6c63f956109c778efd508539cfdb94eabe3d06a41a56c2a6a1fae68983e20295",
+            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\default\\config.stderr",
+            "stderr_bytes": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "events_sha256": "6743a6c2c176e51abc618a90306e6690b8e39cae5da00390653b5486bd153089"
+        },
+        {
+          "events_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\protected-events.jsonl",
           "sidecars": [
             {
-              "sha256": "997265947db1ac03432abe3539ac316c847cfab49b1065735550a843328ccdce",
-              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\protected-allocator.37772.json",
+              "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\protected-allocator.79292.json",
+              "sha256": "2e561581ae49bb05a345edfa1fa1415b3843daa3e3fba02b92cdababda3e0f9e",
               "data": {
                 "schema_version": 1,
-                "run_id": "439f7254103a4b53b862035dfebadc83",
-                "process_id": 37772,
+                "run_id": "c322320abfa841d794204c0f57923621",
+                "process_id": 79292,
                 "allocator_limit_bytes": 2147483648,
                 "configuration": "upstream-test",
                 "expected_finalizer_warnings": 0,
@@ -920,29 +914,35 @@
             }
           ],
           "kind": "protected",
-          "environment": {
-            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\protected-allocator",
-            "LUA_ADA_CONFORMANCE_RUN_ID": "439f7254103a4b53b862035dfebadc83",
-            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\runtime image;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources",
-            "MEMLIMIT": "2147483648",
-            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648"
+          "configuration": "upstream-test",
+          "child_stdout": {
+            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\protected-child.stdout",
+            "sha256": "58e790f8d98cfc2e5ce82582946d817d294375805b4445e79c322ed0ccf020fd"
           },
+          "environment": {
+            "LUA_ADA_CONFORMANCE_RUN_ID": "c322320abfa841d794204c0f57923621",
+            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648",
+            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\runtime image;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources",
+            "MEMLIMIT": "2147483648",
+            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\protected-allocator"
+          },
+          "telemetry_limit": "Abrupt default-signal death may bypass normal-return Lua telemetry; absent sidecars are not invented or called balanced shutdown.",
           "process": {
-            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\windows_signal_broker.exe",
-            "process_id": 84288,
-            "executable_sha256": "8dc7ca2c7495fd594474e4793411b678ee575e7ba7704dba5cc8cf4a1994f694",
+            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\windows_signal_broker.exe",
+            "process_id": 37848,
+            "executable_sha256": "769c7c0777d1def5f261b7cdf3692b712549199de6c0d5544c7d8563274f8819",
             "arguments": [
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\runtime image\\lua.exe",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\disposable cwd\\protected.lua",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\disposable cwd",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\protected-child.stdout",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\protected-child.stderr",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\protected-events.jsonl",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\runtime image\\lua.exe",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\disposable cwd\\protected.lua",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\disposable cwd",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\protected-child.stdout",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\protected-child.stderr",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\protected-events.jsonl",
               "protected"
             ],
-            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\disposable cwd",
-            "started_utc": "2026-11-08T10:34:42.3612386Z",
-            "elapsed_milliseconds": 73,
+            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\disposable cwd",
+            "started_utc": "2026-11-08T10:46:24.9550981Z",
+            "elapsed_milliseconds": 80,
             "timeout_seconds": 30,
             "exit_code": 0,
             "abnormal_exit_kind": null,
@@ -954,200 +954,172 @@
             "input_write_failed": false,
             "early_input_close_requested": false,
             "process_tree_kill_error": null,
-            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\protected.stdout",
+            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\protected.stdout",
             "stdout_bytes": 0,
             "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\protected.stderr",
+            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\protected.stderr",
             "stderr_bytes": 0,
             "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
           },
-          "config_process": {
-            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\runtime image\\lua.exe",
-            "process_id": 89228,
-            "executable_sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
-            "arguments": [
-              "--conformance-config"
-            ],
-            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\disposable cwd",
-            "started_utc": "2026-11-08T10:34:42.3268598Z",
-            "elapsed_milliseconds": 29,
-            "timeout_seconds": 5,
-            "exit_code": 0,
-            "abnormal_exit_kind": null,
-            "timed_out": false,
-            "capture_limit_bytes": 1048576,
-            "capture_exceeded": false,
-            "pipe_drain_failed": false,
-            "output_drain_failed": false,
-            "input_write_failed": false,
-            "early_input_close_requested": false,
-            "process_tree_kill_error": null,
-            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\config.stdout",
-            "stdout_bytes": 456,
-            "stdout_sha256": "65bc59bb7bd1f68dc6670263547590fc5b3878f7cd7c205ec7aa8a9d9775ebfb",
-            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\config.stderr",
-            "stderr_bytes": 0,
-            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-          },
+          "artifacts": [
+            {
+              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\runtime image\\lua.exe",
+              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\bin\\lua.exe",
+              "sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
+              "pe_header": {
+                "machine": 34404,
+                "optional_header_magic": 523,
+                "subsystem": 3
+              }
+            },
+            {
+              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\runtime image\\libconformance_lua.dll",
+              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\lib\\libconformance_lua.dll",
+              "sha256": "90cd6bb9cb2f5cdfe04a79ad2a2a8779f1e2cda590d53aaebb3caf5524fe973c"
+            }
+          ],
           "events": [
             {
               "event": "create-child-new-console-hidden",
               "elapsed_ms": 0,
-              "broker_pid": 84288,
-              "child_pid": 37772,
+              "broker_pid": 37848,
+              "child_pid": 79292,
               "ok": true,
               "win32_error": 0,
-              "value": 37772
+              "value": 79292
             },
             {
               "event": "detach-broker",
               "elapsed_ms": 0,
-              "broker_pid": 84288,
-              "child_pid": 37772,
+              "broker_pid": 37848,
+              "child_pid": 79292,
               "ok": true,
               "win32_error": 0,
               "value": 0
             },
             {
               "event": "actual-stdout-readiness",
-              "elapsed_ms": 31,
-              "broker_pid": 84288,
-              "child_pid": 37772,
+              "elapsed_ms": 63,
+              "broker_pid": 37848,
+              "child_pid": 79292,
               "ok": true,
               "win32_error": 0,
               "value": 12
             },
             {
               "event": "attach-child-console-attempt",
-              "elapsed_ms": 31,
-              "broker_pid": 84288,
-              "child_pid": 37772,
+              "elapsed_ms": 63,
+              "broker_pid": 37848,
+              "child_pid": 79292,
               "ok": true,
               "win32_error": 0,
               "value": 0
             },
             {
               "event": "console-member",
-              "elapsed_ms": 31,
-              "broker_pid": 84288,
-              "child_pid": 37772,
+              "elapsed_ms": 63,
+              "broker_pid": 37848,
+              "child_pid": 79292,
               "ok": true,
               "win32_error": 0,
-              "value": 84288
+              "value": 37848
             },
             {
               "event": "console-member",
-              "elapsed_ms": 31,
-              "broker_pid": 84288,
-              "child_pid": 37772,
+              "elapsed_ms": 63,
+              "broker_pid": 37848,
+              "child_pid": 79292,
               "ok": true,
               "win32_error": 0,
-              "value": 37772
+              "value": 79292
             },
             {
               "event": "console-membership",
-              "elapsed_ms": 31,
-              "broker_pid": 84288,
-              "child_pid": 37772,
+              "elapsed_ms": 63,
+              "broker_pid": 37848,
+              "child_pid": 79292,
               "ok": true,
               "win32_error": 0,
               "value": 2
             },
             {
               "event": "attach-isolated-child-console",
-              "elapsed_ms": 31,
-              "broker_pid": 84288,
-              "child_pid": 37772,
+              "elapsed_ms": 63,
+              "broker_pid": 37848,
+              "child_pid": 79292,
               "ok": true,
               "win32_error": 0,
-              "value": 37772
+              "value": 79292
             },
             {
               "event": "console-member",
-              "elapsed_ms": 31,
-              "broker_pid": 84288,
-              "child_pid": 37772,
+              "elapsed_ms": 63,
+              "broker_pid": 37848,
+              "child_pid": 79292,
               "ok": true,
               "win32_error": 0,
-              "value": 84288
+              "value": 37848
             },
             {
               "event": "console-member",
-              "elapsed_ms": 31,
-              "broker_pid": 84288,
-              "child_pid": 37772,
+              "elapsed_ms": 63,
+              "broker_pid": 37848,
+              "child_pid": 79292,
               "ok": true,
               "win32_error": 0,
-              "value": 37772
+              "value": 79292
             },
             {
               "event": "console-membership",
-              "elapsed_ms": 31,
-              "broker_pid": 84288,
-              "child_pid": 37772,
+              "elapsed_ms": 63,
+              "broker_pid": 37848,
+              "child_pid": 79292,
               "ok": true,
               "win32_error": 0,
               "value": 2
             },
             {
               "event": "request-real-ctrl-c-group-zero",
-              "elapsed_ms": 31,
-              "broker_pid": 84288,
-              "child_pid": 37772,
+              "elapsed_ms": 63,
+              "broker_pid": 37848,
+              "child_pid": 79292,
               "ok": true,
               "win32_error": 0,
               "value": 1
             },
             {
               "event": "child-exited",
-              "elapsed_ms": 47,
-              "broker_pid": 84288,
-              "child_pid": 37772,
+              "elapsed_ms": 78,
+              "broker_pid": 37848,
+              "child_pid": 79292,
               "ok": true,
               "win32_error": 0,
               "value": 0
             },
             {
+              "event": "cleanup-complete",
+              "elapsed_ms": 94,
+              "broker_pid": 37848,
+              "child_pid": 79292,
+              "ok": true,
+              "win32_error": 0,
+              "value": 9
+            },
+            {
               "event": "final-result",
-              "elapsed_ms": 63,
-              "broker_pid": 84288,
-              "child_pid": 37772,
+              "elapsed_ms": 94,
+              "broker_pid": 37848,
+              "child_pid": 79292,
               "ok": true,
               "win32_error": 0,
               "value": 1
             }
           ],
-          "artifacts": [
-            {
-              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\runtime image\\lua.exe",
-              "sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
-              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\bin\\lua.exe",
-              "pe_header": {
-                "optional_header_magic": 523,
-                "machine": 34404,
-                "subsystem": 3
-              }
-            },
-            {
-              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\runtime image\\libconformance_lua.dll",
-              "sha256": "90cd6bb9cb2f5cdfe04a79ad2a2a8779f1e2cda590d53aaebb3caf5524fe973c",
-              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\lib\\libconformance_lua.dll"
-            }
-          ],
-          "child_stderr": {
-            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\protected-child.stderr",
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-          },
-          "telemetry_limit": "Abrupt default-signal death may bypass normal-return Lua telemetry; absent sidecars are not invented or called balanced shutdown.",
+          "forced_cleanup": false,
           "fixture": {
-            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\disposable cwd\\protected.lua",
+            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\disposable cwd\\protected.lua",
             "sha256": "27cb72fd96e7f2a2f93a27fb67ced5cfac3f7efd16fc2f035113073ac2009b36"
           },
-          "configuration": "upstream-test"
-        },
-        {
-          "completed": false,
-          "events_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\search-events.jsonl",
           "config": {
             "schema_version": 1,
             "configuration": "upstream-test",
@@ -1169,65 +1141,21 @@
             "allocator_limit_bytes": 2147483648,
             "allocator_accounting": "debug-allocator-backing-bytes"
           },
-          "child_stdout": {
-            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\search-child.stdout",
-            "sha256": "e2bb232cac786f7284bb237d193407e94f32ee0fbf64d27d0ae8b1642de44923"
+          "child_stderr": {
+            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\protected-child.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
           },
-          "forced_cleanup": false,
-          "events_sha256": "004749f10d412e9a59bfc440deeb762b4b074e1a97f0e51fb2905f551d769c5c",
-          "sidecars": [],
-          "kind": "search",
-          "environment": {
-            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\search-allocator",
-            "LUA_ADA_CONFORMANCE_RUN_ID": "9c8e0b91051b457faa01d54fc59abecd",
-            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\runtime image;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources",
-            "MEMLIMIT": "2147483648",
-            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648"
-          },
-          "process": {
-            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\windows_signal_broker.exe",
-            "process_id": 66752,
-            "executable_sha256": "8dc7ca2c7495fd594474e4793411b678ee575e7ba7704dba5cc8cf4a1994f694",
-            "arguments": [
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\runtime image\\lua.exe",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\disposable cwd\\search.lua",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\disposable cwd",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\search-child.stdout",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\search-child.stderr",
-              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\search-events.jsonl",
-              "search"
-            ],
-            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\disposable cwd",
-            "started_utc": "2026-11-08T10:34:42.4467079Z",
-            "elapsed_milliseconds": 1578,
-            "timeout_seconds": 30,
-            "exit_code": 1,
-            "abnormal_exit_kind": null,
-            "timed_out": false,
-            "capture_limit_bytes": 1048576,
-            "capture_exceeded": false,
-            "pipe_drain_failed": false,
-            "output_drain_failed": false,
-            "input_write_failed": false,
-            "early_input_close_requested": false,
-            "process_tree_kill_error": null,
-            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\search.stdout",
-            "stdout_bytes": 0,
-            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\search.stderr",
-            "stderr_bytes": 0,
-            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-          },
+          "completed": true,
           "config_process": {
-            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\runtime image\\lua.exe",
-            "process_id": 89228,
+            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\runtime image\\lua.exe",
+            "process_id": 53612,
             "executable_sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
             "arguments": [
               "--conformance-config"
             ],
-            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\disposable cwd",
-            "started_utc": "2026-11-08T10:34:42.3268598Z",
-            "elapsed_milliseconds": 29,
+            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\disposable cwd",
+            "started_utc": "2026-11-08T10:46:24.9207928Z",
+            "elapsed_milliseconds": 30,
             "timeout_seconds": 5,
             "exit_code": 0,
             "abnormal_exit_kind": null,
@@ -1239,154 +1167,224 @@
             "input_write_failed": false,
             "early_input_close_requested": false,
             "process_tree_kill_error": null,
-            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\config.stdout",
+            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\config.stdout",
             "stdout_bytes": 456,
             "stdout_sha256": "65bc59bb7bd1f68dc6670263547590fc5b3878f7cd7c205ec7aa8a9d9775ebfb",
-            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\config.stderr",
+            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\config.stderr",
             "stderr_bytes": 0,
             "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
           },
+          "events_sha256": "5e153fdc0d495d966c080422d84ceb5d10b49172a02910d66ca7f246246e9be6"
+        },
+        {
+          "events_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\search-events.jsonl",
+          "sidecars": [],
+          "kind": "search",
+          "configuration": "upstream-test",
+          "child_stdout": {
+            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\search-child.stdout",
+            "sha256": "e2bb232cac786f7284bb237d193407e94f32ee0fbf64d27d0ae8b1642de44923"
+          },
+          "environment": {
+            "LUA_ADA_CONFORMANCE_RUN_ID": "ba4501ed2a474810b766614fa1529d01",
+            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648",
+            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\runtime image;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources",
+            "MEMLIMIT": "2147483648",
+            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\search-allocator"
+          },
+          "telemetry_limit": "Abrupt default-signal death may bypass normal-return Lua telemetry; absent sidecars are not invented or called balanced shutdown.",
+          "process": {
+            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\windows_signal_broker.exe",
+            "process_id": 58988,
+            "executable_sha256": "769c7c0777d1def5f261b7cdf3692b712549199de6c0d5544c7d8563274f8819",
+            "arguments": [
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\runtime image\\lua.exe",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\disposable cwd\\search.lua",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\disposable cwd",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\search-child.stdout",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\search-child.stderr",
+              "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\search-events.jsonl",
+              "search"
+            ],
+            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\disposable cwd",
+            "started_utc": "2026-11-08T10:46:25.0473626Z",
+            "elapsed_milliseconds": 1526,
+            "timeout_seconds": 30,
+            "exit_code": 1,
+            "abnormal_exit_kind": null,
+            "timed_out": false,
+            "capture_limit_bytes": 1048576,
+            "capture_exceeded": false,
+            "pipe_drain_failed": false,
+            "output_drain_failed": false,
+            "input_write_failed": false,
+            "early_input_close_requested": false,
+            "process_tree_kill_error": null,
+            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\search.stdout",
+            "stdout_bytes": 0,
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\search.stderr",
+            "stderr_bytes": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "artifacts": [
+            {
+              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\runtime image\\lua.exe",
+              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\bin\\lua.exe",
+              "sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
+              "pe_header": {
+                "machine": 34404,
+                "optional_header_magic": 523,
+                "subsystem": 3
+              }
+            },
+            {
+              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\runtime image\\libconformance_lua.dll",
+              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\lib\\libconformance_lua.dll",
+              "sha256": "90cd6bb9cb2f5cdfe04a79ad2a2a8779f1e2cda590d53aaebb3caf5524fe973c"
+            }
+          ],
           "events": [
             {
               "event": "create-child-new-console-hidden",
-              "elapsed_ms": 16,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 0,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
-              "value": 91268
+              "value": 69572
             },
             {
               "event": "detach-broker",
-              "elapsed_ms": 16,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 0,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 0
             },
             {
               "event": "actual-stdout-readiness",
-              "elapsed_ms": 32,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 31,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 15
             },
             {
               "event": "attach-child-console-attempt",
-              "elapsed_ms": 32,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 31,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 0
             },
             {
               "event": "console-member",
-              "elapsed_ms": 32,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 31,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
-              "value": 66752
+              "value": 58988
             },
             {
               "event": "console-member",
-              "elapsed_ms": 32,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 31,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
-              "value": 91268
+              "value": 69572
             },
             {
               "event": "console-membership",
-              "elapsed_ms": 32,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 31,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 2
             },
             {
               "event": "attach-isolated-child-console",
-              "elapsed_ms": 32,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 31,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
-              "value": 91268
+              "value": 69572
             },
             {
               "event": "console-member",
-              "elapsed_ms": 1032,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1031,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
-              "value": 66752
+              "value": 58988
             },
             {
               "event": "console-member",
-              "elapsed_ms": 1032,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1031,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
-              "value": 91268
+              "value": 69572
             },
             {
               "event": "console-membership",
-              "elapsed_ms": 1032,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1031,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 2
             },
             {
               "event": "request-real-ctrl-c-group-zero",
-              "elapsed_ms": 1032,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1031,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 1
             },
             {
               "event": "console-member",
-              "elapsed_ms": 1141,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1140,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
-              "value": 66752
+              "value": 58988
             },
             {
               "event": "console-member",
-              "elapsed_ms": 1141,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1140,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
-              "value": 91268
+              "value": 69572
             },
             {
               "event": "console-membership",
-              "elapsed_ms": 1141,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1140,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 2
             },
             {
               "event": "request-real-ctrl-c-group-zero",
-              "elapsed_ms": 1141,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1140,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 2
@@ -1394,26 +1392,26 @@
             {
               "event": "console-member",
               "elapsed_ms": 1250,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
-              "value": 66752
+              "value": 58988
             },
             {
               "event": "console-member",
               "elapsed_ms": 1250,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
-              "value": 91268
+              "value": 69572
             },
             {
               "event": "console-membership",
               "elapsed_ms": 1250,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 2
@@ -1421,136 +1419,176 @@
             {
               "event": "request-real-ctrl-c-group-zero",
               "elapsed_ms": 1250,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 3
             },
             {
               "event": "console-member",
-              "elapsed_ms": 1360,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1359,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
-              "value": 66752
+              "value": 58988
             },
             {
               "event": "console-member",
-              "elapsed_ms": 1360,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1359,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
-              "value": 91268
+              "value": 69572
             },
             {
               "event": "console-membership",
-              "elapsed_ms": 1360,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1359,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 2
             },
             {
               "event": "request-real-ctrl-c-group-zero",
-              "elapsed_ms": 1360,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1359,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 4
             },
             {
               "event": "console-member",
-              "elapsed_ms": 1469,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1468,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
-              "value": 66752
+              "value": 58988
             },
             {
               "event": "console-member",
-              "elapsed_ms": 1469,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1468,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
-              "value": 91268
+              "value": 69572
             },
             {
               "event": "console-membership",
-              "elapsed_ms": 1469,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1468,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 2
             },
             {
               "event": "request-real-ctrl-c-group-zero",
-              "elapsed_ms": 1469,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1468,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 5
             },
             {
               "event": "child-exited",
-              "elapsed_ms": 1578,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1515,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": true,
               "win32_error": 0,
               "value": 3221225786
             },
             {
+              "event": "cleanup-complete",
+              "elapsed_ms": 1515,
+              "broker_pid": 58988,
+              "child_pid": 69572,
+              "ok": true,
+              "win32_error": 0,
+              "value": 9
+            },
+            {
               "event": "final-result",
-              "elapsed_ms": 1578,
-              "broker_pid": 66752,
-              "child_pid": 91268,
+              "elapsed_ms": 1515,
+              "broker_pid": 58988,
+              "child_pid": 69572,
               "ok": false,
               "win32_error": 0,
               "value": 5
             }
           ],
-          "artifacts": [
-            {
-              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\runtime image\\lua.exe",
-              "sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
-              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\bin\\lua.exe",
-              "pe_header": {
-                "optional_header_magic": 523,
-                "machine": 34404,
-                "subsystem": 3
-              }
-            },
-            {
-              "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\runtime image\\libconformance_lua.dll",
-              "sha256": "90cd6bb9cb2f5cdfe04a79ad2a2a8779f1e2cda590d53aaebb3caf5524fe973c",
-              "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\lib\\libconformance_lua.dll"
-            }
-          ],
-          "child_stderr": {
-            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\search-child.stderr",
-            "sha256": "3502938af48118d9164dd36c60d9d761721edc05c8ac9f3dfecc68ae347a7bff"
-          },
-          "telemetry_limit": "Abrupt default-signal death may bypass normal-return Lua telemetry; absent sidecars are not invented or called balanced shutdown.",
+          "forced_cleanup": false,
           "fixture": {
-            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\b133f7c63fe248a8856db55452482dc4\\upstream-test\\disposable cwd\\search.lua",
+            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\disposable cwd\\search.lua",
             "sha256": "222c3169804d14b329a2d1383e4b5653be09896abc46f52cc511a51c8c8334f8"
           },
-          "configuration": "upstream-test"
+          "config": {
+            "schema_version": 1,
+            "configuration": "upstream-test",
+            "implementation": "C Lua",
+            "test_adapter": true,
+            "lua_version": "Lua 5.5",
+            "lua_release": "Lua 5.5.1",
+            "integer_bytes": 8,
+            "number_bytes": 8,
+            "compat_global": 0,
+            "extra_space_bytes": 16,
+            "expected_extra_space_bytes": 16,
+            "pointer_bytes": 8,
+            "max_stack": 68000,
+            "max_c_calls": 180,
+            "aux_buffer_bytes": 23,
+            "rand32": true,
+            "compat_math": true,
+            "allocator_limit_bytes": 2147483648,
+            "allocator_accounting": "debug-allocator-backing-bytes"
+          },
+          "child_stderr": {
+            "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\search-child.stderr",
+            "sha256": "3502938af48118d9164dd36c60d9d761721edc05c8ac9f3dfecc68ae347a7bff"
+          },
+          "completed": false,
+          "config_process": {
+            "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\runtime image\\lua.exe",
+            "process_id": 53612,
+            "executable_sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
+            "arguments": [
+              "--conformance-config"
+            ],
+            "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\disposable cwd",
+            "started_utc": "2026-11-08T10:46:24.9207928Z",
+            "elapsed_milliseconds": 30,
+            "timeout_seconds": 5,
+            "exit_code": 0,
+            "abnormal_exit_kind": null,
+            "timed_out": false,
+            "capture_limit_bytes": 1048576,
+            "capture_exceeded": false,
+            "pipe_drain_failed": false,
+            "output_drain_failed": false,
+            "input_write_failed": false,
+            "early_input_close_requested": false,
+            "process_tree_kill_error": null,
+            "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\config.stdout",
+            "stdout_bytes": 456,
+            "stdout_sha256": "65bc59bb7bd1f68dc6670263547590fc5b3878f7cd7c205ec7aa8a9d9775ebfb",
+            "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\windows-main-signals\\6b2d43bcc8904d50a5b22a66f84ff9ed\\upstream-test\\config.stderr",
+            "stderr_bytes": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "events_sha256": "6182e9fa40ae7ddb0bcf9cc34655733b32ec88a0b94b9cf1f30d74aeaab6eec2"
         }
       ],
       "completed": false
-    },
-    "sha256": "747ee3137dc3a65fd36112df555190e406553727fad4c606af13f7c17e4f6516",
-    "path": "reports/windows-main-signals/b133f7c63fe248a8856db55452482dc4/observation.json"
+    }
   },
   "initial_failure": {
     "frozen_observer": {
@@ -1863,5 +1901,13 @@
       "path": "reports/windows-main-signals/297f1e506c1b439b85d7aa2797c618f5/broker-source-initial.c"
     }
   },
-  "scope": "Default protected and search establish authored real OS-signal positives. Native T protected is clean; native T search remains FAIL with actual ltests final-memory assertion. No criterion change, exclusion, Ada signal implementation, adapted main or whole-file acceptance."
+  "scope": "Default protected and search establish authored real OS-signal positives. Native T protected is clean; native T search remains FAIL with actual ltests final-memory assertion. No criterion change, exclusion, Ada signal implementation, adapted main or whole-file acceptance.",
+  "previous_author_packet": {
+    "path": "reports/windows-main-signals/b133f7c63fe248a8856db55452482dc4/prior-author-packet.json",
+    "sha256": "18c4538ba5e7e346d7a76aa3be7b55f932328a130c688f1a42d7f7da52e4b7d4",
+    "frozen_observer": {
+      "path": "reports/windows-main-signals/b133f7c63fe248a8856db55452482dc4/observer-source-prior.ps1",
+      "sha256": "755df213a52bb2ebb035d5c41f49135f489ccdd770bb9633bdc2de9d8b897116"
+    }
+  }
 }

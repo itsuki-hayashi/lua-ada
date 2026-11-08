@@ -8,6 +8,7 @@ $path = Join-Path $root ('tests/conformance/targets/' +
 $packet = Get-Content -LiteralPath $path -Raw |
     ConvertFrom-Json -AsHashtable -Depth 100
 $script:checks = 0
+$controlCExit = [Convert]::ToUInt32('C000013A', 16)
 function Require([bool] $Condition, [string] $Message) {
     if (-not $Condition) { throw $Message }
     $script:checks++
@@ -50,6 +51,8 @@ function Check-Document($Document) {
         $contract.attach_retry_error -eq 6 -and $contract.attach_retry_max_ms -eq 2000 -and
         $contract.child_deadline_ms -eq 25000 -and $contract.outer_deadline_seconds -eq 30 -and
         $contract.capture_limit_bytes -eq 1048576 -and
+        $contract.expected_search_exit_status -eq $controlCExit -and
+        $contract.checked_cleanup_required -eq $true -and
         $contract.terminate_cleanup_is_failure -eq $true) 'Broker contract changed'
     $paths = @('experiments/conformance/c/windows_signal_broker.c',
         'tests/conformance/platform/windows-main-sigint-protected.lua',
@@ -141,11 +144,18 @@ function Check-Document($Document) {
         $ready = @($events | Where-Object event -CEQ 'actual-stdout-readiness')
         $exited = @($events | Where-Object event -CEQ 'child-exited')
         $final = @($events | Where-Object event -CEQ 'final-result')
+        $cleanup = @($events | Where-Object event -CEQ 'cleanup-complete')
         $requests = @($events | Where-Object event -CEQ 'request-real-ctrl-c-group-zero')
         Require ($created.Count -eq 1 -and $ready.Count -eq 1 -and
             $exited.Count -eq 1 -and $final.Count -eq 1 -and
             $requests.Count -eq $expectedCounts[$index] -and $final[0].ok -eq $wanted -and
             @($events | Where-Object event -CEQ 'failed-probe-timeout-cleanup-only').Count -eq 0) 'Event outcomes changed'
+        Require ($cleanup.Count -eq 1 -and $cleanup[0].ok -and
+            $cleanup[0].value -eq 9 -and
+            @($events | Where-Object {
+                $_.event -in @('close-owned-handle-failed',
+                    'detach-child-console-failed', 'free-attribute-storage-failed')
+            }).Count -eq 0) 'Checked cleanup failed'
         $previous = 0
         $number = 0
         for ($j = 0; $j -lt $events.Count; $j++) {
@@ -190,8 +200,8 @@ function Check-Document($Document) {
         } else {
             $abruptCount++
             Require ([IO.File]::ReadAllText($role.child_stdout.path) -ceq "15`r`n" -and
-                $exited[0].value -eq 3221225786 -and
-                $result.actual_exit_code -eq 3221225786 -and
+                $exited[0].value -eq $controlCExit -and
+                $result.actual_exit_code -eq $controlCExit -and
                 $result.normal_return_telemetry -eq $false -and
                 $result.abrupt_missing_telemetry -eq $true -and
                 $result.accounting_claim -ceq 'unavailable-no-normal-return-telemetry' -and
@@ -222,6 +232,20 @@ function Check-Document($Document) {
         $Document.initial_failure.frozen_source.sha256 -ceq $initial.build.source_sha256) 'Initial exact broker source lost'
     Require ((Hash (Join-Path $root $Document.initial_failure.frozen_observer.path)) -ceq
         $Document.initial_failure.frozen_observer.sha256) 'Initial exact observer lost'
+    $prior = $Document.previous_author_packet
+    Require ((Hash (Join-Path $root $prior.path)) -ceq $prior.sha256) 'Prior author packet changed'
+    $old = Get-Content -LiteralPath (Join-Path $root $prior.path) -Raw |
+        ConvertFrom-Json -AsHashtable -Depth 100
+    Require ($old.complete_native_positive_gate -eq $false -and
+        $old.results.Count -eq 4 -and $old.results[3].strict_pass -eq $false -and
+        $old.results[3].request_count -eq 5 -and
+        $old.current_observation.data.completed -eq $false -and
+        (Hash (Join-Path $root $old.current_observation.path)) -ceq
+        $old.current_observation.sha256) 'Previous four observations relabelled/lost'
+    Require ((Hash $old.current_observation.data.build.source_snapshot) -ceq
+        $old.current_observation.data.build.source_sha256 -and
+        (Hash (Join-Path $root $prior.frozen_observer.path)) -ceq
+        $prior.frozen_observer.sha256) 'Previous broker/observer source lost'
 }
 
 Check-Document $packet
@@ -250,4 +274,13 @@ Must-Reject source-drift { param($p) $p.source_bindings[0].sha256 = '0' * 64 }
 Must-Reject payload-drift { param($p) $p.source_anchors[1].byte_length-- }
 Must-Reject count-refresh { param($p) $p.results[3].request_count = 2 }
 Must-Reject initial-failure-erasure { param($p) $p.initial_failure.data.completed = $true }
-"Windows real signals: $positive integrity checks and 16 rejection controls passed; native T search remains FAIL, no source/runtime authority"
+Must-Reject unexpected-access-violation {
+    param($p) $p.results[1].actual_exit_code = [Convert]::ToUInt32('C0000005', 16)
+}
+Must-Reject loosened-exit-contract {
+    param($p) $p.broker_contract.expected_search_exit_status = 1
+}
+Must-Reject unchecked-cleanup {
+    param($p) $p.broker_contract.checked_cleanup_required = $false
+}
+"Windows real signals: $positive integrity checks and 19 rejection controls passed; native T search remains FAIL, no source/runtime authority"
