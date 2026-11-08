@@ -5,7 +5,7 @@ function Get-CliCaseDefinitions {
     param([Parameter(Mandatory)][string]$DefaultPackagePath,
           [Parameter(Mandatory)][string]$DefaultPackageCPath,
           [ValidateSet('windows','linux','macos')][string]$Platform,
-          [ValidateSet('full','native','prompt')][string]$Mode='full')
+          [ValidateSet('full','native','prompt','batch')][string]$Mode='full')
     $newline=if($Platform -ceq 'windows'){"`r`n"}else{"`n"}
     $banner='Lua 5.5.1  Copyright (C) 1994-2026 Lua.org, PUC-Rio'
     # These are the original CLI operation contracts, shared by observation
@@ -386,6 +386,35 @@ function Get-CliCaseDefinitions {
         if($case.ContainsKey('ExitCode')){$case['InputMayCloseEarly']=$true}
     }
     
+    if($Mode -ceq 'batch'){
+        # The checkpoint validates these noninteractive operations separately
+        # from the actual paired readline/console campaigns. Keep the full110
+        # definitions and its two package probes unchanged. A new interactive
+        # case needs an explicit selection review; never silently drop it.
+        $interactiveTitles=@(
+            '-i prints banner, prompts and expression results',
+            'REPL prints every result through print',
+            'REPL multiline statement uses continuation prompt',
+            'REPL error is reported and the loop continues',
+            'REPL syntax error is reported and the loop continues',
+            'REPL calls the overwritten global print',
+            'REPL resolves print through the environment handler',
+            'REPL semantic EOF error does not consume next command',
+            'REPL print failure is wrapped and not fatal',
+            'REPL with print removed reports and continues',
+            'REPL typed exit skips later input',
+            '-i runs snippets before the loop'
+        )+@($promptCases.Title)
+        $actualInteractive=@($cases|Where-Object{'-i' -cin $_.Args})
+        if($cases.Count -ne 110 -or $interactiveTitles.Count -ne 31 -or
+            (($actualInteractive.Title|Sort-Object)-join '|') -cne (($interactiveTitles|Sort-Object)-join '|')){
+            throw 'Batch CLI selection requires the exact reviewed interactive IDs and arguments'
+        }
+        $batch=@($cases|Where-Object{$_.Title -cnotin $interactiveTitles})
+        if($batch.Count -ne 79){throw 'Batch CLI selection must retain all79 noninteractive controls'}
+        return @{cases=$batch;prompt_titles=@($promptCases.Title);excluded_interactive_titles=$interactiveTitles;
+            full_source_cases=110;batch_source_cases=79;checkpoint_only=$true;runtime_acceptance=$false;coverage_authority=$false}
+    }
     $selected=@($cases|Where-Object{
         $Mode -ceq 'full' -or ($Mode -ceq 'native' -and $_.Title -cin $nativeTitles) -or
         ($Mode -ceq 'prompt' -and $_.Title -cin $promptCases.Title)

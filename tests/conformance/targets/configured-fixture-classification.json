@@ -573,11 +573,11 @@
         },
         {
           "path": "scripts/CliFixtureCases.psm1",
-          "sha256": "7666810b0873d71ac4e2d16760705694d14256bc98babda97ea8cdd061ad80f0"
+          "sha256": "257c4f929bff7200141f95f94f7f9d5743552d5a124813e2482935359e5ac68e"
         },
         {
           "path": "scripts/check-cli.ps1",
-          "sha256": "fb9a159f790d82509ec2a988b08ba900dd4baed1baf875aa65736b3c8897aacc"
+          "sha256": "08f31d8cc14b31bee91a533d4d719aea6bf25a9e5be3a98cd6d6288574199930"
         },
         {
           "path": "cli/shared/lua_ada_cli_readline.c",
@@ -609,7 +609,7 @@
         },
         {
           "path": "scripts/check-cli-readline.ps1",
-          "sha256": "2e770912883ee046a63e52bcf02e117c639dcec24dd280f035be83793bcdaf8c"
+          "sha256": "208141feec0325da377f3798770375447475e9300a338e70b09108f800ad9738"
         },
         {
           "path": "scripts/test-cli-readline-portability.ps1",

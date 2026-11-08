@@ -9,18 +9,18 @@
   "coverage_authority": false,
   "execution_evidence": [],
   "source_snapshot": {
-    "repository_revision": "0db6e82182c19bad876e1d40632f490b1e409d71",
+    "repository_revision": "6d52343bf33066d1634732a944916e2bda5c2413",
     "repository_dirty": true
   },
   "ordinary_no_argument_catalog": {
     "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json",
-    "sha256": "9ab7784d4f9087b785eaf4549b5e3f6c09da46526a1a2813fbd47ca911ef8e08",
-    "case_count": 605
+    "sha256": "83bd099f975a35b3cbe0230db08f15d3ee6f20828e873c56373e2c80af831636",
+    "case_count": 608
   },
   "source_bindings": [
     {
       "path": "c_api/tests/builtin_api_contract.c",
-      "sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
+      "sha256": "a2aa9177bcd595d90a1a277a1c3438b5f99a2fa13bcd70b35e9e825ecfbe9416"
     },
     {
       "path": "c_api/tests/consumer_allocator.h",

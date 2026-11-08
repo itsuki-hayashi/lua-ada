@@ -7337,6 +7337,51 @@
       "runtime_acceptance": false,
       "coverage_authority": false,
       "execution_evidence": []
+    },
+    {
+      "consumer": "builtin-api",
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "pcall-argument-refusal",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-pcall-argument-refusal"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "consumer": "builtin-api",
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "pcall-argument-error-recovery",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-pcall-argument-error-recovery"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "consumer": "builtin-api",
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "pcall-argument-weak-release",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-pcall-argument-weak-release"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
     }
   ],
   "source_measurements": {

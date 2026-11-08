@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory)][string]$Interpreter,
-    [switch]$NativeProtocol,[switch]$PromptProtocol,
+    [switch]$NativeProtocol,[switch]$PromptProtocol,[switch]$BatchProtocol,
     [ValidateSet('Ada','ReferenceC')][string]$RuntimeRole='Ada',
     [ValidateSet('default','upstream-test')][string]$Configuration='default',
     [ValidateSet('development','validation','release')][string]$Profile='validation',
@@ -11,7 +11,7 @@ param(
 $ErrorActionPreference='Stop'
 if(($CollectAllObservations -or $DevelopmentObservation) -and
     (-not $CollectAllObservations -or -not $DevelopmentObservation -or
-     $RuntimeRole -cne 'ReferenceC' -or -not $PromptProtocol -or $NativeProtocol)){
+     $RuntimeRole -cne 'ReferenceC' -or -not $PromptProtocol -or $NativeProtocol -or $BatchProtocol)){
     throw 'CollectAllObservations requires explicit development-only native prompt observation'
 }
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
@@ -52,8 +52,8 @@ if((Get-FileHash (Join-Path $projectRoot 'tests/lua/cli_prompt_controls.lua')).H
     throw 'Prompt callback fixture copy changed bytes'
 }
 
-if($NativeProtocol -and $PromptProtocol){throw 'Choose one explicit CLI protocol subset'}
-$mode=if($PromptProtocol){'prompt'}elseif($NativeProtocol){'native'}else{'full'}
+if(@($NativeProtocol,$PromptProtocol,$BatchProtocol|Where-Object{$_}).Count -gt 1){throw 'Choose one explicit CLI protocol subset'}
+$mode=if($BatchProtocol){'batch'}elseif($PromptProtocol){'prompt'}elseif($NativeProtocol){'native'}else{'full'}
 $platform=if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'}
 if($RuntimeDirectory -eq ''){
     $part=if($Configuration -ceq 'upstream-test'){'upstream-test/'}else{''}

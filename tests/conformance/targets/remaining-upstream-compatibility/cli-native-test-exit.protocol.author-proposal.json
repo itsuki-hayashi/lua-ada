@@ -13,7 +13,7 @@
   "source_snapshot": {
     "repository_revision": "0db6e82182c19bad876e1d40632f490b1e409d71",
     "repository_dirty": true,
-    "revision": "c71319349f19bcc03a471fac7f913c1f103237ca"
+    "revision": "6d52343bf33066d1634732a944916e2bda5c2413"
   },
   "feature_review": {
     "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/cli-native-t-exit-no-close.independent-feature-review.json",
@@ -22,11 +22,11 @@
   "source_bindings": [
     {
       "path": "scripts/CliFixtureCases.psm1",
-      "sha256": "7666810b0873d71ac4e2d16760705694d14256bc98babda97ea8cdd061ad80f0"
+      "sha256": "257c4f929bff7200141f95f94f7f9d5743552d5a124813e2482935359e5ac68e"
     },
     {
       "path": "scripts/CliFixtureEvidence.psm1",
-      "sha256": "5a7eb52b404b1b9b1b2408949cc8d87047b07970bc42237fe30424980dd86934"
+      "sha256": "c1d2e6f988b358fceb698f3a0ca50b203a853ee2849cb8b26f00a9d87c820527"
     },
     {
       "path": "scripts/ConformanceRunner.psm1",
@@ -34,7 +34,7 @@
     },
     {
       "path": "scripts/check-cli.ps1",
-      "sha256": "fb9a159f790d82509ec2a988b08ba900dd4baed1baf875aa65736b3c8897aacc"
+      "sha256": "08f31d8cc14b31bee91a533d4d719aea6bf25a9e5be3a98cd6d6288574199930"
     },
     {
       "path": "scripts/check-configured-cli.ps1",
@@ -74,7 +74,7 @@
     },
     {
       "path": "tests/conformance/targets/configured-fixture-classification.json",
-      "sha256": "490f3437f0de9aff2d2aed8f13defa8c129b23d931a760086126ff166703def9"
+      "sha256": "a384b4f7570b0e25ac5b6e332badaaf27ccc34090771e8fae0ede3a674598caa"
     },
     {
       "path": "cli/shared/lua_ada_cli_readline.c",
@@ -106,7 +106,7 @@
     },
     {
       "path": "scripts/check-cli-readline.ps1",
-      "sha256": "2e770912883ee046a63e52bcf02e117c639dcec24dd280f035be83793bcdaf8c"
+      "sha256": "208141feec0325da377f3798770375447475e9300a338e70b09108f800ad9738"
     },
     {
       "path": "scripts/test-cli-readline-portability.ps1",

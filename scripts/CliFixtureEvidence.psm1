@@ -244,7 +244,7 @@ function Assert-CliFixtureReport {
     param([Parameter(Mandatory)][string]$Root,
           [Parameter(Mandatory)][Collections.IDictionary]$Report,
           [Parameter(Mandatory)][string]$Interpreter,
-          [ValidateSet('full','native','prompt')][string]$Mode='full',
+          [ValidateSet('full','native','prompt','batch')][string]$Mode='full',
           [scriptblock]$ResolveFile,[switch]$RequireProtocolReview)
     if($Report.schema_version -ne 1 -or $Report.kind -cne 'cli-fixture-observations' -or
         $Report.mode -cne $Mode -or $Report.synthetic_fixture -isnot [bool] -or $Report.synthetic_fixture){throw 'CLI report identity or actual mode differs'}

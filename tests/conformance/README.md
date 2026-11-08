@@ -105,7 +105,7 @@ evidence. Its C rows and all 473 global classifications remain pending until
 review and fresh paired observations in the required immutable contexts.
 
 The successor author inputs preserve the historical 100 C and 94 AUnit
-identities and currently regenerate 605 C and 870 AUnit witnesses. The checked-in
+identities and currently regenerate 608 C and 870 AUnit witnesses. The checked-in
 catalogue records its own dated source snapshot and needs regeneration before
 reviewing new inputs. Additional return/closing, reader, self-value and diagnostic
 cases are named source candidates with empty execution evidence. All 473 global
@@ -201,7 +201,7 @@ they cannot replace a fresh context build.
 The seven/eight base witnesses still leave dedicated console Lua/C, typed CLI
 argument and readline report reconciliation pending. The final receiver
 explicitly rejects a context until those receivers exist. The four C console modes are
-separate actual invocations; the ordinary 605 C source candidates cannot borrow
+separate actual invocations; the ordinary 608 C source candidates cannot borrow
 their evidence or count them as no-argument consumer operations.
 
 The Windows native T no-close event is separately labelled

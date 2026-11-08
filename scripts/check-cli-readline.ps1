@@ -62,7 +62,19 @@ foreach($role in @('native','ada')){
         $arguments=@('-i')
         if($case.ContainsKey('warnings')){$arguments+='-W'}
         if($case.ContainsKey('ignore')){$arguments+='-E'}
-        $arguments+=@('-e',$setup)
+        $caseSetup=$setup
+        if($Configuration -ceq 'upstream-test' -and $IsLinux -and $case.name -ceq 'missing-library-warnings-on'){
+            # The pinned T observer aborts unexpected enabled warnings. This
+            # case intentionally requests one; the independent review permits
+            # printing it, while retaining the real failure/-W/raw comparison.
+            $review='tests/conformance/targets/remaining-upstream-compatibility/reviews/readline-expected-warning.feature-review.md'
+            $reviewHash='a7a0bce436101ff9835008929fdb6923b4940c4833eec14faa10459db4194944'
+            if((Get-FileHash -LiteralPath (Join-Path $root $review)).Hash.ToLowerInvariant() -cne $reviewHash){
+                throw 'Expected readline warning requires its exact independent feature review'
+            }
+            $caseSetup="if T then warn('@allow')end;"+$caseSetup
+        }
+        $arguments+=@('-e',$caseSetup)
         $process=Invoke-ConformanceProcess -Executable $exe -Arguments $arguments `
             -Directory $directory -OutputPrefix (Join-Path $directory 'process') `
             -TimeoutSeconds 30 -StandardInputPath $inputPath -Environment $environment
@@ -96,6 +108,10 @@ $report=@{schema_version=1;kind='cli-readline-process-regressions';configuration
     limitations=@('Product CLI observations do not supply measured Ada allocator telemetry or final context acceptance.',
         'Native backend selection is exercised on the actual host; this is not a TTY observation.',
         'References remain unchanged; each exact raw comparison uses the same-host original C CLI.')}
+if($Configuration -ceq 'upstream-test' -and $IsLinux){
+    $report['expected_warning_review']=@{path=$review;sha256=$reviewHash;case='missing-library-warnings-on';
+        setup_prefix="if T then warn('@allow')end;";runtime_acceptance=$false;coverage_authority=$false}
+}
 [IO.File]::WriteAllText((Join-Path $OutputDirectory 'result.json'),
     ($report|ConvertTo-Json -Depth 32).Replace("`r`n","`n")+"`n",[Text.UTF8Encoding]::new($false))
 if($failures.Count){throw "CLI readline differs in $($failures.Count) cases; $OutputDirectory"}

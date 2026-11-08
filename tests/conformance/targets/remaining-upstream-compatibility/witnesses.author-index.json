@@ -1,6 +1,6 @@
 {
   "global_api": {
-    "sha256": "7a6ec74f92e7709b2d5aefb3fd3b73edb6f0948631710ca0129b8c02aecd364d",
+    "sha256": "648454798c82bbdcb01deef161ae493a3fcb0098be8773f142a8c5941935962f",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/global-api.author-proposal.json"
   },
   "retained_api_routes": 159,
@@ -84,21 +84,21 @@
   "retained_consumer_cases": 100,
   "proposed_aunit_cases": 870,
   "consumer": {
-    "sha256": "9ab7784d4f9087b785eaf4549b5e3f6c09da46526a1a2813fbd47ca911ef8e08",
+    "sha256": "83bd099f975a35b3cbe0230db08f15d3ee6f20828e873c56373e2c80af831636",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json"
   },
   "retained_aunit_cases": 94,
-  "proposed_consumer_cases": 605,
+  "proposed_consumer_cases": 608,
   "independent_review_status": "pending",
   "runtime_acceptance": false,
   "global_api_entries": 473,
   "witness_policy": {
-    "sha256": "377401eae8bb9662b6dd830a704812ada15bf66363b419fdaa2c7a548fcb1d39",
+    "sha256": "3cf86b382c5111db8dbe53e476ecf21782a97a76791828b7b96b34004d297672",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/witness-policy.author-proposal.json"
   },
   "source_snapshot": {
-    "revision": "0db6e82182c19bad876e1d40632f490b1e409d71",
-    "repository_dirty": false,
+    "revision": "6d52343bf33066d1634732a944916e2bda5c2413",
+    "repository_dirty": true,
     "kind": "repository-source-snapshot"
   },
   "target": "remaining-upstream-compatibility",
@@ -109,7 +109,7 @@
   "pending_conditional_campaigns": [
     {
       "path": "tests/conformance/targets/remaining-upstream-compatibility/debug-console-consumer.author-proposal.json",
-      "sha256": "385e684fafb317872142070b0fbfbe37f1f0d10525e0d449a3666da9c3b26cae",
+      "sha256": "d817c70e4e8c3f6772db05838d32e43e67db0045a068ce799c1033030e79fcdc",
       "case_count": 4,
       "coverage_authority": false,
       "runtime_acceptance": false
