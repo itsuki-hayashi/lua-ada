@@ -10,7 +10,13 @@ $temporary=Join-Path $root ('reports/optimizer-v3-selftest/'+[guid]::NewGuid().T
 $bytes=[IO.File]::ReadAllBytes((Join-Path $root 'references/lua/testes/code.lua'))
 $original=@(Get-ConformanceCoverageUnits -Path code.lua -Bytes $bytes)
 $feature=Get-Content (Join-Path $root "$base/reviews/code-private-optimizer.independent-feature-review.json") -Raw|ConvertFrom-Json -AsHashtable -Depth 48
-$feature.source_bindings+=@(@{path='scripts/ConformanceInventory.psm1';sha256=(Get-FileHash (Join-Path $root 'scripts/ConformanceInventory.psm1')).Hash.ToLowerInvariant()})
+# Disposable fixtures bind the complete verifier graph. This never updates an
+# actual feature review or blesses its stale source identities.
+foreach($dependency in @('scripts/ConformanceInventory.psm1','scripts/ConformanceResourceEligibility.ps1')){
+    if($dependency -cnotin $feature.source_bindings.path){
+        $feature.source_bindings+=@(@{path=$dependency;sha256=(Get-FileHash (Join-Path $root $dependency)).Hash.ToLowerInvariant()})
+    }
+}
 $retention=Get-Content (Join-Path $root "$base/reviews/code-optimizer-semantic-retention.independent-review.json") -Raw|ConvertFrom-Json -AsHashtable -Depth 48
 $scopes=(Get-Content (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility.exclusions.json') -Raw|ConvertFrom-Json -AsHashtable).protected_scopes
 $paths=@('references/lua/testes/code.lua')+@($feature.source_bindings.path)+@($retention.witness_sources.path)+@($retention.witness.path)+@($scopes.path)
@@ -83,6 +89,10 @@ foreach($index in 0..7){Case "exact pinned private structure $index retains orig
     $f=Fixture $index;$r=Validate $f;Parents $f
     if($r.evidence.Count -or $f.record.status -cne 'pending' -or $f.records.Count -ne 52){throw 'Source binding fixture acquired pass authority'}
 }}
+Case 'dot-sourced verifier dependency cannot use a stale digest' {
+    $f=Fixture;$binding=@($f.feature.source_bindings|Where-Object path -CEQ 'scripts/ConformanceResourceEligibility.ps1')[0]
+    $binding.sha256='0'*64;Bind $f;Reject {Validate $f} 'Review file hash differs'
+}
 Case 'labelled synthetic reviews cannot authorize the actual target' {$f=Fixture;Reject {Validate $f -Actual} 'synthetic review'}
 foreach($flag in @('public_api','mixed_obligation','module_compatibility_obligation')){Case "$flag cannot be waived" {$f=Fixture;$f.exclusion[$flag]=$true;Reject {Validate $f} 'without public or mixed'}}
 Case 'observable structures cannot masquerade as invisible v1 metadata' {$f=Fixture;$f.exclusion.module_observable=$false;Reject {Validate $f} 'without public or mixed'}

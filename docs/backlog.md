@@ -19,6 +19,12 @@ still require reviewed treatment
 of private table inspection. Preserve ordinary assertions and all complete
 return protocols; neither a diagnostic pass nor a T omission closes them.
 
+Independently review the [V4 resource verifier](sessions/2026-11-08-observable-resource-eligibility.md),
+renew Code's ten-source dependency bindings and current materialized-counterpart
+sources, then separately author any exact memerr child/source decision. No
+policy installation or source execution is authorized by the verifier alone;
+querystr and all mandatory public/refusal/optimized obligations remain separate.
+
 Review the [source-bound materialized-vararg counterparts](sessions/2026-11-08-materialized-vararg-counterparts.md)
 before any exact private-count eligibility or source decomposition. Eight
 focused public/refusal cases preserve real values, aliases, fault increments,

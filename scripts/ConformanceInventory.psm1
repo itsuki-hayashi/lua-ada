@@ -4,6 +4,7 @@ $script:ReferenceRevision = '7579fc9d7ed90240487251dfb69168f8e64e9294'
 $script:Utf8 = [Text.UTF8Encoding]::new($false, $true)
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceExclusionEligibility.psm1')
+. (Join-Path $PSScriptRoot 'ConformanceResourceEligibility.ps1')
 $script:ExclusionBaselines = @(
     @{id='gc-io-events';path='tests/conformance/scopes/gc-io-events.json';
         sha256='79fa732f60f380c93be190f43640acf0b2ac595bdf9196d2fc8fd0a7ee62eae7'},
@@ -556,7 +557,8 @@ function Assert-ConformanceOptimizerReviews {
     }
     $featurePaths=@('references/lua/manual/manual.of','references/lua/ltests.c','src/lua-canonical_compiler.adb',
         'src/lua-canonical_compiler.ads','src/lua-opcodes.ads','src/lua-chunks.ads',
-        'scripts/ConformanceExclusionEligibility.psm1','scripts/ConformanceInventory.psm1','scripts/ConformanceTransforms.psm1')
+        'scripts/ConformanceExclusionEligibility.psm1','scripts/ConformanceInventory.psm1',
+        'scripts/ConformanceResourceEligibility.ps1','scripts/ConformanceTransforms.psm1')
     if($feature.source_bindings -isnot [Array] -or (($feature.source_bindings.path|Sort-Object)-join '|') -cne (($featurePaths|Sort-Object)-join '|')){
         throw 'V3 feature lacks current implementation/source bindings'
     }
@@ -676,6 +678,8 @@ function Test-ConformanceTargetExclusion {
     # proposal as invisible. No accepted historical Code partition exists;
     # V1/V2 behavior for their original source domains remains unchanged.
     if($Source -ceq 'code.lua' -and $eligibilityVersion -ne 3){throw 'Pinned code optimizer exclusions require observable V3 eligibility'}
+    Assert-ConformanceResourceDomain -Source $Source -Record $Record -Version $eligibilityVersion
+    if($eligibilityVersion -eq 4){Assert-ConformanceResourceSource -Bytes $SourceBytes -Record $Record -Exclusion $Exclusion}
     if($eligibilityVersion -eq 2){Assert-ConformancePrivateBoundSource -Source $Source -Bytes $SourceBytes -Record $Record -Exclusion $Exclusion}
     if($eligibilityVersion -eq 3){
         if($Record.kind -cne 'reviewed-block'){throw 'V3 optimizer must use an exact derived reviewed block'}
@@ -794,7 +798,7 @@ function Test-ConformanceTargetExclusion {
     foreach ($field in $fields) {
         # JSON object key order is irrelevant, including the nested guard.
         $actual = $Exclusion[$field]; $approved = $approval.exclusion[$field]
-        if ($field -cin @('t_guard','retained_parent')) {
+        if ($field -cin @('t_guard','retained_parent','retained_materialization')) {
             if ((@($actual.Keys | Sort-Object) -join '|') -cne (@($approved.Keys | Sort-Object) -join '|')) {
                 throw 'Exclusion approved T guard fields differ'
             }
@@ -819,6 +823,7 @@ function Test-ConformanceTargetExclusion {
     }
     if($eligibilityVersion -eq 2){Assert-ConformancePrivateBoundFeatureReview -Root $Root -Exclusion $Exclusion -Decision $decision}
     if($eligibilityVersion -eq 3){Assert-ConformanceOptimizerReviews -Root $Root -Exclusion $Exclusion -Decision $decision -Approval $approval -AllowSyntheticReview:$AllowSyntheticReview}
+    if($eligibilityVersion -eq 4){Assert-ConformanceResourceReviews -Root $Root -Exclusion $Exclusion -Decision $decision -Approval $approval -AllowSyntheticReview:$AllowSyntheticReview}
     return $Exclusion
 }
 
@@ -1162,6 +1167,9 @@ function Test-ConformanceInventory {
             }
             if($exclusion.source -ceq $file.path -and (Get-ConformanceExclusionEligibilityVersion $exclusion) -eq 3){
                 Assert-ConformanceOptimizerParentRecords -Bytes $bytes -Exclusion $exclusion -Records $indexed -Exclusions $exclusions
+            }
+            if($exclusion.source -ceq $file.path -and (Get-ConformanceExclusionEligibilityVersion $exclusion) -eq 4){
+                Assert-ConformanceResourceParentRecords -Bytes $bytes -Exclusion $exclusion -Records $indexed -Exclusions $exclusions
             }
         }
         Test-ConformanceSourceLinks -Records $records -RequireComplete:$RequireComplete `

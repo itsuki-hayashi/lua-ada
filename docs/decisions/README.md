@@ -3,6 +3,9 @@
 ADR 0039 records [CLI prompt transport](0039-cli-prompt-transport.md), actual
 anonymous C callbacks, rooted prompt output and typed process-exit preservation.
 
+ADR 0040 records [observable private resource eligibility](0040-observable-private-resource-eligibility.md),
+a one-row source verifier with retained public behavior and no installed data.
+
 ADR 0038 records [scalar closing links](0038-scalar-closing-links.md),
 allocation-free canonical marking and actual slot/capture lifetime.
 

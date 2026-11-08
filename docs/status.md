@@ -22,6 +22,13 @@ each local configuration; eight binary compiler/VM roles agree. Original
 default nextvar now completes. Original strings advances to its locale
 collation assertion; private table-inspection and final matrix gates remain.
 
+The [V4 resource verifier](sessions/2026-11-08-observable-resource-eligibility.md)
+implements a closed exact memerr allocation-count source rule with retained
+public materialization and optimized zero-allocation obligations. Sixty new
+binding cases and legacy suites pass; no resource policy row, review approval,
+transformation or runtime acceptance is installed. Code's imported verifier
+binding must be independently renewed as a ten-source graph.
+
 Eight [materialized-vararg counterparts](sessions/2026-11-08-materialized-vararg-counterparts.md)
 separate ordinary table/value/capture semantics from mandatory real T fault
 sweeps and cleanup. Both local configurations pass 2,557 AUnit cases; ordinary

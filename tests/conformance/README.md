@@ -284,6 +284,18 @@ only a derived pure numeric comparison conjunct inside a hashed original
 assertion. Calls, statements, another Boolean branch and widening to the parent
 are rejected. This is an eligibility subset, not a Lua parser or runtime change.
 
+[Eligibility V4](../../docs/decisions/0040-observable-private-resource-eligibility.md)
+separately handles one observable private positive allocation comparison:
+pinned memerr.lua133's whole19-byte assert. It preserves the original6-byte
+anchor, required real materialization child, and optimized254-byte zero-count
+workload. Independent current feature/retention and exact approval remain
+mandatory; synthetic tests never authorize actual target data. Run
+scripts/test-resource-exclusion-v4.ps1 for its60 bounded source-binding cases.
+No V4 policy row or source adaptation is installed by this implementation.
+The imported helper also belongs to V3's verifier graph, which now requires10
+current bindings and independent renewal; the eight optimizer candidates do
+not change.
+
 Version 2 requires an approval with schema version 2 and a separate independent
 feature decision. That decision binds the observation/compatibility flags, the
 retained parent, exact pinned manual bytes, retained counterpart source hashes,

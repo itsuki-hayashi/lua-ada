@@ -6,6 +6,8 @@ Correction: [native string locales](2026-11-08-native-string-locales.md).
 
 Correction: [table errors and missing iteration arguments](2026-11-08-table-error-arguments.md).
 
+Component: [observable resource eligibility V4](2026-11-08-observable-resource-eligibility.md).
+
 Component: [materialized vararg counterparts](2026-11-08-materialized-vararg-counterparts.md).
 
 Correction: [marked closing-value mutation](2026-11-08-marked-closing-mutation.md).
