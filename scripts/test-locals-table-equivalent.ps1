@@ -7,6 +7,19 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceReviewedSources.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
 $manifest='tests/conformance/targets/remaining-upstream-compatibility/locals-dead-table-storage.equivalent.author-proposal.json'
 $mapping=Get-Content (Join-Path $root $manifest) -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+$datedProposalHash=(Get-FileHash (Join-Path $root $manifest)).Hash.ToLowerInvariant()
+$datedMapping=$mapping|ConvertTo-Json -Depth 64|ConvertFrom-Json -AsHashtable -Depth 64
+$installedPath=Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/locals-dead-table-storage.equivalent.json'
+$installed=$null
+if(Test-Path -LiteralPath $installedPath){
+    $installed=Get-Content $installedPath -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+    # Validate real current independent authority first. Negative fixtures then
+    # clone only the current input identities, keeping the author's review
+    # pending. Never rewrite its dated proposal or manufacture an approval to
+    # make a stale source fixture pass.
+    $null=Get-TargetLocalsTableEquivalentReplay -Root $root -Specification $installed -Implementation Ada -Configuration upstream-test
+    $mapping.counterpart_source_snapshot=$installed.counterpart_source_snapshot|ConvertTo-Json -Depth 64|ConvertFrom-Json -AsHashtable -Depth 64
+}
 $temporary=Join-Path $root ('reports/locals-equivalent-definition/'+[guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($temporary)
 $originalHash=(Get-FileHash (Join-Path $root $mapping.source)).Hash.ToLowerInvariant()
@@ -65,6 +78,17 @@ function Synthetic-Review-Fixture([switch]$Narrative) {
     return @{root=$directory;mapping=$value}
 }
 
+if($null -ne $installed){
+    Case 'installed actual independent review replays only in memory without runtime authority' {
+        $r=Replay $installed
+        if($r.sha256 -cne '54481f4b2c760ef1f8efd747706a3e6eb02553f582e15210aaaab6ec72c448d8' -or
+            $r.runtime_acceptance -or $r.coverage_authority){throw 'Installed source replay gained runtime authority'}
+    }
+    Case 'dated pre-tail author proposal stays unchanged and stale production bindings reject' {
+        Reject {Definition $datedMapping} 'hash differs'
+        if((Get-FileHash (Join-Path $root $manifest)).Hash.ToLowerInvariant() -cne $datedProposalHash){throw 'Dated author proposal was rewritten'}
+    }
+}
 Case 'pending proposal definition returns only a planned hash and no authority or bytes' {
     $r=Definition (Clone)
     if(-not $r.definition_validated -or $r.planned_sha256 -cne '54481f4b2c760ef1f8efd747706a3e6eb02553f582e15210aaaab6ec72c448d8' -or
@@ -130,4 +154,4 @@ Case 'actual original reference bytes remain unchanged' {
         throw 'Definition tests modified the original guard, table, deletion, collection or refusal sweep'
     }
 }
-Write-Output "PASS: $script:cases locals exact-definition/rejection tests; no adapted Lua source emitted or executed"
+Write-Output "PASS: $script:cases locals source-definition/rejection and accepted-memory tests; no adapted Lua source emitted or executed"
