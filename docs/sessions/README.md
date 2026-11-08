@@ -2,6 +2,8 @@
 
 Correction: [table errors and missing iteration arguments](2026-11-08-table-error-arguments.md).
 
+Component: [materialized vararg counterparts](2026-11-08-materialized-vararg-counterparts.md).
+
 Correction: [marked closing-value mutation](2026-11-08-marked-closing-mutation.md).
 
 Feature review: [materialized vararg allocation count](2026-11-08-memerr-vararg-feature-review.md).

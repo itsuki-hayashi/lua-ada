@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "kind": "memerr-materialized-vararg-counterpart-author-packet",
+  "candidate_id": "memerr-materialized-vararg-allocation-count",
+  "author": "Codex /root/runtime_gaps",
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "scope": "Focused semantic and actual provider-refusal counterparts only. No eligibility, inventory, source exclusion, transformation, normalization, fabricated count or passing whole-file obligation is authored.",
+  "runtime_source_base": "87daf6c",
+  "runtime_checkpoint": "eaf451e73a032aa27bff8beaf729564e65a5a820",
+  "test_only_change": true,
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "original_source": {
+    "path": "references/lua/testes/memerr.lua",
+    "byte_length": 7512,
+    "sha256": "02cc2a754e688bdfcbf507e009d899c4d367f27ced45094b68fdf208a6912491"
+  },
+  "original_candidate": {
+    "path": "references/lua/testes/memerr.lua",
+    "byte_offset": 3544,
+    "byte_length": 19,
+    "line": 133,
+    "end_line": 133,
+    "anchor_sha256": "671d423d19a8f100b52a4f4a1402dcbc11e2aa6eadaa7a1eaa77bf09640add01",
+    "original_bytes": "assert(b.aloc == 3)"
+  },
+  "retained_optimized_span": {
+    "path": "references/lua/testes/memerr.lua",
+    "byte_offset": 3604,
+    "byte_length": 254,
+    "line": 134,
+    "end_line": 138,
+    "anchor_sha256": "065e3973d7ca76db008fd02bda7d3321d0daeffa35b11a18281ec77b01917976",
+    "original_bytes": "  -- table optimized away\n  local function sel (n, ...arg) return arg[n] + arg.n end\n  local b = testamem(\"optimized vararg table\",\n        function () return sel(2.0, 20, 30) end)\n  assert(b.res == 32 and b.aloc == 0)   -- no memory needed for this case",
+    "must_remain_byte_identical": true,
+    "waiver": false
+  },
+  "independent_feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/memerr-vararg-allocation.independent-feature-review.json",
+    "byte_length": 5276,
+    "sha256": "d6c6fdce0d098cb20d26ef6af5f29fa23ac5da707635b3c7fcbb696fa8858b60"
+  },
+  "fixtures": [
+    {
+      "path": "tests/lua/materialized_vararg.lua",
+      "byte_length": 1641,
+      "sha256": "a9d505daf56bcd3b8a4f62cd3d74df2d25558550b54ff6ee0d42cce7827c709f",
+      "classification": "author ordinary public counterpart; catalog authority remains separate",
+      "requires_T": false,
+      "cases": [
+        "Payload_Types",
+        "Nil_Holes",
+        "Fresh_Aliases",
+        "Captured_Table"
+      ]
+    },
+    {
+      "path": "tests/lua/materialized_vararg_refusal.lua",
+      "byte_length": 3311,
+      "sha256": "7c0e8c9e0e38f1ef59d0b61122b8c5327085808ebcf905b0a03432134c539b5f",
+      "classification": "author mandatory real T fault companion; T absence is an error",
+      "requires_T": true,
+      "cases": [
+        "Count_Faults",
+        "Byte_Faults",
+        "Partial_Release",
+        "Retained_Recovery"
+      ]
+    }
+  ],
+  "counterpart_bindings": [
+    {
+      "path": "tests/src/lua-materialized_vararg_tests.ads",
+      "byte_length": 317,
+      "sha256": "aefb493ac39fe0a954721141dd2fe8fbaef89a6d8d896cc6a273082859b2cb79"
+    },
+    {
+      "path": "tests/src/lua-materialized_vararg_tests.adb",
+      "byte_length": 4775,
+      "sha256": "0499d39b7207149c87b81f6f22589a2c702f3a8f1055f0a935678d6fb858b97b"
+    },
+    {
+      "path": "tests/src/test_runner.adb",
+      "byte_length": 11779,
+      "sha256": "a05493735b3965c93f7c06bd285119f6654d0ec9e7c9f5ff3200190fe563d717"
+    }
+  ],
+  "runtime_bindings": [
+    {
+      "path": "src/lua-engine.ads",
+      "byte_length": 68222,
+      "sha256": "0c9512c28952853f142ed36596977872fe0fe98073c181c7685d0329e2a84cfe"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "byte_length": 115735,
+      "sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409"
+    },
+    {
+      "path": "src/lua-engine-canonical.adb",
+      "byte_length": 72998,
+      "sha256": "8cc932f984e66265dfa8b9c60da299e73d77c8cf52566ffc46190a641a1d22b2"
+    },
+    {
+      "path": "src/lua-canonical_compiler.adb",
+      "byte_length": 100779,
+      "sha256": "afd7c271850015208d5f302735ba5a7feb2cb2a6263ff3daecd033c1039f761c"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "byte_length": 349453,
+      "sha256": "133d61789e04563a487848a8e2d02519e3cbc0788dad0b980928192b18082326"
+    },
+    {
+      "path": "src/lua-engine-stacks.ads",
+      "byte_length": 4236,
+      "sha256": "65db9cc1a5a87cba8c59bba21a5e4033c6fb817902e32ee29a38ce93c7d71398"
+    },
+    {
+      "path": "src/lua-engine-stacks.adb",
+      "byte_length": 18474,
+      "sha256": "f2c4291ac27d842a2e0e5b454871ae0e422f5d8c5941103927974d295318a69d"
+    },
+    {
+      "path": "src/lua-engine-tables.adb",
+      "byte_length": 18307,
+      "sha256": "31db4043d6b387c08b61a2ff6f6197d9a5495626200d67cf56cfad66f0821173"
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "byte_length": 56579,
+      "sha256": "d803883a7f07c8a3ecfa082b7c7c6addc72d29cde65ee35a149002ac6541ff8a"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "byte_length": 182897,
+      "sha256": "c0d3add249a5a2ef9d59f6a34ec9b6ad917da0d7a9ebb43ee6d13320bd679216"
+    },
+    {
+      "path": "src/lua-storage.adb",
+      "byte_length": 19480,
+      "sha256": "c025b2d9cdf08a4eafe003459c17f8ad8c2124f8bbb4144140532084a337dbda"
+    },
+    {
+      "path": "src/lua-storage-vectors.adb",
+      "byte_length": 19755,
+      "sha256": "6795bd60f6d3942eecb253fc089dda1b35c25c5c07e1266c26ea5773b36f3f21"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "byte_length": 33803,
+      "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3"
+    },
+    {
+      "path": "tests/c/conformance_adapter.c",
+      "byte_length": 6781,
+      "sha256": "4141d51fbabd31aae0d7f1c529d2caab381c2a15f980fd7750bfb360f757ceb2"
+    },
+    {
+      "path": "tests/src/lua-conformance_allocator.adb",
+      "byte_length": 8314,
+      "sha256": "c5f0347be0e16db96e1d93d7fb7aa4a3ac316fdc7efc3355d8d19f591b548b36"
+    },
+    {
+      "path": "tests/src/lua-conformance_memory.adb",
+      "byte_length": 11885,
+      "sha256": "c003fa691b5a9ab4f889092553ed296247bd162df1c33ea6923c72e1a24ec199"
+    }
+  ],
+  "retained_properties": [
+    "The exact original pack(...t) returning t workload receives 10,20,30,40,hello. Check table/n5, all integer/string types, every value and absent sixth entry.",
+    "Nil/count boundaries, fresh per-call identity, shared object aliases and independently captured table lifetime are ordinary T-free requirements.",
+    "Actual count allowance starts at zero and increases by one; actual byte allowance increases by seven from the measured baseline. Both collections and deep4 run before every attempt. Stop at first actual success.",
+    "The count and byte loops have finite harness caps 128 and 16384 iterations, not positive allocation geometry assertions. Every prior result/status must be the genuine memory error.",
+    "Every T AUnit case requires actual selected-owner refusals and zero live provider blocks after physical teardown. The partial-construction case clears its source closure/payload and requires weak collection after every outcome.",
+    "Retain a successful result through refusal and collection, then require a fresh healthy result and eventual weak release.",
+    "Actual successful count/extra-byte thresholds are recorded in scalar measurement fields and copied to raw diagnostic sidecars. They are neither compared to fixed positive values nor used to rewrite output.",
+    "The original optimized n=2.0 named-vararg result32/count0/zero-extra-byte block remains unchanged and separately mandatory.",
+    "The original whole fault campaign, reports and required mixed/materialization parent remain open until separate current-source review and execution."
+  ],
+  "validation": {
+    "tools": {
+      "alire": "2.1.1",
+      "gnat": "16.1.0"
+    },
+    "nested_test_builds": {
+      "default": "pass",
+      "upstream_test": "pass",
+      "prebuilt": true,
+      "runtime_source": "87daf6c plus eaf451e"
+    },
+    "aunit": {
+      "default": {
+        "run": 2557,
+        "successful": 2557,
+        "failed": 0,
+        "unexpected": 0
+      },
+      "upstream_test": {
+        "run": 2557,
+        "successful": 2557,
+        "failed": 0,
+        "unexpected": 0
+      },
+      "instructions_per_fixture": 1000000,
+      "limits_changed": false
+    },
+    "ordinary_binary_roles": {
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "roles": 8,
+      "stdout_sha256": "3587fb806a2310d3aaf7d3fa29ab7d8dee42588646b6badcde8e46c66ace705c",
+      "stderr_bytes": 0
+    },
+    "T_fault_binary_roles": {
+      "configuration": "upstream-test",
+      "roles": 4,
+      "stdout_sha256": "0c62f6fa1c800188a24dddbb627d00ecbba6966cb302103177eb5753659fadff",
+      "stderr_bytes": 0,
+      "ada_managed_refusals_per_run": 812,
+      "ada_provider_refusals_per_run": 812
+    },
+    "T_absence_negatives": {
+      "native_default": {
+        "exit_code": 1,
+        "stdout_bytes": 0
+      },
+      "ada_default": {
+        "exit_code": 1,
+        "stdout_bytes": 0
+      }
+    },
+    "ada_shutdown": {
+      "outstanding_bytes": 0,
+      "outstanding_blocks": 0,
+      "shutdown_complete": true,
+      "accounting_fault": false
+    },
+    "observed_measurements": {
+      "native_T": {
+        "count": 3,
+        "extra_bytes": 252
+      },
+      "ada_T": {
+        "count": 5,
+        "extra_bytes": 5460
+      },
+      "scope": "Only this focused counterpart launch. Actual implementation-specific observations, not exact-count expectations or original whole-file acceptance."
+    }
+  },
+  "raw_evidence_prefix": "reports/hook-top/materialized-",
+  "limitations": [
+    "No runtime code changes are part of this test-only counterpart checkpoint. The verified eaf runtime supplies the unchanged implementation.",
+    "No new standalone C/native-module/full platform campaign was run for these test additions. Prior eaf strict runtime/C and unchanged 2-GiB source evidence remain separately dated.",
+    "The full isolated documentation check remains blocked by the missing busted fixture; changed documents are checked separately.",
+    "Eligibility/schema/inventory edits require explicit Root authorization and renewed affected feature/source reviews. No older source authority is silently reused."
+  ]
+}

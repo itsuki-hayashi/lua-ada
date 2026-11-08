@@ -8,6 +8,12 @@ locale collation; instrumented nextvar/sort still require reviewed treatment
 of private table inspection. Preserve ordinary assertions and all complete
 return protocols; neither a diagnostic pass nor a T omission closes them.
 
+Review the [source-bound materialized-vararg counterparts](sessions/2026-11-08-materialized-vararg-counterparts.md)
+before any exact private-count eligibility or source decomposition. Eight
+focused public/refusal cases preserve real values, aliases, fault increments,
+roots and recovery; they install no exclusion and do not waive the original
+optimized32/count0/zero-extra-byte obligation or passing whole-file evidence.
+
 Include the [marked-slot mutation correction](sessions/2026-11-08-marked-closing-mutation.md)
 when renewing current locals runtime/checker bindings. Its four ordinary
 counterparts establish the focused nil/false/type-closing behavior, not a

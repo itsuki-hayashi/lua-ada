@@ -9,6 +9,13 @@ each local configuration; eight binary compiler/VM roles agree. Original
 default nextvar now completes. Original strings advances to its locale
 collation assertion; private table-inspection and final matrix gates remain.
 
+Eight [materialized-vararg counterparts](sessions/2026-11-08-materialized-vararg-counterparts.md)
+separate ordinary table/value/capture semantics from mandatory real T fault
+sweeps and cleanup. Both local configurations pass 2,557 AUnit cases; ordinary
+and T fault binary roles match separately. The original private positive count,
+optimized zero-allocation block and whole-source acceptance retain their
+separate review/execution requirements.
+
 The [marked-slot correction](sessions/2026-11-08-marked-closing-mutation.md)
 preserves a scalar closing obligation after a debugger writes nil/false.
 Four ordinary native-paired cases cover type closers, actual replacement
