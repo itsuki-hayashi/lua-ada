@@ -44,6 +44,9 @@ $sources=@(foreach($relative in $sourceNames){
     @{path=$relative;sha256=(Get-FileHash -LiteralPath $from).Hash.ToLowerInvariant();
         snapshot_path=$to;snapshot_sha256=(Get-FileHash -LiteralPath $to).Hash.ToLowerInvariant()}
 })
+if(@($sources|Where-Object { $_.sha256 -cne $_.snapshot_sha256 }).Count){
+    throw 'Debug console C source changed during its byte snapshot'
+}
 $modes=@('host','host-close','callback-close','callback-error')
 $sourceText=[IO.File]::ReadAllText((Join-Path $sourceRoot 'c_api/tests/builtin_api_contract.c'))
 foreach($mode in $modes){
