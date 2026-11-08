@@ -1,0 +1,399 @@
+{
+  "schema_version": 1,
+  "kind": "locals-closing-current-source-author-audit",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "review_status": "pending-independent-current-source-and-exact-review",
+  "independent_reviewer": null,
+  "authority_installation": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_snapshot": {
+    "revision": "228f95aacbacade6de36477d902ebcbc749fcef4",
+    "runtime_revision": "698ebe5e9181a964f66b258c2e789fb3e7060536",
+    "pending_public_diagnostic_changes_included": false
+  },
+  "manifest": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/locals-dead-table-storage.closing-successor.author-proposal.json",
+    "sha256": "189ea7c9e94213eeef210df4bf120b2b3df8a6fe9e93e8702a97c012d98661ea"
+  },
+  "dated_V1": {
+    "manifest": {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/locals-dead-table-storage.equivalent.json",
+      "sha256": "4e7ef62abeb3cabf1e61985481da812561fe1a32fbb1a1e3c9365a9e1d7a435c"
+    },
+    "frozen_counterpart_snapshot_hash": "981f4ceb94d7a272c41f3e2c29f8836c4e8abd351d36f6edf070f5a24ad01f01",
+    "paths": 22,
+    "changed": false,
+    "current_replay": "correctly stale; no automatic approval inheritance"
+  },
+  "direct_owned_graph": [
+    {
+      "path": "tests/lua/table_storage_public.lua",
+      "sha256": "4e7c949594d81e29b4f065485ab6dd7060a88c68392a63acd4fef00dc6ba8838",
+      "role": "actual source-linked table checker and public weak/key/storage controls",
+      "previous_sha256": "4e7c949594d81e29b4f065485ab6dd7060a88c68392a63acd4fef00dc6ba8838",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "tests/lua/table_storage_private.lua",
+      "sha256": "9a4bc32f8a2dd37863c4f7e702f8600a8da8a7f7d887a829aa4ba9f6f3dd9576",
+      "role": "actual source-linked table checker and public weak/key/storage controls",
+      "previous_sha256": "9a4bc32f8a2dd37863c4f7e702f8600a8da8a7f7d887a829aa4ba9f6f3dd9576",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.ads",
+      "sha256": "f845a5e1b2f79a5c21b8be8840bf250ff758130dc14c0d9c345cb4d4ffb71b21",
+      "role": "real T adapter publication and runtime/test callback boundary",
+      "previous_sha256": "f845a5e1b2f79a5c21b8be8840bf250ff758130dc14c0d9c345cb4d4ffb71b21",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3",
+      "role": "real T adapter publication and runtime/test callback boundary",
+      "previous_sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "tests/src/lua-engine-table_storage_probe.ads",
+      "sha256": "67d9cb92e436c029c76f85e25ce8f8528ceea01265ae384ef33d50b51e687ab2",
+      "role": "actual source-linked table checker and public weak/key/storage controls",
+      "previous_sha256": "67d9cb92e436c029c76f85e25ce8f8528ceea01265ae384ef33d50b51e687ab2",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "tests/src/lua-engine-table_storage_probe.adb",
+      "sha256": "a30f62f83f16307ed0180de33dc80c61a03dd5e455a000880ab5eb9ca1933579",
+      "role": "actual source-linked table checker and public weak/key/storage controls",
+      "previous_sha256": "a30f62f83f16307ed0180de33dc80c61a03dd5e455a000880ab5eb9ca1933579",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "tests/src/lua-table_storage_inspection_tests.adb",
+      "sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8",
+      "role": "actual source-linked table checker and public weak/key/storage controls",
+      "previous_sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "tests/src/table_storage_public_tests.adb",
+      "sha256": "d72e02ad4a62b20a5809ed08c098dfea032e02f5b3c9ac9faf97e4e379c58d0c",
+      "role": "actual source-linked table checker and public weak/key/storage controls",
+      "previous_sha256": "d72e02ad4a62b20a5809ed08c098dfea032e02f5b3c9ac9faf97e4e379c58d0c",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "sha256": "d803883a7f07c8a3ecfa082b7c7c6addc72d29cde65ee35a149002ac6541ff8a",
+      "role": "actual scalar/weak liveness and close-link tracing",
+      "previous_sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687",
+      "change_kind": "current-source-change-requires-independent-review"
+    },
+    {
+      "path": "src/lua-engine-tables.adb",
+      "sha256": "31db4043d6b387c08b61a2ff6f6197d9a5495626200d67cf56cfad66f0821173",
+      "role": "actual table row/hash/free-list storage and rebuild",
+      "previous_sha256": "31db4043d6b387c08b61a2ff6f6197d9a5495626200d67cf56cfad66f0821173",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "src/lua-engine.ads",
+      "sha256": "0c9512c28952853f142ed36596977872fe0fe98073c181c7685d0329e2a84cfe",
+      "role": "World/Context/Frame scalar closing state and root declarations",
+      "previous_sha256": "87341b09c731c5d5389d56db55e0da942d348e720c30eb822e7be0b8324035f9",
+      "change_kind": "current-source-change-requires-independent-review"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/locals-dead-table-storage.independent-feature-review.json",
+      "sha256": "110246c59dbb2765133b718b24aa3256cd7457b5286fa4a0878b6a152a812f91",
+      "role": "dated independent feature-only eligibility decision",
+      "previous_sha256": "110246c59dbb2765133b718b24aa3256cd7457b5286fa4a0878b6a152a812f91",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409",
+      "role": "selected owner, pin/move/free and frame lifetime primitives",
+      "previous_sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "references/lua/manual/manual.of",
+      "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+      "role": "pinned public collection/closing/weak lifetime contract",
+      "previous_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "sha256": "133d61789e04563a487848a8e2d02519e3cbc0788dad0b980928192b18082326",
+      "role": "scheduler/frame/context ownership, tail retirement and close traversal",
+      "previous_sha256": "942935e36b015a5becde354b3eba5b3166f2cd29ba25cb6c9181bc7b8532a8c5",
+      "change_kind": "current-source-change-requires-independent-review"
+    },
+    {
+      "path": "src/lua-engine-stacks.adb",
+      "sha256": "f2c4291ac27d842a2e0e5b454871ae0e422f5d8c5941103927974d295318a69d",
+      "role": "owned scalar/cell/close-link interface and implementation",
+      "previous_sha256": "46881022d8a021e2f0a084e81a9d4378bcb7c4be007e3bd7f3dee76a2481c819",
+      "change_kind": "current-source-change-requires-independent-review"
+    },
+    {
+      "path": "src/lua-engine-canonical.adb",
+      "sha256": "8cc932f984e66265dfa8b9c60da299e73d77c8cf52566ffc46190a641a1d22b2",
+      "role": "canonical actions and scalar close request implementation",
+      "previous_sha256": "71963fbe8a1c8ac7ca39064ead7e3818c89adc17d940b9576bd638bb86563539",
+      "change_kind": "current-source-change-requires-independent-review"
+    },
+    {
+      "path": "src/lua-canonical_compiler.adb",
+      "sha256": "afd7c271850015208d5f302735ba5a7feb2cb2a6263ff3daecd033c1039f761c",
+      "role": "retained TBC/CLOSE source generation",
+      "previous_sha256": "afd7c271850015208d5f302735ba5a7feb2cb2a6263ff3daecd033c1039f761c",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "tests/src/lua-table_storage_inspection_tests.ads",
+      "sha256": "882397a1afd8d1024353b82d402f478a7718d07cee9cc0f4d1cf07a702820a43",
+      "role": "actual source-linked table checker and public weak/key/storage controls",
+      "previous_sha256": "882397a1afd8d1024353b82d402f478a7718d07cee9cc0f4d1cf07a702820a43",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "tests/src/table_storage_public_tests.ads",
+      "sha256": "acd25837f1d39ca66fe6b89eaa705a358d4b869f6b85aede063cb10460fae77e",
+      "role": "actual source-linked table checker and public weak/key/storage controls",
+      "previous_sha256": "acd25837f1d39ca66fe6b89eaa705a358d4b869f6b85aede063cb10460fae77e",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "scripts/ConformanceLocalsEquivalent.psm1",
+      "sha256": "a3363efad92b7618fb868d17b6690fb18310807aded27ff9b7283a9d1e3b94c9",
+      "role": "bounded exact source selector/validator",
+      "previous_sha256": "47e616c0ee8743de7a7d5a7722b84d2ff531a0f5e66996baeec00a377d05ddb1",
+      "change_kind": "current-source-change-requires-independent-review"
+    },
+    {
+      "path": "scripts/ConformanceReviewedSources.psm1",
+      "sha256": "38b45f13b88f62e019d475154b058afdeaffe987d7d7636dfa82b591fb2cb2ac",
+      "role": "bounded exact source selector/validator",
+      "previous_sha256": "38b45f13b88f62e019d475154b058afdeaffe987d7d7636dfa82b591fb2cb2ac",
+      "change_kind": "unchanged-retained-binding"
+    },
+    {
+      "path": "tests/src/lua-conformance_memory.adb",
+      "sha256": "c003fa691b5a9ab4f889092553ed296247bd162df1c33ea6923c72e1a24ec199",
+      "role": "actual read-only heap/context/scalar-root checker",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "tests/lua/scalar_closing_refusal.lua",
+      "sha256": "b08301ac199b9ce078e42ed5f6a6412c5f7de958364a4fdc855c54c13de9f0c4",
+      "role": "complete12 realT closing/refusal/public workload",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "tests/lua/scalar_closing_mutation.lua",
+      "sha256": "528b004311b9437af50ddce6236fbe0bcbc5f0be3229b52fc67d7695e9244c6d",
+      "role": "complete4 ordinary nil/false/type/error/GC mutation controls",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "tests/src/lua-scalar_closing_tests.ads",
+      "sha256": "17632802344a1007b2d129312e181bc8c59f334e947cbc8f90145f7d2b808092",
+      "role": "separately named closing/root/owner/corruption and actual fixture tests",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "tests/src/lua-scalar_closing_tests.adb",
+      "sha256": "60bdb210ed0914ef3711db48f9158728b7328a5ed8b50582e464b1a6392fab87",
+      "role": "separately named closing/root/owner/corruption and actual fixture tests",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "tests/src/lua-closing_prefix_tests.adb",
+      "sha256": "fe38bd2588cd8756fbfbdfa9e4c8f9a8486bb3b42598211481c37ca08fe4dd80",
+      "role": "owned closing argument-prefix invariants and regressions",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "tests/src/lua-execution_retirement_tests.adb",
+      "sha256": "c297fed1363222ae7f1d7c4d7af94d9d02da3e800d6988bdc73b8ab84dcabee5",
+      "role": "activation/root retirement and cleanup regressions",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "src/lua-engine-stacks.ads",
+      "sha256": "65db9cc1a5a87cba8c59bba21a5e4033c6fb817902e32ee29a38ce93c7d71398",
+      "role": "owned scalar/cell/close-link interface and implementation",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "src/lua-engine-canonical.ads",
+      "sha256": "8dac74cfbbf410f7a53b31b0f6f14766916968353781b64e697d791975dd49ce",
+      "role": "canonical actions and scalar close request implementation",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "src/lua-engine-machine.ads",
+      "sha256": "87b122e678df3b2ada80209bf90c523fb4f5082eac0e8392b280af4237ae8049",
+      "role": "scheduler/frame/context ownership, tail retirement and close traversal",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "tests/src/lua-conformance_memory.ads",
+      "sha256": "e9bb3c35566fa8e6a30ee9437f0622476f3f1efc7792ca0efddd4c44211f2dd7",
+      "role": "actual read-only heap/context/scalar-root checker",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "tests/src/lua-closing_prefix_tests.ads",
+      "sha256": "79cb35726b1d5edaf3746eb7d4f61e32639540bdc4790054a49695d83a094eac",
+      "role": "owned closing argument-prefix invariants and regressions",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "tests/src/lua-execution_retirement_tests.ads",
+      "sha256": "51d5861ee67f06e925d592e1364ec2d46b9e433e807f5869a147b61be9859fc7",
+      "role": "activation/root retirement and cleanup regressions",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "tests/src/lua-storage-conformance.ads",
+      "sha256": "bdee8486b34f92fa01941740e2a5ccbabaf232881ed2d9e082bbc8ce3355bd08",
+      "role": "direct checker delegate: actual selected-owner/accounting verification",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "tests/src/lua-storage-conformance.adb",
+      "sha256": "b72933c54a580fba2bca39cddad6f8168a497d450287aefe279bc54e6a49ac1b",
+      "role": "direct checker delegate: actual selected-owner/accounting verification",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "tests/src/lua-conformance_allocator.ads",
+      "sha256": "8ab6a36234b62f121496a5b32d602039520a62355145400996653ae4ee64fee1",
+      "role": "actual selected-owner count/byte refusal controls used by scalar fault tests",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    },
+    {
+      "path": "tests/src/lua-conformance_allocator.adb",
+      "sha256": "c5f0347be0e16db96e1d93d7fb7aa4a3ac316fdc7efc3355d8d19f591b548b36",
+      "role": "actual selected-owner count/byte refusal controls used by scalar fault tests",
+      "previous_sha256": null,
+      "change_kind": "new-explicit-direct-dependency"
+    }
+  ],
+  "edges": [
+    [
+      "Canonical",
+      "Machine",
+      "Stacks: owned close link and original scalar/captured value"
+    ],
+    [
+      "Machine",
+      "Engine World/Frame/Context",
+      "actual owner/initialized bound before close traversal"
+    ],
+    [
+      "Collector",
+      "Stacks and Engine declarations",
+      "actual liveness/root tracing of marked scalars"
+    ],
+    [
+      "ConformanceMemory.Verify",
+      "Storage.Conformance.Verify",
+      "actual checker/accounting dependency"
+    ],
+    [
+      "ScalarClosingTests",
+      "ConformanceAllocator",
+      "real refusal controls; no simulated failure"
+    ],
+    [
+      "ScalarClosingTests",
+      "scalar_closing_refusal.lua",
+      "all12 actual provider/public cases"
+    ],
+    [
+      "ScalarClosingTests",
+      "scalar_closing_mutation.lua",
+      "all4 actual nil/false/type/error/GC bodies"
+    ]
+  ],
+  "registration_linkage_only": {
+    "path": "tests/src/test_runner.adb",
+    "unique_exact_text": "Lua.Scalar_Closing_Tests.Register (Result);",
+    "byte_offset": 6204,
+    "byte_length": 43,
+    "sha256": "617e5cac063cde272e1866bf88758d9b01e7c7ba4cf116a5e9198052de0a4c61",
+    "runtime_evidence": [],
+    "scope": "Exact observed source line only; does not bind the whole runner or establish registration execution. Actual frozen named AUnit receipts remain required."
+  },
+  "baseline_boundary": {
+    "unchanged_shared_components": [
+      "owned compiler/general storage infrastructure",
+      "AUnit and Test_Support infrastructure"
+    ],
+    "scope": "This finite direct closing/checker/control graph is source-review input. It does not replace the final source-bound compiled image, complete actual named receipts, public fixture operations or whole original/native/derived source observations."
+  },
+  "retained_operations": {
+    "count": 2,
+    "patches": [
+      {
+        "id": "observe-original-object-key-and-live-entries",
+        "start_byte": 2355,
+        "length_bytes": 26,
+        "source_sha256": "04035d9ee038af9e7f37506bbf2f8c5ae6917c7ecd8de5a99c5205551cd00bc6",
+        "replacement_sha256": "b75d7d1f14fd6c90f85b1c90658a1d1eca36aa717ef34d049c669d758a89c0ed"
+      },
+      {
+        "id": "inspect-deleted-table-storage-and-key-reclamation",
+        "start_byte": 2490,
+        "length_bytes": 110,
+        "source_sha256": "00b85ae4732a06e844c82cd987ba31de93c22d726a4cbd18f3914cf8fde5f628",
+        "replacement_sha256": "42c9256c7ee4e7a32c95c7e01682cd837e7d287cfbd3b8482b721d738e781518"
+      }
+    ],
+    "output_sha256": "54481f4b2c760ef1f8efd747706a3e6eb02553f582e15210aaaab6ec72c448d8",
+    "output_bytes": 31717,
+    "source_emitted": false,
+    "source_exclusions": [],
+    "original_parents_pending": [
+      "LUA-LOCALS-INTERNAL-REFERENCE-0001",
+      "LUA-LOCALS-ASSERT-CALL-0023"
+    ]
+  },
+  "review_questions": [
+    "Follow linked closing marks through original capture identity, mutable debug local writes, nil/false mutation and current-metamethod failure; retain original closer/error identity and outer cleanup.",
+    "Inspect owner and initialized upper bounds before dereference/tracing; the checker must inspect actual links and owners without allocating, collecting, repairing or inventing C geometry.",
+    "Keep actual selected-owner refusal/retry and the complete original later locals allocation/closing sweep unchanged, including M0 closer restoration.",
+    "Independently inspect both exact unchanged patches and all39 current source identities; do not copy the old V1 reviewer/status as current authority.",
+    "After the separate pending public diagnostic runtime changes commit, refresh affected bindings and review them before any accepted successor or adapted execution.",
+    "Require fresh original C both modes, original Ada default, exact derived Ada T5/function result protocol, literal-dot progress contract, actual named/counterpart operations and selected-owner0/0/shutdown before runtime/final-source reconciliation."
+  ],
+  "next_actions": [
+    "Independent current source/exact review after production diagnostic checkpoint; no approval is supplied here.",
+    "Select a distinct reviewed live successor manifest only after review; keep the original V1 mapping/reviews dated and unchanged.",
+    "Fresh same-final-image whole File/Aggregate and required context evidence; no original ledger anchor is completed by this packet."
+  ]
+}
