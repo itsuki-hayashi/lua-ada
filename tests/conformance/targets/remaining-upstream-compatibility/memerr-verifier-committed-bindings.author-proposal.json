@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "kind": "source-binding-refresh-author-proposal",
+  "id": "memerr-verifier-committed-bindings-73b69d6",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "review_status": "pending-independent-review",
+  "independent_reviewer": null,
+  "authority_installation": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_snapshot": {
+    "repository_revision": "73b69d65942dec817ce82f466786dbaec6b31700",
+    "scope": "committed-source-only; no unmerged pool source",
+    "unmerged_pool_included": false,
+    "tracked_source_matches_committed_snapshot": true
+  },
+  "separate_pool_follow_up": {
+    "status": "deferred-until-committed",
+    "paths": [
+      "src/lua-engine.ads",
+      "src/lua-engine.adb",
+      "src/lua-engine-foreign.adb"
+    ],
+    "requires_new_author_hash_capture": true,
+    "requires_independent_source_semantic_review": true,
+    "runtime_acceptance": false
+  },
+  "preservation_rules": [
+    "Keep original source/API ledgers and original parent obligations pending.",
+    "Preserve all dated proposals, accepted predecessor artifacts and raw observations unchanged.",
+    "New source/semantic hashes are author calculations only; no reviewer decision or runtime authority is inherited.",
+    "No adapted file is emitted or executed by this packet.",
+    "Capture final committed pool changes separately; do not use these pre-pool hashes to approve future bytes."
+  ],
+  "predecessor_manifest": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/memerr-verifier-allocation.equivalent.json",
+    "sha256": "aa8c14698b25d95564b1f736e49277b4312fb4b2d7574807c4e67d58ce8b93bb"
+  },
+  "counterpart_bindings": [
+    {
+      "path": "references/lua/ltests.c",
+      "previous_sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199",
+      "current_sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199",
+      "changed": false
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "previous_sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0",
+      "current_sha256": "532ac55f963ff15ea259f30f1493639cb862ab76f6e82ee47ebb1438add04bf3",
+      "changed": true
+    },
+    {
+      "path": "tests/src/lua-conformance_allocator.adb",
+      "previous_sha256": "c5f0347be0e16db96e1d93d7fb7aa4a3ac316fdc7efc3355d8d19f591b548b36",
+      "current_sha256": "c5f0347be0e16db96e1d93d7fb7aa4a3ac316fdc7efc3355d8d19f591b548b36",
+      "changed": false
+    },
+    {
+      "path": "tests/c/conformance_adapter.c",
+      "previous_sha256": "4141d51fbabd31aae0d7f1c529d2caab381c2a15f980fd7750bfb360f757ceb2",
+      "current_sha256": "4141d51fbabd31aae0d7f1c529d2caab381c2a15f980fd7750bfb360f757ceb2",
+      "changed": false
+    },
+    {
+      "path": "tests/src/lua-sessions-conformance.adb",
+      "previous_sha256": "15666c173f37041d24b59737b0051964487c28806cb3a5c26eb2ce144bcb2ae9",
+      "current_sha256": "15666c173f37041d24b59737b0051964487c28806cb3a5c26eb2ce144bcb2ae9",
+      "changed": false
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/memerr-verifier.author.lua",
+      "previous_sha256": "453c9d685bb1dce92f956975ce05e7358b2b0d8e0f54248b2b147fbf07ccb32a",
+      "current_sha256": "453c9d685bb1dce92f956975ce05e7358b2b0d8e0f54248b2b147fbf07ccb32a",
+      "changed": false
+    },
+    {
+      "path": "scripts/ConformanceVerifierEquivalents.psm1",
+      "previous_sha256": "3a0f01431471c7793284efe338ae2c3142ce40233aa9d3e784cb95db892029c1",
+      "current_sha256": "3a0f01431471c7793284efe338ae2c3142ce40233aa9d3e784cb95db892029c1",
+      "changed": false
+    }
+  ],
+  "committed_source_changes": [
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "previous_revision": "9ce9f00c545c8aab111bd4f74d5f578705b2e29e",
+      "previous_sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0",
+      "current_sha256": "532ac55f963ff15ea259f30f1493639cb862ab76f6e82ee47ebb1438add04bf3",
+      "exact_delta_spans": [
+        {
+          "kind": "insert",
+          "previous": {
+            "byte_offset": 149,
+            "byte_length": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          "current": {
+            "byte_offset": 149,
+            "byte_length": 37,
+            "sha256": "1228e188e4d40650e5c4dc9e5e9944659f5d601b794bb97d21c18865039ec110",
+            "text": "with Lua.Engine.Table_Storage_Probe;\n"
+          }
+        },
+        {
+          "kind": "insert",
+          "previous": {
+            "byte_offset": 4005,
+            "byte_length": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          "current": {
+            "byte_offset": 4042,
+            "byte_length": 5772,
+            "sha256": "9e98703492b505c33eb3c35eddd17a4a16affd0656cd10b6ddb154b881200efb",
+            "text": "   procedure Verify_Table_Storage\n     (State : World; Item : Value;\n      Member_Rows, Live_Entries : out Natural)\n   is\n      Table : Object_Access;\n      Rows, Hash_Rows, Free_Rows, Free_Flags : Natural := 0;\n      Cursor, Visited, Membership : Natural;\n      procedure Check (Condition : Boolean);\n      procedure Reference (Pointer : Object_Access; Kind : Heap_Kind);\n      procedure Value_Reference (Data : Value);\n\n      procedure Check (Condition : Boolean) is\n      begin\n         if not Condition then\n            raise Program_Error with \"table storage invariant failed\";\n         end if;\n      end Check;\n\n      procedure Reference (Pointer : Object_Access; Kind : Heap_Kind) is\n      begin\n         --  A stale or foreign pointer cannot supply its own registry slot.\n         --  Compare pointer values against actual owned rows first; only a\n         --  matching live allocation may be dereferenced or passed to Hash.\n         Check (Pointer /= null);\n         for Index in 1 .. State.Heap.Last_Index loop\n            if State.Heap (Index) = Pointer then\n               Check (Pointer.Kind = Kind);\n               Check (Pointer.Registry_Slot = Index);\n               return;\n            end if;\n         end loop;\n         Check (False);\n      end Reference;\n\n      procedure Value_Reference (Data : Value) is\n      begin\n         case Data.Kind is\n            when String_Kind => Reference (Data.Reference, String_Object);\n            when Table_Kind => Reference (Data.Reference, Table_Object);\n            when Closure_Kind => Reference (Data.Reference, Closure);\n            when Native_Closure_Kind =>\n               Reference (Data.Reference, Native_Closure);\n            when Thread_Kind => Reference (Data.Reference, Thread_Object);\n            when Userdata_Kind => Reference (Data.Reference, Userdata_Object);\n            when others => null;\n         end case;\n      end Value_Reference;\n   begin\n      Member_Rows := 0;\n      Live_Entries := 0;\n      Check (Item.Kind = Table_Kind);\n      Reference (Item.Reference, Table_Object);\n      Table := Item.Reference;\n      Rows := Natural (Table.Members.Length);\n\n      --  Establish safe keys/values and scalar link extents independently of\n      --  every index. A nil-valued tombstone may still retain a live key and\n      --  stay indexed; a collected nil key must have no collision successor.\n      for Row of Table.Members loop\n         Value_Reference (Row.Key);\n         Value_Reference (Row.Item);\n         Check (Row.Next <= Rows and then Row.Free_Next <= Rows);\n         if Row.Key.Kind = Nil_Kind then\n            Check (Row.Item.Kind = Nil_Kind and then Row.Next = 0);\n         end if;\n         if Row.Item.Kind = Nil_Kind then\n            Check (Row.Free_Listed);\n         else\n            Live_Entries := Live_Entries + 1;\n         end if;\n         if Row.Free_Listed then\n            Free_Flags := Free_Flags + 1;\n         else\n            Check (Row.Free_Next = 0);\n         end if;\n      end loop;\n\n      for Index in 1 .. Table.Array_Index.Last_Index loop\n         Cursor := Table.Array_Index (Index);\n         Check (Cursor <= Rows);\n         if Cursor /= 0 then\n            Check (Equal (Table.Members (Cursor).Key,\n                          (Integer_Kind, Integer_Value (Index))));\n            Check (Table.Members (Cursor).Next = 0);\n         end if;\n      end loop;\n      --  Prove every hash walk finite before invoking ordinary lookup. A\n      --  repeated row in one chain necessarily exceeds Rows; cross-bucket\n      --  aliasing is detected by the independent per-row membership pass.\n      for Head of Table.Hash_Index loop\n         Cursor := Head;\n         Visited := 0;\n         while Cursor /= 0 loop\n            Check (Cursor <= Rows and then Visited < Rows);\n            Check (Table.Members (Cursor).Key.Kind /= Nil_Kind);\n            Check (Hash_Rows < Rows);\n            Hash_Rows := Hash_Rows + 1;\n            Visited := Visited + 1;\n            Cursor := Table.Members (Cursor).Next;\n         end loop;\n      end loop;\n      Check (Table.Hash_Rows = Hash_Rows);\n\n      Cursor := Table.Free_Row;\n      while Cursor /= 0 loop\n         Check (Cursor <= Rows and then Free_Rows < Rows);\n         Check (Table.Members (Cursor).Free_Listed);\n         Free_Rows := Free_Rows + 1;\n         Cursor := Table.Members (Cursor).Free_Next;\n      end loop;\n      Check (Free_Rows = Free_Flags);\n\n      --  No input-sized visited bitmap or copied row vector is necessary.\n      --  Bounded repeated walks prove each retained key has exactly one\n      --  index, nil keys have none, and Find agrees with the actual row.\n      --  The prior phase proved these unchanged chains finite and in bounds.\n      --  Live revived rows may remain on the free list until insertion pops\n      --  them; free/index overlap therefore does not imply corruption.\n      for Index in 1 .. Rows loop\n         Membership := 0;\n         for Row of Table.Array_Index loop\n            if Row = Index then\n               Check (Membership = 0);\n               Membership := 1;\n            end if;\n         end loop;\n         for Head of Table.Hash_Index loop\n            Cursor := Head;\n            while Cursor /= 0 loop\n               if Cursor = Index then\n                  Check (Membership = 0);\n                  Membership := 1;\n               end if;\n               Cursor := Table.Members (Cursor).Next;\n            end loop;\n         end loop;\n         if Table.Members (Index).Key.Kind = Nil_Kind then\n            Check (Membership = 0);\n         else\n            Check (Membership = 1);\n            Check (Table_Storage_Probe.Find\n                     (Table, Table.Members (Index).Key) = Index);\n         end if;\n      end loop;\n      Member_Rows := Rows;\n   end Verify_Table_Storage;\n\n"
+          }
+        },
+        {
+          "kind": "insert",
+          "previous": {
+            "byte_offset": 22500,
+            "byte_length": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          "current": {
+            "byte_offset": 28309,
+            "byte_length": 323,
+            "sha256": "c3bf5ea9883d49deef0d05ee264aceb4a4cdd3dae80540867c7eb2b7a7fa97c3",
+            "text": "         when 38 =>\n            declare\n               Rows, Live : Natural;\n            begin\n               Verify_Table_Storage (State, Argument (1), Rows, Live);\n               Result.Count := 2;\n               Result.Integers :=\n                 [C.long_long (Rows), C.long_long (Live), others => 0];\n            end;\n"
+          }
+        },
+        {
+          "kind": "replace",
+          "previous": {
+            "byte_offset": 24623,
+            "byte_length": 53,
+            "sha256": "cf1a452cca8c6617aaea624c6b1acca9c8ff648ecaf2962adb571fb03f347d61",
+            "text": "         if Operation in 1 .. 10 | 12 | 13 | 37 then\n"
+          },
+          "current": {
+            "byte_offset": 30755,
+            "byte_length": 58,
+            "sha256": "d9282b55d5788abb01fe953da781d2b8d47025bd54739a6d2b113b924511d523",
+            "text": "         if Operation in 1 .. 10 | 12 | 13 | 37 | 38 then\n"
+          }
+        },
+        {
+          "kind": "insert",
+          "previous": {
+            "byte_offset": 26410,
+            "byte_length": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          "current": {
+            "byte_offset": 32547,
+            "byte_length": 43,
+            "sha256": "52fb0534b4f6ff9ab5237a28d387b55043f8d784d1b9eb7ebdbc337779d8d664",
+            "text": "      Add (\"ada_check_table_storage\", 38);\n"
+          }
+        }
+      ],
+      "whole_predecessor_reconstructed": true,
+      "reconstructed_sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0",
+      "independent_semantic_review": "pending"
+    }
+  ],
+  "preserved_operation": {
+    "source": {
+      "path": "references/lua/testes/memerr.lua",
+      "sha256": "02cc2a754e688bdfcbf507e009d899c4d367f27ced45094b68fdf208a6912491"
+    },
+    "implementation": "Ada",
+    "configuration": "upstream-test",
+    "insertion": {
+      "replacement": "  T.alloccount()\n",
+      "start_byte": 140,
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "length_bytes": 0
+    },
+    "retained_spans": [
+      {
+        "byte_offset": 106,
+        "sha256": "24a6f919689ea609ba03232fe8612d54ca4045810431ba6b84a26ad61765c852",
+        "id": "protected-call",
+        "byte_length": 34
+      },
+      {
+        "byte_offset": 140,
+        "sha256": "2258cf6e841baf2afb792c687ed09a87dfa0c813db3c5999f155f1b0d224f5a5",
+        "id": "status-message-assertion",
+        "byte_length": 44
+      },
+      {
+        "byte_offset": 861,
+        "sha256": "e92064b5113699458891aea05278493425d514f81d6cc3e7c176677b2587ba8d",
+        "id": "oversized-application",
+        "byte_length": 57
+      },
+      {
+        "byte_offset": 993,
+        "sha256": "8b1b01f67f1b82177438ac34727289f0abb9478557a96a7bba40bd70ef4d9ebc",
+        "id": "limited-application-and-reset",
+        "byte_length": 79
+      },
+      {
+        "byte_offset": 1075,
+        "sha256": "b522c996d34e1643b84e3e9dfcbc013d06abb078ffc4fa8287bc70d5987a83ba",
+        "id": "later-campaigns",
+        "byte_length": 6437
+      }
+    ],
+    "excluded_obligations": [],
+    "output_sha256": "880d83e6ee5b5cf621c59d410fa928340375ac4f4191913c8092a5f385bbda76",
+    "memory_only_output_verified": true,
+    "source_emitted": false,
+    "application_refusal_preserved": true,
+    "original_helper_assertion_preserved": true,
+    "original_reset_and_later_campaigns_preserved": true
+  },
+  "source_review_inputs": [
+    "The complete adapter delta adds the table-storage probe import, bounded Verify_Table_Storage helper, operation38 dispatch/registration and its captured-context classification.",
+    "All previous adapter bytes reconstruct exactly after reversing the five recorded deltas; allocator-count operation2, totalmem operations and other original dispatch bytes are unchanged.",
+    "Extra T helper registration occurs during Install and changes real setup allocation/closure topology. A distinct reviewer must assess its interaction with refusal/verifier assumptions; byte preservation alone is not approval.",
+    "The native allocator, Ada test allocator/session wrapper, C adapter, author verifier and validator source identities are separately recorded; no passing evidence is imported."
+  ],
+  "review_graph": [
+    {
+      "id": "new-verifier-narrative",
+      "current": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/memerr-verifier-allocation.independent-review.json",
+        "sha256": "55bcb998aa2bc96333701db83745b94ed4ef0776288e5dbfc61bf64d3556548c"
+      },
+      "proposed_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/memerr-verifier-allocation.committed-source-review.json",
+      "dependencies": [],
+      "successor_sha256": null,
+      "independent_reviewer": null,
+      "review_status": "pending-independent-review",
+      "requested_decisions": [
+        "Independently inspect current seven counterparts and exact post-pcall-only reset; decide a new semantic hash."
+      ]
+    },
+    {
+      "id": "new-verifier-approval",
+      "current": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/memerr-verifier-allocation.approval.json",
+        "sha256": "cfb9c1ef017a3f3e63dea53337bc6da3cd084eccf3eb0ec0b9225f4cd1a58556"
+      },
+      "proposed_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/memerr-verifier-allocation.committed-source-approval.json",
+      "dependencies": [
+        "new-verifier-narrative"
+      ],
+      "successor_sha256": null,
+      "independent_reviewer": null,
+      "review_status": "pending-independent-review",
+      "requested_decisions": [
+        "Issue a new distinct approval of the current-source semantic hash and exact narrative bytes; do not copy the old accepted decision."
+      ]
+    },
+    {
+      "id": "live-verifier-manifest",
+      "current": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/memerr-verifier-allocation.equivalent.json",
+        "sha256": "aa8c14698b25d95564b1f736e49277b4312fb4b2d7574807c4e67d58ce8b93bb"
+      },
+      "proposed_path": "tests/conformance/targets/remaining-upstream-compatibility/memerr-verifier-allocation.equivalent.json",
+      "dependencies": [
+        "new-verifier-approval"
+      ],
+      "successor_sha256": null,
+      "independent_reviewer": null,
+      "review_status": "pending-independent-review",
+      "requested_decisions": [
+        "Only after review update counterpart hashes and bind the newly hashed approval; preserve dated author proposal and exact operation/output."
+      ]
+    }
+  ],
+  "pending_successor_semantic_sha256": "3f64a5caf1967ea747f90febfa9b034037a15373a468ef9fe37bdbec9b2e59db"
+}

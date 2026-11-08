@@ -1,0 +1,382 @@
+{
+  "schema_version": 1,
+  "kind": "source-binding-refresh-author-proposal",
+  "id": "api941-committed-bindings-73b69d6",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "review_status": "pending-independent-review",
+  "independent_reviewer": null,
+  "authority_installation": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_snapshot": {
+    "repository_revision": "73b69d65942dec817ce82f466786dbaec6b31700",
+    "scope": "committed-source-only; no unmerged pool source",
+    "unmerged_pool_included": false,
+    "tracked_source_matches_committed_snapshot": true
+  },
+  "separate_pool_follow_up": {
+    "status": "deferred-until-committed",
+    "paths": [
+      "src/lua-engine.ads",
+      "src/lua-engine.adb",
+      "src/lua-engine-foreign.adb"
+    ],
+    "requires_new_author_hash_capture": true,
+    "requires_independent_source_semantic_review": true,
+    "runtime_acceptance": false
+  },
+  "preservation_rules": [
+    "Keep original source/API ledgers and original parent obligations pending.",
+    "Preserve all dated proposals, accepted predecessor artifacts and raw observations unchanged.",
+    "New source/semantic hashes are author calculations only; no reviewer decision or runtime authority is inherited.",
+    "No adapted file is emitted or executed by this packet.",
+    "Capture final committed pool changes separately; do not use these pre-pool hashes to approve future bytes."
+  ],
+  "predecessor_manifest": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api-finalized-userdata-reclamation.equivalent.json",
+    "sha256": "d9dfb864e595b2c22471150e526d4e59359f4e651d94a98561e084cf7d234fb8"
+  },
+  "counterpart_bindings": [
+    {
+      "path": "references/lua/manual/manual.of",
+      "previous_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+      "current_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+      "changed": false
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "previous_sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687",
+      "current_sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687",
+      "changed": false
+    },
+    {
+      "path": "src/lua-engine-finalizers.adb",
+      "previous_sha256": "cd29399060bc6f9d045f1d247d76a2419e06e62e9a5ca5055b27213c65c62b62",
+      "current_sha256": "cd29399060bc6f9d045f1d247d76a2419e06e62e9a5ca5055b27213c65c62b62",
+      "changed": false
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "previous_sha256": "8a462ca9c361f595edc85c7d093467da1cc1f7943fef222a36d62b53a869e01c",
+      "current_sha256": "d6abfcb10636b43eb2faf0981f61bc879d33dae1db56e71255efde79d47ea797",
+      "changed": true
+    },
+    {
+      "path": "src/lua-storage-vectors.adb",
+      "previous_sha256": "6795bd60f6d3942eecb253fc089dda1b35c25c5c07e1266c26ea5773b36f3f21",
+      "current_sha256": "6795bd60f6d3942eecb253fc089dda1b35c25c5c07e1266c26ea5773b36f3f21",
+      "changed": false
+    },
+    {
+      "path": "src/lua-storage-vectors.ads",
+      "previous_sha256": "b68454ab6f4e0b30dc69a8fde89ece91674a760c60c672baca7d78b38b06931f",
+      "current_sha256": "b68454ab6f4e0b30dc69a8fde89ece91674a760c60c672baca7d78b38b06931f",
+      "changed": false
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/api-finalization-lifetimes.author.lua",
+      "previous_sha256": "43213950a0f88258a4dc19f893d73329c685ca5ae944026e4645583b38a9c8ac",
+      "current_sha256": "43213950a0f88258a4dc19f893d73329c685ca5ae944026e4645583b38a9c8ac",
+      "changed": false
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.independent-feature-review.json",
+      "previous_sha256": "6738e63cda2f2269cfa776ea70031dcd4dc2aa9cc733d0fe56926b912b7e2288",
+      "current_sha256": "6738e63cda2f2269cfa776ea70031dcd4dc2aa9cc733d0fe56926b912b7e2288",
+      "changed": false
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "previous_sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0",
+      "current_sha256": "532ac55f963ff15ea259f30f1493639cb862ab76f6e82ee47ebb1438add04bf3",
+      "changed": true
+    }
+  ],
+  "committed_source_changes": [
+    {
+      "path": "src/lua-engine.adb",
+      "previous_revision": "9ce9f00c545c8aab111bd4f74d5f578705b2e29e",
+      "previous_sha256": "8a462ca9c361f595edc85c7d093467da1cc1f7943fef222a36d62b53a869e01c",
+      "current_sha256": "d6abfcb10636b43eb2faf0981f61bc879d33dae1db56e71255efde79d47ea797",
+      "exact_delta_spans": [
+        {
+          "kind": "insert",
+          "previous": {
+            "byte_offset": 54235,
+            "byte_length": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          "current": {
+            "byte_offset": 54235,
+            "byte_length": 67,
+            "sha256": "c0fe5777c458b14cc0b1a0302ce5937de94f92a59876a52fa824b2d436125330",
+            "text": "      Item.Hook_Trace_PC := 0;\n      Item.Hook_Line_Mask := False;\n"
+          }
+        }
+      ],
+      "whole_predecessor_reconstructed": true,
+      "reconstructed_sha256": "8a462ca9c361f595edc85c7d093467da1cc1f7943fef222a36d62b53a869e01c",
+      "independent_semantic_review": "pending"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "previous_revision": "9ce9f00c545c8aab111bd4f74d5f578705b2e29e",
+      "previous_sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0",
+      "current_sha256": "532ac55f963ff15ea259f30f1493639cb862ab76f6e82ee47ebb1438add04bf3",
+      "exact_delta_spans": [
+        {
+          "kind": "insert",
+          "previous": {
+            "byte_offset": 149,
+            "byte_length": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          "current": {
+            "byte_offset": 149,
+            "byte_length": 37,
+            "sha256": "1228e188e4d40650e5c4dc9e5e9944659f5d601b794bb97d21c18865039ec110",
+            "text": "with Lua.Engine.Table_Storage_Probe;\n"
+          }
+        },
+        {
+          "kind": "insert",
+          "previous": {
+            "byte_offset": 4005,
+            "byte_length": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          "current": {
+            "byte_offset": 4042,
+            "byte_length": 5772,
+            "sha256": "9e98703492b505c33eb3c35eddd17a4a16affd0656cd10b6ddb154b881200efb",
+            "text": "   procedure Verify_Table_Storage\n     (State : World; Item : Value;\n      Member_Rows, Live_Entries : out Natural)\n   is\n      Table : Object_Access;\n      Rows, Hash_Rows, Free_Rows, Free_Flags : Natural := 0;\n      Cursor, Visited, Membership : Natural;\n      procedure Check (Condition : Boolean);\n      procedure Reference (Pointer : Object_Access; Kind : Heap_Kind);\n      procedure Value_Reference (Data : Value);\n\n      procedure Check (Condition : Boolean) is\n      begin\n         if not Condition then\n            raise Program_Error with \"table storage invariant failed\";\n         end if;\n      end Check;\n\n      procedure Reference (Pointer : Object_Access; Kind : Heap_Kind) is\n      begin\n         --  A stale or foreign pointer cannot supply its own registry slot.\n         --  Compare pointer values against actual owned rows first; only a\n         --  matching live allocation may be dereferenced or passed to Hash.\n         Check (Pointer /= null);\n         for Index in 1 .. State.Heap.Last_Index loop\n            if State.Heap (Index) = Pointer then\n               Check (Pointer.Kind = Kind);\n               Check (Pointer.Registry_Slot = Index);\n               return;\n            end if;\n         end loop;\n         Check (False);\n      end Reference;\n\n      procedure Value_Reference (Data : Value) is\n      begin\n         case Data.Kind is\n            when String_Kind => Reference (Data.Reference, String_Object);\n            when Table_Kind => Reference (Data.Reference, Table_Object);\n            when Closure_Kind => Reference (Data.Reference, Closure);\n            when Native_Closure_Kind =>\n               Reference (Data.Reference, Native_Closure);\n            when Thread_Kind => Reference (Data.Reference, Thread_Object);\n            when Userdata_Kind => Reference (Data.Reference, Userdata_Object);\n            when others => null;\n         end case;\n      end Value_Reference;\n   begin\n      Member_Rows := 0;\n      Live_Entries := 0;\n      Check (Item.Kind = Table_Kind);\n      Reference (Item.Reference, Table_Object);\n      Table := Item.Reference;\n      Rows := Natural (Table.Members.Length);\n\n      --  Establish safe keys/values and scalar link extents independently of\n      --  every index. A nil-valued tombstone may still retain a live key and\n      --  stay indexed; a collected nil key must have no collision successor.\n      for Row of Table.Members loop\n         Value_Reference (Row.Key);\n         Value_Reference (Row.Item);\n         Check (Row.Next <= Rows and then Row.Free_Next <= Rows);\n         if Row.Key.Kind = Nil_Kind then\n            Check (Row.Item.Kind = Nil_Kind and then Row.Next = 0);\n         end if;\n         if Row.Item.Kind = Nil_Kind then\n            Check (Row.Free_Listed);\n         else\n            Live_Entries := Live_Entries + 1;\n         end if;\n         if Row.Free_Listed then\n            Free_Flags := Free_Flags + 1;\n         else\n            Check (Row.Free_Next = 0);\n         end if;\n      end loop;\n\n      for Index in 1 .. Table.Array_Index.Last_Index loop\n         Cursor := Table.Array_Index (Index);\n         Check (Cursor <= Rows);\n         if Cursor /= 0 then\n            Check (Equal (Table.Members (Cursor).Key,\n                          (Integer_Kind, Integer_Value (Index))));\n            Check (Table.Members (Cursor).Next = 0);\n         end if;\n      end loop;\n      --  Prove every hash walk finite before invoking ordinary lookup. A\n      --  repeated row in one chain necessarily exceeds Rows; cross-bucket\n      --  aliasing is detected by the independent per-row membership pass.\n      for Head of Table.Hash_Index loop\n         Cursor := Head;\n         Visited := 0;\n         while Cursor /= 0 loop\n            Check (Cursor <= Rows and then Visited < Rows);\n            Check (Table.Members (Cursor).Key.Kind /= Nil_Kind);\n            Check (Hash_Rows < Rows);\n            Hash_Rows := Hash_Rows + 1;\n            Visited := Visited + 1;\n            Cursor := Table.Members (Cursor).Next;\n         end loop;\n      end loop;\n      Check (Table.Hash_Rows = Hash_Rows);\n\n      Cursor := Table.Free_Row;\n      while Cursor /= 0 loop\n         Check (Cursor <= Rows and then Free_Rows < Rows);\n         Check (Table.Members (Cursor).Free_Listed);\n         Free_Rows := Free_Rows + 1;\n         Cursor := Table.Members (Cursor).Free_Next;\n      end loop;\n      Check (Free_Rows = Free_Flags);\n\n      --  No input-sized visited bitmap or copied row vector is necessary.\n      --  Bounded repeated walks prove each retained key has exactly one\n      --  index, nil keys have none, and Find agrees with the actual row.\n      --  The prior phase proved these unchanged chains finite and in bounds.\n      --  Live revived rows may remain on the free list until insertion pops\n      --  them; free/index overlap therefore does not imply corruption.\n      for Index in 1 .. Rows loop\n         Membership := 0;\n         for Row of Table.Array_Index loop\n            if Row = Index then\n               Check (Membership = 0);\n               Membership := 1;\n            end if;\n         end loop;\n         for Head of Table.Hash_Index loop\n            Cursor := Head;\n            while Cursor /= 0 loop\n               if Cursor = Index then\n                  Check (Membership = 0);\n                  Membership := 1;\n               end if;\n               Cursor := Table.Members (Cursor).Next;\n            end loop;\n         end loop;\n         if Table.Members (Index).Key.Kind = Nil_Kind then\n            Check (Membership = 0);\n         else\n            Check (Membership = 1);\n            Check (Table_Storage_Probe.Find\n                     (Table, Table.Members (Index).Key) = Index);\n         end if;\n      end loop;\n      Member_Rows := Rows;\n   end Verify_Table_Storage;\n\n"
+          }
+        },
+        {
+          "kind": "insert",
+          "previous": {
+            "byte_offset": 22500,
+            "byte_length": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          "current": {
+            "byte_offset": 28309,
+            "byte_length": 323,
+            "sha256": "c3bf5ea9883d49deef0d05ee264aceb4a4cdd3dae80540867c7eb2b7a7fa97c3",
+            "text": "         when 38 =>\n            declare\n               Rows, Live : Natural;\n            begin\n               Verify_Table_Storage (State, Argument (1), Rows, Live);\n               Result.Count := 2;\n               Result.Integers :=\n                 [C.long_long (Rows), C.long_long (Live), others => 0];\n            end;\n"
+          }
+        },
+        {
+          "kind": "replace",
+          "previous": {
+            "byte_offset": 24623,
+            "byte_length": 53,
+            "sha256": "cf1a452cca8c6617aaea624c6b1acca9c8ff648ecaf2962adb571fb03f347d61",
+            "text": "         if Operation in 1 .. 10 | 12 | 13 | 37 then\n"
+          },
+          "current": {
+            "byte_offset": 30755,
+            "byte_length": 58,
+            "sha256": "d9282b55d5788abb01fe953da781d2b8d47025bd54739a6d2b113b924511d523",
+            "text": "         if Operation in 1 .. 10 | 12 | 13 | 37 | 38 then\n"
+          }
+        },
+        {
+          "kind": "insert",
+          "previous": {
+            "byte_offset": 26410,
+            "byte_length": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          "current": {
+            "byte_offset": 32547,
+            "byte_length": 43,
+            "sha256": "52fb0534b4f6ff9ab5237a28d387b55043f8d784d1b9eb7ebdbc337779d8d664",
+            "text": "      Add (\"ada_check_table_storage\", 38);\n"
+          }
+        }
+      ],
+      "whole_predecessor_reconstructed": true,
+      "reconstructed_sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0",
+      "independent_semantic_review": "pending"
+    }
+  ],
+  "preserved_operation": {
+    "source": {
+      "path": "references/lua/testes/api.lua",
+      "sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0"
+    },
+    "configuration": "upstream-test",
+    "source_exclusions": [],
+    "original_required_obligations": [
+      "LUA-API-ASSERT-CALL-0195"
+    ],
+    "replacements": [
+      {
+        "id": "observe-real-finalization-identities",
+        "start_byte": 26342,
+        "length_bytes": 92,
+        "source_sha256": "e317c746eb09899963ef954a7c055c9586786d38b6d3105bd098aaf924eaaca0",
+        "replacement": "  local udata_initial = T.totalmem(\"userdata\")\n  local udata_finalized = 0\n  local udata_keys = setmetatable({}, {__mode = \"k\"})\n  local udata_values = setmetatable({}, {__mode = \"v\"})\n  local udata_seen = {}\n  a = {__gc = function (u)\n    local id = udata_keys[u]\n    assert(type(u) == \"userdata\" and type(id) == \"number\")\n    assert(not udata_seen[id] and udata_values[id] == nil)\n    udata_seen[id] = true\n    udata_finalized = udata_finalized + 1\n  end}\n  for i=1,1000 do\n    local u = debug.setmetatable(T.newuserdata(0), a)\n    udata_keys[u], udata_values[i] = i, u\n  end",
+        "invariant": "Create exactly the original1000 zero-sized userdata under the original stopped collector; observe each actual callback once and public weak-key/value lifecycle.",
+        "counterpart_tests": [
+          "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.independent-feature-review.json",
+          "tests/conformance/targets/remaining-upstream-compatibility/api-finalization-lifetimes.author.lua",
+          "references/lua/manual/manual.of",
+          "src/lua-engine.adb",
+          "src/lua-engine-collector.adb",
+          "src/lua-engine-finalizers.adb",
+          "src/lua-storage-vectors.ads",
+          "src/lua-storage-vectors.adb",
+          "tests/src/lua-conformance_adapter.adb"
+        ],
+        "replacement_sha256": "4ea83215dcd39b88d65939f1e31cfe4e2b8511056d4fac64af85f582993b4862"
+      },
+      {
+        "id": "retain-first-cycle-resurrection-and-growth",
+        "start_byte": 26477,
+        "length_bytes": 118,
+        "source_sha256": "bffa07bc389e6c96386f1726d0164b7cb4b8289659e54fd4fa3491a66390396b",
+        "replacement": "  collectgarbage()  -- this collection only calls TM, without freeing memory\n  assert(collectgarbage(\"count\") >= x+10)\n  assert(udata_finalized == 1000)\n  assert(T.totalmem(\"userdata\") == udata_initial + 1000)\n  for i=1,1000 do assert(udata_seen[i] and udata_values[i] == nil) end\n  local udata_key_count = 0\n  for _ in pairs(udata_keys) do udata_key_count = udata_key_count + 1 end\n  assert(udata_key_count == 1000)",
+        "invariant": "Keep the original first collection and positive-growth assertion unchanged; require1000 callbacks,1000 still-live userdata and actual weak lifetime observations.",
+        "counterpart_tests": [
+          "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.independent-feature-review.json",
+          "tests/conformance/targets/remaining-upstream-compatibility/api-finalization-lifetimes.author.lua",
+          "references/lua/manual/manual.of",
+          "src/lua-engine.adb",
+          "src/lua-engine-collector.adb",
+          "src/lua-engine-finalizers.adb",
+          "src/lua-storage-vectors.ads",
+          "src/lua-storage-vectors.adb",
+          "tests/src/lua-conformance_adapter.adb"
+        ],
+        "replacement_sha256": "bfb330581234832119aeb09029f3f29374bf5c1a86cf8ea9ba68a3918dd63e4d"
+      },
+      {
+        "id": "replace-only-byte-tolerance-with-real-reclamation",
+        "start_byte": 26638,
+        "length_bytes": 38,
+        "source_sha256": "24b4ad560648daf4c61aabcc8daed4abc769e3a202dfb754d39fce6e7ded7250",
+        "replacement": "local udata_bytes = collectgarbage(\"count\")\n  assert(type(udata_bytes) == \"number\")\n  assert(udata_finalized == 1000)\n  assert(T.totalmem(\"userdata\") == udata_initial)\n  assert(next(udata_keys) == nil and next(udata_values) == nil)",
+        "invariant": "Keep the original second collection and truthful count operation; require reclaimed actual userdata, no repeated finalizers and cleared weak identities. Selected-owner shutdown remains mandatory in raw execution telemetry.",
+        "counterpart_tests": [
+          "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.independent-feature-review.json",
+          "tests/conformance/targets/remaining-upstream-compatibility/api-finalization-lifetimes.author.lua",
+          "references/lua/manual/manual.of",
+          "src/lua-engine.adb",
+          "src/lua-engine-collector.adb",
+          "src/lua-engine-finalizers.adb",
+          "src/lua-storage-vectors.ads",
+          "src/lua-storage-vectors.adb",
+          "tests/src/lua-conformance_adapter.adb"
+        ],
+        "replacement_sha256": "6091003d71d920a9fb2ad7166f3b67a8c4981cd9e66f09f55b6e4816d824a6ae"
+      }
+    ],
+    "output_sha256": "2838c5b9183c835b3581f829657d30451c16be1bfca952e5b8638d67e5966897",
+    "memory_only_output_verified": true,
+    "source_emitted": false,
+    "retained_semantics": [
+      "Original1000 userdata and stopped collector.",
+      "Original two collections/restart and positive growth assertions.",
+      "Actual1000 unique finalizer identities, first-cycle live counts, weak lifetime assertions and second-cycle full reclamation.",
+      "Truthful count observation plus actual selected-owner shutdown remain required; no residual ownership waiver."
+    ]
+  },
+  "source_review_inputs": [
+    "The committed Engine delta consists only of initializing Hook_Trace_PC to0 and Hook_Line_Mask toFalse in the existing activation reset; the full predecessor reconstructs by removing those exact two assignments.",
+    "Collector, finalizers and storage-vector sources are byte-identical to the previous counterpart snapshot. The adapter adds the actual storage inspector as separately recorded; previous totalmem/newuserdata operation bodies reconstruct unchanged.",
+    "A distinct reviewer must assess callback/hook-reset and added T-helper setup topology against finalization/weak-lifetime/refusal invariants. This author packet records source facts, not a semantic approval."
+  ],
+  "review_graph": [
+    {
+      "id": "new-api941-exact-narrative",
+      "current": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.independent-exact-review.json",
+        "sha256": "debbe8f85cc0080b3316075394104f0a4e5f2f9c70d37a45a58811ca4d5482ef"
+      },
+      "proposed_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.committed-source-exact-review.json",
+      "dependencies": [],
+      "successor_sha256": null,
+      "independent_reviewer": null,
+      "review_status": "pending-independent-review",
+      "requested_decisions": [
+        "Independently review all nine current counterpart identities and retained finalization semantics; decide each exact replacement anew.",
+        "Preserve unchanged feature decision as dated relevance input; do not claim it approves current implementation bytes."
+      ]
+    },
+    {
+      "id": "new-api941-exact-approval",
+      "current": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.exact-approval.json",
+        "sha256": "b6f0cd8d2ae1d180f8eff3401aaddb7776dd356599c3dd76ce311550680e58b8"
+      },
+      "proposed_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.committed-source-exact-approval.json",
+      "dependencies": [
+        "new-api941-exact-narrative"
+      ],
+      "successor_sha256": null,
+      "independent_reviewer": null,
+      "review_status": "pending-independent-review",
+      "requested_decisions": [
+        "Bind all three current-source counterpart lists and the fresh narrative hash with new independent decisions."
+      ]
+    },
+    {
+      "id": "live-api941-equivalent",
+      "current": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/api-finalized-userdata-reclamation.equivalent.json",
+        "sha256": "d9dfb864e595b2c22471150e526d4e59359f4e651d94a98561e084cf7d234fb8"
+      },
+      "proposed_path": "tests/conformance/targets/remaining-upstream-compatibility/api-finalized-userdata-reclamation.equivalent.json",
+      "dependencies": [
+        "new-api941-exact-approval"
+      ],
+      "successor_sha256": null,
+      "independent_reviewer": null,
+      "review_status": "pending-independent-review",
+      "requested_decisions": [
+        "Only after review update current counterpart snapshot and approval binding, preserving all source/replacement/output bytes and required original parent."
+      ]
+    }
+  ],
+  "composition_follow_up": {
+    "status": "blocked-pending-current-api941-review-and-separate-composition-review",
+    "current_live_composite": {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/api-private-bound-and-userdata-lifetimes.composite.json",
+      "sha256": "2d330df74f94f666967020fa5453cf3e64fa2a05eabd9aa745c686e8d2e5b2c3"
+    },
+    "accepted_private18_input": {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.transform.json",
+      "sha256": "2438260413355164328518f67572e33ee1fc27c859e024cf3aa7534b1636a2f2"
+    },
+    "accepted_policy_input": {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility.exclusions.json",
+      "sha256": "4917d6bbd7a3048f60a262f2e744a596af5e870039085ce9f2aa6d6945307224"
+    },
+    "api941_successor_sha256": null,
+    "composition_successor_reviewer": null,
+    "composition_successor_sha256": null,
+    "preserved_output_sha256": "c360ae605ad7d2e7935a38ad684a5bb0fd081e59d6d3cc397527864f75cc77d3",
+    "preserved_required_parents": [
+      "LUA-API-ASSERT-CALL-0125",
+      "LUA-API-ASSERT-CALL-0195"
+    ],
+    "preserved_exclusion_ids": [
+      "LUA-API-REVIEWED-BLOCK-9001"
+    ],
+    "requirements": [
+      "Refresh both component identities and policy hash only after current API941 exact approval exists.",
+      "Require a new distinct composition approval; no private18 approval renews the lifecycle inner operation.",
+      "Preserve disjoint original-coordinate union, exact child9001 and both pending semantic parents.",
+      "Do not emit or execute the composite while any inner or transitive review binding is stale."
+    ]
+  }
+}
