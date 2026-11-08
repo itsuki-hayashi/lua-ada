@@ -13,6 +13,11 @@ Fifteen native-paired cases match four-way compiler/VM campaigns in both
 configurations; each local configuration passes 2,200 AUnit cases. Unchanged
 errors.lua now reaches function-statement store-line attribution. Full
 source/T and immutable final-head acceptance remain open.
+The [return-hook checkpoint](sessions/2026-11-08-return-hook-windows.md)
+delivers actual edited result slots and removes stale packet roots before
+callback collection. Seventeen new named cases pass within 2,202 AUnit cases
+per isolated configuration, with all four native/Ada producer/VM combinations
+matching. Result mutation by closers without a return hook remains open.
 
 The [sort argument checkpoint](sessions/2026-11-08-sort-argument-phases.md)
 preserves actual receiver/comparator argument names, validation order and

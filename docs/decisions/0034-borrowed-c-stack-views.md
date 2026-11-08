@@ -49,6 +49,17 @@ pointers, or parallel closing implementation.
 
 ## Evidence boundary
 
+Return hooks follow the same real-cell ownership rule. Keep the completed
+callee's physical source window until the hook returns, reserve delivery
+packet capacity beforehand, and remove copied input/result roots before
+callback collection. The explicit @return.hook continuation reconstructs the
+packet from Transfer_First/Transfer_Count after actual local writes. Internal
+protection contributes its status prefix once; public pcall/xpcall already
+expose that prefix in their editable real return range. External-release
+continuations retain whether their range is already a complete packet.
+The migration packet backend retains its previous separate packet lifetime;
+it has no canonical scalar return window to borrow.
+
 Nine separately named public C regressions cover real scalar edits, hook
 removal/nested calls, protected and unprotected errors, blocked nested yield,
 direct hook yield, weak argument/upvalue release, and allocator reentry into
@@ -60,6 +71,7 @@ uses an explicit --without-release-reentry option and is not evidence that
 the omitted case passed. Both Ada configurations retain the release case.
 
 Strict Ada build/runtime results belong in the component session after
-execution. Exact optimizer temporary counts/content, return-hook result
-mutation, remaining T commands, and full upstream acceptance are separate
-obligations. This decision grants no source exclusion.
+execution. The initial view component and subsequent return-window component
+retain separate evidence. Exact optimizer temporary counts/content, remaining
+T commands, and full upstream acceptance remain separate obligations. This
+decision grants no source exclusion.

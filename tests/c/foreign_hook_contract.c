@@ -131,6 +131,61 @@ static int captured_result(lua_State *L) {
     return 1;
 }
 
+static int returned_value(lua_State *L) {
+    if (view_mode == 10) {
+        lua_newtable(L);
+        lua_getglobal(L, "weak_hook_value");
+        lua_pushvalue(L, 1);
+        lua_rawseti(L, -2, 1);
+        lua_pop(L, 1);
+    } else lua_pushinteger(L, 11);
+    return 1;
+}
+
+static void returned_value_hook(lua_State *L, lua_Debug *ar) {
+    int selected, top;
+    if (ar->event != LUA_HOOKRET) return;
+    if (!lua_getinfo(L, "fr", ar)) { view_failed=86; return; }
+    selected = lua_tocfunction(L, -1) == returned_value;
+    lua_pop(L, 1);
+    if (!selected) return;
+    ++view_hits;
+    lua_sethook(L, NULL, 0, 0);
+    top = lua_gettop(L);
+    if (ar->ntransfer != 1 || ar->ftransfer < 1 ||
+        ar->ftransfer > top) { view_failed=87; return; }
+    if (view_mode == 10) lua_pushnil(L);
+    else lua_pushinteger(L, 37);
+    /* A custom C hook edits the same actual result cell through a raw
+     * index. The result count is retained; only its value changes. */
+    lua_replace(L, ar->ftransfer);
+    if (view_mode == 10) {
+        lua_gc(L, LUA_GCCOLLECT);
+        lua_getglobal(L, "weak_hook_value");
+        lua_rawgeti(L, -1, 1);
+        if (!lua_isnil(L, -1)) view_failed=88;
+        lua_pop(L, 2);
+    }
+    if (lua_gettop(L) != top) view_failed=89;
+}
+
+static int returned_value_contract(lua_State *L, int which) {
+    int status;
+    luaL_openlibs(L);
+    if (luaL_dostring(L,
+        "weak_hook_value=setmetatable({},{__mode='v'})") != LUA_OK)
+        return 96;
+    view_mode=which; view_hits=view_failed=0;
+    lua_pushcfunction(L, returned_value);
+    lua_sethook(L, returned_value_hook, LUA_MASKRET, 0);
+    status=lua_pcall(L, 0, 1, 0);
+    lua_sethook(L, NULL, 0, 0);
+    if (status != LUA_OK || view_hits != 1) return 97;
+    if (view_failed) return view_failed;
+    if (which == 10) return lua_isnil(L, -1) ? 0 : 98;
+    return lua_tointeger(L, -1) == 37 ? 0 : 99;
+}
+
 static void weak_view_hook(lua_State *L, lua_Debug *ar) {
     int selected;
     if (ar->event != LUA_HOOKCALL) return;
@@ -514,6 +569,12 @@ int lua_ada_test_hook_contract(int which) {
     memset(&observed, 0, sizeof observed);
     observed.expected = L;
     observation = &observed;
+    if (which >= 25 && which <= 26) {
+        result = returned_value_contract(L, which - 16);
+        observation = NULL;
+        lua_close(L);
+        return result;
+    }
     if (which == 24) {
         observation = NULL;
         return release_view_contract(L);

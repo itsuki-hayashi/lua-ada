@@ -2311,8 +2311,11 @@ package body Lua.Engine.Machine is
         (not Activation.Is_Native or else
            Element (Activation.Native_Name, 1) /= '@')
       then
-         --  Keep the departing frame and outgoing values alive while its
-         --  return hook executes. Only the continuation retires them.
+         --  Keep the departing scalar window as the authoritative result
+         --  owner. A return hook can replace its values through get/setlocal;
+         --  copied packets would both lose those edits and retain discarded
+         --  weak objects during callback collection. Reserve reconstruction
+         --  storage before entering the hook, then drop only the copies.
          Activation.Return_Hook_Done := True;
          if not (Policy = Resume_Caller and then
                  Activation.Foreign_Handler /= System.Null_Address)
@@ -2320,10 +2323,50 @@ package body Lua.Engine.Machine is
             Activation.Transfer_Count := Natural
               ((if Public_Protection then Packet.Length else Result.Length));
          end if;
+         if Activation.Has_Stack_Window then
+            declare
+               Prefix : constant Natural :=
+                 (if Public_Protection then 0 else Activation.Protection);
+               Count : constant Natural := Activation.Transfer_Count;
+               Work : constant Ada.Containers.Count_Type :=
+                 Activation.Native_Arguments.Length +
+                 Activation.Native_Results.Length +
+                 Activation.Native_Captures.Length +
+                 Activation.Unwind_Results.Length +
+                 Activation.Error_Packet.Length +
+                 Ada.Containers.Count_Type (Count) +
+                 Ada.Containers.Count_Type (Prefix);
+            begin
+               if Count > Natural'Last - Prefix then
+                  Fail (State, "stack overflow");
+               elsif State.Policy = Bounded then
+                  if Work > Ada.Containers.Count_Type
+                    (State.Bounds.Instructions - Natural'Min
+                       (State.Steps, State.Bounds.Instructions))
+                  then
+                     Fail (State, "instruction limit exceeded", True);
+                  end if;
+                  State.Steps := State.Steps + Natural (Work);
+               end if;
+               Activation.Native_Results.Reserve_Capacity
+                 (Ada.Containers.Count_Type (Count + Prefix));
+            end;
+         end if;
          Schedule (Self, "@return.hook", Values.Empty_Vector, 0);
-         Copy_Roots
-           (State, State.Current.Stack.Last_Element.Unwind_Results,
-            Result);
+         if Activation.Has_Stack_Window then
+            Activation.Native_Arguments.Clear;
+            Activation.Native_Results.Clear;
+            Activation.Native_Captures.Clear;
+            Activation.Unwind_Results.Clear;
+            Activation.Error_Packet.Clear;
+         else
+            --  The migration packet backend has no scalar return window.
+            --  Preserve its existing continuation lifetime independently;
+            --  native/canonical result-slot behavior uses the branch above.
+            Copy_Roots
+              (State, State.Current.Stack.Last_Element.Unwind_Results,
+               Result);
+         end if;
          Hook_Event (Self, "return", Target => Activation);
          return;
       end if;
@@ -3575,14 +3618,51 @@ package body Lua.Engine.Machine is
          Complete (Self, Values.Empty_Vector);
          return;
       elsif Name = "@return.hook" then
-         Packet := Activation.Unwind_Results;
-         State.Current.Stack.Delete_Last;
          declare
             Old : Frame_Access := Activation;
+            Owner : constant Frame_Access := State.Current.Stack
+              (State.Current.Stack.Last_Index - 1);
+            Public_Protection : constant Boolean := Owner.Is_Native and then
+              (Owner.Native_Name = "base.pcall" or else
+               Owner.Native_Name = "base.xpcall");
+            Prefix : constant Natural :=
+              (if Public_Protection then 0 else Owner.Protection);
          begin
+            if not Owner.Has_Stack_Window then
+               Packet := Activation.Unwind_Results;
+               State.Current.Stack.Delete_Last;
+               Release_Frame (State, Old);
+               Complete (Self, Packet);
+               return;
+            end if;
+            --  The hook has returned; its own physical window has retired.
+            --  Rebuild from the exact source range while that real callee
+            --  still owns it. Internal protection contributes its separate
+            --  true prefix once. Public pcall/xpcall already expose their
+            --  complete tuple, including a status cell the hook may edit.
+            if Owner.Native_Results.Capacity < Ada.Containers.Count_Type
+              (Owner.Transfer_Count + Prefix)
+            then
+               raise Program_Error with "return hook packet capacity lost";
+            end if;
+            Owner.Native_Results.Clear;
+            for Index in 1 .. Prefix loop
+               Append_Root
+                 (State, Owner.Native_Results, (Boolean_Kind, True));
+            end loop;
+            for Index in 1 .. Owner.Transfer_Count loop
+               Append_Root
+                 (State, Owner.Native_Results,
+                  Stacks.Read (State.Current,
+                    Owner.Stack_Base + Owner.Transfer_First + Index - 1));
+            end loop;
+            State.Current.Stack.Delete_Last;
             Release_Frame (State, Old);
+            --  This is the already adjusted delivery packet. Complete must
+            --  not wrap it again or replay an operation's result publisher.
+            Complete_Packet
+              (Self, Owner.Native_Results, Owner.Native_Results);
          end;
-         Complete (Self, Packet);
          return;
       elsif Name = "@close.thread" then
          if State.Current.Stack.Length = 1 then
@@ -5356,10 +5436,18 @@ package body Lua.Engine.Machine is
             elsif State.Current.Stack.Last_Element.External_Return_Pending then
                State.Current.Stack.Last_Element.External_Return_Pending :=
                  False;
-               Complete
-                 (Self, State.Current.Stack.Last_Element.Unwind_Results,
-                  Independent => State.Current.Stack.Last_Element.
-                    External_Return_Independent);
+               if State.Current.Stack.Last_Element.
+                 External_Return_Independent
+               then
+                  --  This retained range is already the complete packet;
+                  --  a hook reconstruction may include protection prefixes.
+                  Complete_Packet
+                    (Self, State.Current.Stack.Last_Element.Unwind_Results,
+                     State.Current.Stack.Last_Element.Unwind_Results);
+               else
+                  Complete
+                    (Self, State.Current.Stack.Last_Element.Unwind_Results);
+               end if;
             elsif State.Current.Stack.Last_Element.Native_Tail_State =
               Ready_Native_Tail
             then

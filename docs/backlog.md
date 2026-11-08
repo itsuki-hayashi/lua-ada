@@ -13,6 +13,11 @@ configuration and 2,200 passing AUnit cases per configuration. Correct the
 measured function-statement definition store line in unchanged errors.lua
 while preserving closure end-line events. Full T memerr.lua's cold scalar
 output refusal and all remaining full-target obligations remain open.
+The [actual return-hook window](sessions/2026-11-08-return-hook-windows.md)
+checkpoint passes seventeen new native-paired cases and 2,202 AUnit cases per
+isolated configuration. Continue the confirmed pre-close result snapshot
+obligation: a closer's actual outgoing-slot edit is lost without a return
+hook. Then continue remaining public T commands and original source gates.
 
 Table.sort's argument phases have [local evidence](sessions/2026-11-08-sort-argument-phases.md):
 fifteen native-paired behaviors, four-way compiler/VM checks in both matching

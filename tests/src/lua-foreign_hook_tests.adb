@@ -33,6 +33,22 @@ package body Lua.Foreign_Hook_Tests is
    procedure Hook_Argument_Weak_Root;
    procedure Hook_Upvalue_Weak_Root;
    procedure External_Release_Lua_View;
+   procedure C_Return_Value_Mutation;
+   procedure C_Return_Weak_Root;
+
+   procedure C_Return_Value_Mutation is
+   begin
+      --  A custom C return hook writes the real first transfer slot. The
+      --  protected C caller must receive 37 rather than a stale copy of 11.
+      Assert (Contract (25) = 0, "C return hook edits actual delivered cell");
+   end C_Return_Value_Mutation;
+
+   procedure C_Return_Weak_Root is
+   begin
+      --  The C body returns a table referenced only by its real result and
+      --  a weak entry. Replacing that cell with nil lets hook GC reclaim it.
+      Assert (Contract (26) = 0, "C return hook drops stale result roots");
+   end C_Return_Weak_Root;
 
    procedure External_Release_Lua_View is
    begin
@@ -256,5 +272,9 @@ package body Lua.Foreign_Hook_Tests is
                         Hook_Upvalue_Weak_Root'Access);
       Test_Support.Add (Suite, "C release: borrowed Lua cells and concat",
                         External_Release_Lua_View'Access);
+      Test_Support.Add (Suite, "C hooks: return mutation reaches C caller",
+                        C_Return_Value_Mutation'Access);
+      Test_Support.Add (Suite, "C hooks: return replacement drops weak root",
+                        C_Return_Weak_Root'Access);
    end Register;
 end Lua.Foreign_Hook_Tests;
