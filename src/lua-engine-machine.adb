@@ -4776,6 +4776,33 @@ package body Lua.Engine.Machine is
             Complete (Self, Values.Empty_Vector);
          elsif Name = "@invoke" then
             Complete (Self, Activation.Native_Results);
+         elsif Name = "@unary" and then Operator = Length then
+            --  __len has already returned its real result to this owned
+            --  packet. A fresh single-value vector here needlessly fails
+            --  when that callback leaves allocation disabled. Normalize the
+            --  same rooted packet to the first result (or nil) instead.
+            --  Reserve before clearing; the scalar copy never replaces its
+            --  collector root across a fallible operation or safe point.
+            Left := First (Activation.Native_Results);
+            if State.Policy = Bounded then
+               declare
+                  Work : constant Ada.Containers.Count_Type :=
+                    Activation.Native_Results.Length + 1;
+               begin
+                  if Work > Ada.Containers.Count_Type
+                    (State.Bounds.Instructions - Natural'Min
+                       (State.Steps, State.Bounds.Instructions))
+                  then
+                     Fail (State, "instruction limit exceeded", True);
+                  end if;
+                  State.Steps := State.Steps + Natural (Work);
+               end;
+            end if;
+            Activation.Native_Results.Reserve_Capacity (1);
+            Activation.Native_Results.Clear;
+            Activation.Native_Results.Append (Left);
+            Complete_Packet
+              (Self, Activation.Native_Results, Activation.Native_Results);
          elsif Name = "@binary" and then
            Activation.Native_Operator in Equal | Not_Equal |
              Less | Less_Equal | Greater | Greater_Equal
@@ -4890,7 +4917,14 @@ package body Lua.Engine.Machine is
          end if;
       elsif Name in "@length" | "@equal" then
          if Activation.Native_Stage = 1 then
-            Return_Native (First (Activation.Native_Results));
+            if Name = "@length" then
+               --  The inner @unary length phase already normalized exactly
+               --  one result, including nil. Forward that owned packet to
+               --  the public C boundary without another cold scalar copy.
+               Complete (Self, Activation.Native_Results);
+            else
+               Return_Native (First (Activation.Native_Results));
+            end if;
          else
             Activation.Native_Stage := 1;
             Schedule
