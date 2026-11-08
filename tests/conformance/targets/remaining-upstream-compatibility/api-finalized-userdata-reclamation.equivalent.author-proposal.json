@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "kind": "target-source-equivalent-author-proposal",
+  "id": "api-finalized-userdata-reclamation",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": "references/lua/testes/api.lua",
+  "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+  "configuration": "upstream-test",
+  "disposition": "ada-internal-equivalent",
+  "feature_review": {
+    "sha256": "6738e63cda2f2269cfa776ea70031dcd4dc2aa9cc733d0fe56926b912b7e2288",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.independent-feature-review.json"
+  },
+  "original_required_obligations": [
+    "LUA-API-ASSERT-CALL-0195"
+  ],
+  "source_exclusions": [],
+  "replacements": [
+    {
+      "id": "observe-real-finalization-identities",
+      "start_byte": 26342,
+      "length_bytes": 92,
+      "source_sha256": "e317c746eb09899963ef954a7c055c9586786d38b6d3105bd098aaf924eaaca0",
+      "replacement": "  local udata_initial = T.totalmem(\"userdata\")\n  local udata_finalized = 0\n  local udata_keys = setmetatable({}, {__mode = \"k\"})\n  local udata_values = setmetatable({}, {__mode = \"v\"})\n  local udata_seen = {}\n  a = {__gc = function (u)\n    local id = udata_keys[u]\n    assert(type(u) == \"userdata\" and type(id) == \"number\")\n    assert(not udata_seen[id] and udata_values[id] == nil)\n    udata_seen[id] = true\n    udata_finalized = udata_finalized + 1\n  end}\n  for i=1,1000 do\n    local u = debug.setmetatable(T.newuserdata(0), a)\n    udata_keys[u], udata_values[i] = i, u\n  end",
+      "invariant": "Create exactly the original1000 zero-sized userdata under the original stopped collector; observe each actual callback once and public weak-key/value lifecycle.",
+      "counterpart_tests": [
+        "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.independent-feature-review.json",
+        "tests/conformance/targets/remaining-upstream-compatibility/api-finalization-lifetimes.author.lua",
+        "references/lua/manual/manual.of",
+        "src/lua-engine.adb",
+        "src/lua-engine-collector.adb",
+        "src/lua-engine-finalizers.adb",
+        "src/lua-storage-vectors.ads",
+        "src/lua-storage-vectors.adb",
+        "tests/src/lua-conformance_adapter.adb"
+      ]
+    },
+    {
+      "id": "retain-first-cycle-resurrection-and-growth",
+      "start_byte": 26477,
+      "length_bytes": 118,
+      "source_sha256": "bffa07bc389e6c96386f1726d0164b7cb4b8289659e54fd4fa3491a66390396b",
+      "replacement": "  collectgarbage()  -- this collection only calls TM, without freeing memory\n  assert(collectgarbage(\"count\") >= x+10)\n  assert(udata_finalized == 1000)\n  assert(T.totalmem(\"userdata\") == udata_initial + 1000)\n  for i=1,1000 do assert(udata_seen[i] and udata_values[i] == nil) end\n  local udata_key_count = 0\n  for _ in pairs(udata_keys) do udata_key_count = udata_key_count + 1 end\n  assert(udata_key_count == 1000)",
+      "invariant": "Keep the original first collection and positive-growth assertion unchanged; require1000 callbacks,1000 still-live userdata and actual weak lifetime observations.",
+      "counterpart_tests": [
+        "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.independent-feature-review.json",
+        "tests/conformance/targets/remaining-upstream-compatibility/api-finalization-lifetimes.author.lua",
+        "references/lua/manual/manual.of",
+        "src/lua-engine.adb",
+        "src/lua-engine-collector.adb",
+        "src/lua-engine-finalizers.adb",
+        "src/lua-storage-vectors.ads",
+        "src/lua-storage-vectors.adb",
+        "tests/src/lua-conformance_adapter.adb"
+      ]
+    },
+    {
+      "id": "replace-only-byte-tolerance-with-real-reclamation",
+      "start_byte": 26638,
+      "length_bytes": 38,
+      "source_sha256": "24b4ad560648daf4c61aabcc8daed4abc769e3a202dfb754d39fce6e7ded7250",
+      "replacement": "local udata_bytes = collectgarbage(\"count\")\n  assert(type(udata_bytes) == \"number\")\n  assert(udata_finalized == 1000)\n  assert(T.totalmem(\"userdata\") == udata_initial)\n  assert(next(udata_keys) == nil and next(udata_values) == nil)",
+      "invariant": "Keep the original second collection and truthful count operation; require reclaimed actual userdata, no repeated finalizers and cleared weak identities. Selected-owner shutdown remains mandatory in raw execution telemetry.",
+      "counterpart_tests": [
+        "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.independent-feature-review.json",
+        "tests/conformance/targets/remaining-upstream-compatibility/api-finalization-lifetimes.author.lua",
+        "references/lua/manual/manual.of",
+        "src/lua-engine.adb",
+        "src/lua-engine-collector.adb",
+        "src/lua-engine-finalizers.adb",
+        "src/lua-storage-vectors.ads",
+        "src/lua-storage-vectors.adb",
+        "tests/src/lua-conformance_adapter.adb"
+      ]
+    }
+  ],
+  "output_sha256": "2838c5b9183c835b3581f829657d30451c16be1bfca952e5b8638d67e5966897",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "review": {
+    "reviewer": null,
+    "artifact": null,
+    "author": "Codex /root/validation_delivery",
+    "artifact_sha256": null,
+    "status": "pending"
+  }
+}
