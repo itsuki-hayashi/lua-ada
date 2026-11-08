@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-transform",
+  "id": "api-fixed-buffer-private-bound",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": "references/lua/testes/api.lua",
+  "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+  "configuration": "upstream-test",
+  "exclusion_policy_sha256": "5f9d5d03fa75af590e6163291e4145e745e613fb07d27af896e5d189bf2d0b6a",
+  "replacements": [
+    {
+      "id": "fixed-buffer-private-allocation-bound",
+      "exclusion_id": "LUA-API-REVIEWED-BLOCK-9001",
+      "start_byte": 17053,
+      "length_bytes": 18,
+      "source_sha256": "f89400b75cf254feed3cc991449a9e7bc1679e6cd9b5b6be1b6598dfa176bf55",
+      "replacement": ""
+    }
+  ],
+  "output_sha256": "51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc",
+  "author_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.author-proposal.json",
+    "sha256": "6cd1e2c1e912d22c4bcdbaee0c9587d47be903c27668fa7a5fd22f199574cab8"
+  },
+  "policy_binding_status": "Successor draft: same exact 18-byte operation and output; composition, runtime and original parents 0125/0195 remain separate obligations; not approved.",
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "review": {
+    "author": "Codex /root/validation_delivery",
+    "reviewer": null,
+    "status": "pending",
+    "artifact": null,
+    "artifact_sha256": null
+  },
+  "source_feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json",
+    "sha256": "e2b2703a870b265b6505e68a7c8b1e52dc81c69f146c9442eb4fd6d1bdd93ab9"
+  },
+  "supersedes": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.transform.json",
+    "sha256": "2438260413355164328518f67572e33ee1fc27c859e024cf3aa7534b1636a2f2",
+    "change": "exclusion_policy_sha256 4917d6... -> candidate sha"
+  },
+  "original_parents": [
+    {
+      "id": "LUA-API-ASSERT-CALL-0125",
+      "byte_offset": 17039,
+      "byte_length": 33,
+      "anchor_sha256": "9c64cb79308eea2b302880a35a479936b515b820ed8c610d1d23f5158593b3d2",
+      "status": "pending",
+      "required": true
+    },
+    {
+      "id": "LUA-API-ASSERT-CALL-0195",
+      "byte_offset": 26638,
+      "byte_length": 6,
+      "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+      "status": "pending",
+      "required": true
+    }
+  ],
+  "draft_status": "pending",
+  "installed": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "excluded_from_this_successor": [
+    "API941 equivalent source binding renewal",
+    "API18/API941 composition approval renewal",
+    "original parent runtime acceptance"
+  ]
+}

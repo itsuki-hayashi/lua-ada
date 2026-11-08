@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "kind": "code-v3-policy-installation-draft",
+  "id": "code-private-optimizer-v3",
+  "target": "remaining-upstream-compatibility",
+  "draft_status": "pending",
+  "installed": false,
+  "author": "Codex /root/validation_delivery",
+  "assistance": "Claude Code Haiku (claude-haiku-5-5)",
+  "candidate_payload": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.policy.candidate.json",
+    "sha256": "5f9d5d03fa75af590e6163291e4145e745e613fb07d27af896e5d189bf2d0b6a",
+    "note": "Installed-format candidate bytes. Pending: not installed; Code children carry pending reviews, so normal readers must reject."
+  },
+  "base_installed_policy": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility.exclusions.json",
+    "sha256": "4917d6bbd7a3048f60a262f2e744a596af5e870039085ce9f2aa6d6945307224"
+  },
+  "planned_uninstalled_resolutions": {
+    "count": 8,
+    "status": "planned-uninstalled",
+    "ids": [
+      "LUA-CODE-REVIEWED-BLOCK-9001",
+      "LUA-CODE-REVIEWED-BLOCK-9002",
+      "LUA-CODE-REVIEWED-BLOCK-9003",
+      "LUA-CODE-REVIEWED-BLOCK-9004",
+      "LUA-CODE-REVIEWED-BLOCK-9005",
+      "LUA-CODE-REVIEWED-BLOCK-9006",
+      "LUA-CODE-REVIEWED-BLOCK-9007",
+      "LUA-CODE-REVIEWED-BLOCK-9008"
+    ]
+  },
+  "decomposition_draft": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.decomposition.draft.json",
+    "sha256": "cdb54c0505c1923049ac558117cecf71c9b5e7180ce04f70ea2bb1cbd62f54ca"
+  },
+  "review": {
+    "status": "pending",
+    "reviewer": null,
+    "artifact": null,
+    "artifact_sha256": null
+  },
+  "approval_slots": [
+    "eight Code child exclusion reviews (reviewer != author, status accepted, artifact + artifact_sha256)",
+    "independent final installation approval binding candidate bytes to installed bytes",
+    "independent decomposition decisions: 9 required pending nodes and 18 original-reference decompositions",
+    "Code exact8 T-transform approval binding exclusion_policy_sha256 = candidate sha and output 676304c0...",
+    "API18 successor T-transform approval binding exclusion_policy_sha256 = candidate sha",
+    "Independent final decisions must bind these candidate bytes; the dated exact source direction remains evidence of its original input only."
+  ],
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_snapshot": {
+    "revision": "c15b1eb16be8eb1509abb31ba8cf2098efd3ba90",
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294"
+  }
+}

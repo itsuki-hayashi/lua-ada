@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-transform-review",
+  "transform_id": "api-fixed-buffer-private-bound",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": null,
+  "decision": "pending",
+  "public_assertion_preservation": "Author proposes only the previously reviewed 18-byte conjunct removal, unchanged output and pending original parents; only the new whole-policy binding needs an independent successor decision.",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": []
+}

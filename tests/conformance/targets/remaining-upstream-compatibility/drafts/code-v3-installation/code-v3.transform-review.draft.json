@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-transform-review",
+  "transform_id": "code-private-optimizer-v3",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": null,
+  "decision": "pending",
+  "public_assertion_preservation": "Author proposes only eight registered private spans; exact checkR and all retained source fragments/public counterpart observations remain mandatory.",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": []
+}
