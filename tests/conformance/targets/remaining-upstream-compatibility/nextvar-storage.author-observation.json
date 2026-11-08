@@ -1,0 +1,1713 @@
+{
+  "schema_version": 1,
+  "kind": "author-counterpart-observation",
+  "id": "nextvar-actual-storage-counterparts",
+  "date": "2026-11-08",
+  "author": "Codex /root/remaining_suite",
+  "base_revision": "5ac08df9433380a67d8495171d0c378c017d1132",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "review": {
+    "status": "pending",
+    "reviewer": null
+  },
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "adaptation_authority": false,
+  "source_exclusions": [],
+  "replacements": [],
+  "scope": "Test-only companion/17 AUnit cases. Existing adapter/checker and every reference byte are unchanged. No source equivalent or private geometry API is installed.",
+  "model": {
+    "constructors": 529,
+    "ada_storage_mode": "Mandatory actual operation38 checks member ownership, links and lookup consistency at every checkpoint; rows/live never mean C capacities",
+    "public_mode": "Both native and Ada execute exact same public operations/values/cardinality; no private inspector claim",
+    "no_new_production_api": true,
+    "ordinary_original_100000_churn_unchanged": true,
+    "finite_churn_cycles_per_shape": 1024,
+    "no_physical_rehash_termination": true,
+    "constructor_preservation": [
+      "source generation",
+      "load",
+      "distinct warm call",
+      "GC stop/restart",
+      "length",
+      "all array/hash values",
+      "evaluated mp2 inequalities"
+    ],
+    "no_fixed_allocation_count_promise": true
+  },
+  "fault_witnesses": {
+    "native_private_count_equivalence_claim": false,
+    "allowed_first_refusal_operations": [
+      "NEWTABLE",
+      "SETLIST",
+      "SETFIELD",
+      "SETI",
+      "SETTABLE"
+    ],
+    "arming": "Immediately before actual canonical NEWTABLE after compilation and driver setup",
+    "required": [
+      "actual callback refusal >0",
+      "canonical memory error",
+      "earlier rooted table/marker retained",
+      "result binding stays false",
+      "same-source healthy retry through normal execution boundary",
+      "all97 entries/length64/marker alias",
+      "zero selected managed and raw storage"
+    ],
+    "allowances": [
+      0,
+      1,
+      3,
+      6
+    ],
+    "provider": "Actual selected callback for initialization through finalization; fail growth persistently after allowance"
+  },
+  "source_bindings": [
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "bytes": 22750,
+      "sha256": "a49a917beb9e5c000d60baed697cefcdcb4ca985bba27b71d587cff8776b5029"
+    },
+    {
+      "path": "references/lua/testes/sort.lua",
+      "bytes": 9625,
+      "sha256": "283f72b600acda62016689c92a694f2b91c1fc49dbcba377a9a5ed78b2784dc3"
+    },
+    {
+      "path": "references/lua/ltests.c",
+      "bytes": 59576,
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
+    },
+    {
+      "path": "tests/lua/nextvar_storage_invariants.lua",
+      "bytes": 6262,
+      "sha256": "6bc3f00826389003ab17d4a84b7ca825ac71bd0a4d55032537eaf527b569b1a9"
+    },
+    {
+      "path": "tests/src/lua-nextvar_storage_tests.ads",
+      "bytes": 162,
+      "sha256": "d7b3e8e22b0cfd4e02ca6f3410e756091104dee562d41e8a028d05e797e9b8ed"
+    },
+    {
+      "path": "tests/src/lua-nextvar_storage_tests.adb",
+      "bytes": 14759,
+      "sha256": "b5f81984be22ed7adb89434f964d68952c6896d9decc1d515370d6c3ba92078f"
+    },
+    {
+      "path": "tests/src/test_runner.adb",
+      "bytes": 12028,
+      "sha256": "8ac9f8eb0b0c50fe770db29e6e1c8630ee709e5ec2af14ff01f93f91a32d9b19"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.ads",
+      "bytes": 1691,
+      "sha256": "f845a5e1b2f79a5c21b8be8840bf250ff758130dc14c0d9c345cb4d4ffb71b21"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "bytes": 35059,
+      "sha256": "80a6c4b17e0dd1c2758c4bc79d159cf22bd74ccedb41f70ed82066f658abfd1c"
+    },
+    {
+      "path": "tests/src/lua-engine-table_storage_probe.ads",
+      "bytes": 300,
+      "sha256": "67d9cb92e436c029c76f85e25ce8f8528ceea01265ae384ef33d50b51e687ab2"
+    },
+    {
+      "path": "tests/src/lua-engine-table_storage_probe.adb",
+      "bytes": 517,
+      "sha256": "a30f62f83f16307ed0180de33dc80c61a03dd5e455a000880ab5eb9ca1933579"
+    },
+    {
+      "path": "tests/src/lua-table_storage_inspection_tests.adb",
+      "bytes": 19973,
+      "sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+    },
+    {
+      "path": "tests/src/lua-table_reservation_tests.adb",
+      "bytes": 5900,
+      "sha256": "0239b41c77496565c39600da7576ceca7d43af806b127766f3a101292fdb4bf4"
+    },
+    {
+      "path": "tests/src/table_storage_public_tests.adb",
+      "bytes": 4034,
+      "sha256": "d72e02ad4a62b20a5809ed08c098dfea032e02f5b3c9ac9faf97e4e379c58d0c"
+    },
+    {
+      "path": "tests/lua/table_storage_public.lua",
+      "bytes": 1717,
+      "sha256": "4e7c949594d81e29b4f065485ab6dd7060a88c68392a63acd4fef00dc6ba8838"
+    },
+    {
+      "path": "src/lua-engine.ads",
+      "bytes": 68222,
+      "sha256": "0c9512c28952853f142ed36596977872fe0fe98073c181c7685d0329e2a84cfe"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "bytes": 115735,
+      "sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409"
+    },
+    {
+      "path": "src/lua-engine-tables.ads",
+      "bytes": 1491,
+      "sha256": "8647dc634a9fc713910b8bff35997601863b2a217eccf5b57390b68a852c3d33"
+    },
+    {
+      "path": "src/lua-engine-tables.adb",
+      "bytes": 18307,
+      "sha256": "31db4043d6b387c08b61a2ff6f6197d9a5495626200d67cf56cfad66f0821173"
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "bytes": 56579,
+      "sha256": "d803883a7f07c8a3ecfa082b7c7c6addc72d29cde65ee35a149002ac6541ff8a"
+    },
+    {
+      "path": "src/lua-engine-canonical.adb",
+      "bytes": 72998,
+      "sha256": "8cc932f984e66265dfa8b9c60da299e73d77c8cf52566ffc46190a641a1d22b2"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "bytes": 350173,
+      "sha256": "a8679e1348552d54d9af30c86fe8c0143e7fea6146dffe336c159e0834fc2bf3"
+    },
+    {
+      "path": "src/lua-storage.ads",
+      "bytes": 9613,
+      "sha256": "3fba9527f74bfc65ec72508108d36fab3dacea279d80a7e81228ed7236505587"
+    },
+    {
+      "path": "src/lua-storage.adb",
+      "bytes": 19480,
+      "sha256": "c025b2d9cdf08a4eafe003459c17f8ad8c2124f8bbb4144140532084a337dbda"
+    },
+    {
+      "path": "tests/src/lua-sessions-conformance.adb",
+      "bytes": 5747,
+      "sha256": "d85d2c0e94c2764de0f3ce8a61f812582c3170d59fe9d13304f416041d0f8890"
+    },
+    {
+      "path": "tests/src/lua-conformance_allocator.adb",
+      "bytes": 8328,
+      "sha256": "de41be3c4cdc2b0d0f0ba21cdccdd40e542601168aacb43615df7c86851beda5"
+    },
+    {
+      "path": "tests/lua_ada_tests.gpr",
+      "bytes": 1785,
+      "sha256": "cc51a41e743b3a561269ff970ec1a104c4d012a050faa76148a719d1dda19635"
+    },
+    {
+      "path": "lua_ada.gpr",
+      "bytes": 9982,
+      "sha256": "cb19451eccb2ea15ee2ec9281a479972d2078120047e503e25390217b024a9ca"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/nextvar-sort-table-geometry.author-proposal.json",
+      "bytes": 33971,
+      "sha256": "68a7df28cceb7a325c8d73b3b6d971a1732d9945039d132ca53dba12adbc975a"
+    }
+  ],
+  "source_spans": [
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "first_line": 36,
+      "last_line": 43,
+      "start_byte": 763,
+      "length_bytes": 168,
+      "sha256": "8072c4038dca23171eed29ba579196263ff03adac856e6ef95096a3a79fae06a",
+      "purpose": "Physical size helper; no facade supplied"
+    },
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "first_line": 127,
+      "last_line": 142,
+      "start_byte": 2602,
+      "length_bytes": 362,
+      "sha256": "ef91a20573b694af55e8d137ecba48777f2e630082c14c0327270b14d4cd8fe5",
+      "purpose": "Original 100000-cycle public churn preserved, not replaced"
+    },
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "first_line": 151,
+      "last_line": 155,
+      "start_byte": 3104,
+      "length_bytes": 157,
+      "sha256": "4152f1f9a24e946567cc90bf3d40b00ebca8ec582d91b91c40a1fcc3f2ff384b",
+      "purpose": "Ordinary mp2 expressions/inequalities remain useful"
+    },
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "first_line": 173,
+      "last_line": 193,
+      "start_byte": 3613,
+      "length_bytes": 744,
+      "sha256": "bacd2dbb7984f5730442cf41e72ea089c4ce56a266e3264dcc3eec378076329e",
+      "purpose": "529 real constructors; private positive allocation count distinguished"
+    },
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "first_line": 197,
+      "last_line": 207,
+      "start_byte": 4368,
+      "length_bytes": 290,
+      "sha256": "55ecf87e2a4e9de31098d8cfedf9a719ccd82379a32de3b4ac09885199001339",
+      "purpose": "Open constructor cardinality and values"
+    },
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "first_line": 210,
+      "last_line": 231,
+      "start_byte": 4663,
+      "length_bytes": 360,
+      "sha256": "66706ddfb30d9eab8ef4c911d135240ef03361fa9c42088fa3ee918d69018584",
+      "purpose": "Dynamic dense/hash writes"
+    },
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "first_line": 232,
+      "last_line": 266,
+      "start_byte": 5023,
+      "length_bytes": 915,
+      "sha256": "e8c8cee68cfa8d83c09095a9a1e02aeedb377053a85190a756cceb5ed899e3d3",
+      "purpose": "Physical trigger separated from finite real churn and surviving map"
+    },
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "first_line": 268,
+      "last_line": 291,
+      "start_byte": 5941,
+      "length_bytes": 582,
+      "sha256": "f8d925a132881f6742417f40ed7813d34652ffde888b598c89ce7916bff91d02",
+      "purpose": "Reverse and sparse fills"
+    },
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "first_line": 293,
+      "last_line": 307,
+      "start_byte": 6569,
+      "length_bytes": 377,
+      "sha256": "945d0c080be1afb19c16bb9d8236629b009f45fbdb9c7007c58a6695fbe54c35",
+      "purpose": "Original 255 string bindings remain through finite churn"
+    },
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "first_line": 309,
+      "last_line": 322,
+      "start_byte": 6955,
+      "length_bytes": 268,
+      "sha256": "133506fa66fa2b6a834548e6064bb3905a912d61006db3ca145133376fff42ec",
+      "purpose": "Vararg materialization, cardinality and mutations"
+    },
+    {
+      "path": "references/lua/ltests.c",
+      "first_line": 1130,
+      "last_line": 1169,
+      "start_byte": 30407,
+      "length_bytes": 1092,
+      "sha256": "69a47f008ef9979ad7f14236d77f79e5abde8402a5a5717bacfde1322bf4b112",
+      "purpose": "Native querytab exposes C physical storage, not Ada counts"
+    }
+  ],
+  "builds": {
+    "initial_default_failure": "17 missing previous specs and one ineffective use-type clause; corrected declarations/import, no disabled diagnostics",
+    "gnat": "16.1.0",
+    "production_4c_to_5ac_diff_empty": true,
+    "commands": [
+      "alr -n -C tests build --validation --profiles=lua_ada=validation -- -XLUA_ADA_LIBRARY_TYPE=static -XLUA_ADA_CONFIGURATION=default -XLUA_ADA_PREBUILT=true",
+      "alr -n -C tests build --validation --profiles=lua_ada=validation -- -XLUA_ADA_LIBRARY_TYPE=static -XLUA_ADA_CONFIGURATION=upstream-test -XLUA_ADA_PREBUILT=true"
+    ],
+    "runtime_cli_c_consumer_rebuilds_not_needed": true,
+    "alire": "2.1.1",
+    "runtime_checks_enabled": true,
+    "final_serial_builds": "both pass",
+    "retained_flags": [
+      "-gnat2022",
+      "-gnatwa",
+      "-gnatwe",
+      "-gnatv",
+      "-gnaty"
+    ]
+  },
+  "aunit": {
+    "targeted_provider_cases": 4,
+    "upstream_test": {
+      "successful": 2629,
+      "failed_assertions": 0,
+      "run": 2629,
+      "unexpected_errors": 0
+    },
+    "new_named_cases": 17,
+    "selected_cleanup_assertions_mandatory": true,
+    "default": {
+      "successful": 2629,
+      "failed_assertions": 0,
+      "run": 2629,
+      "unexpected_errors": 0
+    },
+    "public_and_mandatory_walk_cases": 11,
+    "mandatory_mode_inspector_negatives": 2
+  },
+  "limits": {
+    "scope": "Raw process campaign, not AUnit embedding quota",
+    "no_no_port": true,
+    "no_soft": true,
+    "mode_flags": [],
+    "allocator_limit_bytes": 2147483648,
+    "timeout_seconds": 900,
+    "sidecars": "Actual workload PID/run/configuration/cap bound; not configuration-probe output"
+  },
+  "documentation": {
+    "full_checker": "blocked by uninitialized tests/modules/busted/busted-scm-1.rockspec; not passing",
+    "changed_markdown_links": 4,
+    "changed_files_utf8_lf_final_newline": 9
+  },
+  "stdout": {
+    "return_count": 1,
+    "sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104",
+    "bytes": 352,
+    "return_value": 29,
+    "binary_roles": 8
+  },
+  "inspection_cost": {
+    "peak_managed_bytes": 5157942,
+    "process": "upstream-test-Ada-actual-storage",
+    "elapsed_milliseconds": 11638,
+    "read_only_checker_unchanged": true,
+    "interpretation": "Complete529+allotherworkloads local 900s/2GiB envelope observation, not comparative benchmark"
+  },
+  "native_initial": {
+    "source_sha256": "6bc3f00826389003ab17d4a84b7ca825ac71bd0a4d55032537eaf527b569b1a9",
+    "runtime_acceptance": false,
+    "coverage_authority": false,
+    "records": [
+      {
+        "configuration": "default",
+        "mode": "public",
+        "run_id": "1818239060304d419f96d399873d46ae",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-ReferenceC-fixtures\\lua.exe",
+          "process_id": 76016,
+          "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+          "arguments": [
+            "-E",
+            "-e",
+            "assert(assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/lua/nextvar_storage_invariants.lua]=]))('public')==29)"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:16:00.5401956Z",
+          "elapsed_milliseconds": 137,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-counterparts-ac316974c8c74a59936f46ba268c3a07\\default-Native.stdout",
+          "stdout_bytes": 352,
+          "stdout_sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-counterparts-ac316974c8c74a59936f46ba268c3a07\\default-Native.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-counterparts-ac316974c8c74a59936f46ba268c3a07\\default-Native.allocator.76016.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "1818239060304d419f96d399873d46ae",
+          "process_id": 76016,
+          "allocator_limit_bytes": 2147483648,
+          "configuration": "default",
+          "managed_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0
+        }
+      },
+      {
+        "configuration": "upstream-test",
+        "mode": "public",
+        "run_id": "05817f860bcb4f51a5375ce63e6c55ec",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-ReferenceC-fixtures\\lua.exe",
+          "process_id": 69860,
+          "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+          "arguments": [
+            "-E",
+            "-e",
+            "assert(assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/lua/nextvar_storage_invariants.lua]=]))('public')==29)"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:16:00.7170752Z",
+          "elapsed_milliseconds": 452,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-counterparts-ac316974c8c74a59936f46ba268c3a07\\upstream-test-Native.stdout",
+          "stdout_bytes": 352,
+          "stdout_sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-counterparts-ac316974c8c74a59936f46ba268c3a07\\upstream-test-Native.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-counterparts-ac316974c8c74a59936f46ba268c3a07\\upstream-test-Native.allocator.69860.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "05817f860bcb4f51a5375ce63e6c55ec",
+          "process_id": 69860,
+          "allocator_limit_bytes": 2147483648,
+          "configuration": "upstream-test",
+          "expected_finalizer_warnings": 0,
+          "managed_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0
+        }
+      }
+    ]
+  },
+  "binary_campaign": {
+    "source_sha256": "6bc3f00826389003ab17d4a84b7ca825ac71bd0a4d55032537eaf527b569b1a9",
+    "runtime_acceptance": false,
+    "coverage_authority": false,
+    "records": [
+      {
+        "name": "default-Native-producer",
+        "run_id": "4f555db693cc480a91d9a29d79b1be2a",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-ReferenceC-fixtures\\lua.exe",
+          "process_id": 78628,
+          "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/lua/nextvar_storage_invariants.lua]=]));local file=assert(io.open([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Native.luac]=],'wb'));assert(file:write(string.dump(f)));assert(file:close())"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:21:32.6297306Z",
+          "elapsed_milliseconds": 19,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Native-producer.stdout",
+          "stdout_bytes": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Native-producer.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Native-producer.allocator.78628.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "4f555db693cc480a91d9a29d79b1be2a",
+          "process_id": 78628,
+          "allocator_limit_bytes": 2147483648,
+          "configuration": "default",
+          "managed_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0
+        }
+      },
+      {
+        "name": "default-Native-to-Native",
+        "run_id": "fc0040c536674ef7814711d8cfda325e",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-ReferenceC-fixtures\\lua.exe",
+          "process_id": 85956,
+          "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Native.luac]=]));local r=table.pack(f('public'));assert(r.n==1 and r[1]==29)"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:21:32.6855963Z",
+          "elapsed_milliseconds": 124,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Native-to-Native.stdout",
+          "stdout_bytes": 352,
+          "stdout_sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Native-to-Native.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Native-to-Native.allocator.85956.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "fc0040c536674ef7814711d8cfda325e",
+          "process_id": 85956,
+          "allocator_limit_bytes": 2147483648,
+          "configuration": "default",
+          "managed_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0
+        },
+        "chunk_sha256": "47257db679daefb5dc3b50a5486e9d29d161af6b92c19b22ea51884330ee0730"
+      },
+      {
+        "name": "default-Native-to-Ada",
+        "run_id": "8e66d83468194ecea29a5807f0a87265",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\tests\\bin\\static\\conformance_runner.exe",
+          "process_id": 69540,
+          "executable_sha256": "afebaf495141308789ea8e135bdf78fbd35e657829ab054fc668a6e457f165ca",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Native.luac]=]));local r=table.pack(f('public'));assert(r.n==1 and r[1]==29)"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:21:32.8158257Z",
+          "elapsed_milliseconds": 17168,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Native-to-Ada.stdout",
+          "stdout_bytes": 352,
+          "stdout_sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Native-to-Ada.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Native-to-Ada.allocator.69540.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "8e66d83468194ecea29a5807f0a87265",
+          "process_id": 69540,
+          "configuration": "default",
+          "allocator_limit_bytes": 2147483648,
+          "managed_refusals": 0,
+          "provider_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0,
+          "peak_managed_bytes": 5032415,
+          "expected_finalizer_warnings": 0,
+          "shutdown_complete": true,
+          "accounting_fault": false
+        },
+        "chunk_sha256": "47257db679daefb5dc3b50a5486e9d29d161af6b92c19b22ea51884330ee0730"
+      },
+      {
+        "name": "default-Ada-producer",
+        "run_id": "2968999dc5594e3487c023dd7779df01",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\tests\\bin\\static\\conformance_runner.exe",
+          "process_id": 76112,
+          "executable_sha256": "afebaf495141308789ea8e135bdf78fbd35e657829ab054fc668a6e457f165ca",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/lua/nextvar_storage_invariants.lua]=]));local file=assert(io.open([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada.luac]=],'wb'));assert(file:write(string.dump(f)));assert(file:close())"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:21:50.0200002Z",
+          "elapsed_milliseconds": 17,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-producer.stdout",
+          "stdout_bytes": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-producer.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-producer.allocator.76112.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "2968999dc5594e3487c023dd7779df01",
+          "process_id": 76112,
+          "configuration": "default",
+          "allocator_limit_bytes": 2147483648,
+          "managed_refusals": 0,
+          "provider_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0,
+          "peak_managed_bytes": 1007126,
+          "expected_finalizer_warnings": 0,
+          "shutdown_complete": true,
+          "accounting_fault": false
+        }
+      },
+      {
+        "name": "default-Ada-to-Native",
+        "run_id": "d928d6ec04ce482999d4eb570a61c35c",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-ReferenceC-fixtures\\lua.exe",
+          "process_id": 33472,
+          "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada.luac]=]));local r=table.pack(f('public'));assert(r.n==1 and r[1]==29)"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:21:50.0695486Z",
+          "elapsed_milliseconds": 114,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-to-Native.stdout",
+          "stdout_bytes": 352,
+          "stdout_sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-to-Native.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-to-Native.allocator.33472.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "d928d6ec04ce482999d4eb570a61c35c",
+          "process_id": 33472,
+          "allocator_limit_bytes": 2147483648,
+          "configuration": "default",
+          "managed_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0
+        },
+        "chunk_sha256": "ad251b4df0f0646e0f267b6cc901a507bb9293ac69cee425d02f8583042227f4"
+      },
+      {
+        "name": "default-Ada-to-Ada",
+        "run_id": "e344ea08d8b24260834b45e38e02bb54",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\tests\\bin\\static\\conformance_runner.exe",
+          "process_id": 17776,
+          "executable_sha256": "afebaf495141308789ea8e135bdf78fbd35e657829ab054fc668a6e457f165ca",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada.luac]=]));local r=table.pack(f('public'));assert(r.n==1 and r[1]==29)"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:21:50.1902425Z",
+          "elapsed_milliseconds": 20179,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-to-Ada.stdout",
+          "stdout_bytes": 352,
+          "stdout_sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-to-Ada.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-to-Ada.allocator.17776.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "e344ea08d8b24260834b45e38e02bb54",
+          "process_id": 17776,
+          "configuration": "default",
+          "allocator_limit_bytes": 2147483648,
+          "managed_refusals": 0,
+          "provider_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0,
+          "peak_managed_bytes": 5048806,
+          "expected_finalizer_warnings": 0,
+          "shutdown_complete": true,
+          "accounting_fault": false
+        },
+        "chunk_sha256": "ad251b4df0f0646e0f267b6cc901a507bb9293ac69cee425d02f8583042227f4"
+      },
+      {
+        "name": "default-Ada-public-direct",
+        "run_id": "d5d6722920464e0d93a42be815a1fde2",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\tests\\bin\\static\\conformance_runner.exe",
+          "process_id": 29360,
+          "executable_sha256": "afebaf495141308789ea8e135bdf78fbd35e657829ab054fc668a6e457f165ca",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/lua/nextvar_storage_invariants.lua]=]));local r=table.pack(f('public'));assert(r.n==1 and r[1]==29)"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:22:10.4039699Z",
+          "elapsed_milliseconds": 20367,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-public-direct.stdout",
+          "stdout_bytes": 352,
+          "stdout_sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-public-direct.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-public-direct.allocator.29360.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "d5d6722920464e0d93a42be815a1fde2",
+          "process_id": 29360,
+          "configuration": "default",
+          "allocator_limit_bytes": 2147483648,
+          "managed_refusals": 0,
+          "provider_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0,
+          "peak_managed_bytes": 5054777,
+          "expected_finalizer_warnings": 0,
+          "shutdown_complete": true,
+          "accounting_fault": false
+        }
+      },
+      {
+        "name": "default-Ada-storage-absent",
+        "run_id": "f97c58b5a90f4942a46a92d495c4091b",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\tests\\bin\\static\\conformance_runner.exe",
+          "process_id": 41636,
+          "executable_sha256": "afebaf495141308789ea8e135bdf78fbd35e657829ab054fc668a6e457f165ca",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/lua/nextvar_storage_invariants.lua]=]));local ok,e=pcall(f,'ada-storage');assert(not ok and type(e)=='string');print('PASS absent inspector rejected')"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:22:30.860019Z",
+          "elapsed_milliseconds": 13,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-storage-absent.stdout",
+          "stdout_bytes": 32,
+          "stdout_sha256": "3c97670dc0e21997db60bfbc675fafd80b72a60c0d8f387419d59318f885e373",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-storage-absent.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\default-Ada-storage-absent.allocator.41636.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "f97c58b5a90f4942a46a92d495c4091b",
+          "process_id": 41636,
+          "configuration": "default",
+          "allocator_limit_bytes": 2147483648,
+          "managed_refusals": 0,
+          "provider_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0,
+          "peak_managed_bytes": 1006620,
+          "expected_finalizer_warnings": 0,
+          "shutdown_complete": true,
+          "accounting_fault": false
+        }
+      },
+      {
+        "name": "upstream-test-Native-producer",
+        "run_id": "4670daaa32a749218710c2970e4a68a1",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-ReferenceC-fixtures\\lua.exe",
+          "process_id": 92560,
+          "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/lua/nextvar_storage_invariants.lua]=]));local file=assert(io.open([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Native.luac]=],'wb'));assert(file:write(string.dump(f)));assert(file:close())"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:22:30.9090051Z",
+          "elapsed_milliseconds": 9,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Native-producer.stdout",
+          "stdout_bytes": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Native-producer.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Native-producer.allocator.92560.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "4670daaa32a749218710c2970e4a68a1",
+          "process_id": 92560,
+          "allocator_limit_bytes": 2147483648,
+          "configuration": "upstream-test",
+          "expected_finalizer_warnings": 0,
+          "managed_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0
+        }
+      },
+      {
+        "name": "upstream-test-Native-to-Native",
+        "run_id": "1453b73544064e3d9fb5079f85f918a5",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-ReferenceC-fixtures\\lua.exe",
+          "process_id": 16444,
+          "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Native.luac]=]));local r=table.pack(f('public'));assert(r.n==1 and r[1]==29)"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:22:30.9239753Z",
+          "elapsed_milliseconds": 506,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Native-to-Native.stdout",
+          "stdout_bytes": 352,
+          "stdout_sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Native-to-Native.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Native-to-Native.allocator.16444.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "1453b73544064e3d9fb5079f85f918a5",
+          "process_id": 16444,
+          "allocator_limit_bytes": 2147483648,
+          "configuration": "upstream-test",
+          "expected_finalizer_warnings": 0,
+          "managed_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0
+        },
+        "chunk_sha256": "1e114601e9a5241f6a4698719660a4bf01b13985adadc0c19afdb510272823d5"
+      },
+      {
+        "name": "upstream-test-Native-to-Ada",
+        "run_id": "72e44d8e662b43039288b091d67a5a51",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\tests\\bin\\upstream-test\\static\\conformance_runner.exe",
+          "process_id": 80676,
+          "executable_sha256": "284f8b318d7bc9306640dc01b42fac6cb269fbf94db922608cfe359796d704bb",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Native.luac]=]));local r=table.pack(f('public'));assert(r.n==1 and r[1]==29)"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:22:31.4404302Z",
+          "elapsed_milliseconds": 5819,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Native-to-Ada.stdout",
+          "stdout_bytes": 352,
+          "stdout_sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Native-to-Ada.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Native-to-Ada.allocator.80676.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "72e44d8e662b43039288b091d67a5a51",
+          "process_id": 80676,
+          "configuration": "upstream-test",
+          "allocator_limit_bytes": 2147483648,
+          "managed_refusals": 0,
+          "provider_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0,
+          "peak_managed_bytes": 5138377,
+          "expected_finalizer_warnings": 0,
+          "shutdown_complete": true,
+          "accounting_fault": false
+        },
+        "chunk_sha256": "1e114601e9a5241f6a4698719660a4bf01b13985adadc0c19afdb510272823d5"
+      },
+      {
+        "name": "upstream-test-Ada-producer",
+        "run_id": "f8580c16c1a747f48f31287a4422bdf5",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\tests\\bin\\upstream-test\\static\\conformance_runner.exe",
+          "process_id": 85172,
+          "executable_sha256": "284f8b318d7bc9306640dc01b42fac6cb269fbf94db922608cfe359796d704bb",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/lua/nextvar_storage_invariants.lua]=]));local file=assert(io.open([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada.luac]=],'wb'));assert(file:write(string.dump(f)));assert(file:close())"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:22:37.2985826Z",
+          "elapsed_milliseconds": 17,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-producer.stdout",
+          "stdout_bytes": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-producer.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-producer.allocator.85172.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "f8580c16c1a747f48f31287a4422bdf5",
+          "process_id": 85172,
+          "configuration": "upstream-test",
+          "allocator_limit_bytes": 2147483648,
+          "managed_refusals": 0,
+          "provider_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0,
+          "peak_managed_bytes": 1086120,
+          "expected_finalizer_warnings": 0,
+          "shutdown_complete": true,
+          "accounting_fault": false
+        }
+      },
+      {
+        "name": "upstream-test-Ada-to-Native",
+        "run_id": "627e56e1fbad43b8bc40388718b54dec",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-ReferenceC-fixtures\\lua.exe",
+          "process_id": 77576,
+          "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada.luac]=]));local r=table.pack(f('public'));assert(r.n==1 and r[1]==29)"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:22:37.3494359Z",
+          "elapsed_milliseconds": 486,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-to-Native.stdout",
+          "stdout_bytes": 352,
+          "stdout_sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-to-Native.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-to-Native.allocator.77576.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "627e56e1fbad43b8bc40388718b54dec",
+          "process_id": 77576,
+          "allocator_limit_bytes": 2147483648,
+          "configuration": "upstream-test",
+          "expected_finalizer_warnings": 0,
+          "managed_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0
+        },
+        "chunk_sha256": "35b0f178d30f9070e0dd6582dc0519e9ecca7239418176a15ed35782318fbf51"
+      },
+      {
+        "name": "upstream-test-Ada-to-Ada",
+        "run_id": "064f989180a946febe5a21540996282d",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\tests\\bin\\upstream-test\\static\\conformance_runner.exe",
+          "process_id": 83040,
+          "executable_sha256": "284f8b318d7bc9306640dc01b42fac6cb269fbf94db922608cfe359796d704bb",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada.luac]=]));local r=table.pack(f('public'));assert(r.n==1 and r[1]==29)"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:22:37.8425862Z",
+          "elapsed_milliseconds": 4967,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-to-Ada.stdout",
+          "stdout_bytes": 352,
+          "stdout_sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-to-Ada.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-to-Ada.allocator.83040.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "064f989180a946febe5a21540996282d",
+          "process_id": 83040,
+          "configuration": "upstream-test",
+          "allocator_limit_bytes": 2147483648,
+          "managed_refusals": 0,
+          "provider_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0,
+          "peak_managed_bytes": 5151984,
+          "expected_finalizer_warnings": 0,
+          "shutdown_complete": true,
+          "accounting_fault": false
+        },
+        "chunk_sha256": "35b0f178d30f9070e0dd6582dc0519e9ecca7239418176a15ed35782318fbf51"
+      },
+      {
+        "name": "upstream-test-Ada-public-direct",
+        "run_id": "5f8079076f19438882c8c8f464d120f8",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\tests\\bin\\upstream-test\\static\\conformance_runner.exe",
+          "process_id": 83516,
+          "executable_sha256": "284f8b318d7bc9306640dc01b42fac6cb269fbf94db922608cfe359796d704bb",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/lua/nextvar_storage_invariants.lua]=]));local r=table.pack(f('public'));assert(r.n==1 and r[1]==29)"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:22:42.8417176Z",
+          "elapsed_milliseconds": 5109,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-public-direct.stdout",
+          "stdout_bytes": 352,
+          "stdout_sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-public-direct.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-public-direct.allocator.83516.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "5f8079076f19438882c8c8f464d120f8",
+          "process_id": 83516,
+          "configuration": "upstream-test",
+          "allocator_limit_bytes": 2147483648,
+          "managed_refusals": 0,
+          "provider_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0,
+          "peak_managed_bytes": 5157937,
+          "expected_finalizer_warnings": 0,
+          "shutdown_complete": true,
+          "accounting_fault": false
+        }
+      },
+      {
+        "name": "upstream-test-Ada-actual-storage",
+        "run_id": "6defdb1bf90b42fbafe9849d16618f0a",
+        "process": {
+          "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\tests\\bin\\upstream-test\\static\\conformance_runner.exe",
+          "process_id": 41372,
+          "executable_sha256": "284f8b318d7bc9306640dc01b42fac6cb269fbf94db922608cfe359796d704bb",
+          "arguments": [
+            "-E",
+            "-e",
+            "local f=assert(loadfile([=[C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/lua/nextvar_storage_invariants.lua]=]));local r=table.pack(f('ada-storage'));assert(r.n==1 and r[1]==29)"
+          ],
+          "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada",
+          "started_utc": "2026-11-08T09:22:47.9846671Z",
+          "elapsed_milliseconds": 11638,
+          "timeout_seconds": 900,
+          "exit_code": 0,
+          "abnormal_exit_kind": null,
+          "timed_out": false,
+          "capture_limit_bytes": 67108864,
+          "capture_exceeded": false,
+          "pipe_drain_failed": false,
+          "output_drain_failed": false,
+          "input_write_failed": false,
+          "early_input_close_requested": false,
+          "process_tree_kill_error": null,
+          "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-actual-storage.stdout",
+          "stdout_bytes": 352,
+          "stdout_sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104",
+          "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-actual-storage.stderr",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\nextvar-binary-4815880f6e2443dbabb7ddef475b43af\\upstream-test-Ada-actual-storage.allocator.41372.json",
+        "telemetry": {
+          "schema_version": 1,
+          "run_id": "6defdb1bf90b42fbafe9849d16618f0a",
+          "process_id": 41372,
+          "configuration": "upstream-test",
+          "allocator_limit_bytes": 2147483648,
+          "managed_refusals": 0,
+          "provider_refusals": 0,
+          "outstanding_bytes": 0,
+          "outstanding_blocks": 0,
+          "peak_managed_bytes": 5157942,
+          "expected_finalizer_warnings": 0,
+          "shutdown_complete": true,
+          "accounting_fault": false
+        }
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "reports/debug-metadata/nextvar-build-default.log",
+      "bytes": 52625,
+      "sha256": "609890361985de16a35090fdfde847b3cd02c7fed1321de5c8e2ea744fbb2363"
+    },
+    {
+      "path": "reports/debug-metadata/nextvar-build-default-corrected.log",
+      "bytes": 49464,
+      "sha256": "e274094ff241e52e61d46b62741fe066bb478eb60c27673327e6de6666a0c873"
+    },
+    {
+      "path": "reports/debug-metadata/nextvar-build-T.log",
+      "bytes": 50057,
+      "sha256": "9719c779dfb16d29dc959224534b173983e97bb7ab12f41f20af9cb487d83fc4"
+    },
+    {
+      "path": "reports/debug-metadata/nextvar-aunit-default.log",
+      "bytes": 100314,
+      "sha256": "fc9b6acc81aba00e383b0e521f7d7ab8a96a35e75adfc1f5162a5a27993fcc8c"
+    },
+    {
+      "path": "reports/debug-metadata/nextvar-aunit-T.log",
+      "bytes": 100314,
+      "sha256": "fc9b6acc81aba00e383b0e521f7d7ab8a96a35e75adfc1f5162a5a27993fcc8c"
+    },
+    {
+      "path": "reports/debug-metadata/run-nextvar-counterparts.ps1",
+      "bytes": 2137,
+      "sha256": "d251949d595f8842fd2bff96c0e6815a9bd072a0abcb739e90fecd71ec6a9142"
+    },
+    {
+      "path": "reports/debug-metadata/run-nextvar-binary.ps1",
+      "bytes": 3421,
+      "sha256": "fb5f757b1bc6ff70c34fdd7fb94cdb51d4b952221eedb26c26007ebe4c0639c5"
+    },
+    {
+      "path": "reports/debug-metadata/nextvar-binary-run.log",
+      "bytes": 2090,
+      "sha256": "10a9bff7bfea3bec2be55ddcd1e8f5b4d3110b42bdd3619b7d821bd356bdf69b"
+    },
+    {
+      "path": "reports/debug-metadata/nextvar-documentation.log",
+      "bytes": 327,
+      "sha256": "4334495720f4671927ea8e0bacaca2476f2d4d5b0c598b9fd31d199ae639a509"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-fixtures/lua.exe",
+      "bytes": 115352,
+      "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-counterparts-ac316974c8c74a59936f46ba268c3a07/default-Native.stdout",
+      "bytes": 352,
+      "sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-counterparts-ac316974c8c74a59936f46ba268c3a07/default-Native.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-counterparts-ac316974c8c74a59936f46ba268c3a07/default-Native.allocator.76016.json",
+      "bytes": 211,
+      "sha256": "b71a232d6ec1f43514d5a444fc725836c7d2adab73a43be3ad3c816e046250d4"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-fixtures/lua.exe",
+      "bytes": 117690,
+      "sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-counterparts-ac316974c8c74a59936f46ba268c3a07/upstream-test-Native.stdout",
+      "bytes": 352,
+      "sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-counterparts-ac316974c8c74a59936f46ba268c3a07/upstream-test-Native.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-counterparts-ac316974c8c74a59936f46ba268c3a07/upstream-test-Native.allocator.69860.json",
+      "bytes": 249,
+      "sha256": "60d7757a8149fe18ff85a2d093fd2fb77cc4b42de8835e6fc19ce4a8245a6d33"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-fixtures/lua.exe",
+      "bytes": 115352,
+      "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Native-producer.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Native-producer.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Native-producer.allocator.78628.json",
+      "bytes": 211,
+      "sha256": "bae536cc3fbf981fe5817a6185ab1a587a9825bbe65462896331822dfd6c343b"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-fixtures/lua.exe",
+      "bytes": 115352,
+      "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Native-to-Native.stdout",
+      "bytes": 352,
+      "sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Native-to-Native.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Native-to-Native.allocator.85956.json",
+      "bytes": 211,
+      "sha256": "ca92c7fa15a3a978a55cb8704233843f81b0b0a0f71e773b4e25d3da9d2865fa"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/bin/static/conformance_runner.exe",
+      "bytes": 22083111,
+      "sha256": "afebaf495141308789ea8e135bdf78fbd35e657829ab054fc668a6e457f165ca"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Native-to-Ada.stdout",
+      "bytes": 352,
+      "sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Native-to-Ada.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Native-to-Ada.allocator.69540.json",
+      "bytes": 352,
+      "sha256": "16d8dee9911b0f7accb4086f2bfcdd93c635a0c527330154f6f1f0069011eaa1"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/bin/static/conformance_runner.exe",
+      "bytes": 22083111,
+      "sha256": "afebaf495141308789ea8e135bdf78fbd35e657829ab054fc668a6e457f165ca"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-producer.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-producer.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-producer.allocator.76112.json",
+      "bytes": 352,
+      "sha256": "c0c19aff0df4c78235f23feac2ce9fb9fbde51257ce27ec3e62518dbcd86c6aa"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-fixtures/lua.exe",
+      "bytes": 115352,
+      "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-to-Native.stdout",
+      "bytes": 352,
+      "sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-to-Native.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-to-Native.allocator.33472.json",
+      "bytes": 211,
+      "sha256": "00e8945407e0ceda7f8c4033da5dcbf6244104dd3c44b97b0fe89b3a348f8ba4"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/bin/static/conformance_runner.exe",
+      "bytes": 22083111,
+      "sha256": "afebaf495141308789ea8e135bdf78fbd35e657829ab054fc668a6e457f165ca"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-to-Ada.stdout",
+      "bytes": 352,
+      "sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-to-Ada.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-to-Ada.allocator.17776.json",
+      "bytes": 352,
+      "sha256": "91384f94af37995a09f5e13b5282a518d64132aa4c817b3e008d1d8a90f4358f"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/bin/static/conformance_runner.exe",
+      "bytes": 22083111,
+      "sha256": "afebaf495141308789ea8e135bdf78fbd35e657829ab054fc668a6e457f165ca"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-public-direct.stdout",
+      "bytes": 352,
+      "sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-public-direct.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-public-direct.allocator.29360.json",
+      "bytes": 352,
+      "sha256": "1a0fbcd89aee807efa7a1171e2f2b4ce6b6105d85f1018a5a1c69817b1a987e9"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/bin/static/conformance_runner.exe",
+      "bytes": 22083111,
+      "sha256": "afebaf495141308789ea8e135bdf78fbd35e657829ab054fc668a6e457f165ca"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-storage-absent.stdout",
+      "bytes": 32,
+      "sha256": "3c97670dc0e21997db60bfbc675fafd80b72a60c0d8f387419d59318f885e373"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-storage-absent.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada-storage-absent.allocator.41636.json",
+      "bytes": 352,
+      "sha256": "052b484347aa6dbbdf2918e9068ad5c98dde9d6b48f72a5070426c100f30b505"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-fixtures/lua.exe",
+      "bytes": 117690,
+      "sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Native-producer.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Native-producer.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Native-producer.allocator.92560.json",
+      "bytes": 249,
+      "sha256": "d27115f841aa564a697257040c641ef585df8ca592323a5df85b6a21a2fc0d0e"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-fixtures/lua.exe",
+      "bytes": 117690,
+      "sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Native-to-Native.stdout",
+      "bytes": 352,
+      "sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Native-to-Native.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Native-to-Native.allocator.16444.json",
+      "bytes": 249,
+      "sha256": "61677176ca2d84ddc6091ebfbf0ffb347f796121f13af39f3e142026d1b75dfd"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/bin/upstream-test/static/conformance_runner.exe",
+      "bytes": 22086695,
+      "sha256": "284f8b318d7bc9306640dc01b42fac6cb269fbf94db922608cfe359796d704bb"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Native-to-Ada.stdout",
+      "bytes": 352,
+      "sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Native-to-Ada.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Native-to-Ada.allocator.80676.json",
+      "bytes": 358,
+      "sha256": "dd713942ef8b13cf430ddee257f28595e57d25f0452361409b4a5b97d8bc452c"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/bin/upstream-test/static/conformance_runner.exe",
+      "bytes": 22086695,
+      "sha256": "284f8b318d7bc9306640dc01b42fac6cb269fbf94db922608cfe359796d704bb"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-producer.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-producer.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-producer.allocator.85172.json",
+      "bytes": 358,
+      "sha256": "b3747cbd6ee62fb15f9a6582b02b38a9a6db45e8f54e69bac674f693a7434334"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-fixtures/lua.exe",
+      "bytes": 117690,
+      "sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-to-Native.stdout",
+      "bytes": 352,
+      "sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-to-Native.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-to-Native.allocator.77576.json",
+      "bytes": 249,
+      "sha256": "be0f3b2fefea8fb2e0774e8b23d3814b7a5d83dd97a243a70864d0cefd064f11"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/bin/upstream-test/static/conformance_runner.exe",
+      "bytes": 22086695,
+      "sha256": "284f8b318d7bc9306640dc01b42fac6cb269fbf94db922608cfe359796d704bb"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-to-Ada.stdout",
+      "bytes": 352,
+      "sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-to-Ada.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-to-Ada.allocator.83040.json",
+      "bytes": 358,
+      "sha256": "557f3797e5543b53e025d4af09a0908aa9f2127742fdbfe1f47d3e1e3c3eac11"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/bin/upstream-test/static/conformance_runner.exe",
+      "bytes": 22086695,
+      "sha256": "284f8b318d7bc9306640dc01b42fac6cb269fbf94db922608cfe359796d704bb"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-public-direct.stdout",
+      "bytes": 352,
+      "sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-public-direct.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-public-direct.allocator.83516.json",
+      "bytes": 358,
+      "sha256": "05a38adecea3acc1c22715c0bc785666919e0a5517dd95539481afadb1050adc"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/tests/bin/upstream-test/static/conformance_runner.exe",
+      "bytes": 22086695,
+      "sha256": "284f8b318d7bc9306640dc01b42fac6cb269fbf94db922608cfe359796d704bb"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-actual-storage.stdout",
+      "bytes": 352,
+      "sha256": "1bafc24bb4d6258b8fec396f67171bb14b6658c3bec292500f79903692915104"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-actual-storage.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada-actual-storage.allocator.41372.json",
+      "bytes": 358,
+      "sha256": "d3764fb024a629b3738abf9c8f8af7a84cbb213006d31d8f81c3ffabfa49b7f1"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Ada.luac",
+      "bytes": 9448,
+      "sha256": "ad251b4df0f0646e0f267b6cc901a507bb9293ac69cee425d02f8583042227f4"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/default-Native.luac",
+      "bytes": 7257,
+      "sha256": "47257db679daefb5dc3b50a5486e9d29d161af6b92c19b22ea51884330ee0730"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Ada.luac",
+      "bytes": 12944,
+      "sha256": "35b0f178d30f9070e0dd6582dc0519e9ecca7239418176a15ed35782318fbf51"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/nextvar-binary-4815880f6e2443dbabb7ddef475b43af/upstream-test-Native.luac",
+      "bytes": 11000,
+      "sha256": "1e114601e9a5241f6a4698719660a4bf01b13985adadc0c19afdb510272823d5"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-runtime/libconformance_lua.dll",
+      "bytes": 419969,
+      "sha256": "6fd51198bee9770aab18cf42ebaf7ccc133a26d4e3dedb22770c41aba84500b3"
+    },
+    {
+      "path": "C:/Users/Itsuki/.codex/worktrees/remaining-debug/lua-ada/reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-runtime/libconformance_lua.dll",
+      "bytes": 554149,
+      "sha256": "acf15408805f0889c976b89c10ff224b6200a20f8c1c71aaaedcd98515d53738"
+    }
+  ],
+  "remaining": [
+    "Independent counterpart/source review required",
+    "No nextvar or sort source adaptation/emission/execution authorized here",
+    "Every original mixed assertion/expected mp2 evaluation must be bound for any future equivalent",
+    "Native querytab geometry and unused indexed printer are not reported passing",
+    "Changed runtime/checker requires explicit current binding review, not hash-only renewal",
+    "Final immutable contexts/aggregate/whole-target acceptance remain separate"
+  ]
+}

@@ -2,6 +2,13 @@
 
 ## Active remaining-suite delivery
 
+Independently review the [bounded Nextvar storage counterparts](sessions/2026-11-08-nextvar-storage-counterparts.md)
+before any exact mixed-source equivalent. Preserve all construction/warm-call,
+GC, values, expected mp2 evaluations and original 100,000-cycle churn. Actual
+rows/live counts must never replace a physical-rehash termination condition.
+Retain actual provider refusal/retry and measured 529-constructor walk cost;
+neither supplies private C geometry or automatic source-review authority.
+
 Carry the [reviewed Verybig replay](sessions/2026-11-08-verybig-approved-source.md)
 into final Windows contexts with actual rooted-name/fresh-CWD applicability
 evidence. Preserve the four complete local observations without promoting

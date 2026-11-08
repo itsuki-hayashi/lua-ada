@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [bounded Nextvar storage counterparts](2026-11-08-nextvar-storage-counterparts.md).
+
 Component: [reviewed Verybig Windows replay](2026-11-08-verybig-approved-source.md).
 
 Component: [native allocator loaded image](2026-11-08-allocator-loaded-image.md).

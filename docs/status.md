@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [bounded Nextvar counterparts](sessions/2026-11-08-nextvar-storage-counterparts.md)
+exercise all 529 constructor size pairs, real table churn/values and actual
+Ada storage walks without fabricating C capacities. Both local configurations
+pass 2,629 AUnit cases, including four actual constructor-provider refusals
+and healthy retries. Exact upstream source decisions and final acceptance
+remain separate; no Nextvar/Sort adaptation is installed by this checkpoint.
+
 The [reviewed Verybig Windows replay](sessions/2026-11-08-verybig-approved-source.md)
 completes the full large-program workload in local native/Ada default/T roles,
 with identical output, single-result 10 and balanced measured ownership.
