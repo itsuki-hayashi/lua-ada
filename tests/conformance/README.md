@@ -5,6 +5,19 @@ for [M3](../../docs/milestones/m3.md), including accepted bounded scopes and
 unresolved obligations. It contains no second Lua implementation or altered
 upstream source. A completed scope does not establish full M3 acceptance.
 
+The user's early checkpoint ends the current full-target advancement. Automatic
+push/PR CI runs the bounded twelve validation contexts: Windows, Linux and
+macOS, default and instrumented configurations, static and shared libraries.
+`check-checkpoint.ps1` retains strict builds, full AUnit/C consumers, frontend
+and opcode checks, canonical/binary protocols, output policy and actual paired
+readline/console campaigns. Its explicit BatchProtocol executes 79 unchanged
+noninteractive CLI controls plus two package-path probes. The 31 interactive
+CLI definitions remain in the unchanged full 112-process gate, whose complete
+native-backend protocol remains deferred. Batch evidence cannot discharge it.
+The original 26-context target and diagnostic workflows remain manual; target
+validators still refuse incomplete acceptance. A checkpoint CI pass is never
+a full-upstream, original-source, global API or LuaRocks acceptance certificate.
+
 The test launcher reads the canonical LUA_ADA_CONFORMANCE_ALLOCATOR selection:
 67108864 for Heavy and 2147483648 for ordinary/aggregate execution. Missing
 selection defaults to 2 GiB; other spellings reject configuration. The live

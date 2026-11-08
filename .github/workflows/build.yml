@@ -1,8 +1,6 @@
-name: Build and full target observations
+name: Full upstream acceptance (deferred manual campaign)
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
     inputs:
       development_observations:

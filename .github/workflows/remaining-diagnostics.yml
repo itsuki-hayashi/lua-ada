@@ -1,9 +1,7 @@
-name: Remaining upstream build diagnostics
+name: Remaining upstream diagnostics (deferred manual campaign)
 
 on:
-  push:
-    branches:
-      - codex/m3-remaining-upstream-compatibility
+  workflow_dispatch:
 
 permissions:
   contents: read
