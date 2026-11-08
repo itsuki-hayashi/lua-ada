@@ -100,6 +100,16 @@ if($baseline.configuration -ceq 'upstream-test'){
         $p=(Row $r primitive-not-refusal).process
         Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS: primitive NOT nil`n",''))
     } 'complete ordered protocol'
+    Case 'actual Ada table storage cannot disappear from the instrumented campaign' {param($r)
+        $r.processes=@($r.processes|Where-Object operation -CNE table-storage-private)
+    } 'process set is incomplete'
+    Case 'a native T process cannot substitute for the actual Ada invariant inspector' {param($r)
+        (Row $r table-storage-private).role='ReferenceC'
+    } 'actual process is missing or duplicated'
+    Case 'Ada table storage completion must retain all three actual phases' {param($r)
+        $p=(Row $r table-storage-private).process
+        Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS: Ada table storage Deleted_Key_Reclamation`n",''))
+    } 'complete ordered protocol'
     foreach($operation in @('public-api-commands','public-panic-controls','reader-refusal-phases','string-refusal-phases','c-hook-transitions')){
         Case "complete paired T campaign cannot omit $operation" {param($r)
             $r.processes=@($r.processes|Where-Object operation -CNE $operation)

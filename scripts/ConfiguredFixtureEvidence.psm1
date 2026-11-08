@@ -52,6 +52,11 @@ function Get-ConfiguredFixtureDefinitions {
             stdout="CONFIGURED-FIXTURE: real T C hook transitions`n"+
                 ((@('C_Count_To_Line','C_Same_Line','C_Count_Removes_Line','C_Count_Removes_All','C_Line_To_Count')|
                     ForEach-Object{"PASS: C hook transition $_"})-join "`n")+"`nC hook transitions OK`n"}
+        $definitions+=@{id='table-storage-private';source='tests/lua/table_storage_private.lua';roles=@('Ada');
+            setup="$guard;assert(type(T.ada_check_table_storage)=='function');print('CONFIGURED-FIXTURE: actual Ada table storage')";
+            stdout="CONFIGURED-FIXTURE: actual Ada table storage`n"+
+                ((@('Initial_Live_Entries','Deleted_Key_Reclamation','Same_Table_Reuse')|
+                    ForEach-Object{"PASS: Ada table storage $_"})-join "`n")+"`nTable storage private OK`n"}
     }
     # This fixture deliberately counts instructions. Its own source contract
     # requires one C-compiled graph, consumed unchanged by both interpreters;
@@ -61,6 +66,18 @@ function Get-ConfiguredFixtureDefinitions {
         execution='native-dumped-chunk';setup="$guard;print('$marker')";
         stdout="$marker`niterator count`t1`t6`niterator count`t2`t13`nOK`n"}
     return $definitions
+}
+
+function Get-ConfiguredFixtureRoles {
+    param([Parameter(Mandatory)][Collections.IDictionary]$Definition)
+    if(-not $Definition.Contains('roles')){return @('ReferenceC','Ada')}
+    # This is a real Ada invariant inspector, not a querytab implementation or
+    # a facade on native T. Its separate observation cannot credit a C pair.
+    if($Definition.id -cne 'table-storage-private' -or $Definition.roles -isnot [Array] -or
+        $Definition.roles.Count -ne 1 -or $Definition.roles[0] -cne 'Ada'){
+        throw 'Configured fixture internal counterpart roles differ'
+    }
+    return @('Ada')
 }
 
 function Get-ConfiguredFixtureProducerArguments {
@@ -88,6 +105,9 @@ function Get-ConfiguredFixtureSources {
         'tests/lua/public_api_commands.lua','tests/lua/public_panic_controls.lua','tests/lua/public_panic_file.lua',
         'tests/lua/reader_refusal_phases.lua','tests/lua/string_refusal_phases.lua','tests/lua/hook_transition_c.lua',
         'tests/lua/debug_iterator_counts.lua',
+        'tests/lua/table_storage_public.lua','tests/lua/table_storage_private.lua',
+        'tests/src/lua-table_storage_inspection_tests.ads','tests/src/lua-table_storage_inspection_tests.adb',
+        'tests/src/lua-engine-table_storage_probe.ads','tests/src/lua-engine-table_storage_probe.adb',
         ('src/configurations/'+$Configuration+'/lua-runtime_configuration.ads'),
         'references/lua/llimits.h','references/lua/ltests.h','references/lua/luaconf.h',
         'experiments/conformance/reference.gpr','experiments/conformance/c/conformance_cli.c',
@@ -100,7 +120,7 @@ function Get-ConfiguredFixtureAudit {
     param([Parameter(Mandatory)][string]$Root)
     $ordinary=@(Get-ConfiguredFixtureDefinitions default|ForEach-Object source)
     $instrumented=@(Get-ConfiguredFixtureDefinitions upstream-test|ForEach-Object source)
-    $only=@($instrumented|Where-Object{$_ -cnotin $ordinary})
+    $only=@(Get-ConfiguredFixtureDefinitions upstream-test|Where-Object{$_.source -cnotin $ordinary})
     $classification=Get-Content (Join-Path $Root 'tests/conformance/targets/configured-fixture-classification.json') -Raw|ConvertFrom-Json -AsHashtable
     if($classification.schema_version -ne 1 -or $classification.kind -cne 'first-party-configured-fixture-classification' -or
         $classification.runtime_acceptance -isnot [bool] -or $classification.runtime_acceptance -or
@@ -108,12 +128,40 @@ function Get-ConfiguredFixtureAudit {
         $classification.entries -isnot [Array] -or $classification.entries.Count -ne $only.Count){
         throw 'Configured fixture classification is incomplete or claims runtime authority'
     }
-    foreach($path in $only){
+    foreach($definition in $only){
+        $path=$definition.source
+        $roles=@(Get-ConfiguredFixtureRoles $definition)
+        $selection=if($roles.Count -eq 1){'configured-Ada-internal-counterpart-only'}else{'paired-configured-T-only'}
         $record=@($classification.entries|Where-Object path -CEQ $path)
-        if($record.Count -ne 1 -or $record[0].selection -cne 'paired-configured-T-only' -or
+        if($record.Count -ne 1 -or $record[0].selection -cne $selection -or
             [string]::IsNullOrWhiteSpace($record[0].rationale) -or
             (Get-FileHash (Join-Path $Root $path)).Hash.ToLowerInvariant() -cne $record[0].sha256){
             throw "Configured T-only classification requires a fresh mixed/default/T source review: $path"
+        }
+        if($roles.Count -eq 1){
+            $links=$record[0].source_linkage
+            $requiredLinks=@('tests/src/lua-conformance_adapter.adb','tests/c/conformance_adapter.c',
+                'tests/src/lua-table_storage_inspection_tests.adb','tests/src/lua-table_storage_inspection_tests.ads',
+                'tests/src/lua-engine-table_storage_probe.ads','tests/src/lua-engine-table_storage_probe.adb')
+            if($links.kind -cne 'source-linkage-only' -or $links.runtime_evidence -isnot [Array] -or $links.runtime_evidence.Count -ne 0 -or
+                $links.aunit_named_cases -isnot [Array] -or $links.aunit_named_cases.Count -ne 22 -or
+                $links.bindings -isnot [Array] -or (($links.bindings.path|Sort-Object) -join '|') -cne (($requiredLinks|Sort-Object) -join '|')){
+                throw 'Configured Ada invariant source linkage is incomplete or invents execution evidence'
+            }
+            foreach($binding in $links.bindings){
+                if($binding.path -cnotin (Get-ConfiguredFixtureSources upstream-test) -or
+                    (Get-FileHash (Join-Path $Root $binding.path)).Hash.ToLowerInvariant() -cne $binding.sha256){
+                    throw 'Configured Ada invariant implementation linkage is stale'
+                }
+            }
+            $source='tests/src/lua-table_storage_inspection_tests.adb'
+            $text=Get-Content (Join-Path $Root $source) -Raw
+            $named=@([regex]::Matches($text,"(?s)Test_Support\.Add\s*\(Suite,\s*`"([^`"]+)`"\s*,\s*([A-Za-z0-9_]+)'Access")|
+                ForEach-Object{$source+'#'+$_.Groups[2].Value+'|OK '+$_.Groups[1].Value}|Sort-Object)
+            $declared=@($links.aunit_named_cases|ForEach-Object{$_.case+'|'+$_.required_stdout_line}|Sort-Object)
+            if($named.Count -ne 22 -or ($named -join "`n") -cne ($declared -join "`n")){
+                throw 'Configured Ada invariant named AUnit linkage differs; links are not runtime evidence'
+            }
         }
     }
     $entries=@(foreach($file in Get-ChildItem (Join-Path $Root 'tests/lua') -File -Filter '*.lua'|Sort-Object Name){
@@ -127,10 +175,29 @@ function Get-ConfiguredFixtureAudit {
         # of compatibility. New T-bearing files fail closed for human review;
         # mixed ordinary/T files must appear in both configured selections.
         [ordered]@{path=$path;sha256=(Get-FileHash $file.FullName).Hash.ToLowerInvariant();T_identifiers=$references.Count;
-            selection=$(if($path -cin $ordinary){'paired-configured-default-and-T'}elseif($path -cin $instrumented){'paired-configured-T-only'}else{'generic-default-source-comparison'})}
+            selection=$(if($path -cin $ordinary){'paired-configured-default-and-T'}elseif($path -cin $instrumented){
+                @($classification.entries|Where-Object path -CEQ $path)[0].selection}else{'generic-default-source-comparison'})}
     })
     return [ordered]@{schema_version=1;kind='first-party-fixture-selection-audit';entries=$entries;
         runtime_acceptance=$false;coverage_authority=$false}
+}
+
+function Assert-ConfiguredFixtureNamedCounterparts {
+    param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][string]$Context,
+        [Parameter(Mandatory)][Collections.IDictionary]$NamedEvidence)
+    if(-not $Context.StartsWith('upstream-test/',[StringComparison]::Ordinal)){return}
+    if($NamedEvidence.context -cne $Context -or $NamedEvidence.runtime_observed -isnot [bool] -or -not $NamedEvidence.runtime_observed){
+        throw 'Configured Ada invariant requires actual same-context named AUnit observations'
+    }
+    # These identities are only linkage until the named-evidence reader has
+    # checked fresh source-bound raw AUnit receipts. The final image consumer
+    # separately requires independent source review and frozen membership.
+    $classification=Get-Content (Join-Path $Root 'tests/conformance/targets/configured-fixture-classification.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 24
+    $row=@($classification.entries|Where-Object selection -CEQ configured-Ada-internal-counterpart-only)
+    if($row.Count -ne 1 -or $row[0].source_linkage.aunit_named_cases.Count -ne 22){throw 'Configured Ada invariant named linkage is incomplete'}
+    foreach($case in $row[0].source_linkage.aunit_named_cases){
+        if($case.case -cnotin $NamedEvidence.named_aunit_cases){throw 'Configured Ada invariant lacks an actual required named AUnit counterpart'}
+    }
 }
 
 function Assert-ConfiguredFixtureReport {
@@ -182,7 +249,9 @@ function Assert-ConfiguredFixtureReport {
     if($Report.runtimes.Count -ne 2 -or @($Report.runtimes.role|Sort-Object -Unique).Count -ne 2){throw 'Configured fixture runtime pair is incomplete'}
     $definitions=@(Get-ConfiguredFixtureDefinitions $Configuration)
     $binary=@($definitions|Where-Object{$_.Contains('execution') -and $_.execution -ceq 'native-dumped-chunk'})
-    if($Report.processes.Count -ne (2*($definitions.Count+1)+$binary.Count)){throw 'Configured fixture process set is incomplete or duplicated'}
+    $processCount=2+$binary.Count
+    foreach($definition in $definitions){$processCount+=@(Get-ConfiguredFixtureRoles $definition).Count}
+    if($Report.processes.Count -ne $processCount){throw 'Configured fixture process set is incomplete or duplicated'}
     foreach($runtime in $Report.runtimes){
         if($runtime.role -cnotin @('Ada','ReferenceC') -or
             [string]::IsNullOrWhiteSpace((Resolve-Observation $runtime.executable $runtime.executable_sha256)) -or
@@ -191,7 +260,7 @@ function Assert-ConfiguredFixtureReport {
         foreach($library in $runtime.library_files){
             [void](Resolve-Observation $library.path $library.sha256)
         }
-        $operations=@('configuration')+@($definitions.id)
+        $operations=@('configuration')+@($definitions|Where-Object{$runtime.role -cin @(Get-ConfiguredFixtureRoles $_)}|ForEach-Object id)
         if($runtime.role -ceq 'ReferenceC'){$operations+=@($binary|ForEach-Object{'produce-'+$_.id})}
         foreach($operation in $operations){
             $rows=@($Report.processes|Where-Object{$_.role -ceq $runtime.role -and $_.operation -ceq $operation})
@@ -266,7 +335,8 @@ function Assert-ConfiguredFixtureReport {
     # Each role must independently produce the complete normative protocol;
     # agreeing partial output is insufficient. No result here closes a source
     # ledger or grants runtime/target acceptance.
-    return @{configuration=$Configuration;operations=@($definitions.id);runtime_observed=$true;
+    return @{configuration=$Configuration;operations=@($definitions.id);
+        operation_roles=@($definitions|ForEach-Object{@{id=$_.id;roles=@(Get-ConfiguredFixtureRoles $_)}});runtime_observed=$true;
         runtime_acceptance=$false;coverage_authority=$false}
 }
 
@@ -302,4 +372,4 @@ function Assert-ConfiguredFixtureImageReport {
         -Interpreter (Join-Path $Payload $Image.paths.ada_launcher) -ResolveFile $resolve
 }
 
-Export-ModuleMember -Function Get-ConfiguredFixtureDefinitions,Get-ConfiguredFixtureProducerArguments,Get-ConfiguredFixtureSources,Get-ConfiguredFixtureAudit,Assert-ConfiguredFixtureReport,Assert-ConfiguredFixtureImageReport
+Export-ModuleMember -Function Get-ConfiguredFixtureDefinitions,Get-ConfiguredFixtureRoles,Get-ConfiguredFixtureProducerArguments,Get-ConfiguredFixtureSources,Get-ConfiguredFixtureAudit,Assert-ConfiguredFixtureReport,Assert-ConfiguredFixtureNamedCounterparts,Assert-ConfiguredFixtureImageReport

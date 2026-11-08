@@ -4479,6 +4479,181 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: actual Lua counts and weak witness",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Lua_Actual_Counts",
+      "required_stdout_line": "OK table storage: actual Lua counts and weak witness",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: empty table",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Empty_Table",
+      "required_stdout_line": "OK table storage: empty table",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: actual row and live counts",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Mixed_Storage",
+      "required_stdout_line": "OK table storage: actual row and live counts",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: indexed nil-valued tombstone",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Indexed_Tombstone",
+      "required_stdout_line": "OK table storage: indexed nil-valued tombstone",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: revived free-listed row",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Revived_Free_Row",
+      "required_stdout_line": "OK table storage: revived free-listed row",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: collected key unlinks actual row",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Collected_Key",
+      "required_stdout_line": "OK table storage: collected key unlinks actual row",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: same-table collected row reuse",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Reused_Row",
+      "required_stdout_line": "OK table storage: same-table collected row reuse",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: insertion refusal and retry",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Refused_Insert",
+      "required_stdout_line": "OK table storage: insertion refusal and retry",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: read-only checker under refusal",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#No_Allocation",
+      "required_stdout_line": "OK table storage: read-only checker under refusal",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects null target",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Null_Target",
+      "required_stdout_line": "OK table storage: rejects null target",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects unregistered key",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Unregistered_Key",
+      "required_stdout_line": "OK table storage: rejects unregistered key",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects key object tag mismatch",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Wrong_Key_Tag",
+      "required_stdout_line": "OK table storage: rejects key object tag mismatch",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects value object tag mismatch",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Wrong_Value_Tag",
+      "required_stdout_line": "OK table storage: rejects value object tag mismatch",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects array row outside members",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Array_Bounds",
+      "required_stdout_line": "OK table storage: rejects array row outside members",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects hash row outside members",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Hash_Bounds",
+      "required_stdout_line": "OK table storage: rejects hash row outside members",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects cyclic hash chain",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Hash_Cycle",
+      "required_stdout_line": "OK table storage: rejects cyclic hash chain",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects free row outside members",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Free_Bounds",
+      "required_stdout_line": "OK table storage: rejects free row outside members",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects cyclic free chain",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Free_Cycle",
+      "required_stdout_line": "OK table storage: rejects cyclic free chain",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects unreachable free flag",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Free_Flags",
+      "required_stdout_line": "OK table storage: rejects unreachable free flag",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects linked nil-key row",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Nil_Linked",
+      "required_stdout_line": "OK table storage: rejects linked nil-key row",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects wrong hash bucket",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Wrong_Bucket",
+      "required_stdout_line": "OK table storage: rejects wrong hash bucket",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: rejects incorrect hash row count",
+      "case": "tests/src/lua-table_storage_inspection_tests.adb#Hash_Count",
+      "required_stdout_line": "OK table storage: rejects incorrect hash row count",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: anonymous key",
+      "case": "tests/src/table_storage_public_tests.adb#Anonymous_Key",
+      "required_stdout_line": "OK table storage: anonymous key",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: live key",
+      "case": "tests/src/table_storage_public_tests.adb#Live_Key",
+      "required_stdout_line": "OK table storage: live key",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "registered_label": "table storage: same table",
+      "case": "tests/src/table_storage_public_tests.adb#Same_Table",
+      "required_stdout_line": "OK table storage: same table",
+      "execution_evidence": []
     }
   ]
 }

@@ -7,12 +7,15 @@ local weak=setmetatable({},{__mode='v'})
 for k in pairs(a)do if type(k)=='table'then weak[1]=k end end
 local rows,live=T.ada_check_table_storage(a)
 assert(rows==4 and live==4)
+print('PASS: Ada table storage Initial_Live_Entries')
 for k in pairs(a)do a[k]=nil end
 collectgarbage()
 local retained,after=T.ada_check_table_storage(a)
 assert(retained==rows and after==0 and weak[1]==nil and next(a)==nil)
+print('PASS: Ada table storage Deleted_Key_Reclamation')
 local fresh={};a[fresh]=42
 local reused,inserted=T.ada_check_table_storage(a)
 assert(reused==rows and inserted==1 and a[fresh]==42)
+print('PASS: Ada table storage Same_Table_Reuse')
 collectgarbage('restart')
 print('Table storage private OK')

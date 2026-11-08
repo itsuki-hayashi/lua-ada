@@ -45,6 +45,132 @@
       "sha256": "9b3469e108c4f81b7fbe3a5471c1185590e52e0a13e9c86b3af5f2839b1fcc5d",
       "selection": "paired-configured-T-only",
       "rationale": "All five transitions install actual C hooks through T.sethook; public hook-event assertions remain executed in the instrumented pair."
+    },
+    {
+      "rationale": "Every operation invokes the actual Ada owned-storage inspector; no native querytab facade or T-absent branch exists. Public table/key-liveness semantics also execute separately in table_storage_public.lua.",
+      "sha256": "9a4bc32f8a2dd37863c4f7e702f8600a8da8a7f7d887a829aa4ba9f6f3dd9576",
+      "selection": "configured-Ada-internal-counterpart-only",
+      "path": "tests/lua/table_storage_private.lua",
+      "source_linkage": {
+        "aunit_named_cases": [
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Lua_Actual_Counts",
+            "required_stdout_line": "OK table storage: actual Lua counts and weak witness"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Empty_Table",
+            "required_stdout_line": "OK table storage: empty table"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Mixed_Storage",
+            "required_stdout_line": "OK table storage: actual row and live counts"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Indexed_Tombstone",
+            "required_stdout_line": "OK table storage: indexed nil-valued tombstone"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Revived_Free_Row",
+            "required_stdout_line": "OK table storage: revived free-listed row"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Collected_Key",
+            "required_stdout_line": "OK table storage: collected key unlinks actual row"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Reused_Row",
+            "required_stdout_line": "OK table storage: same-table collected row reuse"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Refused_Insert",
+            "required_stdout_line": "OK table storage: insertion refusal and retry"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#No_Allocation",
+            "required_stdout_line": "OK table storage: read-only checker under refusal"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Null_Target",
+            "required_stdout_line": "OK table storage: rejects null target"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Unregistered_Key",
+            "required_stdout_line": "OK table storage: rejects unregistered key"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Wrong_Key_Tag",
+            "required_stdout_line": "OK table storage: rejects key object tag mismatch"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Wrong_Value_Tag",
+            "required_stdout_line": "OK table storage: rejects value object tag mismatch"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Array_Bounds",
+            "required_stdout_line": "OK table storage: rejects array row outside members"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Hash_Bounds",
+            "required_stdout_line": "OK table storage: rejects hash row outside members"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Hash_Cycle",
+            "required_stdout_line": "OK table storage: rejects cyclic hash chain"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Free_Bounds",
+            "required_stdout_line": "OK table storage: rejects free row outside members"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Free_Cycle",
+            "required_stdout_line": "OK table storage: rejects cyclic free chain"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Free_Flags",
+            "required_stdout_line": "OK table storage: rejects unreachable free flag"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Nil_Linked",
+            "required_stdout_line": "OK table storage: rejects linked nil-key row"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Wrong_Bucket",
+            "required_stdout_line": "OK table storage: rejects wrong hash bucket"
+          },
+          {
+            "case": "tests/src/lua-table_storage_inspection_tests.adb#Hash_Count",
+            "required_stdout_line": "OK table storage: rejects incorrect hash row count"
+          }
+        ],
+        "runtime_evidence": [],
+        "kind": "source-linkage-only",
+        "bindings": [
+          {
+            "sha256": "532ac55f963ff15ea259f30f1493639cb862ab76f6e82ee47ebb1438add04bf3",
+            "path": "tests/src/lua-conformance_adapter.adb"
+          },
+          {
+            "sha256": "4141d51fbabd31aae0d7f1c529d2caab381c2a15f980fd7750bfb360f757ceb2",
+            "path": "tests/c/conformance_adapter.c"
+          },
+          {
+            "sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8",
+            "path": "tests/src/lua-table_storage_inspection_tests.adb"
+          },
+          {
+            "sha256": "882397a1afd8d1024353b82d402f478a7718d07cee9cc0f4d1cf07a702820a43",
+            "path": "tests/src/lua-table_storage_inspection_tests.ads"
+          },
+          {
+            "sha256": "67d9cb92e436c029c76f85e25ce8f8528ceea01265ae384ef33d50b51e687ab2",
+            "path": "tests/src/lua-engine-table_storage_probe.ads"
+          },
+          {
+            "sha256": "a30f62f83f16307ed0180de33dc80c61a03dd5e455a000880ab5eb9ca1933579",
+            "path": "tests/src/lua-engine-table_storage_probe.adb"
+          }
+        ]
+      }
     }
   ]
 }

@@ -157,6 +157,7 @@ function Test-TargetImageBuildWitnesses {
     if($WitnessPolicy.source_reviewed -ne $true){throw 'Final context image needs an independently reviewed source witness policy'}
     $named=Test-TargetNamedContextEvidence -Root $Root -Policy $WitnessPolicy -ConsumerReport $consumerPath -AUnitReport $unitPath `
         -Context $Context -Revision $Revision -ConsumerArtifactRoot $payload -AUnitArtifactRoot $payload
+    Assert-ConfiguredFixtureNamedCounterparts -Root $Root -Context $Context -NamedEvidence $named
     $consumer=Get-Content -LiteralPath $consumerPath -Raw|ConvertFrom-Json -AsHashtable -Depth 48
     Assert-TargetBuildRuntimeBindings -Image $image -ConsumerReport $consumer
     if($consumer.Contains('loadfile_contract') -and $null -ne $consumer.loadfile_contract){

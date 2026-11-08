@@ -54,6 +54,7 @@ try{
         [void](Test-ConformanceConfiguration -Observed (Get-Content $p.stdout_path -Raw|ConvertFrom-Json -AsHashtable) `
             -Configuration $Configuration -Target $role -AllocatorLimitBytes 2147483648)
         foreach($definition in $definitions){
+            if($role -cnotin @(Get-ConfiguredFixtureRoles $definition)){continue}
             $fixtureInput=Join-Path $root $definition.source
             $binary=$definition.Contains('execution') -and $definition.execution -ceq 'native-dumped-chunk'
             if($binary){

@@ -128,6 +128,17 @@ final replay checks its revision/context and every executable, runtime library
 and capture against the frozen file identities. A build log or matching final
 marker cannot replace the configured process set.
 
+`table_storage_private.lua` is a separate mandatory **Ada-only** instrumented
+counterpart. It calls the actual Ada owned-storage inspector and records all
+three initial-live/deleted-key/same-table-reuse phases. No native T facade or
+default T-absent result can substitute for that process. Its classification
+links the current inspector/probe implementation and22 named AUnit cases as
+source identities only; these links contain no execution evidence. The target
+build receipt and final frozen-image consumer also require all22 actual named
+AUnit observations from the source-bound same-context suite report.
+`table_storage_public.lua` retains its three ordinary object-key/liveness
+cases in the generic comparison on both configurations.
+
 `debug_iterator_counts.lua` also runs in both configured campaigns. Its source
 explicitly requires one C-compiled graph when comparing exact hook counts.
 The measured native interpreter loads that exact text file and dumps its

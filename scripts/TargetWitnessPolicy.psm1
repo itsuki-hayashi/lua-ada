@@ -442,8 +442,10 @@ function Write-TargetBuildWitnesses {
         $configured.context -cne $Context){throw 'Target configured fixture report is stale dirty or from another context'}
     $configuredObserved=Assert-ConfiguredFixtureReport -Root $Root -Report $configured -Configuration $parts[0] `
         -Interpreter @($configured.runtimes|Where-Object role -CEQ Ada)[0].executable
+    Assert-ConfiguredFixtureNamedCounterparts -Root $Root -Context $Context -NamedEvidence $result
     $result['configured_fixtures']=@{path=[IO.Path]::GetFullPath($ConfiguredReport);sha256=(Get-FileHash $ConfiguredReport).Hash.ToLowerInvariant()}
     $result['configured_fixture_operations']=$configuredObserved.operations
+    $result['configured_fixture_operation_roles']=$configuredObserved.operation_roles
     $directory = Join-Path $Root ('reports/target-builds/' + $Context.Replace('/','-'))
     [void][IO.Directory]::CreateDirectory($directory)
     $result['schema_version'] = 1; $result['kind'] = 'target-build-named-witnesses'
