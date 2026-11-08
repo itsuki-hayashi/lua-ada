@@ -23,7 +23,9 @@ approval, adapted source, runtime evidence or original obligation is renewed.
 
 The [scalar closing checkpoint](sessions/2026-11-08-scalar-closing-links.md)
 marks canonical closing slots without artificial upvalue/list allocations.
-Both local modes pass 2,536 AUnit cases and ordinary C consumers; twelve public
+Both local modes pass 2,538 AUnit cases after the
+[owner-bound correction](sessions/2026-11-08-scalar-closing-owner-bound.md),
+and ordinary C consumers; twelve public
 cases match four T binary roles. Unchanged errors/coroutine files complete
 under the actual 2-GiB ceiling with balanced cleanup. Whole locals source
 bindings must be renewed before current whole-file acceptance.

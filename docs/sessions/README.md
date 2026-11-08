@@ -8,6 +8,8 @@ Component: [actual IO error caller locations](2026-11-08-io-error-locations.md).
 
 Proposal: [API941 tail and owner source bindings](2026-11-08-api941-tail-owner-bindings.md).
 
+Correction: [scalar closing owner bound](2026-11-08-scalar-closing-owner-bound.md).
+
 Component: [scalar closing links](2026-11-08-scalar-closing-links.md).
 
 Source review: [current target GC mapping](2026-11-08-gc-current-source-review.md).

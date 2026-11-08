@@ -17,6 +17,8 @@ package body Lua.Scalar_Closing_Tests is
    procedure Uncaptured_Slot;
    procedure Liveness_Independent_Root;
    procedure Invalid_Link_Recovery;
+   procedure Wrong_Frame_Head;
+   procedure Outside_Context_Head;
 
    generic
       with procedure Behavior (State : World_Access; Item : Frame_Access);
@@ -110,9 +112,68 @@ package body Lua.Scalar_Closing_Tests is
       Collect (State.all);
    end Check_Invalid;
 
+   procedure Check_Wrong_Frame (State : World_Access; Item : Frame_Access);
+   procedure Check_Wrong_Frame (State : World_Access; Item : Frame_Access) is
+      Child : constant Frame_Access := New_Frame (State.all);
+      Original : constant Natural := Item.C_Closing_Level;
+      Level, Previous : Natural;
+      Rejected : Boolean := False;
+   begin
+      --  Publish a genuine initialized child window above the marked owner.
+      --  Its value is valid context storage but must not become this parent's
+      --  head merely because a parallel link exists at the same index.
+      Child.Is_Native := True;
+      Child.Stack_Base := Item.Stack_Base + Item.Stack_Window_Length + 1;
+      Child.Call_Base := Child.Stack_Base;
+      Child.Stack_Live_Top := Child.Stack_Base + 1;
+      State.Current.Stack.Append (Child);
+      VM.Resize_Stack_Window (State.all, Child, 1);
+      Level := Child.Stack_Base + 1;
+      Stacks.Write
+        (State.all, State.Current, Level,
+         Stacks.Read (State.Current, Original));
+      State.Current.C_Close_Links.Replace_Element (Level, (Previous => 0));
+      Item.C_Closing_Level := Level;
+      begin
+         Previous := Stacks.Closing_Predecessor (Item, Level);
+      exception
+         when Program_Error => Rejected := True;
+      end;
+      Item.C_Closing_Level := Original;
+      Assert (Rejected, "closing head accepted another frame's actual slot");
+      Previous := Stacks.Closing_Predecessor (Item, Original);
+      Assert (Previous = 0, "wrong-frame rejection damaged the actual chain");
+      Collect (State.all);
+   end Check_Wrong_Frame;
+
+   procedure Check_Outside (State : World_Access; Item : Frame_Access);
+   procedure Check_Outside (State : World_Access; Item : Frame_Access) is
+      Original : constant Natural := Item.C_Closing_Level;
+      Level : constant Natural :=
+        Natural (State.Current.Foreign_Stack.Length) + 1;
+      Previous : Natural;
+      Rejected : Boolean := False;
+   begin
+      --  Unlike the child-window case, this index has no initialized context
+      --  row at all. Query rejection must happen before dereferencing it.
+      Item.C_Closing_Level := Level;
+      begin
+         Previous := Stacks.Closing_Predecessor (Item, Level);
+      exception
+         when Program_Error => Rejected := True;
+      end;
+      Item.C_Closing_Level := Original;
+      Assert (Rejected, "closing head accepted an uninitialized context row");
+      Previous := Stacks.Closing_Predecessor (Item, Original);
+      Assert (Previous = 0, "out-of-context rejection damaged actual links");
+      Collect (State.all);
+   end Check_Outside;
+
    procedure Uncaptured_Case is new Slot_Fixture (Check_Uncaptured);
    procedure Root_Case is new Slot_Fixture (Check_Root);
    procedure Invalid_Case is new Slot_Fixture (Check_Invalid);
+   procedure Wrong_Frame_Case is new Slot_Fixture (Check_Wrong_Frame);
+   procedure Outside_Case is new Slot_Fixture (Check_Outside);
 
    procedure Uncaptured_Slot is
    begin
@@ -128,6 +189,16 @@ package body Lua.Scalar_Closing_Tests is
    begin
       Invalid_Case;
    end Invalid_Link_Recovery;
+
+   procedure Wrong_Frame_Head is
+   begin
+      Wrong_Frame_Case;
+   end Wrong_Frame_Head;
+
+   procedure Outside_Context_Head is
+   begin
+      Outside_Case;
+   end Outside_Context_Head;
 
    procedure Check (Name : String; Require_Refusal : Boolean := False);
    procedure Original_Failure;
@@ -272,6 +343,12 @@ package body Lua.Scalar_Closing_Tests is
       Test_Support.Add
         (Suite, "scalar closing: invalid link recovery",
          Invalid_Link_Recovery'Access);
+      Test_Support.Add
+        (Suite, "scalar closing: reject another frame head",
+         Wrong_Frame_Head'Access);
+      Test_Support.Add
+        (Suite, "scalar closing: reject uninitialized head",
+         Outside_Context_Head'Access);
       Test_Support.Add
         (Suite, "scalar closing: Original_Failure",
          Original_Failure'Access);

@@ -65,9 +65,15 @@ package body Lua.Engine.Stacks is
       Context : constant Context_Access := Activation.Context;
       Previous : Natural;
    begin
-      if Context = null or else Level <= Activation.Stack_Base then
-         raise Program_Error with "closing link has no scalar owner";
+      if Context = null or else Level <= Activation.Stack_Base or else
+        Level - Activation.Stack_Base > Activation.Stack_Window_Length
+      then
+         raise Program_Error with "closing link is outside its scalar owner";
       end if;
+      --  A C borrow grows this physical owner before exposing extra slots.
+      --  Its reserved length survives retirement; the current context top
+      --  can instead belong to another child or a smaller suspended view.
+      --  Strict descent then also keeps every predecessor below this bound.
       Check_Range (Context, Level, Level);
       Previous := Context.C_Close_Links.Element (Level).Previous;
       if Previous >= Level or else

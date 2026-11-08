@@ -25,7 +25,12 @@ The shared unwind driver interprets canonical scope depths and symbols relative
 to the frame base. Explicit C_Slot_Exit retains absolute API stack levels,
 including a C view borrowing a Lua frame. Before following any link, the private
 Stacks.Closing_Predecessor checks its initialized owner interval and strictly
-descending predecessor. Each selected head is removed before calling its
+descending predecessor. An integration correction also bounds the head by
+Stack_Window_Length, not merely whole-context initialized storage. Actual
+C views grow their physical owner before exposing extra slots; retired owners
+retain that descriptor. A child window or a changing Foreign_Top therefore
+cannot substitute for this owner interval. Strict descent keeps predecessors
+inside the same upper bound. Each selected head is removed before calling its
 handler, matching native closing order and existing continuation/error policy.
 Return and contradictory-tail guards consider both scalar heads and migration
 Close_Lists. The migration backend retains its separate list/cell semantics.
