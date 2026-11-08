@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "kind": "conditional-debug-console-consumer-author-proposal",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "independent_reviewer": null,
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_snapshot": {
+    "repository_revision": "0b95cc880ce35367ecdd8a5cbdbaa2b9b150d749",
+    "repository_dirty": true
+  },
+  "ordinary_no_argument_catalog": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json",
+    "sha256": "d9e243080e75c8a6bf27229c900bb4b7e3adabb320b8873688964e7a9bbf13f1",
+    "case_count": 605
+  },
+  "source_bindings": [
+    {
+      "path": "c_api/tests/builtin_api_contract.c",
+      "sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
+    },
+    {
+      "path": "c_api/tests/consumer_allocator.h",
+      "sha256": "c888b195716ea9ea6023b01d06e9b21eb82035f6ee5beca1cf2bb7095749268c"
+    },
+    {
+      "path": "tests/c/argument_registry_callbacks.h",
+      "sha256": "552a3ec6b7776dd6f1376e1db0de43d7c065726e18b2f336e09e39cd9020907e"
+    },
+    {
+      "path": "scripts/check-debug-console-c.ps1",
+      "sha256": "f87187a8be65d2a11e9dc869c2eb84bb0ba9a25974341a1e3ce7daffe4410d80"
+    },
+    {
+      "path": "scripts/check-debug-console.ps1",
+      "sha256": "952be56d9dbdd688bf13ea196ff85e9f2fe47425470cad54924ecffd321d1b31"
+    },
+    {
+      "path": "scripts/check.ps1",
+      "sha256": "b99d82db89097cbc163645c3a6cec0e62464e501942ede12d25b32f963b30df2"
+    },
+    {
+      "path": "scripts/check-instrumented.ps1",
+      "sha256": "b7bd0d5e32d4b4da0936ef28b1623cb64be160c8f6f600173854aef5a978c484"
+    }
+  ],
+  "cases": [
+    {
+      "id": "builtin-debug-console-host",
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "debug_console_host",
+      "argv": [
+        "--debug-console-host"
+      ],
+      "driver": "scripts/check-debug-console-c.ps1",
+      "required_roles": [
+        "ReferenceC",
+        "Ada"
+      ],
+      "required_configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "named_stdout_lines": [
+        "PASS: builtin-debug-console-host",
+        "PASS: public builtin contract"
+      ],
+      "exact_same_host_stream_comparison": true,
+      "actual_fixed_stdin": "collectgarbage();assert(watch[1]~=nil)\ncollectgarbage();assert(watch[1]==nil)\ncont\n",
+      "scope": "Separate mandatory actual invocation of the console mode, not the no-argument consumer process.",
+      "native_header_role": "pinned-public-SDK default; pinned real ltests.h upstream-test",
+      "allocator_balance_claim": false,
+      "frozen_context_reconciliation": "pending-explicit-report-validation-and-membership",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "id": "builtin-debug-console-host-close",
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "debug_console_host_close",
+      "argv": [
+        "--debug-console-host-close"
+      ],
+      "driver": "scripts/check-debug-console-c.ps1",
+      "required_roles": [
+        "ReferenceC",
+        "Ada"
+      ],
+      "required_configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "named_stdout_lines": [
+        "PASS: builtin-debug-console-host-close",
+        "PASS: public builtin contract"
+      ],
+      "exact_same_host_stream_comparison": true,
+      "actual_fixed_stdin": "collectgarbage();assert(watch[1]~=nil)\ncollectgarbage();assert(watch[1]==nil)\ncont\n",
+      "scope": "Separate mandatory actual invocation of the console mode, not the no-argument consumer process.",
+      "native_header_role": "pinned-public-SDK default; pinned real ltests.h upstream-test",
+      "allocator_balance_claim": false,
+      "frozen_context_reconciliation": "pending-explicit-report-validation-and-membership",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "id": "builtin-debug-console-callback-close",
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "debug_console_callback_close",
+      "argv": [
+        "--debug-console-callback-close"
+      ],
+      "driver": "scripts/check-debug-console-c.ps1",
+      "required_roles": [
+        "ReferenceC",
+        "Ada"
+      ],
+      "required_configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "named_stdout_lines": [
+        "PASS: builtin-debug-console-callback-close",
+        "PASS: public builtin contract"
+      ],
+      "exact_same_host_stream_comparison": true,
+      "actual_fixed_stdin": "collectgarbage();assert(watch[1]~=nil)\ncollectgarbage();assert(watch[1]==nil)\ncont\n",
+      "scope": "Separate mandatory actual invocation of the console mode, not the no-argument consumer process.",
+      "native_header_role": "pinned-public-SDK default; pinned real ltests.h upstream-test",
+      "allocator_balance_claim": false,
+      "frozen_context_reconciliation": "pending-explicit-report-validation-and-membership",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "id": "builtin-debug-console-callback-error",
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "debug_console_callback_error",
+      "argv": [
+        "--debug-console-callback-error"
+      ],
+      "driver": "scripts/check-debug-console-c.ps1",
+      "required_roles": [
+        "ReferenceC",
+        "Ada"
+      ],
+      "required_configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "named_stdout_lines": [
+        "PASS: builtin-debug-console-callback-error",
+        "PASS: public builtin contract"
+      ],
+      "exact_same_host_stream_comparison": true,
+      "actual_fixed_stdin": "collectgarbage();assert(watch[1]~=nil)\ncollectgarbage();assert(watch[1]==nil)\ncont\n",
+      "scope": "Separate mandatory actual invocation of the console mode, not the no-argument consumer process.",
+      "native_header_role": "pinned-public-SDK default; pinned real ltests.h upstream-test",
+      "allocator_balance_claim": false,
+      "frozen_context_reconciliation": "pending-explicit-report-validation-and-membership",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    }
+  ],
+  "remaining_requirements": [
+    "Independently review the four exact mode functions and process contract.",
+    "Freeze and validate both console report kinds, their actual C source/header/compiler/image/input/capture identities, and complete four-mode coverage in each required context.",
+    "Reconcile the conditional operations separately from the unchanged605 no-argument C candidates; never count a printed ordinary footer as execution of these modes.",
+    "Fresh final committed context observations and envelope review remain required. Source candidacy and earlier component captures grant no acceptance."
+  ]
+}

@@ -11,7 +11,7 @@
   "execution_evidence": [],
   "source_exclusions": [],
   "source_snapshot": {
-    "revision": "ce0907ef353ee74941f5a248e447483ec93c8abe",
+    "repository_revision": "0b95cc880ce35367ecdd8a5cbdbaa2b9b150d749",
     "repository_dirty": true
   },
   "feature_review": {
@@ -25,7 +25,7 @@
     },
     {
       "path": "scripts/CliFixtureEvidence.psm1",
-      "sha256": "8892496577efb47616179de544c2473622ccde1f9a1cd1e1182dbd13d50cf0a3"
+      "sha256": "a560f2bde26002e15db3a467015cc585fdda18adf05cc913dbd0bd8c0b2693c8"
     },
     {
       "path": "scripts/ConformanceRunner.psm1",
@@ -33,31 +33,31 @@
     },
     {
       "path": "scripts/check-cli.ps1",
-      "sha256": "70b8e2e1b3708d2c7a92306933ed743d698b334c1c4e4463bcf994fb9b1cb8bd"
+      "sha256": "fb9a159f790d82509ec2a988b08ba900dd4baed1baf875aa65736b3c8897aacc"
     },
     {
       "path": "scripts/check-configured-cli.ps1",
-      "sha256": "5d97dbbc683b0676ab4265cdfeb6e8c92c25307d2600df4fcfb29ab1f99e012e"
+      "sha256": "b84bd892af7b32764b0d04a25cd163b65fd65e980f71ab02a62dca22a7327d94"
     },
     {
       "path": "scripts/ConfiguredFixtureEvidence.psm1",
-      "sha256": "76b488bba3f6e67b476d5f0324d7ae79c8d2c3765573996741b2c5438394c457"
+      "sha256": "fcd32bc93b944b2559cfc662eff97b9903b9f3864b665c29fffcdd0c2a661a3b"
     },
     {
       "path": "scripts/compare.ps1",
-      "sha256": "b89cf01a02b244e820c97a85ebfeb727f5125400a948aefe6ef8997360e5d6c4"
+      "sha256": "aa20fc6e085f65fa48390d05b6de2d12c4eefbd1ba9ec0f0b518929ada87c304"
     },
     {
       "path": "scripts/check.ps1",
-      "sha256": "bf96f7e568269b1efcb530a2d29365ada6fb28f6cd145aa4f66e0d90903806ee"
+      "sha256": "b99d82db89097cbc163645c3a6cec0e62464e501942ede12d25b32f963b30df2"
     },
     {
       "path": "scripts/check-instrumented.ps1",
-      "sha256": "c02337787dff4a6be7712e3c867278b27b8b0abeb515e248b9026d1486865c4e"
+      "sha256": "b7bd0d5e32d4b4da0936ef28b1623cb64be160c8f6f600173854aef5a978c484"
     },
     {
       "path": "scripts/TargetWitnessPolicy.psm1",
-      "sha256": "bd7d340670a5ed369120cc44e5f7e913591c0bbdbcbad98d2887b5b81633db20"
+      "sha256": "0d48ad880351060579050a2f12bf0b00c2ce2007313ca7e3e38cf6eed3b87855"
     },
     {
       "path": "scripts/TargetObservationEnvelope.psm1",
@@ -73,7 +73,7 @@
     },
     {
       "path": "tests/conformance/targets/configured-fixture-classification.json",
-      "sha256": "02736f30c4aa799b615f49538f1697ceb49c6cb95b3f305ecacb8c418c10446b"
+      "sha256": "ba14fbf45c63c160d3c8009f96bafd02cbf480c7ae7f058b263f2dd29a067dfa"
     }
   ],
   "review_scope": [

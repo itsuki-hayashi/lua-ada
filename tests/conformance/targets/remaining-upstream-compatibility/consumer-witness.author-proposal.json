@@ -153,15 +153,15 @@
     },
     {
       "path": "scripts/check.ps1",
-      "sha256": "bf96f7e568269b1efcb530a2d29365ada6fb28f6cd145aa4f66e0d90903806ee"
+      "sha256": "b99d82db89097cbc163645c3a6cec0e62464e501942ede12d25b32f963b30df2"
     },
     {
       "path": "scripts/check-instrumented.ps1",
-      "sha256": "c02337787dff4a6be7712e3c867278b27b8b0abeb515e248b9026d1486865c4e"
+      "sha256": "b7bd0d5e32d4b4da0936ef28b1623cb64be160c8f6f600173854aef5a978c484"
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "bc34d494cca9a7010331c5fc3e14c23161805eba3a36426e0487573bebeccd8b"
+      "sha256": "5e95b5440a4e497bbe5f466504540ebc1ad2e1fd3a438a764ba36e7ca23f3963"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
@@ -253,7 +253,7 @@
     },
     {
       "path": "c_api/tests/builtin_api_contract.c",
-      "sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "path": "c_api/tests/traceback_api_contract.c",
@@ -8918,7 +8918,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -8933,7 +8933,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -8948,7 +8948,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -8963,7 +8963,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -8978,7 +8978,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -8993,7 +8993,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9008,7 +9008,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9023,7 +9023,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9038,7 +9038,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9053,7 +9053,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9068,7 +9068,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9083,7 +9083,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9098,7 +9098,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9113,7 +9113,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9128,7 +9128,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9143,7 +9143,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9158,7 +9158,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9173,7 +9173,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9188,7 +9188,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9203,7 +9203,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9218,7 +9218,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9233,7 +9233,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9248,7 +9248,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/builtin_api_contract.c",
@@ -9263,7 +9263,7 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "source": "c_api/tests/traceback_api_contract.c",
@@ -9846,7 +9846,7 @@
       "runtime_acceptance": false,
       "coverage_authority": false,
       "execution_evidence": [],
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "consumer": "builtin-api",
@@ -9862,7 +9862,7 @@
       "runtime_acceptance": false,
       "coverage_authority": false,
       "execution_evidence": [],
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "consumer": "builtin-api",
@@ -9878,7 +9878,7 @@
       "runtime_acceptance": false,
       "coverage_authority": false,
       "execution_evidence": [],
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "consumer": "builtin-api",
@@ -9894,7 +9894,7 @@
       "runtime_acceptance": false,
       "coverage_authority": false,
       "execution_evidence": [],
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "consumer": "builtin-api",
@@ -9910,7 +9910,7 @@
       "runtime_acceptance": false,
       "coverage_authority": false,
       "execution_evidence": [],
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "consumer": "index-type-api",
@@ -9974,7 +9974,7 @@
       "runtime_acceptance": false,
       "coverage_authority": false,
       "execution_evidence": [],
-      "source_sha256": "340725ca11ccc8e95dc74470db09e3142544ddc7340a8f7bd676f1bbc12a9de3"
+      "source_sha256": "c7c568d5cce20a372ea2c0f158edfc03e3c50216e00e71c0c64baab9296df87d"
     },
     {
       "consumer": "load-dump-api",
