@@ -442,6 +442,13 @@ function Write-TargetBuildWitnesses {
     foreach ($file in Get-ChildItem -LiteralPath (Join-Path $Root 'reports/core-image') -Filter result.json -File -Recurse) {
         if ($file.FullName -cin $PreviousReports) { continue }
         $value = Get-Content -LiteralPath $file.FullName -Raw | ConvertFrom-Json -AsHashtable -Depth 48
+        # Console subprocess reports are distinct protocols. In particular
+        # their C source/configuration fields do not make them AUnit reports.
+        # Their eventual frozen-image binding remains separately required;
+        # this named collector must not borrow them as ordinary consumer or
+        # no-argument AUnit evidence.
+        if($value.Contains('kind') -and $value.kind -cin @(
+            'debug-console-process-regressions','debug-console-c-process-regressions')){continue}
         if ($value.repository_revision -cne $revision -or $value.configuration -cne $parts[0] -or
             $value.platform -cne $parts[1] -or $value.profile -cne $parts[2] -or $value.library_type -cne $library) { continue }
         if ($value.Contains('consumers')) { $consumerPaths += $file.FullName }
