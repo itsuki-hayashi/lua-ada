@@ -1,4 +1,19 @@
 package Lua.Sessions.CLI is
+   function Execute
+     (Self : in out Session; Source, Name : String;
+      Arguments : Argument_Array := No_Arguments) return Execution_Result;
+   --  CLI docall policy: compile before installing the actual error handler,
+   --  then execute behind one real protected C caller. The handler sees the
+   --  intact failed frames and original error value. No engine value escapes.
+   --  Generic Session.Execute retains its ordinary embedding policy.
+
+   function Execute_Display
+     (Self : in out Session; Source : String;
+      Name : String; Display_Failed : out Boolean) return Execution_Result;
+   --  Apply CLI docall policy to the compiled REPL chunk, then invoke current
+   --  print in its separate ordinary display phase. Neither compilation nor
+   --  print failure is transformed by the chunk's message handler.
+
    function Write_Prompt
      (Self : in out Session; First_Line : Boolean) return Execution_Result;
    --  CLI-only operation: resolve _PROMPT/_PROMPT2 through the actual global
