@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [native allocator loaded image](2026-11-08-allocator-loaded-image.md).
+
 Correction: [Heavy allocator ceilings and observation](2026-11-08-heavy-allocator-observation.md).
 
 Component: [actual cached string hash](2026-11-08-test-string-hash.md).

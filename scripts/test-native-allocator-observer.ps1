@@ -20,6 +20,12 @@ $arguments=@('-std=c99','-Wall','-Wextra','-Werror','-pedantic','-DLUA_BUILD_AS_
     ('-I'+(Join-Path $root 'references/lua')),
     (Join-Path $root 'experiments/conformance/c/allocator_observer_probe.c'),
     ('-L'+$libraryPath),'-lconformance_lua','-o',$exe)
+if(-not $IsWindows){
+    # Resolve the real shared data address through the GOT. A non-PIC Linux
+    # executable may otherwise create a copy relocation for l_memcontrol.
+    $arguments+='-fPIC'
+}
+if($IsLinux){$arguments+='-ldl'}
 $build=Invoke-ConformanceProcess -Executable $compilerPath -Arguments $arguments -Directory $root `
     -OutputPrefix (Join-Path $OutputDirectory 'compile') -TimeoutSeconds 120
 if($build.exit_code -ne 0 -or $build.stderr_bytes -ne 0 -or $build.timed_out -or
@@ -40,6 +46,22 @@ $expected=@(
     'successful growth and free are not refusals',
     'original teardown and zero ownership')
 $stdout=[IO.File]::ReadAllText($run.stdout_path).Replace("`r`n","`n")
+$lines=$stdout.Split("`n")
+if($lines[0] -cnotmatch '^ALLOCATOR OBSERVER RUNTIME: (.+)$'){
+    throw 'Actual native allocator observer did not identify its loaded runtime'
+}
+$loadedPath=(Resolve-Path -LiteralPath $Matches[1]).Path
+$loadedDirectory=Split-Path -Parent $loadedPath
+$pathComparison=if($IsWindows){[StringComparison]::OrdinalIgnoreCase}else{[StringComparison]::Ordinal}
+if(-not [string]::Equals($loadedDirectory,$libraryPath,$pathComparison)){
+    throw 'Actual native allocator observer loaded a different runtime directory'
+}
+$expectedRuntime=if($IsWindows){'libconformance_lua.dll'}elseif($IsMacOS){'libconformance_lua.dylib'}else{'libconformance_lua.so'}
+if(-not [string]::Equals([IO.Path]::GetFileName($loadedPath),$expectedRuntime,$pathComparison)){
+    throw 'Actual native allocator observer loaded an unexpected runtime image'
+}
+$loadedHash=(Get-FileHash -LiteralPath $loadedPath).Hash.ToLowerInvariant()
+$stdout=($lines|Select-Object -Skip 1)-join "`n"
 if($run.exit_code -ne 0 -or $run.stderr_bytes -ne 0 -or $run.timed_out -or
     $run.capture_exceeded -or $run.pipe_drain_failed -or $run.abnormal_exit_kind -or
     $stdout -cne (($expected|ForEach-Object{'ALLOCATOR OBSERVER PASS: '+$_}) -join "`n")+"`n"){
@@ -54,7 +76,8 @@ $result=@{schema_version=1;kind='native-allocator-observer-regressions';
     library_directory=$libraryPath;compile=$build;process=$run;
     sources=@($sources|ForEach-Object{@{path=$_;sha256=(Get-FileHash (Join-Path $root $_)).Hash.ToLowerInvariant()}});
     libraries=@(Get-ChildItem -LiteralPath $libraryPath -File|ForEach-Object{@{name=$_.Name;sha256=(Get-FileHash $_.FullName).Hash.ToLowerInvariant()}});
-    runtime_acceptance=$false;coverage_authority=$false;loaded_runtime_linkage_verified=$false;
+    loaded_runtime=@{path=$loadedPath;sha256=$loadedHash;identity_source='OS mapping of actual l_memcontrol data address'};
+    runtime_acceptance=$false;coverage_authority=$false;loaded_runtime_linkage_verified=$true;
     scope='Actual observer unit protocol; final frozen-image linkage and whole-target acceptance remain separate.'}
 [IO.File]::WriteAllText((Join-Path $OutputDirectory 'result.json'),
     ($result|ConvertTo-Json -Depth 32).Replace("`r`n","`n")+"`n",[Text.UTF8Encoding]::new($false))

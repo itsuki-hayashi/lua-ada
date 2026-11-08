@@ -1,4 +1,7 @@
 /* Oracle-only observer regression; no reference implementation enters Ada. */
+#ifndef _WIN32
+#define _GNU_SOURCE
+#endif
 #include "lua.h"
 #include "lauxlib.h"
 #include "ltests.h"
@@ -6,11 +9,38 @@
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
 
 LUA_API size_t conformance_live_bytes(void);
 LUA_API size_t conformance_live_blocks(void);
 LUA_API unsigned long long conformance_refusals(void);
 LUA_API unsigned long long conformance_backing_refusals(void);
+
+static void report_runtime(void) {
+    /* Resolve an actual exported data address, avoiding nonportable conversion
+     * of a function pointer. The same T startup checks its allocator and this
+     * l_memcontrol object belong together. The parent hashes this OS path. */
+#ifdef _WIN32
+    HMODULE module = NULL;
+    char path[32768];
+    DWORD count;
+    assert(GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                             GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                             (LPCSTR)&l_memcontrol, &module));
+    count = GetModuleFileNameA(module, path, sizeof path);
+    assert(count != 0 && count < sizeof path);
+    printf("ALLOCATOR OBSERVER RUNTIME: %s\n", path);
+#else
+    Dl_info info;
+    assert(dladdr((void *)&l_memcontrol, &info) != 0);
+    assert(info.dli_fname != NULL);
+    printf("ALLOCATOR OBSERVER RUNTIME: %s\n", info.dli_fname);
+#endif
+}
 
 static void unchanged_bytes(const unsigned char *p) {
     size_t i;
@@ -29,6 +59,7 @@ int main(void) {
     assert(L != NULL);
     allocator = lua_getallocf(L, &data);
     assert(allocator == debug_realloc && data == &l_memcontrol);
+    report_runtime();
     /* Loading T exercises the pinned allocator identity assertion too. */
     luaL_requiref(L, "T", luaB_opentests, 1);
     lua_pop(L, 1);
