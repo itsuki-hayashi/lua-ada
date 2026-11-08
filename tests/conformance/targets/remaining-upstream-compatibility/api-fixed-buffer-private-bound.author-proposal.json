@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "kind": "api-fixed-buffer-private-bound-author-proposal",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source": {
+    "path": "references/lua/testes/api.lua",
+    "sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0"
+  },
+  "original_mixed_assertion": {
+    "proposed_disposition": "ada-internal-equivalent",
+    "generated_anchor": {
+      "id": "LUA-API-ASSERT-CALL-0125",
+      "kind": "assert-call",
+      "byte_offset": 17039,
+      "byte_length": 6,
+      "line": 580,
+      "end_line": 580,
+      "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": null,
+      "configurations": [],
+      "evidence": [],
+      "review": null
+    },
+    "full_expression": {
+      "byte_offset": 17039,
+      "byte_length": 33,
+      "anchor_sha256": "9c64cb79308eea2b302880a35a479936b515b820ed8c610d1d23f5158593b3d2",
+      "original_bytes": "assert(m2 > m1 and m2 - m1 < 400)",
+      "line": 580
+    },
+    "status": "pending-independent-review",
+    "evidence": [],
+    "proposed_resolution": "Keep this original anchor and require independently reviewed, actually executed positive-growth plus chunk/debug behavior. It is never an exclusion."
+  },
+  "proposed_private_child": {
+    "record": {
+      "id": "LUA-API-REVIEWED-BLOCK-9001",
+      "kind": "reviewed-block",
+      "byte_offset": 17053,
+      "byte_length": 18,
+      "anchor_sha256": "f89400b75cf254feed3cc991449a9e7bc1679e6cd9b5b6be1b6598dfa176bf55",
+      "line": 580,
+      "end_line": 580,
+      "status": "pending",
+      "disposition": "pending",
+      "invariant": null,
+      "configurations": [],
+      "evidence": [],
+      "review": null
+    },
+    "proposed_exclusion": {
+      "id": "LUA-API-REVIEWED-BLOCK-9001",
+      "source": "api.lua",
+      "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+      "byte_offset": 17053,
+      "byte_length": 18,
+      "anchor_sha256": "f89400b75cf254feed3cc991449a9e7bc1679e6cd9b5b6be1b6598dfa176bf55",
+      "status": "excluded",
+      "disposition": "reviewed-t-internal-exclusion",
+      "configurations": [
+        "upstream-test"
+      ],
+      "eligibility": "t-only-private-invariant",
+      "public_api": false,
+      "mixed_obligation": false,
+      "module_observable": false,
+      "invariant": "Exact less-than-400-byte C allocation bound after loading a binary chunk from a fixed buffer",
+      "third_party_irrelevance": "Author inference awaiting independent review: the pinned API permits avoiding copies but does not promise a 400-byte implementation allocation ceiling. Ada retains independently owned canonical code; public B-mode acceptance, reader block/alignment/count requirements, caller lifetime, positive growth, executable results and debug lines remain required.",
+      "t_guard": {
+        "byte_length": 101,
+        "sha256": "6f5f4b60db25bfae9020333e97d5aaa7b3b807e4086af05ea36003dd45f81c90",
+        "byte_offset": 64,
+        "mode": "absent-return"
+      },
+      "evidence": [],
+      "review": {
+        "reviewer": null,
+        "artifact_sha256": null,
+        "artifact": null,
+        "status": "pending",
+        "author": "Codex /root/validation_delivery"
+      }
+    },
+    "parent_expression": {
+      "byte_offset": 17039,
+      "byte_length": 33,
+      "anchor_sha256": "9c64cb79308eea2b302880a35a479936b515b820ed8c610d1d23f5158593b3d2",
+      "original_bytes": "assert(m2 > m1 and m2 - m1 < 400)",
+      "line": 580
+    },
+    "parent_generated_anchor_id": "LUA-API-ASSERT-CALL-0125",
+    "author_inference": "Only the pure upper-bound conjunct is C storage/optimization specific. The neighboring positive-growth assertion is retained byte-identically."
+  },
+  "preserved_spans": [
+    {
+      "byte_offset": 17046,
+      "byte_length": 7,
+      "anchor_sha256": "9114998f9e307778f192dd0df246c51b0a6e97ae6ddc18e3e6f5a2be5b514449",
+      "original_bytes": "m2 > m1",
+      "line": 580
+    },
+    {
+      "byte_offset": 16621,
+      "byte_length": 31,
+      "anchor_sha256": "ce727347d7ab11658353b8cc20f0ca81d4e1cee5c5b863e32ea13af6cfd7b260",
+      "original_bytes": "assert(#source > N * 4 * 4 + N)",
+      "line": 568
+    },
+    {
+      "byte_offset": 17075,
+      "byte_length": 57,
+      "anchor_sha256": "66aac34b94e0e9b39df6c474a84c3680fae26f88fc7cccaceff6124da17f707d",
+      "original_bytes": "X = 0; code(); assert(X == N and Y == string.rep(\"a\", N))",
+      "line": 581
+    },
+    {
+      "byte_offset": 17540,
+      "byte_length": 23,
+      "anchor_sha256": "0202114496cd899a58d97d15ea6c6ff067ff9bac12a7d36c0565a3229255296e",
+      "original_bytes": "checkerr(\":301:\", code)",
+      "line": 596
+    }
+  ],
+  "public_contract_source": {
+    "byte_offset": 128525,
+    "interpretation": "ModeB is public. Caller buffer lifetime and whole-first-read requirements remain; avoiding internal copies is permitted, and the exact C 400-byte private threshold requires separate eligibility review.",
+    "path": "references/lua/manual/manual.of",
+    "byte_length": 666,
+    "anchor_sha256": "91c0ba7c2e007a606de7e22fb4f67f9e71c8268d9c9006668c73e9801f36deb3",
+    "source_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+  },
+  "public_counterparts": [
+    {
+      "sha256": "45d4ff1c4704cb6ecb3af30c592fbf87c0d33882f40196c6f0833020c58f7b9d",
+      "expected_stdout": "API FIXED BUFFER PUBLIC OK",
+      "status": "pending-independent-review",
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-public.lua"
+    },
+    {
+      "sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989",
+      "required_witnesses": [
+        "C API PASS: reader piece lifetime and deferred execution",
+        "C API PASS: fixed binary reader consumes one stable block",
+        "C API PASS: fixed binary reader enforces actual piece boundaries"
+      ],
+      "status": "retain-required-runtime-evidence",
+      "path": "c_api/tests/load_dump_contract.h"
+    }
+  ],
+  "implementation_source": {
+    "interpretation": "Owned canonical representation, with B-mode contiguous block requirements retained; not normative proof by itself.",
+    "sha256": "8b681ec3b245bbcd6ac41d20b2260ff25039111b816c7c50feed140518d9844f",
+    "path": "src/lua-chunks.ads"
+  },
+  "required_next_actions": [
+    "Independent feature review of the exact child span, public contract interpretation and retained parent obligation; no self approval.",
+    "Append only independently reviewed derived child records while preserving every original lexical anchor and all protected scope descriptors.",
+    "Keep the original mixed assertion required as a reviewed equivalent; a private child alone cannot complete it or supply pass evidence.",
+    "Approve the exact source-only exclusion before binding/approving this precise empty replacement. No adapted Ada execution is authorized by this packet.",
+    "Observe original C and independently approved derived Ada whole-file behavior in every applicable fresh immutable context, including every public B-mode counterpart.",
+    "Local first-party diagnostic allocation/public probes are not original full-api execution evidence, a semantic approval, or final acceptance."
+  ],
+  "author_observations": [
+    {
+      "path": "reports/fixed-buffer-private-author/c32476c4c25a44d782d0236b4338b4a5/observations.json",
+      "sha256": "4fdc6ea226d549d493af87adafb1d1e8d3c31428012d580135251e90ceb0c78f",
+      "scope": "First-party diagnostic component observations; not original whole-api evidence or approval",
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "path": "reports/fixed-buffer-public-author/0ec109c8abad4d1e8feb0b87a5815fc8/observations.json",
+      "sha256": "1666bd577b490526b986e821398cfcf651b61d06a63e8fc73d4a59e31239c170",
+      "scope": "First-party diagnostic component observations; not original whole-api evidence or approval",
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    }
+  ]
+}

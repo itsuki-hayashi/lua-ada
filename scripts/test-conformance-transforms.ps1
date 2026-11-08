@@ -544,6 +544,26 @@ Case 'Aggregate derived tree keeps original snapshots immutable and detects chan
     Reject {Replay-AggregateReport} 'execution contract'
 }
 
+Case 'API mixed assertion reconstruction removes only its separately bound private conjunct' {
+    # Real immutable source with an explicitly synthetic resolved-exclusion
+    # object tests byte reconstruction only. No approval is installed and
+    # no original or adapted Lua process executes in this fixture.
+    $packet=Get-Content (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.author-proposal.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+    $spec=Get-Content (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.transform.author-proposal.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+    $syntheticResolved=@{};$syntheticResolved[$packet.proposed_private_child.record.id]=$packet.proposed_private_child.proposed_exclusion
+    $r=Get-ConformanceTReplay -Root $root -Specification $spec -PolicySha256 $spec.exclusion_policy_sha256 -ResolvedExclusions $syntheticResolved -AllowUnreviewedDiagnostics
+    $text=[Text.Encoding]::UTF8.GetString($r.bytes)
+    Assert-True ($r.diagnostic_only -and $text.Contains('assert(m2 > m1)') -and
+        $text.Contains('X = 0; code(); assert(X == N and Y == string.rep("a", N))') -and
+        $text.Contains('checkerr(":301:", code)')) 'Private child erased retained growth, execution or debug behavior'
+    $wide=$spec|ConvertTo-Json -Depth 64|ConvertFrom-Json -AsHashtable -Depth 64
+    $wide.replacements[0].start_byte=$packet.original_mixed_assertion.full_expression.byte_offset
+    $wide.replacements[0].length_bytes=$packet.original_mixed_assertion.full_expression.byte_length
+    $wide.replacements[0].source_sha256=$packet.original_mixed_assertion.full_expression.anchor_sha256
+    Reject {Get-ConformanceTReplay -Root $root -Specification $wide -PolicySha256 $spec.exclusion_policy_sha256 -ResolvedExclusions $syntheticResolved -AllowUnreviewedDiagnostics} 'wider than or differs'
+    Reject {Get-ConformanceTReplay -Root $root -Specification $spec -PolicySha256 $spec.exclusion_policy_sha256 -ResolvedExclusions @{}} 'missing or duplicate approved exclusions'
+}
+
 Write-Output "PASS: $script:Cases exact-byte transform regressions; synthetic approval fixtures, no runtime conformance claim"
 $productionBlockers = @()
 foreach ($name in @('gc-ada-instrumented','files-windows-platform','files-macos-platform')) {

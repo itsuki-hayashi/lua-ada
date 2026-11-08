@@ -104,6 +104,16 @@ line/end-line citations within that same source file. Regenerated lexical
 anchors cannot be deleted or changed. A manual-audit unit remains pending
 until all generated/dynamic obligations have been inventoried and reviewed.
 
+A mixed assertion retains its original anchor and its required public runtime
+behavior. An independently reviewed private subexpression can be represented
+by an additional exact-span `reviewed-block`, with an exclusion targeting only
+that child. The original assertion still requires actual evidence as a reviewed
+equivalent; the child decision cannot supply that evidence or complete the
+parent. An exact empty replacement may remove the private conjunct while the
+public assertion and surrounding calls remain byte-identical. Author proposals
+such as the API fixed-buffer allocation-bound packet install no ledger records,
+exclusions, approvals or passing results.
+
 ## Resolution and evidence contract
 
 Pending entries have `status: pending`, `disposition: pending`, no invariant,

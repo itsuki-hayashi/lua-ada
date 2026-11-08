@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-transform",
+  "id": "api-fixed-buffer-private-bound",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": "references/lua/testes/api.lua",
+  "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+  "configuration": "upstream-test",
+  "exclusion_policy_sha256": "670661910142841d16c84ebaad69117c79d12b96e25ae6801218cd8d0d0461a5",
+  "replacements": [
+    {
+      "id": "fixed-buffer-private-allocation-bound",
+      "exclusion_id": "LUA-API-REVIEWED-BLOCK-9001",
+      "start_byte": 17053,
+      "length_bytes": 18,
+      "source_sha256": "f89400b75cf254feed3cc991449a9e7bc1679e6cd9b5b6be1b6598dfa176bf55",
+      "replacement": ""
+    }
+  ],
+  "output_sha256": "51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc",
+  "author_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.author-proposal.json",
+    "sha256": "e58c5e4e6c39274ccd87d8f02bd9d93848c520f3a7dbbfb5ae4097d189ced66a"
+  },
+  "policy_binding_status": "Pending independent feature review and exclusion installation. Current empty-policy hash is not authorization.",
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "review": {
+    "reviewer": null,
+    "artifact_sha256": null,
+    "artifact": null,
+    "status": "pending",
+    "author": "Codex /root/validation_delivery"
+  }
+}

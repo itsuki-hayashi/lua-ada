@@ -3,6 +3,7 @@ param()
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'ConformanceTransforms.psm1')
 $utf8 = [Text.UTF8Encoding]::new($false)
 $temporary = Join-Path $root ('reports/exclusion-selftest/' + [Guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($temporary)
@@ -369,6 +370,67 @@ Case 'target overlay resolves one cited obligation without rewriting its ledger'
     $policy.exclusions = @($f.exclusion,$f.exclusion); Write-Json $policyPath $policy
     Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $inventory `
         -TargetPolicy remaining-upstream-compatibility } 'duplicate source exclusion'
+}
+
+Case 'a private child of a mixed assertion preserves its original anchor and retained runtime bytes' {
+    # Real pinned source spans plus synthetic decisions exercise the schema.
+    # No Lua process runs and no production source/exclusion record changes.
+    $source='api.lua';$bytes=[IO.File]::ReadAllBytes((Join-Path $root 'references/lua/testes/api.lua'))
+    $text=[Text.Encoding]::Latin1.GetString($bytes)
+    $guardStart=$text.IndexOf('if T==nil then');$guardLength=$text.IndexOf('end',$guardStart)+3-$guardStart
+    $f=New-Fixture -Text $text -Mode absent-return -GuardStart $guardStart -GuardLength $guardLength
+    $whole='assert(m2 > m1 and m2 - m1 < 400)';$private=' and m2 - m1 < 400'
+    $parentOffset=$text.IndexOf($whole);$privateOffset=$text.IndexOf($private,$parentOffset)
+    Assert-True ($parentOffset -gt 0 -and $privateOffset -gt $parentOffset) 'Pinned mixed assertion changed'
+    $inventory=Join-Path $f.root 'inventory';[void][IO.Directory]::CreateDirectory((Join-Path $inventory 'targets'))
+    foreach($name in @('suite.json','c-api.jsonl','coverage')){Copy-Item -LiteralPath (Join-Path $root "tests/conformance/$name") -Destination $inventory -Recurse}
+    $path=Join-Path $inventory 'coverage/api.jsonl';$records=@(Read-ConformanceJsonLines $path)
+    $parent=@($records|Where-Object{$_.kind -ceq 'assert-call' -and $_.byte_offset -eq $parentOffset})[0]
+    $parentBefore=ConvertTo-Json $parent -Depth 32 -Compress
+    $child=@{id='LUA-API-REVIEWED-BLOCK-9999';kind='reviewed-block';byte_offset=$privateOffset;
+        byte_length=$private.Length;anchor_sha256=(Get-ConformanceHash ($utf8.GetBytes($private)));
+        line=580;end_line=580;status='pending';disposition='pending';invariant=$null;configurations=@();evidence=@();review=$null}
+    Write-ConformanceJsonLines $path (@($records)+@($child))
+    $f.source=$source;$f.bytes=$bytes;$f.record=$child
+    foreach($key in @('id','byte_offset','byte_length','anchor_sha256')){$f.exclusion[$key]=$child[$key]}
+    $f.exclusion.source=$source
+    $f.exclusion.invariant='Only the exact C storage optimization allocation upper bound'
+    $f.review_prefix=[IO.Path]::GetRelativePath($root,$f.root).Replace('\','/')
+    $f.exclusion.review.artifact=$f.review_prefix+'/approval.json'
+    Write-Json (Join-Path $f.root 'narrative.json') @{reviewer='fixture-reviewer';exclusion_id=$child.id;decision='accepted';
+        t_dominance='Pinned literal absent-T return';private_invariant='Synthetic decision for the exact upper-bound conjunct only';
+        third_party_irrelevance='The retained growth/execution/debug behavior is still required; this is a schema fixture, not feature approval'}
+    Set-Approval $f
+    $policy=@{schema_version=1;target='remaining-upstream-compatibility';reference_revision='7579fc9d7ed90240487251dfb69168f8e64e9294';
+        protected_scopes=$protectedScopes;exclusions=@($f.exclusion)}
+    Write-Json (Join-Path $inventory 'targets/remaining-upstream-compatibility.exclusions.json') $policy
+    $strict=Test-ConformanceInventory -Root $root -InventoryDirectory $inventory
+    $target=Test-ConformanceInventory -Root $root -InventoryDirectory $inventory -TargetPolicy remaining-upstream-compatibility
+    $parentAfter=@(Read-ConformanceJsonLines $path|Where-Object id -CEQ $parent.id)[0]
+    Assert-True ((ConvertTo-Json $parentAfter -Depth 32 -Compress) -ceq $parentBefore) 'Original mixed assertion anchor was rewritten'
+    Assert-True ($target.ExcludedSourceObligations -eq 1 -and $target.PendingSourceAnchors -eq $strict.PendingSourceAnchors -and
+        $target.RequiredPendingSourceAnchors -eq $strict.PendingSourceAnchors-1 -and -not $target.Complete -and -not $target.TargetComplete) 'Private child discharged its retained original anchor'
+    $change=@{id='private-upper-bound';start_byte=$privateOffset;length_bytes=$private.Length;source_sha256=$child.anchor_sha256;replacement=''}
+    $patched=Get-ConformancePatchedBytes -SourceBytes $bytes -Replacements @($change)
+    $expected=$text.Remove($privateOffset,$private.Length)
+    Assert-True ((Get-ConformanceHash $patched) -ceq (Get-ConformanceHash ($utf8.GetBytes($expected))) -and
+        [Text.Encoding]::UTF8.GetString($patched).Contains('assert(m2 > m1)') -and
+        [Text.Encoding]::UTF8.GetString($patched).Contains('X = 0; code(); assert(X == N and Y == string.rep("a", N))')) 'Private child altered retained execution bytes'
+    $f.exclusion.mixed_obligation=$true
+    Assert-Rejected {Test-ConformanceTargetExclusion -Root $root -Source $source -SourceBytes $bytes -Record $child -Exclusion $f.exclusion} 'without public or mixed behavior'
+}
+
+Case 'a reviewed split cannot complete while its retained public runtime child is pending' {
+    # These are fabricated linked record states, not executed observations.
+    $candidate=@{id='LUA-SAMPLE-ASSERT-CALL-0001';kind='assert-call';status='reviewed';classification='reference';
+        configurations=@('upstream-test');obligations=@('LUA-SAMPLE-REVIEWED-BLOCK-9001','LUA-SAMPLE-REVIEWED-BLOCK-9002')}
+    $private=@{id='LUA-SAMPLE-REVIEWED-BLOCK-9001';kind='reviewed-block';status='pending';configurations=@()}
+    $public=@{id='LUA-SAMPLE-REVIEWED-BLOCK-9002';kind='reviewed-block';status='pending';configurations=@('upstream-test')}
+    $resolved=@{$private.id=@{configurations=@('upstream-test')}}
+    Assert-Rejected {Test-ConformanceSourceLinks @($candidate,$private,$public) -RequireComplete -TargetPolicy remaining-upstream-compatibility -ResolvedExclusions $resolved} 'Linked runtime obligation remains pending'
+    $public.status='passed'
+    Test-ConformanceSourceLinks @($candidate,$private,$public) -RequireComplete -TargetPolicy remaining-upstream-compatibility -ResolvedExclusions $resolved
+    Assert-Rejected {Test-ConformanceSourceLinks @($candidate,$private,$public) -RequireComplete} 'Linked runtime obligation remains pending'
 }
 
 Write-Output "PASS: $script:Cases focused conformance exclusion tests"
