@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [canonical frame storage reduction](2026-11-08-canonical-frame-footprint.md).
+
 Component: [native CLI readline and fallback](2026-11-08-cli-native-readline.md).
 
 Observation: [retained Code execution and immutable artifacts](2026-11-08-code-local-execution.md).

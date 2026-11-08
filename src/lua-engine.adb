@@ -1281,8 +1281,6 @@ package body Lua.Engine is
          Item.Slots.Update_Element (Index, Clear_Packet'Access);
       end loop;
       Item.Active_Registers := 0;
-      Item.Canonical_Registers.Clear;
-      Item.Canonical_Cells.Clear;
       Item.Varargs.Clear;
       Item.Closers.Clear;
       Item.Unwind_Live.Clear;
@@ -1525,8 +1523,6 @@ package body Lua.Engine is
       Item.Closers.Set_Owner (Item.Memory);
       Item.Unwind_Live.Set_Owner (Item.Memory);
       Item.Unwind_Results.Set_Owner (Item.Memory);
-      Item.Canonical_Registers.Set_Owner (Item.Memory);
-      Item.Canonical_Cells.Set_Owner (Item.Memory);
       return Item;
    end New_Frame;
 
