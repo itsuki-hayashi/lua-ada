@@ -56,11 +56,12 @@ try {
         $pin -ne '7579fc9d7ed90240487251dfb69168f8e64e9294') {
         throw 'Frontend oracle requires the pinned Lua 5.5.1 checkout'
     }
+    $configurationPart=if($Configuration -ceq 'upstream-test'){'upstream-test/'}else{''}
     if (-not $Probe) {
-        $Probe = Join-Path $projectRoot "tests/bin/static/lexer_probe$suffix"
+        $Probe = Join-Path $projectRoot "tests/bin/${configurationPart}static/lexer_probe$suffix"
     }
     if (-not $OpcodeProbe) {
-        $OpcodeProbe = Join-Path $projectRoot "tests/bin/static/lua-opcode_probe$suffix"
+        $OpcodeProbe = Join-Path $projectRoot "tests/bin/${configurationPart}static/lua-opcode_probe$suffix"
     }
     foreach ($project in @('frontend_oracle', 'opcode_oracle')) {
         Invoke-Checked gprbuild @('-P', "experiments/frontend/$project.gpr",
