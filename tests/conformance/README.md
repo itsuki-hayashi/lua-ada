@@ -114,6 +114,26 @@ public assertion and surrounding calls remain byte-identical. Author proposals
 such as the API fixed-buffer allocation-bound packet install no ledger records,
 exclusions, approvals or passing results.
 
+Exclusion eligibility version 1 retains its original interpretation and rejects
+module-observable decisions. An explicit `eligibility_schema_version: 2`
+distinguishes the factual `module_observable` annotation from
+`module_compatibility_obligation`. The latter must be a real false boolean;
+public API behavior, mixed obligations, ordinary configurations, previous passes
+and accepted source partitions remain protected. Version 2 currently permits
+only a derived pure numeric comparison conjunct inside a hashed original
+assertion. Calls, statements, another Boolean branch and widening to the parent
+are rejected. This is an eligibility subset, not a Lua parser or runtime change.
+
+Version 2 requires an approval with schema version 2 and a separate independent
+feature decision. That decision binds the observation/compatibility flags, the
+retained parent, exact pinned manual bytes, retained counterpart source hashes,
+the reason no public bound is promised, and explicit retained behavior. A generic
+private-label rationale cannot replace it. A completed original assertion needs
+its own `ada-internal-equivalent` evidence and `source_exclusion_ids` linkage;
+alternatively, a reviewed reference must retain an unexcluded runtime child
+outside the private span. These rules keep visible implementation measurements
+from waiving application failure, cleanup or execution requirements.
+
 ## Resolution and evidence contract
 
 Pending entries have `status: pending`, `disposition: pending`, no invariant,

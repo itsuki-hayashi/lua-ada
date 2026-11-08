@@ -550,7 +550,11 @@ Case 'API mixed assertion reconstruction removes only its separately bound priva
     # no original or adapted Lua process executes in this fixture.
     $packet=Get-Content (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.author-proposal.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 64
     $spec=Get-Content (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.transform.author-proposal.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 64
-    $syntheticResolved=@{};$syntheticResolved[$packet.proposed_private_child.record.id]=$packet.proposed_private_child.proposed_exclusion
+    $syntheticExclusion=$packet.proposed_private_child.exclusion_candidate|ConvertTo-Json -Depth 64|ConvertFrom-Json -AsHashtable -Depth 64
+    # The pending author object is intentionally not an installed payload.
+    # Only this unit fixture supplies a synthetic resolved state.
+    $syntheticExclusion.status='excluded';$syntheticExclusion.disposition='reviewed-t-internal-exclusion'
+    $syntheticResolved=@{};$syntheticResolved[$packet.proposed_private_child.record.id]=$syntheticExclusion
     $r=Get-ConformanceTReplay -Root $root -Specification $spec -PolicySha256 $spec.exclusion_policy_sha256 -ResolvedExclusions $syntheticResolved -AllowUnreviewedDiagnostics
     $text=[Text.Encoding]::UTF8.GetString($r.bytes)
     Assert-True ($r.diagnostic_only -and $text.Contains('assert(m2 > m1)') -and

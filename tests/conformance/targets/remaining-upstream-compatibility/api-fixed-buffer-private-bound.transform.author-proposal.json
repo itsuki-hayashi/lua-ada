@@ -21,7 +21,7 @@
   "output_sha256": "51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc",
   "author_proposal": {
     "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.author-proposal.json",
-    "sha256": "e58c5e4e6c39274ccd87d8f02bd9d93848c520f3a7dbbfb5ae4097d189ced66a"
+    "sha256": "6cd1e2c1e912d22c4bcdbaee0c9587d47be903c27668fa7a5fd22f199574cab8"
   },
   "policy_binding_status": "Pending independent feature review and exclusion installation. Current empty-policy hash is not authorization.",
   "independent_review_status": "pending",

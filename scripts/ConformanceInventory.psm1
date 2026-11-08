@@ -3,6 +3,7 @@ $ErrorActionPreference = 'Stop'
 $script:ReferenceRevision = '7579fc9d7ed90240487251dfb69168f8e64e9294'
 $script:Utf8 = [Text.UTF8Encoding]::new($false, $true)
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceExclusionEligibility.psm1')
 $script:ExclusionBaselines = @(
     @{id='gc-io-events';path='tests/conformance/scopes/gc-io-events.json';
         sha256='79fa732f60f380c93be190f43640acf0b2ac595bdf9196d2fc8fd0a7ee62eae7'},
@@ -356,6 +357,128 @@ function Assert-ConformanceExclusionBaselineBinding {
     }
 }
 
+function Assert-ConformancePrivateBoundSource {
+    param([string] $Source,[byte[]] $Bytes,[Collections.IDictionary] $Record,[Collections.IDictionary] $Exclusion)
+    # V2 is a deliberately narrow source rule: a pure implementation bound
+    # can be a derived conjunct, while the original assertion remains a
+    # distinct required obligation. It cannot consume a call or statement.
+    $parent=$Exclusion.retained_parent
+    $original=@(Get-ConformanceCoverageUnits -Path $Source -Bytes $Bytes|Where-Object id -CEQ $parent.id)
+    if($Record.kind -cne 'reviewed-block' -or $parent.id -ceq $Record.id -or
+        $original.Count -ne 1 -or $original[0].kind -cne 'assert-call' -or $original[0].byte_offset -ne $parent.byte_offset -or
+        $parent.byte_offset -gt $Bytes.Length -or $parent.byte_length -gt $Bytes.Length-$parent.byte_offset -or
+        $Record.byte_offset -le $parent.byte_offset -or
+        $Record.byte_offset+$Record.byte_length -ge $parent.byte_offset+$parent.byte_length){
+        throw 'V2 private bound must be a derived child inside its retained original assertion'
+    }
+    $parentBytes=[byte[]]::new($parent.byte_length);[Array]::Copy($Bytes,$parent.byte_offset,$parentBytes,0,$parent.byte_length)
+    if((Get-ConformanceHash $parentBytes) -cne $parent.anchor_sha256){throw 'V2 retained parent source hash differs'}
+    $tokens=@(Get-ConformanceTokens $parentBytes)
+    if($tokens.Count -lt 5 -or $tokens[0].Text -cne 'assert' -or $tokens[1].Text -cne '(' -or $tokens[-1].Text -cne ')'){
+        throw 'V2 retained parent is not an exact assertion expression'
+    }
+    $depth=0
+    for($index=1;$index -lt $tokens.Count;$index++){
+        if($tokens[$index].IsString){continue}
+        if($tokens[$index].Text -ceq '('){$depth++}
+        elseif($tokens[$index].Text -ceq ')'){$depth--}
+        if($depth -lt 0 -or ($depth -eq 0 -and $index -ne $tokens.Count-1)){throw 'V2 retained parent crosses its assertion boundary'}
+    }
+    if($depth -ne 0){throw 'V2 retained parent assertion is unbalanced'}
+    $privateBytes=[byte[]]::new($Record.byte_length);[Array]::Copy($Bytes,$Record.byte_offset,$privateBytes,0,$privateBytes.Length)
+    $private=@(Get-ConformanceTokens $privateBytes)
+    if($private.Count -lt 4 -or $private[0].Text -cne 'and' -or
+        @($private|Where-Object{$_.IsString -or $_.Text -cin @('assert','function','return','if','then','else','elseif','for','while','do','repeat','until','end','local','goto','break','T',';','{','}')}).Count -ne 0 -or
+        @($private|Select-Object -Skip 1|Where-Object{$_.Text -cin @('and','or')}).Count -ne 0 -or
+        @($private|Where-Object{$_.Text -cmatch '^[0-9]'}).Count -eq 0 -or
+        @($private|Where-Object{$_.Text -cin @('<','>','=')}).Count -eq 0){
+        throw 'V2 private bound must be a pure comparison conjunct without public operations'
+    }
+    $privateDepth=0
+    for($index=1;$index -lt $private.Count;$index++){
+        if($private[$index].Text -ceq '('){$privateDepth++}
+        elseif($private[$index].Text -ceq ')'){$privateDepth--}
+        if($privateDepth -lt 0){throw 'V2 private bound crosses a retained expression delimiter'}
+        if($private[$index].Text -ceq '(' -and $private[$index-1].Text -cmatch '^[A-Za-z_]' -and
+            $private[$index-1].Text -cnotin @('and','or','not')){throw 'V2 private bound cannot remove a public or application call'}
+        if($private[$index].Text -ceq '=' -and
+            -not (($index -gt 0 -and $private[$index-1].Text -cin @('=','<','>','~')) -or
+                ($index+1 -lt $private.Count -and $private[$index+1].Text -ceq '='))){throw 'V2 private bound cannot contain an assignment'}
+    }
+    if($privateDepth -ne 0){throw 'V2 private bound crosses a retained expression delimiter'}
+}
+
+function Assert-ConformancePrivateBoundFeatureReview {
+    param([string] $Root,[Collections.IDictionary] $Exclusion,[Collections.IDictionary] $Decision)
+    if(@(@('schema_version','kind','feature_review')|Where-Object{-not $Decision.Contains($_)}).Count -ne 0){
+        throw 'V2 observable private bound lacks explicit independent feature review'
+    }
+    $feature=$Decision.feature_review
+    if($Decision.schema_version -ne 2 -or $Decision.kind -cne 't-private-bound-feature-review' -or
+        $feature -isnot [Collections.IDictionary] -or
+        @(@('module_observable','module_compatibility_obligation','observation_kind','retained_parent_id','no_public_bound_guarantee','rationale',
+            'retained_behaviors','public_contract_source','counterpart_source_bindings')|Where-Object{-not $feature.Contains($_)}).Count -ne 0 -or
+        $feature.module_observable -isnot [bool] -or $feature.module_observable -ne $Exclusion.module_observable -or
+        $feature.module_compatibility_obligation -isnot [bool] -or $feature.module_compatibility_obligation -or
+        $feature.observation_kind -cne $Exclusion.observation_kind -or $feature.retained_parent_id -cne $Exclusion.retained_parent.id -or
+        $feature.no_public_bound_guarantee -isnot [bool] -or -not $feature.no_public_bound_guarantee -or
+        [string]::IsNullOrWhiteSpace([string]$feature.rationale) -or $feature.retained_behaviors -isnot [Array] -or
+        $feature.retained_behaviors.Count -eq 0 -or @($feature.retained_behaviors|Where-Object{[string]::IsNullOrWhiteSpace([string]$_)}).Count -ne 0 -or
+        @($feature.retained_behaviors|Sort-Object -Unique).Count -ne $feature.retained_behaviors.Count){
+        throw 'V2 observable private bound lacks explicit independent feature relevance and retained-behavior review'
+    }
+    $contract=$feature.public_contract_source
+    if($contract -isnot [Collections.IDictionary] -or $contract.path -cne 'references/lua/manual/manual.of' -or
+        ($contract.byte_offset -isnot [int] -and $contract.byte_offset -isnot [long]) -or $contract.byte_offset -lt 0 -or
+        ($contract.byte_length -isnot [int] -and $contract.byte_length -isnot [long]) -or $contract.byte_length -le 0 -or
+        $contract.anchor_sha256 -cnotmatch '^[0-9a-f]{64}$'){throw 'V2 feature review lacks pinned public contract source'}
+    $path=Resolve-ReviewedFile -Root $Root -Path $contract.path -Sha256 $contract.source_sha256
+    $bytes=[IO.File]::ReadAllBytes($path)
+    if($contract.byte_offset -gt $bytes.Length -or $contract.byte_length -gt $bytes.Length-$contract.byte_offset){throw 'V2 public contract source span is outside its file'}
+    $span=[byte[]]::new($contract.byte_length);[Array]::Copy($bytes,$contract.byte_offset,$span,0,$span.Length)
+    if((Get-ConformanceHash $span) -cne $contract.anchor_sha256){throw 'V2 public contract source span hash differs'}
+    if($feature.counterpart_source_bindings -isnot [Array] -or $feature.counterpart_source_bindings.Count -eq 0){throw 'V2 feature review lacks retained counterpart source bindings'}
+    $seen=@{};$testSource=$false
+    foreach($binding in $feature.counterpart_source_bindings){
+        if($binding.path -cnotmatch '^(?:src|c_api/tests|tests/(?:c|lua|src|conformance/targets/remaining-upstream-compatibility))/[a-zA-Z0-9_-]+\.(?:c|h|lua|adb|ads)$' -or
+            $seen.ContainsKey($binding.path)){throw 'V2 feature review counterpart source binding is invalid or duplicate'}
+        $seen[$binding.path]=$true
+        if($binding.path -cmatch '^(?:c_api/tests|tests)/'){$testSource=$true}
+        [void](Resolve-ReviewedFile -Root $Root -Path $binding.path -Sha256 $binding.sha256)
+    }
+    if(-not $testSource){throw 'V2 feature review requires retained test counterpart source, not implementation claims alone'}
+}
+
+function Assert-ConformancePrivateBoundParentRecord {
+    param([Collections.IDictionary] $Exclusion,[Collections.IDictionary] $Records,[Collections.IDictionary] $Exclusions)
+    $id=$Exclusion.retained_parent.id
+    if(-not $Records.Contains($id) -or $Exclusions.Contains($id)){throw 'V2 retained original parent cannot be absent or excluded'}
+    $parent=$Records[$id]
+    if($parent.status -ceq 'pending'){return}
+    if($parent.status -ceq 'passed'){
+        if($parent.disposition -cne 'ada-internal-equivalent' -or -not $parent.Contains('source_exclusion_ids') -or
+            $parent.source_exclusion_ids -isnot [Array] -or $Exclusion.id -cnotin $parent.source_exclusion_ids){
+            throw 'V2 retained original assertion needs its own executed reviewed-equivalent evidence and exact child linkage'
+        }
+        return
+    }
+    # A source-reference classification needs a separate retained runtime
+    # child. A link solely to the excluded private observation cannot discharge
+    # a mixed assertion's public part, even after all other records pass.
+    $public=@($parent.obligations|Where-Object{$_ -cne $Exclusion.id -and -not $Exclusions.Contains($_) -and $Records.Contains($_)})
+    if($parent.status -cne 'reviewed' -or $parent.classification -cne 'reference' -or
+        $Exclusion.id -cnotin $parent.obligations -or $public.Count -eq 0){throw 'V2 mixed parent requires a separately retained public runtime obligation'}
+    foreach($publicId in $public){
+        $child=$Records[$publicId]
+        if($child.kind -cin @('assert-call','reviewed-block') -and $child.byte_length -gt 0 -and
+            $child.byte_offset -ge $Exclusion.retained_parent.byte_offset -and
+            $child.byte_offset+$child.byte_length -le $Exclusion.retained_parent.byte_offset+$Exclusion.retained_parent.byte_length -and
+            ($child.byte_offset+$child.byte_length -le $Exclusion.byte_offset -or
+                $child.byte_offset -ge $Exclusion.byte_offset+$Exclusion.byte_length)){return}
+    }
+    throw 'V2 retained public runtime child must cite preserved parent bytes outside the private bound'
+}
+
 function Test-ConformanceTargetExclusion {
     param([Parameter(Mandatory)][string] $Root,
           [Parameter(Mandatory)][string] $Source,
@@ -408,13 +531,13 @@ function Test-ConformanceTargetExclusion {
     if (@($Exclusion.configurations).Count -ne 1 -or
         $Exclusion.configurations[0] -cne 'upstream-test' -or
         $Exclusion.eligibility -cne 't-only-private-invariant' -or
-        $Exclusion.public_api -isnot [bool] -or $Exclusion.public_api -or
-        $Exclusion.mixed_obligation -isnot [bool] -or $Exclusion.mixed_obligation -or
-        $Exclusion.module_observable -isnot [bool] -or $Exclusion.module_observable -or
+        -not (Test-ConformanceExclusionCompatibilityShape $Exclusion) -or
         [string]::IsNullOrWhiteSpace([string]$Exclusion.invariant) -or
         [string]::IsNullOrWhiteSpace([string]$Exclusion.third_party_irrelevance)) {
         throw 'Exclusion must identify a T-only private invariant without public or mixed behavior'
     }
+    $eligibilityVersion=Get-ConformanceExclusionEligibilityVersion $Exclusion
+    if($eligibilityVersion -eq 2){Assert-ConformancePrivateBoundSource -Source $Source -Bytes $SourceBytes -Record $Record -Exclusion $Exclusion}
     $guard = $Exclusion.t_guard
     if ($null -eq $guard -or $guard.mode -cnotin @('positive-guard','absent-return') -or
         ($guard.byte_offset -isnot [int] -and $guard.byte_offset -isnot [long]) -or
@@ -511,7 +634,7 @@ function Test-ConformanceTargetExclusion {
     }
     $approvalPath = Resolve-ReviewedFile -Root $Root -Path $review.artifact -Sha256 $review.artifact_sha256
     $approval = Get-Content -LiteralPath $approvalPath -Raw | ConvertFrom-Json -AsHashtable -Depth 32
-    if ($approval.schema_version -ne 1 -or $approval.kind -cne 't-exclusion-approval' -or
+    if ($approval.schema_version -ne $eligibilityVersion -or $approval.kind -cne 't-exclusion-approval' -or
         $approval.target -cne 'remaining-upstream-compatibility' -or
         $approval.reference_revision -cne $script:ReferenceRevision -or
         $approval.author -cne $review.author -or $approval.reviewer -cne $review.reviewer -or
@@ -520,9 +643,7 @@ function Test-ConformanceTargetExclusion {
     # Bind every semantic field, including false eligibility booleans. The
     # approval omits only its own referring review metadata, avoiding a hash
     # cycle while preventing an old approval from blessing a broadened span.
-    $fields = @('id','source','source_sha256','byte_offset','byte_length','anchor_sha256',
-        'status','disposition','configurations','eligibility','public_api','mixed_obligation',
-        'module_observable','invariant','third_party_irrelevance','t_guard','evidence')
+    $fields = @(Get-ConformanceExclusionSemanticFields $Exclusion)
     if (@($Exclusion.Keys | Where-Object { $_ -cnotin ($fields + @('review')) }).Count -ne 0 -or
         $null -eq $approval.exclusion -or @($approval.exclusion.Keys).Count -ne $fields.Count) {
         throw 'Exclusion approval field set differs'
@@ -530,7 +651,7 @@ function Test-ConformanceTargetExclusion {
     foreach ($field in $fields) {
         # JSON object key order is irrelevant, including the nested guard.
         $actual = $Exclusion[$field]; $approved = $approval.exclusion[$field]
-        if ($field -ceq 't_guard') {
+        if ($field -cin @('t_guard','retained_parent')) {
             if ((@($actual.Keys | Sort-Object) -join '|') -cne (@($approved.Keys | Sort-Object) -join '|')) {
                 throw 'Exclusion approved T guard fields differ'
             }
@@ -553,6 +674,7 @@ function Test-ConformanceTargetExclusion {
         [string]::IsNullOrWhiteSpace([string]$decision.third_party_irrelevance)) {
         throw 'Exclusion independent source decision differs or lacks rationale'
     }
+    if($eligibilityVersion -eq 2){Assert-ConformancePrivateBoundFeatureReview -Root $Root -Exclusion $Exclusion -Decision $decision}
     return $Exclusion
 }
 
@@ -812,6 +934,10 @@ function Test-ConformanceInventory {
                 $exclusions.ContainsKey($exclusion.id)) { throw 'Unknown or duplicate source exclusion' }
             $exclusions[$exclusion.id] = $exclusion
         }
+        foreach($exclusion in $exclusions.Values){
+            if((Get-ConformanceExclusionEligibilityVersion $exclusion) -eq 2 -and
+                $exclusions.ContainsKey($exclusion.retained_parent.id)){throw 'V2 retained original parent cannot itself be excluded'}
+        }
     }
     $seenFiles = @{}; $seenUnits = @{}; $unitCount = 0; $pending = 0
     foreach ($file in $manifest.files) {
@@ -884,6 +1010,11 @@ function Test-ConformanceInventory {
             $endLine = 1 + [regex]::Matches($text.Substring(0, $record.byte_offset + $record.byte_length), '\r\n|\n\r|\n|\r').Count
             if ($record.line -ne $startLine -or $record.end_line -ne $endLine) {
                 throw "Manual block source line drift: $($record.id)"
+            }
+        }
+        foreach($exclusion in $resolvedExclusions.Values){
+            if($exclusion.source -ceq $file.path -and (Get-ConformanceExclusionEligibilityVersion $exclusion) -eq 2){
+                Assert-ConformancePrivateBoundParentRecord -Exclusion $exclusion -Records $indexed -Exclusions $exclusions
             }
         }
         Test-ConformanceSourceLinks -Records $records -RequireComplete:$RequireComplete `

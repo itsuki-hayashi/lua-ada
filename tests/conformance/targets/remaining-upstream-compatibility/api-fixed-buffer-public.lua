@@ -1,5 +1,6 @@
--- First-party public B-mode witness; MIT, see ../../../../LICENSE.
+-- First-party harness-dependent B-mode witness; MIT, see ../../../../LICENSE.
 -- This is neither an adapted upstream file nor an exclusion decision.
+-- T.testC is supplied by the native T or first-party conformance harness.
 -- The caller keeps every dump alive while its loaded function is used.
 assert(type(T) == 'table' and type(T.testC) == 'function')
 

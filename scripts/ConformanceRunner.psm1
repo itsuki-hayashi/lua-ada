@@ -1,5 +1,6 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+Import-Module (Join-Path $PSScriptRoot 'ConformanceExclusionEligibility.psm1')
 
 function Invoke-ConformanceProcess {
     [CmdletBinding()]
@@ -398,9 +399,7 @@ function Test-ConformanceAcceptance {
                     $excluded.disposition -cne 'reviewed-t-internal-exclusion' -or
                     $excluded.eligibility -cne 't-only-private-invariant' -or
                     @($excluded.configurations).Count -ne 1 -or $excluded.configurations[0] -cne 'upstream-test' -or
-                    $excluded.public_api -isnot [bool] -or $excluded.public_api -or
-                    $excluded.mixed_obligation -isnot [bool] -or $excluded.mixed_obligation -or
-                    $excluded.module_observable -isnot [bool] -or $excluded.module_observable -or
+                    -not (Test-ConformanceExclusionCompatibilityShape $excluded) -or
                     @($excluded.evidence).Count -ne 0) {
                     throw "Omission cannot use this target exclusion: $id"
                 }

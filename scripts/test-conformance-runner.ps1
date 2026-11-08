@@ -516,6 +516,20 @@ Case 'strict execution cannot consume an approved target exclusion' {
     $fixture = New-ExcludedOmissionFixture; $fixture.TargetPolicy = 'strict-upstream'
     Assert-AcceptanceRejected $fixture 'Strict original-suite protocol accepted an exclusion'
 }
+Case 'v2 observable private bounds require explicit compatibility and retained-parent bindings' {
+    # Synthetic resolved source metadata only; no feature review or execution.
+    $fixture=New-ExcludedOmissionFixture
+    $excluded=@($fixture.ResolvedExclusions.Values)[0]
+    $excluded.eligibility_schema_version=2;$excluded.module_observable=$true
+    $excluded.module_compatibility_obligation=$false;$excluded.observation_kind='private-resource-bound'
+    $excluded.retained_parent=@{id='LUA-SAMPLE-ASSERT-CALL-0001';byte_offset=0;byte_length=33;anchor_sha256=('a'*64)}
+    $result=Test-ConformanceAcceptance @fixture
+    Assert-True ($result.gate_acceptance -and $result.excluded_omissions.Count -eq 1) 'Truthful observable annotation was conflated with public compatibility'
+    $excluded.module_compatibility_obligation=$true
+    Assert-AcceptanceRejected $fixture 'A public module compatibility obligation became a private omission'
+    $excluded.module_compatibility_obligation=$false;$excluded.retained_parent=@{}
+    Assert-AcceptanceRejected $fixture 'A v2 bound omitted its separately retained original assertion'
+}
 Case 'instrumented T absence cannot be waived by an exclusion' {
     $fixture = New-ExcludedOmissionFixture; $fixture.Configuration = 'upstream-test'
     Assert-AcceptanceRejected $fixture 'Instrumented T omission accepted'

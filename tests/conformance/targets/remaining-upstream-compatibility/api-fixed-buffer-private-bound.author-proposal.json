@@ -54,22 +54,31 @@
       "evidence": [],
       "review": null
     },
-    "proposed_exclusion": {
+    "parent_expression": {
+      "byte_offset": 17039,
+      "byte_length": 33,
+      "anchor_sha256": "9c64cb79308eea2b302880a35a479936b515b820ed8c610d1d23f5158593b3d2",
+      "original_bytes": "assert(m2 > m1 and m2 - m1 < 400)",
+      "line": 580
+    },
+    "parent_generated_anchor_id": "LUA-API-ASSERT-CALL-0125",
+    "author_inference": "Only the pure upper-bound conjunct is C storage/optimization specific. The neighboring positive-growth assertion is retained byte-identically.",
+    "exclusion_candidate": {
       "id": "LUA-API-REVIEWED-BLOCK-9001",
       "source": "api.lua",
       "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
       "byte_offset": 17053,
       "byte_length": 18,
       "anchor_sha256": "f89400b75cf254feed3cc991449a9e7bc1679e6cd9b5b6be1b6598dfa176bf55",
-      "status": "excluded",
-      "disposition": "reviewed-t-internal-exclusion",
+      "status": "proposed",
+      "disposition": "pending-review",
       "configurations": [
         "upstream-test"
       ],
       "eligibility": "t-only-private-invariant",
       "public_api": false,
       "mixed_obligation": false,
-      "module_observable": false,
+      "module_observable": true,
       "invariant": "Exact less-than-400-byte C allocation bound after loading a binary chunk from a fixed buffer",
       "third_party_irrelevance": "Author inference awaiting independent review: the pinned API permits avoiding copies but does not promise a 400-byte implementation allocation ceiling. Ada retains independently owned canonical code; public B-mode acceptance, reader block/alignment/count requirements, caller lifetime, positive growth, executable results and debug lines remain required.",
       "t_guard": {
@@ -85,17 +94,21 @@
         "artifact": null,
         "status": "pending",
         "author": "Codex /root/validation_delivery"
+      },
+      "eligibility_schema_version": 2,
+      "module_compatibility_obligation": false,
+      "observation_kind": "private-resource-bound",
+      "retained_parent": {
+        "id": "LUA-API-ASSERT-CALL-0125",
+        "byte_offset": 17039,
+        "byte_length": 33,
+        "anchor_sha256": "9c64cb79308eea2b302880a35a479936b515b820ed8c610d1d23f5158593b3d2"
       }
     },
-    "parent_expression": {
-      "byte_offset": 17039,
-      "byte_length": 33,
-      "anchor_sha256": "9c64cb79308eea2b302880a35a479936b515b820ed8c610d1d23f5158593b3d2",
-      "original_bytes": "assert(m2 > m1 and m2 - m1 < 400)",
-      "line": 580
-    },
-    "parent_generated_anchor_id": "LUA-API-ASSERT-CALL-0125",
-    "author_inference": "Only the pure upper-bound conjunct is C storage/optimization specific. The neighboring positive-growth assertion is retained byte-identically."
+    "proposed_installed_status": "excluded only after independent eligibility and feature approval",
+    "proposed_installed_disposition": "reviewed-t-internal-exclusion only after independent eligibility and feature approval",
+    "observability_statement": "GC-count observations are visible to Lua modules. The proposed exclusion concerns only an implementation allocation ceiling with no promised public guarantee; it does not claim the measurement is invisible.",
+    "policy_requirements": "Eligibility schema2, independently reviewed feature rationale, pinned public contract bytes, retained counterpart sources and original parent linkage are required. This proposed/pending-review object is not an installed exclusion payload."
   },
   "preserved_spans": [
     {
@@ -137,20 +150,27 @@
   },
   "public_counterparts": [
     {
-      "sha256": "45d4ff1c4704cb6ecb3af30c592fbf87c0d33882f40196c6f0833020c58f7b9d",
+      "sha256": "93c98589d51546968f8ff84a435f792df5759e70cb57aba93bfecc750b33759f",
       "expected_stdout": "API FIXED BUFFER PUBLIC OK",
       "status": "pending-independent-review",
-      "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-public.lua"
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-public.lua",
+      "harness_dependency": "T.testC supplied by native T or first-party conformance harness; this is not a standalone ordinary-Lua witness"
     },
     {
       "sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989",
       "required_witnesses": [
         "C API PASS: reader piece lifetime and deferred execution",
         "C API PASS: fixed binary reader consumes one stable block",
-        "C API PASS: fixed binary reader enforces actual piece boundaries"
+        "C API PASS: fixed binary reader enforces actual piece boundaries",
+        "C API PASS: reader allocation refusal cleanup and recovery"
       ],
       "status": "retain-required-runtime-evidence",
       "path": "c_api/tests/load_dump_contract.h"
+    },
+    {
+      "status": "retain-caller-buffer-lifetime-and-reader-contract",
+      "sha256": "d30c069655d43c095937c916250670b1ec245a6bc51ee7c40ea7158978942a4c",
+      "path": "src/lua-inputs.ads"
     }
   ],
   "implementation_source": {
@@ -159,10 +179,10 @@
     "path": "src/lua-chunks.ads"
   },
   "required_next_actions": [
-    "Independent feature review of the exact child span, public contract interpretation and retained parent obligation; no self approval.",
+    "Independently review eligibility schema2 and feature rationale separately; no source decision or helper test grants approval.",
     "Append only independently reviewed derived child records while preserving every original lexical anchor and all protected scope descriptors.",
     "Keep the original mixed assertion required as a reviewed equivalent; a private child alone cannot complete it or supply pass evidence.",
-    "Approve the exact source-only exclusion before binding/approving this precise empty replacement. No adapted Ada execution is authorized by this packet.",
+    "Convert the proposed/pending-review candidate to a source-only exclusion only after independent policy and feature approval, then separately approve exact replacement bytes. No adapted Ada execution is authorized by this packet.",
     "Observe original C and independently approved derived Ada whole-file behavior in every applicable fresh immutable context, including every public B-mode counterpart.",
     "Local first-party diagnostic allocation/public probes are not original full-api execution evidence, a semantic approval, or final acceptance."
   ],
@@ -180,6 +200,21 @@
       "scope": "First-party diagnostic component observations; not original whole-api evidence or approval",
       "runtime_acceptance": false,
       "coverage_authority": false
+    },
+    {
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "scope": "Fresh explicitly harness-dependent public counterpart; source and executable hashes bound; no original whole-api or acceptance claim",
+      "sha256": "d390ab6e1c0ce683fac1b3118432ee2e1d1bdf86fe776e5589f64b106f578053",
+      "path": "reports/fixed-buffer-public-author/5e9a053ed3784b00846240bbaf9938eb/observations.json"
     }
+  ],
+  "retained_requirements": [
+    "Positive real collectgarbage count growth m2>m1 remains an explicit required upstream check, although the manual does not specify its exact value.",
+    "Public B-mode acceptance and caller buffer lifetime remain required.",
+    "First-block count, contiguous alignment/piece boundaries and truncated fixed-block rejection remain required.",
+    "Allocation-refusal status, cleanup, retry, retained roots and healthy subsequent execution remain required.",
+    "The loaded chunk must actually produce X==N and the complete Y string.",
+    "The unstripped second chunk must actually report source line301."
   ]
 }

@@ -3,6 +3,7 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceExclusionEligibility.psm1')
 $script:TransformReference = '7579fc9d7ed90240487251dfb69168f8e64e9294'
 
 function Get-ConformancePatchedBytes {
@@ -68,9 +69,7 @@ function Assert-TTransformReplacement {
         $Change.length_bytes -ne $Exclusion.byte_length -or $Change.source_sha256 -cne $Exclusion.anchor_sha256 -or
         $Exclusion.status -cne 'excluded' -or $Exclusion.disposition -cne 'reviewed-t-internal-exclusion' -or
         $Exclusion.eligibility -cne 't-only-private-invariant' -or
-        $Exclusion.public_api -isnot [bool] -or $Exclusion.public_api -or
-        $Exclusion.mixed_obligation -isnot [bool] -or $Exclusion.mixed_obligation -or
-        $Exclusion.module_observable -isnot [bool] -or $Exclusion.module_observable) {
+        -not (Test-ConformanceExclusionCompatibilityShape $Exclusion)) {
         throw 'T transform span is wider than or differs from its approved private exclusion'
     }
     # Excluding private checks needs no executable replacement statements.
