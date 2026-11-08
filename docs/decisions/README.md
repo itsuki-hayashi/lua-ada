@@ -111,3 +111,6 @@ selected-closure/table roots and sequential guarded primitive callbacks.
 
 ADR 0044 records [native CLI readline](0044-cli-native-readline.md), platform
 selection, rooted prompt/input ownership and history refusal recovery.
+
+ADR 0047 records [canonical frame footprint](0047-canonical-frame-footprint.md)
+and removal of unused per-frame register arenas without changing stack limits.

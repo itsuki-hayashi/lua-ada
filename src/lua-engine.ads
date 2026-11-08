@@ -629,8 +629,8 @@ private package Lua.Engine is
       Slots      : Packets.Vector;
       Active_Registers : Natural := 0;
       --  Retained rows above this bound are empty cached capacity.
-      Canonical_Registers : Scalar_Values.Vector;
-      Canonical_Cells : Cell_References.Vector;
+      --  Canonical registers and captured-cell associations belong to the
+      --  context's shared scalar stack, not additional per-frame arenas.
       Canonical_Top : Natural := 0;
       Canonical_GC_Top : Natural := 0;
       --  Exclusive live scalar stack bound while a caller is suspended.

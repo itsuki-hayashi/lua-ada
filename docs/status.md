@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [frame storage correction](sessions/2026-11-08-canonical-frame-footprint.md)
+removes two unused per-frame arenas. Local unchanged coroutine default peak
+falls from 1,968,500,975 to 1,896,476,423 managed bytes with the same 2 GiB
+ceiling and zero cleanup ownership. Eight strict builds, both 2,665-case AUnit
+suites and 26/27 C consumers pass. The macOS resident watchdog and full matrix
+remain unresolved; this local reduction does not certify either gate.
+
 The [native readline component](sessions/2026-11-08-cli-native-readline.md)
 retains rooted prompts through native input and selected-owner history buffers.
 Both local full AUnit suites pass 2,665 cases; fourteen exact paired Windows
