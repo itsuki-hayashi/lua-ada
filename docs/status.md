@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [original main.lua diagnostics](sessions/2026-11-08-main-cli-native-baseline.md)
+fail the same Windows temporary-output redirection in native/Ada default/T.
+Parent/bare/arg identities and measured primary cleanup are verified. Separate
+native-paired probes expose fixed Ada REPL prompts where _PROMPT/_PROMPT2
+require dynamic lookup/conversion. Full main completion, platform equivalents
+and the bounded prompt repair remain open; no source authority is granted.
+
 The [IO error-location correction](sessions/2026-11-08-io-error-locations.md)
 uses the actual immediate public caller for raising file-open errors. Seven
 focused cases pass within2,528 AUnit cases in each local mode, and all eight

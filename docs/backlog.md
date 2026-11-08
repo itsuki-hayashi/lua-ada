@@ -2,6 +2,13 @@
 
 ## Active remaining-suite delivery
 
+Repair the [measured dynamic prompt gap](sessions/2026-11-08-main-cli-native-baseline.md)
+through a CLI-only session helper and actual native continuations, after native
+nil/conversion/error controls. Separately review Windows main.lua equivalents
+for the shared native shell/temp-file dependencies while preserving every
+public CLI operation and actual interrupt/module/child cleanup obligation.
+Original main.lua fails in every measured role; no body or protocol is waived.
+
 The [IO caller-location cases](sessions/2026-11-08-io-error-locations.md) pass
 both full local AUnit runs and all public binary roles. Preserve immediate C
 caller/stripped-code behavior while continuing original source and CLI gates.

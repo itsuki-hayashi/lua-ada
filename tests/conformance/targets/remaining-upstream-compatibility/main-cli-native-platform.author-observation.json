@@ -1,0 +1,2530 @@
+{
+  "schema_version": 1,
+  "kind": "main-cli-native-platform-author-observation",
+  "author": "Codex /root/remaining_suite",
+  "observed_date": "2026-11-08",
+  "platform": "windows",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_snapshot_revision": "0f3c780bb83a461bdba12ce8679525f9d1d0e786",
+  "diagnostic_only": true,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_approval": false,
+  "source_exclusions": [],
+  "review": {
+    "status": "not-granted",
+    "reviewer": null,
+    "artifact": null
+  },
+  "evidence_directory": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335",
+  "limits": {
+    "primary_timeout_seconds": 900,
+    "primary_allocator_limit_bytes": 2147483648,
+    "launcher_parent_bare_arg_probe_timeout_seconds": 30,
+    "repl_preflight_timeout_seconds": 30,
+    "isolated_prompt_probe_timeout_seconds": 30,
+    "primary_child_individual_duration_measured": false,
+    "primary_children_share_parent_deadline_seconds": 900,
+    "timeout_policy": "On primary timeout the existing runner kills the process tree and records kill/drain errors; no individual primary-child deadline is claimed.",
+    "product_cli_allocator_ceiling_measured": false,
+    "mode_flags": []
+  },
+  "host_shell": {
+    "comspec": "C:\\WINDOWS\\system32\\cmd.exe",
+    "executable_sha256": "15cd209c995b7d3009c91ca40892d5b8f1fb162f3e5f10716642ea278e8e0d7b",
+    "root_relative_temporary_output": "All four instrumented observations have one leading backslash and no drive; original first output redirection is denied by this host."
+  },
+  "images": [
+    {
+      "configuration": "default",
+      "implementation": "ReferenceC",
+      "original_path": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\bin\\lua.exe",
+      "frozen_executable": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-fixtures/lua.exe",
+        "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd"
+      },
+      "runtime_libraries": [
+        {
+          "original": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\lib\\libconformance_lua.dll",
+          "copy": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-ReferenceC-runtime\\libconformance_lua.dll",
+          "sha256": "6fd51198bee9770aab18cf42ebaf7ccc133a26d4e3dedb22770c41aba84500b3"
+        }
+      ],
+      "observed_configuration": {
+        "schema_version": 1,
+        "configuration": "default",
+        "implementation": "C Lua",
+        "test_adapter": false,
+        "lua_version": "Lua 5.5",
+        "lua_release": "Lua 5.5.1",
+        "integer_bytes": 8,
+        "number_bytes": 8,
+        "compat_global": 1,
+        "extra_space_bytes": 8,
+        "expected_extra_space_bytes": 8,
+        "pointer_bytes": 8,
+        "max_stack": 1000000,
+        "max_c_calls": 200,
+        "aux_buffer_bytes": 1024,
+        "rand32": false,
+        "compat_math": false,
+        "allocator_limit_bytes": 2147483648,
+        "allocator_accounting": "lua-managed-payload-bytes"
+      }
+    },
+    {
+      "configuration": "default",
+      "implementation": "Ada",
+      "original_path": "C:\\Users\\Itsuki\\workspace\\lua-ada\\tests\\bin\\static\\conformance_runner.exe",
+      "frozen_executable": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-fixtures/lua.exe",
+        "sha256": "6d3627d6e55a6d23ccf093c2cc96f0f8223304e5b3c1ab99595b21c93e666f13"
+      },
+      "runtime_libraries": [],
+      "observed_configuration": {
+        "schema_version": 1,
+        "implementation": "Lua Ada",
+        "lua_release": "Lua 5.5.1",
+        "configuration": "default",
+        "test_adapter": false,
+        "runtime_build_profile": "validation",
+        "launcher_build_profile": "validation",
+        "launcher_library_type": "static",
+        "integer_bytes": 8,
+        "number_bytes": 8,
+        "pointer_bytes": 8,
+        "extra_space_bytes": 8,
+        "expected_extra_space_bytes": 8,
+        "max_stack": 1000000,
+        "max_c_calls": 200,
+        "aux_buffer_bytes": 1024,
+        "compat_global": 1,
+        "rand32": false,
+        "compat_math": false,
+        "allocator_accounting": "managed-provider-raw-bytes",
+        "allocator_limit_bytes": 2147483648
+      }
+    },
+    {
+      "configuration": "upstream-test",
+      "implementation": "ReferenceC",
+      "original_path": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\bin\\lua.exe",
+      "frozen_executable": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-fixtures/lua.exe",
+        "sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa"
+      },
+      "runtime_libraries": [
+        {
+          "original": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\lib\\libconformance_lua.dll",
+          "copy": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-ReferenceC-runtime\\libconformance_lua.dll",
+          "sha256": "acf15408805f0889c976b89c10ff224b6200a20f8c1c71aaaedcd98515d53738"
+        }
+      ],
+      "observed_configuration": {
+        "schema_version": 1,
+        "configuration": "upstream-test",
+        "implementation": "C Lua",
+        "test_adapter": true,
+        "lua_version": "Lua 5.5",
+        "lua_release": "Lua 5.5.1",
+        "integer_bytes": 8,
+        "number_bytes": 8,
+        "compat_global": 0,
+        "extra_space_bytes": 16,
+        "expected_extra_space_bytes": 16,
+        "pointer_bytes": 8,
+        "max_stack": 68000,
+        "max_c_calls": 180,
+        "aux_buffer_bytes": 23,
+        "rand32": true,
+        "compat_math": true,
+        "allocator_limit_bytes": 2147483648,
+        "allocator_accounting": "debug-allocator-backing-bytes"
+      }
+    },
+    {
+      "configuration": "upstream-test",
+      "implementation": "Ada",
+      "original_path": "C:\\Users\\Itsuki\\workspace\\lua-ada\\tests\\bin\\upstream-test\\static\\conformance_runner.exe",
+      "frozen_executable": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-fixtures/lua.exe",
+        "sha256": "0105841771d912dce117faeea26230763a7fc265802d90747180a68370763d5c"
+      },
+      "runtime_libraries": [],
+      "observed_configuration": {
+        "schema_version": 1,
+        "implementation": "Lua Ada",
+        "lua_release": "Lua 5.5.1",
+        "configuration": "upstream-test",
+        "test_adapter": true,
+        "runtime_build_profile": "validation",
+        "launcher_build_profile": "validation",
+        "launcher_library_type": "static",
+        "integer_bytes": 8,
+        "number_bytes": 8,
+        "pointer_bytes": 8,
+        "extra_space_bytes": 8,
+        "expected_extra_space_bytes": 8,
+        "max_stack": 68000,
+        "max_c_calls": 180,
+        "aux_buffer_bytes": 23,
+        "compat_global": 0,
+        "rand32": true,
+        "compat_math": true,
+        "allocator_accounting": "managed-provider-raw-bytes",
+        "allocator_limit_bytes": 2147483648
+      }
+    },
+    {
+      "configuration": "default",
+      "implementation": "Ada product CLI",
+      "original_path": "C:\\Users\\Itsuki\\workspace\\lua-ada\\cli\\bin\\static\\lua_ada.exe",
+      "frozen_executable": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ProductCLI-fixtures/lua.exe",
+        "sha256": "d5efeb7d34c88772cb1683879a7b16f3617811e32d1364bf86d72f969a4d3044"
+      },
+      "observed_configuration": null,
+      "test_adapter_present": false,
+      "primary_allocator_ceiling_measured": false,
+      "purpose": "Supplemental actual product CLI prompt mismatch, not an instrumented primary or cleanup proof."
+    },
+    {
+      "configuration": "upstream-test",
+      "implementation": "Ada product CLI",
+      "original_path": "C:\\Users\\Itsuki\\workspace\\lua-ada\\cli\\bin\\upstream-test\\static\\lua_ada.exe",
+      "frozen_executable": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ProductCLI-fixtures/lua.exe",
+        "sha256": "6c0a279dd31c91f173b116138d7bf043d7c2dede459ca2c7d3da28d6fb061bf7"
+      },
+      "observed_configuration": null,
+      "test_adapter_present": false,
+      "primary_allocator_ceiling_measured": false,
+      "purpose": "Supplemental actual product CLI prompt mismatch, not an instrumented primary or cleanup proof."
+    }
+  ],
+  "source_bindings": [
+    {
+      "path": "references/lua/testes/main.lua",
+      "sha256": "844d13f96bdbf03a554b8b466fdf21aeac2bcddb907ad2b971814c994898d457"
+    },
+    {
+      "path": "references/lua/testes/all.lua",
+      "sha256": "f1b8b8075a71e7abc40260f6b9112e8d2a1057772f26374df4bc800d10296309"
+    },
+    {
+      "path": "references/lua/lua.c",
+      "sha256": "17ce8e73dd3586b84076ceaad9d638887723a1c60945c6ee086d723a6e61453f"
+    },
+    {
+      "path": "references/lua/loslib.c",
+      "sha256": "3ed70ea013b0c7a5a758db435f76fe5a99e87f07ea02ed19b2012fb728f8aa13"
+    },
+    {
+      "path": "cli/shared/lua_cli.ads",
+      "sha256": "862937874d2e723b57f2d58edf45536f1a6e95c5d7730c01c22708d790ca3243"
+    },
+    {
+      "path": "cli/shared/lua_cli.adb",
+      "sha256": "1575dd7498f90fda13789e16cd87f0f757a8fcdad65b3be8181184ee36f7bde8"
+    },
+    {
+      "path": "src/lua-platform_os.ads",
+      "sha256": "18cd7d97c4e7e460649aadb04545a3efe7d80d193474a12eaed03b329fe6d13e"
+    },
+    {
+      "path": "src/platform/lua_ada_os.c",
+      "sha256": "7ee5bccb62bed2b87cfa766e7798374cf2e6fce05dc96343bff77b1b14d22148"
+    },
+    {
+      "path": "src/lua-sessions.ads",
+      "sha256": "48662418cabcdfc12b66ed09d7e4f4639042f2165843db67c0443e66c8a71662"
+    },
+    {
+      "path": "src/lua-sessions.adb",
+      "sha256": "6829d2d5f3c4bd92325f329059273ab3ae6ed4ea55bac996992a7e4598a50ef6"
+    },
+    {
+      "path": "scripts/ConformanceRunner.psm1",
+      "sha256": "a5715c2da32df777eed533d6eeb87ddef85ef5f854e64d25c00cc3e812acd245"
+    },
+    {
+      "path": "scripts/ConformanceScope.psm1",
+      "sha256": "56135da3ceb45c3a20d77144379a493a2f9e5c092a6cd2f27aea260f3dbadeac"
+    },
+    {
+      "path": "scripts/ConformanceFileProtocols.psm1",
+      "sha256": "0ff9d9617af38a209af4fdf59ff85ae1bab5d5800e23e2be3e898bb8f1c7c17d"
+    },
+    {
+      "path": "scripts/run-conformance.ps1",
+      "sha256": "4230036e11ad8e3a21b3b9fd23ad5ec90b324afc6b7a54e0338778a57a051a9a"
+    },
+    {
+      "path": "tests/conformance/platform/windows_process.c",
+      "sha256": "ec9e360874a7789762e0b873b05c2dfb8b2a713099f1ff8958b89898edba5a9d"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/file-completion.author-proposal.json",
+      "sha256": "731f841cf93a8d4db535a828b84d62d7219431a07e89d01bb022085803120855"
+    }
+  ],
+  "source_regions": [
+    {
+      "path": "references/lua/testes/main.lua",
+      "start_line": 5,
+      "end_line": 9,
+      "byte_offset": 105,
+      "byte_length": 176,
+      "sha256": "68ea47fefe3a9b3f0d95c76477a09d7f808d3067b8c35cd0c18eadee953ebb5d"
+    },
+    {
+      "path": "references/lua/testes/main.lua",
+      "start_line": 17,
+      "end_line": 21,
+      "byte_offset": 405,
+      "byte_length": 84,
+      "sha256": "cd9f7c113eba7717e572b74bd5c24fa5ab38a8b14cb36673c6dddfa37a0062c2"
+    },
+    {
+      "path": "references/lua/testes/main.lua",
+      "start_line": 64,
+      "end_line": 68,
+      "byte_offset": 1345,
+      "byte_length": 141,
+      "sha256": "b5fdc8eeef2a5668b693f9358ae8a7938d3038b1fbc979fb767c1be5a32e2885"
+    },
+    {
+      "path": "references/lua/testes/main.lua",
+      "start_line": 79,
+      "end_line": 82,
+      "byte_offset": 1792,
+      "byte_length": 104,
+      "sha256": "04a7995d51f16853ad0c6d97448e4fa4541e6ef98c29f4ad1fec29fb755b3470"
+    },
+    {
+      "path": "references/lua/testes/main.lua",
+      "start_line": 371,
+      "end_line": 421,
+      "byte_offset": 9942,
+      "byte_length": 1219,
+      "sha256": "1520cc7fa53fca5139d07f45f37f33758bdb72ece27f24c0e1c315941592ca6f"
+    },
+    {
+      "path": "references/lua/lua.c",
+      "start_line": 549,
+      "end_line": 563,
+      "byte_offset": 15529,
+      "byte_length": 543,
+      "sha256": "021a125f26075a978c38efde1089d8e140c2146d1445a9e7144ad0e033613b50"
+    }
+  ],
+  "original_runs": [
+    {
+      "configuration": "default",
+      "implementation": "ReferenceC",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-main.json",
+        "sha256": "eec828e614e210d98e83e070e4624bee31d4906888d3bce6bb525ef1e1fe2aaf"
+      },
+      "process": {
+        "process_id": 64152,
+        "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+        "arguments": [
+          "main.lua"
+        ],
+        "started_utc": "2026-11-08T06:13:37.2473084Z",
+        "elapsed_milliseconds": 69,
+        "timeout_seconds": 900,
+        "exit_code": 1,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-main.stdout",
+          "sha256": "7bd4a14021ce248f720d78fca88f60e6609720f66b6b761ec75053abfbf61993"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-main.stderr",
+          "sha256": "3226a2314fc154921584b417e4084924dba8270fbeaccd427831e5cf006ca3a0"
+        },
+        "stderr_bytes": 317
+      },
+      "original_fixture_changes": [],
+      "launcher_checks": {
+        "verified": true,
+        "metadata": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-launcher.json",
+          "sha256": "f6b778aacea063fbbd4dc10cc0eb3e5ba6318f8ba993a998e1d7eb8e220ef32f"
+        },
+        "probes": [
+          {
+            "name": "parent",
+            "capture": {
+              "process_id": 52032,
+              "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+              "arguments": [
+                "--conformance-config"
+              ],
+              "started_utc": "2026-11-08T06:13:37.0495073Z",
+              "elapsed_milliseconds": 43,
+              "timeout_seconds": 30,
+              "exit_code": 0,
+              "timed_out": false,
+              "capture_exceeded": false,
+              "pipe_drain_failed": false,
+              "process_tree_kill_error": null,
+              "stdout": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-launcher-parent.stdout",
+                "sha256": "6c63f956109c778efd508539cfdb94eabe3d06a41a56c2a6a1fae68983e20295"
+              },
+              "stderr": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-launcher-parent.stderr",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr_bytes": 0
+            }
+          },
+          {
+            "name": "bare",
+            "capture": {
+              "process_id": 82712,
+              "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+              "arguments": [
+                "-e",
+                "local p=assert(io.popen(\"lua --conformance-config\",\"r\")); local s=p:read(\"a\"); assert(p:close()); io.write(s)"
+              ],
+              "started_utc": "2026-11-08T06:13:37.1222677Z",
+              "elapsed_milliseconds": 27,
+              "timeout_seconds": 30,
+              "exit_code": 0,
+              "timed_out": false,
+              "capture_exceeded": false,
+              "pipe_drain_failed": false,
+              "process_tree_kill_error": null,
+              "stdout": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-launcher-bare.stdout",
+                "sha256": "6c63f956109c778efd508539cfdb94eabe3d06a41a56c2a6a1fae68983e20295"
+              },
+              "stderr": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-launcher-bare.stderr",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr_bytes": 0
+            }
+          },
+          {
+            "name": "arg",
+            "capture": {
+              "process_id": 77328,
+              "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+              "arguments": [
+                "-e",
+                "local i=0; while arg[i] do i=i-1 end; local exe=arg[i+1]; local command='\"\"'..exe..'\" --conformance-config\"'; local p=assert(io.popen(command,\"r\")); local s=p:read(\"a\"); assert(p:close()); io.write(s)"
+              ],
+              "started_utc": "2026-11-08T06:13:37.1534204Z",
+              "elapsed_milliseconds": 26,
+              "timeout_seconds": 30,
+              "exit_code": 0,
+              "timed_out": false,
+              "capture_exceeded": false,
+              "pipe_drain_failed": false,
+              "process_tree_kill_error": null,
+              "stdout": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-launcher-arg.stdout",
+                "sha256": "6c63f956109c778efd508539cfdb94eabe3d06a41a56c2a6a1fae68983e20295"
+              },
+              "stderr": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-launcher-arg.stderr",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr_bytes": 0
+            }
+          }
+        ],
+        "telemetry": [
+          {
+            "schema_version": 1,
+            "run_id": "d6583a3b3e174cf6a7400134cb70b713",
+            "process_id": 77328,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          {
+            "schema_version": 1,
+            "run_id": "d6583a3b3e174cf6a7400134cb70b713",
+            "process_id": 82712,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          }
+        ]
+      },
+      "repl_preflight": {
+        "process_id": 38236,
+        "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+        "arguments": [
+          "-E",
+          "-W",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:13:37.2148951Z",
+        "elapsed_milliseconds": 7,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-repl-prerequisite.stdout",
+          "sha256": "69a8f541add4714752679623acf66e6bad296f29f9994aa96c96d3a494d5da39"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-repl-prerequisite.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "primary_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-ReferenceC-main.allocator.64152.json",
+          "sha256": "ef85ce09410dac7189835e5227f563d98a552f536cabac44584a23daf2b50129",
+          "data": {
+            "schema_version": 1,
+            "run_id": "efd14f7cc09b46bb8f72a485343ea5a2",
+            "process_id": 64152,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          }
+        },
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-ReferenceC-main.allocator.73808.json",
+          "sha256": "d33ec5035a6ba23eb2104431b9f282d2878c232e1d1e12f927f7447699019f9a",
+          "data": {
+            "schema_version": 1,
+            "run_id": "efd14f7cc09b46bb8f72a485343ea5a2",
+            "process_id": 73808,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          }
+        }
+      ],
+      "recording_correction": "Flattened one nested empty array returned by Test-ConformanceFixtureHashes; all original fixture hashes rechecked and unchanged. Initial metadata retained separately.",
+      "pre_correction_record": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-main.json.pre-flat-fixture-record.json",
+        "sha256": "2b4303f23b71233a86fe98e27748fe171697bf86fabe28291a62021ac84bcae9"
+      },
+      "native_module_block_reached": false,
+      "native_fixture_modules_prepared": false
+    },
+    {
+      "configuration": "default",
+      "implementation": "Ada",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-main.json",
+        "sha256": "c3725837221effe3d7c0d2989adfb839c4cda361aabd98051d767b1e409c22f0"
+      },
+      "process": {
+        "process_id": 87452,
+        "executable_sha256": "6d3627d6e55a6d23ccf093c2cc96f0f8223304e5b3c1ab99595b21c93e666f13",
+        "arguments": [
+          "main.lua"
+        ],
+        "started_utc": "2026-11-08T06:13:48.2962638Z",
+        "elapsed_milliseconds": 47,
+        "timeout_seconds": 900,
+        "exit_code": 1,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-main.stdout",
+          "sha256": "8dc2a597c723d2df46267ef50286b248f6ed0c66839b3669932e0d8646557e39"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-main.stderr",
+          "sha256": "a11a9cd758a2f414c4c124518320e355da9457f1180467a2424c17f4401adfc2"
+        },
+        "stderr_bytes": 38
+      },
+      "original_fixture_changes": [],
+      "launcher_checks": {
+        "verified": true,
+        "metadata": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-launcher.json",
+          "sha256": "0c2435d0c42cb3ef8e626fdb097739969d9f6ca9a9a10eecc2e21d2d0f25513d"
+        },
+        "probes": [
+          {
+            "name": "parent",
+            "capture": {
+              "process_id": 93116,
+              "executable_sha256": "6d3627d6e55a6d23ccf093c2cc96f0f8223304e5b3c1ab99595b21c93e666f13",
+              "arguments": [
+                "--conformance-config"
+              ],
+              "started_utc": "2026-11-08T06:13:47.7482549Z",
+              "elapsed_milliseconds": 256,
+              "timeout_seconds": 30,
+              "exit_code": 0,
+              "timed_out": false,
+              "capture_exceeded": false,
+              "pipe_drain_failed": false,
+              "process_tree_kill_error": null,
+              "stdout": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-launcher-parent.stdout",
+                "sha256": "52da7c70140c7c215757ad88bbbbd1db7f61f946569cd89206b1f5f164b142b4"
+              },
+              "stderr": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-launcher-parent.stderr",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr_bytes": 0
+            }
+          },
+          {
+            "name": "bare",
+            "capture": {
+              "process_id": 71880,
+              "executable_sha256": "6d3627d6e55a6d23ccf093c2cc96f0f8223304e5b3c1ab99595b21c93e666f13",
+              "arguments": [
+                "-e",
+                "local p=assert(io.popen(\"lua --conformance-config\",\"r\")); local s=p:read(\"a\"); assert(p:close()); io.write(s)"
+              ],
+              "started_utc": "2026-11-08T06:13:48.05573Z",
+              "elapsed_milliseconds": 52,
+              "timeout_seconds": 30,
+              "exit_code": 0,
+              "timed_out": false,
+              "capture_exceeded": false,
+              "pipe_drain_failed": false,
+              "process_tree_kill_error": null,
+              "stdout": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-launcher-bare.stdout",
+                "sha256": "52da7c70140c7c215757ad88bbbbd1db7f61f946569cd89206b1f5f164b142b4"
+              },
+              "stderr": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-launcher-bare.stderr",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr_bytes": 0
+            }
+          },
+          {
+            "name": "arg",
+            "capture": {
+              "process_id": 88824,
+              "executable_sha256": "6d3627d6e55a6d23ccf093c2cc96f0f8223304e5b3c1ab99595b21c93e666f13",
+              "arguments": [
+                "-e",
+                "local i=0; while arg[i] do i=i-1 end; local exe=arg[i+1]; local command='\"\"'..exe..'\" --conformance-config\"'; local p=assert(io.popen(command,\"r\")); local s=p:read(\"a\"); assert(p:close()); io.write(s)"
+              ],
+              "started_utc": "2026-11-08T06:13:48.1314241Z",
+              "elapsed_milliseconds": 31,
+              "timeout_seconds": 30,
+              "exit_code": 0,
+              "timed_out": false,
+              "capture_exceeded": false,
+              "pipe_drain_failed": false,
+              "process_tree_kill_error": null,
+              "stdout": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-launcher-arg.stdout",
+                "sha256": "52da7c70140c7c215757ad88bbbbd1db7f61f946569cd89206b1f5f164b142b4"
+              },
+              "stderr": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-launcher-arg.stderr",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr_bytes": 0
+            }
+          }
+        ],
+        "telemetry": [
+          {
+            "schema_version": 1,
+            "run_id": "5ce171d527b24092990b4f0ae33b344e",
+            "process_id": 63696,
+            "configuration": "default",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 148421,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          },
+          {
+            "schema_version": 1,
+            "run_id": "5ce171d527b24092990b4f0ae33b344e",
+            "process_id": 71880,
+            "configuration": "default",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 172806,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          },
+          {
+            "schema_version": 1,
+            "run_id": "5ce171d527b24092990b4f0ae33b344e",
+            "process_id": 74636,
+            "configuration": "default",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 148421,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          },
+          {
+            "schema_version": 1,
+            "run_id": "5ce171d527b24092990b4f0ae33b344e",
+            "process_id": 88824,
+            "configuration": "default",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 198442,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          },
+          {
+            "schema_version": 1,
+            "run_id": "5ce171d527b24092990b4f0ae33b344e",
+            "process_id": 93116,
+            "configuration": "default",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 148421,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          }
+        ]
+      },
+      "repl_preflight": {
+        "process_id": 52044,
+        "executable_sha256": "6d3627d6e55a6d23ccf093c2cc96f0f8223304e5b3c1ab99595b21c93e666f13",
+        "arguments": [
+          "-E",
+          "-W",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:13:48.2633895Z",
+        "elapsed_milliseconds": 9,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-repl-prerequisite.stdout",
+          "sha256": "69a8f541add4714752679623acf66e6bad296f29f9994aa96c96d3a494d5da39"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-repl-prerequisite.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "primary_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-Ada-main.allocator.68648.json",
+          "sha256": "cdc972293ae6d9b24d9d0a61ae7e1e4b2a601cb4b30bc642eb8b75d5516dce4b",
+          "data": {
+            "schema_version": 1,
+            "run_id": "393a660902674d10ac10abfe19d7da35",
+            "process_id": 68648,
+            "configuration": "default",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 152366,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          }
+        },
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-Ada-main.allocator.87452.json",
+          "sha256": "5410c230d0f1ac346f47877e50d438ac44403a8f8dd86756fb08195b2bd37204",
+          "data": {
+            "schema_version": 1,
+            "run_id": "393a660902674d10ac10abfe19d7da35",
+            "process_id": 87452,
+            "configuration": "default",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 1794799,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          }
+        }
+      ],
+      "recording_correction": "Flattened one nested empty array returned by Test-ConformanceFixtureHashes; all original fixture hashes rechecked and unchanged. Initial metadata retained separately.",
+      "pre_correction_record": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-main.json.pre-flat-fixture-record.json",
+        "sha256": "0d22a858d3d55ba81341d352a4d52ef30e693d8f8943354fe917503b3b03eedb"
+      },
+      "native_module_block_reached": false,
+      "native_fixture_modules_prepared": false
+    },
+    {
+      "configuration": "upstream-test",
+      "implementation": "ReferenceC",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-main.json",
+        "sha256": "1014dc010a6c296fceb56dce7bfc308efc383b192ef6ee71b495a4022172e04d"
+      },
+      "process": {
+        "process_id": 11840,
+        "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+        "arguments": [
+          "main.lua"
+        ],
+        "started_utc": "2026-11-08T06:13:37.7223881Z",
+        "elapsed_milliseconds": 41,
+        "timeout_seconds": 900,
+        "exit_code": 1,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-main.stdout",
+          "sha256": "f460d6fc8d34e37a9354b3f75e7609e7bd17180dcbe18341844507efa99a25c8"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-main.stderr",
+          "sha256": "90a61ac4fcd74f87f50071528259ebd2e3a80fe32d09c3f712cdc4f19225410e"
+        },
+        "stderr_bytes": 323
+      },
+      "original_fixture_changes": [],
+      "launcher_checks": {
+        "verified": true,
+        "metadata": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-launcher.json",
+          "sha256": "760f8dac3d4c8980f780f95d29597a898cd6746446b5a1e7af608a99dd42f34d"
+        },
+        "probes": [
+          {
+            "name": "parent",
+            "capture": {
+              "process_id": 6440,
+              "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+              "arguments": [
+                "--conformance-config"
+              ],
+              "started_utc": "2026-11-08T06:13:37.608067Z",
+              "elapsed_milliseconds": 33,
+              "timeout_seconds": 30,
+              "exit_code": 0,
+              "timed_out": false,
+              "capture_exceeded": false,
+              "pipe_drain_failed": false,
+              "process_tree_kill_error": null,
+              "stdout": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-launcher-parent.stdout",
+                "sha256": "65bc59bb7bd1f68dc6670263547590fc5b3878f7cd7c205ec7aa8a9d9775ebfb"
+              },
+              "stderr": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-launcher-parent.stderr",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr_bytes": 0
+            }
+          },
+          {
+            "name": "bare",
+            "capture": {
+              "process_id": 49840,
+              "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+              "arguments": [
+                "-e",
+                "local p=assert(io.popen(\"lua --conformance-config\",\"r\")); local s=p:read(\"a\"); assert(p:close()); io.write(s)"
+              ],
+              "started_utc": "2026-11-08T06:13:37.6495089Z",
+              "elapsed_milliseconds": 26,
+              "timeout_seconds": 30,
+              "exit_code": 0,
+              "timed_out": false,
+              "capture_exceeded": false,
+              "pipe_drain_failed": false,
+              "process_tree_kill_error": null,
+              "stdout": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-launcher-bare.stdout",
+                "sha256": "65bc59bb7bd1f68dc6670263547590fc5b3878f7cd7c205ec7aa8a9d9775ebfb"
+              },
+              "stderr": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-launcher-bare.stderr",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr_bytes": 0
+            }
+          },
+          {
+            "name": "arg",
+            "capture": {
+              "process_id": 8600,
+              "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+              "arguments": [
+                "-e",
+                "local i=0; while arg[i] do i=i-1 end; local exe=arg[i+1]; local command='\"\"'..exe..'\" --conformance-config\"'; local p=assert(io.popen(command,\"r\")); local s=p:read(\"a\"); assert(p:close()); io.write(s)"
+              ],
+              "started_utc": "2026-11-08T06:13:37.6786987Z",
+              "elapsed_milliseconds": 25,
+              "timeout_seconds": 30,
+              "exit_code": 0,
+              "timed_out": false,
+              "capture_exceeded": false,
+              "pipe_drain_failed": false,
+              "process_tree_kill_error": null,
+              "stdout": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-launcher-arg.stdout",
+                "sha256": "65bc59bb7bd1f68dc6670263547590fc5b3878f7cd7c205ec7aa8a9d9775ebfb"
+              },
+              "stderr": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-launcher-arg.stderr",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr_bytes": 0
+            }
+          }
+        ],
+        "telemetry": [
+          {
+            "schema_version": 1,
+            "run_id": "bfd743692b7a44148e3d30382ffc53e4",
+            "process_id": 49840,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          {
+            "schema_version": 1,
+            "run_id": "bfd743692b7a44148e3d30382ffc53e4",
+            "process_id": 8600,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          }
+        ]
+      },
+      "repl_preflight": {
+        "process_id": 85712,
+        "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+        "arguments": [
+          "-E",
+          "-W",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:13:37.7121225Z",
+        "elapsed_milliseconds": 6,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-repl-prerequisite.stdout",
+          "sha256": "69a8f541add4714752679623acf66e6bad296f29f9994aa96c96d3a494d5da39"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-repl-prerequisite.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "primary_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-ReferenceC-main.allocator.11840.json",
+          "sha256": "6ebc14179f98bff94488366c530577046b5e3077a6f9d56234d6469a1f34a27c",
+          "data": {
+            "schema_version": 1,
+            "run_id": "f4e27a02cf654d5abf77bd507dc8bc2b",
+            "process_id": 11840,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          }
+        },
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-ReferenceC-main.allocator.25288.json",
+          "sha256": "8c9f80720daf4b6cd26f33d0e2f77e2982a6fa01a392e86ab2ca24baf82bd5df",
+          "data": {
+            "schema_version": 1,
+            "run_id": "f4e27a02cf654d5abf77bd507dc8bc2b",
+            "process_id": 25288,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          }
+        }
+      ],
+      "recording_correction": "Flattened one nested empty array returned by Test-ConformanceFixtureHashes; all original fixture hashes rechecked and unchanged. Initial metadata retained separately.",
+      "pre_correction_record": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-main.json.pre-flat-fixture-record.json",
+        "sha256": "d5b597d8c5c04277366bee21bd65b1096c12c38af5be344353dad87bc896c6ef"
+      },
+      "native_module_block_reached": false,
+      "native_fixture_modules_prepared": false
+    },
+    {
+      "configuration": "upstream-test",
+      "implementation": "Ada",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-main.json",
+        "sha256": "83ac11c1b3c2cecd14f380430902f6c6cc709451f4d45d925114d2c8d747c4c7"
+      },
+      "process": {
+        "process_id": 36672,
+        "executable_sha256": "0105841771d912dce117faeea26230763a7fc265802d90747180a68370763d5c",
+        "arguments": [
+          "main.lua"
+        ],
+        "started_utc": "2026-11-08T06:13:49.6017717Z",
+        "elapsed_milliseconds": 67,
+        "timeout_seconds": 900,
+        "exit_code": 1,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-main.stdout",
+          "sha256": "dce09333885ff397fa84260c9b8875c3c2b63d524301678aecab2d665863ca50"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-main.stderr",
+          "sha256": "a11a9cd758a2f414c4c124518320e355da9457f1180467a2424c17f4401adfc2"
+        },
+        "stderr_bytes": 38
+      },
+      "original_fixture_changes": [],
+      "launcher_checks": {
+        "verified": true,
+        "metadata": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-launcher.json",
+          "sha256": "86d5ab0c5aaa524734ef94122571a327ff2e50835f190e11702309fb99881ab0"
+        },
+        "probes": [
+          {
+            "name": "parent",
+            "capture": {
+              "process_id": 19868,
+              "executable_sha256": "0105841771d912dce117faeea26230763a7fc265802d90747180a68370763d5c",
+              "arguments": [
+                "--conformance-config"
+              ],
+              "started_utc": "2026-11-08T06:13:48.9797194Z",
+              "elapsed_milliseconds": 409,
+              "timeout_seconds": 30,
+              "exit_code": 0,
+              "timed_out": false,
+              "capture_exceeded": false,
+              "pipe_drain_failed": false,
+              "process_tree_kill_error": null,
+              "stdout": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-launcher-parent.stdout",
+                "sha256": "2d100d0743d643c35d225646eb2bd8fe2b28b1c146c19109d0835943f613ca08"
+              },
+              "stderr": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-launcher-parent.stderr",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr_bytes": 0
+            }
+          },
+          {
+            "name": "bare",
+            "capture": {
+              "process_id": 57176,
+              "executable_sha256": "0105841771d912dce117faeea26230763a7fc265802d90747180a68370763d5c",
+              "arguments": [
+                "-e",
+                "local p=assert(io.popen(\"lua --conformance-config\",\"r\")); local s=p:read(\"a\"); assert(p:close()); io.write(s)"
+              ],
+              "started_utc": "2026-11-08T06:13:49.4128065Z",
+              "elapsed_milliseconds": 31,
+              "timeout_seconds": 30,
+              "exit_code": 0,
+              "timed_out": false,
+              "capture_exceeded": false,
+              "pipe_drain_failed": false,
+              "process_tree_kill_error": null,
+              "stdout": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-launcher-bare.stdout",
+                "sha256": "2d100d0743d643c35d225646eb2bd8fe2b28b1c146c19109d0835943f613ca08"
+              },
+              "stderr": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-launcher-bare.stderr",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr_bytes": 0
+            }
+          },
+          {
+            "name": "arg",
+            "capture": {
+              "process_id": 50260,
+              "executable_sha256": "0105841771d912dce117faeea26230763a7fc265802d90747180a68370763d5c",
+              "arguments": [
+                "-e",
+                "local i=0; while arg[i] do i=i-1 end; local exe=arg[i+1]; local command='\"\"'..exe..'\" --conformance-config\"'; local p=assert(io.popen(command,\"r\")); local s=p:read(\"a\"); assert(p:close()); io.write(s)"
+              ],
+              "started_utc": "2026-11-08T06:13:49.4670681Z",
+              "elapsed_milliseconds": 51,
+              "timeout_seconds": 30,
+              "exit_code": 0,
+              "timed_out": false,
+              "capture_exceeded": false,
+              "pipe_drain_failed": false,
+              "process_tree_kill_error": null,
+              "stdout": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-launcher-arg.stdout",
+                "sha256": "2d100d0743d643c35d225646eb2bd8fe2b28b1c146c19109d0835943f613ca08"
+              },
+              "stderr": {
+                "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-launcher-arg.stderr",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr_bytes": 0
+            }
+          }
+        ],
+        "telemetry": [
+          {
+            "schema_version": 1,
+            "run_id": "a2fa5d3e754e480791ca18d455b6a250",
+            "process_id": 19868,
+            "configuration": "upstream-test",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 224867,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          },
+          {
+            "schema_version": 1,
+            "run_id": "a2fa5d3e754e480791ca18d455b6a250",
+            "process_id": 41676,
+            "configuration": "upstream-test",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 224867,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          },
+          {
+            "schema_version": 1,
+            "run_id": "a2fa5d3e754e480791ca18d455b6a250",
+            "process_id": 50260,
+            "configuration": "upstream-test",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 275054,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          },
+          {
+            "schema_version": 1,
+            "run_id": "a2fa5d3e754e480791ca18d455b6a250",
+            "process_id": 54924,
+            "configuration": "upstream-test",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 224867,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          },
+          {
+            "schema_version": 1,
+            "run_id": "a2fa5d3e754e480791ca18d455b6a250",
+            "process_id": 57176,
+            "configuration": "upstream-test",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 249116,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          }
+        ]
+      },
+      "repl_preflight": {
+        "process_id": 4192,
+        "executable_sha256": "0105841771d912dce117faeea26230763a7fc265802d90747180a68370763d5c",
+        "arguments": [
+          "-E",
+          "-W",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:13:49.5684912Z",
+        "elapsed_milliseconds": 9,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-repl-prerequisite.stdout",
+          "sha256": "69a8f541add4714752679623acf66e6bad296f29f9994aa96c96d3a494d5da39"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-repl-prerequisite.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "primary_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-Ada-main.allocator.16512.json",
+          "sha256": "08ae55a3a128c251d1d9baea89985c7f5cdddd8c3bd4735ac222af689e88a4ca",
+          "data": {
+            "schema_version": 1,
+            "run_id": "7316ea11d7304beb971d2d47424c9a5d",
+            "process_id": 16512,
+            "configuration": "upstream-test",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 229376,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          }
+        },
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-Ada-main.allocator.36672.json",
+          "sha256": "491c561029ee85b0b81a1914d90390481f32ad3c5f8b363556d6b447f9445d43",
+          "data": {
+            "schema_version": 1,
+            "run_id": "7316ea11d7304beb971d2d47424c9a5d",
+            "process_id": 36672,
+            "configuration": "upstream-test",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 1871411,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          }
+        }
+      ],
+      "recording_correction": "Flattened one nested empty array returned by Test-ConformanceFixtureHashes; all original fixture hashes rechecked and unchanged. Initial metadata retained separately.",
+      "pre_correction_record": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-main.json.pre-flat-fixture-record.json",
+        "sha256": "aae1f39dcc6e7d44b78ce43e87aab68bf07f1a02a56ac5a82ca635cf2d95e490"
+      },
+      "native_module_block_reached": false,
+      "native_fixture_modules_prepared": false
+    }
+  ],
+  "instrumented_actual_temp_values": [
+    {
+      "configuration": "default",
+      "implementation": "ReferenceC",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-temp-path-diagnostic.json",
+        "sha256": "092d4e9d02e9d879205c755630886d193f37e30a5f196e1481bc2eff9f6b4f9f"
+      },
+      "process": {
+        "process_id": 62580,
+        "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+        "arguments": [
+          "-e",
+          "debug.sethook(function(event,line)\n  if line==81 and debug.getinfo(2,'S').source=='@main.lua' then\n    debug.sethook()\n    for i=1,40 do\n      local name,value=debug.getlocal(2,i)\n      if name=='prog' or name=='otherprog' or name=='out' then\n        io.stderr:write('DIAGNOSTIC ',name,'=',string.format('%q',value),'\\n')\n      end\n    end\n  end\nend,'l')",
+          "main.lua"
+        ],
+        "started_utc": "2026-11-08T06:19:44.4460901Z",
+        "elapsed_milliseconds": 50,
+        "timeout_seconds": 900,
+        "exit_code": 1,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-temp-path-diagnostic.stdout",
+          "sha256": "7bd4a14021ce248f720d78fca88f60e6609720f66b6b761ec75053abfbf61993"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-temp-path-diagnostic.stderr",
+          "sha256": "bade84c5ee9d21c3cc53c16591a30ae0346a40ed5d283d41dd919f3f9173668a"
+        },
+        "stderr_bytes": 407
+      },
+      "actual_temporary_paths": {
+        "prog": "\\s1t3k.",
+        "otherprog": "\\s1t3k.1",
+        "out": "\\s1t3k.2"
+      },
+      "primary_original_execution": false,
+      "source_modified": false
+    },
+    {
+      "configuration": "default",
+      "implementation": "Ada",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-temp-path-diagnostic.json",
+        "sha256": "38f9e3289b4196e2c858c768ec3847c355a907da2e0b5b7e322a0ff4a9c35234"
+      },
+      "process": {
+        "process_id": 49140,
+        "executable_sha256": "6d3627d6e55a6d23ccf093c2cc96f0f8223304e5b3c1ab99595b21c93e666f13",
+        "arguments": [
+          "-e",
+          "debug.sethook(function(event,line)\n  if line==81 and debug.getinfo(2,'S').source=='@main.lua' then\n    debug.sethook()\n    for i=1,40 do\n      local name,value=debug.getlocal(2,i)\n      if name=='prog' or name=='otherprog' or name=='out' then\n        io.stderr:write('DIAGNOSTIC ',name,'=',string.format('%q',value),'\\n')\n      end\n    end\n  end\nend,'l')",
+          "main.lua"
+        ],
+        "started_utc": "2026-11-08T06:19:44.5428742Z",
+        "elapsed_milliseconds": 51,
+        "timeout_seconds": 900,
+        "exit_code": 1,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-temp-path-diagnostic.stdout",
+          "sha256": "8dc2a597c723d2df46267ef50286b248f6ed0c66839b3669932e0d8646557e39"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-temp-path-diagnostic.stderr",
+          "sha256": "7579e7f05c90661e763e74e0eb481d83648b3ffe793a713ffcd35524d644bae0"
+        },
+        "stderr_bytes": 128
+      },
+      "actual_temporary_paths": {
+        "prog": "\\s1fvk.",
+        "otherprog": "\\s1fvk.1",
+        "out": "\\s1fvk.2"
+      },
+      "primary_original_execution": false,
+      "source_modified": false
+    },
+    {
+      "configuration": "upstream-test",
+      "implementation": "ReferenceC",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-temp-path-diagnostic.json",
+        "sha256": "64bec5fd26b296982da0a99be3b25a2b0bc90cef6465f70aa552a40e3dee3b09"
+      },
+      "process": {
+        "process_id": 90908,
+        "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+        "arguments": [
+          "-e",
+          "debug.sethook(function(event,line)\n  if line==81 and debug.getinfo(2,'S').source=='@main.lua' then\n    debug.sethook()\n    for i=1,40 do\n      local name,value=debug.getlocal(2,i)\n      if name=='prog' or name=='otherprog' or name=='out' then\n        io.stderr:write('DIAGNOSTIC ',name,'=',string.format('%q',value),'\\n')\n      end\n    end\n  end\nend,'l')",
+          "main.lua"
+        ],
+        "started_utc": "2026-11-08T06:19:44.6253467Z",
+        "elapsed_milliseconds": 42,
+        "timeout_seconds": 900,
+        "exit_code": 1,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-temp-path-diagnostic.stdout",
+          "sha256": "f460d6fc8d34e37a9354b3f75e7609e7bd17180dcbe18341844507efa99a25c8"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-temp-path-diagnostic.stderr",
+          "sha256": "a37dfe9fd467fcece4f9f6c654f93cef8ae181f3cb8f2448dc17564713e48f1e"
+        },
+        "stderr_bytes": 413
+      },
+      "actual_temporary_paths": {
+        "prog": "\\s2oos.",
+        "otherprog": "\\s2oos.1",
+        "out": "\\s2oos.2"
+      },
+      "primary_original_execution": false,
+      "source_modified": false
+    },
+    {
+      "configuration": "upstream-test",
+      "implementation": "Ada",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-temp-path-diagnostic.json",
+        "sha256": "ac40a636cc369788dd1c3952a7a6fe4fb283b002ba4d43d304f25796a740c70a"
+      },
+      "process": {
+        "process_id": 30724,
+        "executable_sha256": "0105841771d912dce117faeea26230763a7fc265802d90747180a68370763d5c",
+        "arguments": [
+          "-e",
+          "debug.sethook(function(event,line)\n  if line==81 and debug.getinfo(2,'S').source=='@main.lua' then\n    debug.sethook()\n    for i=1,40 do\n      local name,value=debug.getlocal(2,i)\n      if name=='prog' or name=='otherprog' or name=='out' then\n        io.stderr:write('DIAGNOSTIC ',name,'=',string.format('%q',value),'\\n')\n      end\n    end\n  end\nend,'l')",
+          "main.lua"
+        ],
+        "started_utc": "2026-11-08T06:19:44.6801098Z",
+        "elapsed_milliseconds": 70,
+        "timeout_seconds": 900,
+        "exit_code": 1,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-temp-path-diagnostic.stdout",
+          "sha256": "dce09333885ff397fa84260c9b8875c3c2b63d524301678aecab2d665863ca50"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-temp-path-diagnostic.stderr",
+          "sha256": "69a3e15e2e8d90409595edc91446bbf80ee99cfd3cfa5cc31fb11cc8e652f333"
+        },
+        "stderr_bytes": 125
+      },
+      "actual_temporary_paths": {
+        "prog": "\\su04.",
+        "otherprog": "\\su04.1",
+        "out": "\\su04.2"
+      },
+      "primary_original_execution": false,
+      "source_modified": false
+    }
+  ],
+  "isolated_prompt_boundaries": [
+    {
+      "configuration": "default",
+      "image_kind": "ReferenceC",
+      "case": "custom-prompt",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-custom-prompt.json",
+        "sha256": "654a1527f46b34d8f0e41915670481cb5693d03fd43cbbfc83a9dc4b021c5ddc"
+      },
+      "capture": {
+        "process_id": 42964,
+        "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+        "arguments": [
+          "-e_PROMPT='alo'",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:46.7888619Z",
+        "elapsed_milliseconds": 91,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-custom-prompt.stdout",
+          "sha256": "d32158d76d2c7bd1cec1a8c48e3cd9fc550ddc12670a3eae035e20409b2996e3"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-custom-prompt.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-custom-prompt.stdin",
+        "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a"
+      },
+      "allocator_ceiling_measured": true,
+      "selected_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-ReferenceC-custom-prompt.allocator.42964.json",
+          "sha256": "023fcfe288b5e2e1b726986428f276c42a70b8336cd5749f8c46f99439c692c2",
+          "data": {
+            "schema_version": 1,
+            "run_id": "516cee261a244fb0afd44a40dba3289c",
+            "process_id": 42964,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          }
+        }
+      ],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "default",
+      "image_kind": "ReferenceC",
+      "case": "empty-prompts",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-empty-prompts.json",
+        "sha256": "dd84f30dcbc3dce2e0213b7433694eae1ab88927881424136e7b86cb9a296e22"
+      },
+      "capture": {
+        "process_id": 73652,
+        "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+        "arguments": [
+          "-e_PROMPT='' _PROMPT2=''",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:46.9297703Z",
+        "elapsed_milliseconds": 67,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-empty-prompts.stdout",
+          "sha256": "9e52dcf75b70a0207027e993f3ff6eef712d8b621819a566bf065b2a0b8254ef"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-empty-prompts.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-empty-prompts.stdin",
+        "sha256": "ae89ccd425a68ea4c2eaba25d5e1d2933baf1381be73068c6c7fdf9c7a5da24d"
+      },
+      "allocator_ceiling_measured": true,
+      "selected_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-ReferenceC-empty-prompts.allocator.73652.json",
+          "sha256": "25365e95d2d11e2410770ab068daea76b44e0bd605fc6dfacf7a9da0dcf16bc5",
+          "data": {
+            "schema_version": 1,
+            "run_id": "4243435cc07b453e906d27099b2f6f6a",
+            "process_id": 73652,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          }
+        }
+      ],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "default",
+      "image_kind": "ReferenceC",
+      "case": "nonstring-prompt",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-nonstring-prompt.json",
+        "sha256": "5ab36e11eb4368ffa4115f2f80a035005d1860e4e9b418467d58acba62f553ca"
+      },
+      "capture": {
+        "process_id": 71288,
+        "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+        "arguments": [
+          "-e",
+          "local C='X'; _PROMPT=setmetatable({}, {__tostring=function() C=C..'X'; return C end})",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:47.0082862Z",
+        "elapsed_milliseconds": 65,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-nonstring-prompt.stdout",
+          "sha256": "a63e9da2fdd3e7253834ae28d2a92aecf330a99e6d8b91d36c3e3bb52270d446"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-nonstring-prompt.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ReferenceC-nonstring-prompt.stdin",
+        "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a"
+      },
+      "allocator_ceiling_measured": true,
+      "selected_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-ReferenceC-nonstring-prompt.allocator.71288.json",
+          "sha256": "1fb1b92f8cde234075604f46f2f3a8c9d05b7e228e27d123de156d8be05d91c8",
+          "data": {
+            "schema_version": 1,
+            "run_id": "82f0ecb8a43b48488a9b94515b8f4501",
+            "process_id": 71288,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          }
+        }
+      ],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "default",
+      "image_kind": "Ada",
+      "case": "custom-prompt",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-custom-prompt.json",
+        "sha256": "1da8a9d5d93615e072f0c7e6a0ac1281a6cfd347f107e51c493dbf80474039f1"
+      },
+      "capture": {
+        "process_id": 51760,
+        "executable_sha256": "6d3627d6e55a6d23ccf093c2cc96f0f8223304e5b3c1ab99595b21c93e666f13",
+        "arguments": [
+          "-e_PROMPT='alo'",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:47.0858254Z",
+        "elapsed_milliseconds": 68,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-custom-prompt.stdout",
+          "sha256": "46611c56dd7573825d32ee7585476ee105592e7dd7bfdf72ff64535de4ae452a"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-custom-prompt.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-custom-prompt.stdin",
+        "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a"
+      },
+      "allocator_ceiling_measured": true,
+      "selected_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-Ada-custom-prompt.allocator.51760.json",
+          "sha256": "6980b16843197aa65f587a0771f0a29d46b1afb30ea8f6191e5afeca91e473be",
+          "data": {
+            "schema_version": 1,
+            "run_id": "93a8bf3a86d54a6a92b2913d685d633b",
+            "process_id": 51760,
+            "configuration": "default",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 155168,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          }
+        }
+      ],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "default",
+      "image_kind": "Ada",
+      "case": "empty-prompts",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-empty-prompts.json",
+        "sha256": "e965fc8a44d586f97821159282bce719d27e551a10acd09be321024e61fb3b96"
+      },
+      "capture": {
+        "process_id": 36104,
+        "executable_sha256": "6d3627d6e55a6d23ccf093c2cc96f0f8223304e5b3c1ab99595b21c93e666f13",
+        "arguments": [
+          "-e_PROMPT='' _PROMPT2=''",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:47.1894227Z",
+        "elapsed_milliseconds": 70,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-empty-prompts.stdout",
+          "sha256": "3d45db20ed055df433eacaf840c54a252f1db35667366225e2ac31edbd64cf9e"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-empty-prompts.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-empty-prompts.stdin",
+        "sha256": "ae89ccd425a68ea4c2eaba25d5e1d2933baf1381be73068c6c7fdf9c7a5da24d"
+      },
+      "allocator_ceiling_measured": true,
+      "selected_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-Ada-empty-prompts.allocator.36104.json",
+          "sha256": "3e33bdb604090e5b796c6f15a479d38e26e4c1185bd567123b62299bcb7cf3c5",
+          "data": {
+            "schema_version": 1,
+            "run_id": "c7cb4807053246ec84eecffb729bd700",
+            "process_id": 36104,
+            "configuration": "default",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 158299,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          }
+        }
+      ],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "default",
+      "image_kind": "Ada",
+      "case": "nonstring-prompt",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-nonstring-prompt.json",
+        "sha256": "d90f14b89b7b3d7994efdeeec5bac299dee48b34ab046cac39930b497cb2c03b"
+      },
+      "capture": {
+        "process_id": 4596,
+        "executable_sha256": "6d3627d6e55a6d23ccf093c2cc96f0f8223304e5b3c1ab99595b21c93e666f13",
+        "arguments": [
+          "-e",
+          "local C='X'; _PROMPT=setmetatable({}, {__tostring=function() C=C..'X'; return C end})",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:47.2966106Z",
+        "elapsed_milliseconds": 72,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-nonstring-prompt.stdout",
+          "sha256": "46611c56dd7573825d32ee7585476ee105592e7dd7bfdf72ff64535de4ae452a"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-nonstring-prompt.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-Ada-nonstring-prompt.stdin",
+        "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a"
+      },
+      "allocator_ceiling_measured": true,
+      "selected_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\default-Ada-nonstring-prompt.allocator.4596.json",
+          "sha256": "2bc6b2e9e1f4c917bdd49624181f7004a9408eea29a68cdb2894e1bf93c35c4c",
+          "data": {
+            "schema_version": 1,
+            "run_id": "f7bfba39b4774d8ea3c61f5696661738",
+            "process_id": 4596,
+            "configuration": "default",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 164918,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          }
+        }
+      ],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "default",
+      "image_kind": "ProductCLI",
+      "case": "custom-prompt",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ProductCLI-custom-prompt.json",
+        "sha256": "e265056f4050d98af2abda5d32a9fce62479db45e7cbf77e254c691de4adfbde"
+      },
+      "capture": {
+        "process_id": 33228,
+        "executable_sha256": "d5efeb7d34c88772cb1683879a7b16f3617811e32d1364bf86d72f969a4d3044",
+        "arguments": [
+          "-e_PROMPT='alo'",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:47.8125035Z",
+        "elapsed_milliseconds": 286,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ProductCLI-custom-prompt.stdout",
+          "sha256": "46611c56dd7573825d32ee7585476ee105592e7dd7bfdf72ff64535de4ae452a"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ProductCLI-custom-prompt.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ProductCLI-custom-prompt.stdin",
+        "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a"
+      },
+      "allocator_ceiling_measured": false,
+      "selected_telemetry": [],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "default",
+      "image_kind": "ProductCLI",
+      "case": "empty-prompts",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ProductCLI-empty-prompts.json",
+        "sha256": "3a20709747e5f34b7a65e206fe5f7ac02fe8747a8518fedf9eb3379737ee1923"
+      },
+      "capture": {
+        "process_id": 81200,
+        "executable_sha256": "d5efeb7d34c88772cb1683879a7b16f3617811e32d1364bf86d72f969a4d3044",
+        "arguments": [
+          "-e_PROMPT='' _PROMPT2=''",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:48.1289911Z",
+        "elapsed_milliseconds": 78,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ProductCLI-empty-prompts.stdout",
+          "sha256": "3d45db20ed055df433eacaf840c54a252f1db35667366225e2ac31edbd64cf9e"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ProductCLI-empty-prompts.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ProductCLI-empty-prompts.stdin",
+        "sha256": "ae89ccd425a68ea4c2eaba25d5e1d2933baf1381be73068c6c7fdf9c7a5da24d"
+      },
+      "allocator_ceiling_measured": false,
+      "selected_telemetry": [],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "default",
+      "image_kind": "ProductCLI",
+      "case": "nonstring-prompt",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ProductCLI-nonstring-prompt.json",
+        "sha256": "609e8a11d4f26ccb5c2f77207802b0ac5c41b73b642e61391ed425fb53b26e45"
+      },
+      "capture": {
+        "process_id": 77912,
+        "executable_sha256": "d5efeb7d34c88772cb1683879a7b16f3617811e32d1364bf86d72f969a4d3044",
+        "arguments": [
+          "-e",
+          "local C='X'; _PROMPT=setmetatable({}, {__tostring=function() C=C..'X'; return C end})",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:48.2354301Z",
+        "elapsed_milliseconds": 80,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ProductCLI-nonstring-prompt.stdout",
+          "sha256": "46611c56dd7573825d32ee7585476ee105592e7dd7bfdf72ff64535de4ae452a"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ProductCLI-nonstring-prompt.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/default-ProductCLI-nonstring-prompt.stdin",
+        "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a"
+      },
+      "allocator_ceiling_measured": false,
+      "selected_telemetry": [],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "upstream-test",
+      "image_kind": "ReferenceC",
+      "case": "custom-prompt",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-custom-prompt.json",
+        "sha256": "39b3aca934a9fc7cf54d7cbdb298276e2fd3f7c36d671b8e87d62c0277f046fa"
+      },
+      "capture": {
+        "process_id": 70732,
+        "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+        "arguments": [
+          "-e_PROMPT='alo'",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:48.3450115Z",
+        "elapsed_milliseconds": 79,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-custom-prompt.stdout",
+          "sha256": "d32158d76d2c7bd1cec1a8c48e3cd9fc550ddc12670a3eae035e20409b2996e3"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-custom-prompt.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-custom-prompt.stdin",
+        "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a"
+      },
+      "allocator_ceiling_measured": true,
+      "selected_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-ReferenceC-custom-prompt.allocator.70732.json",
+          "sha256": "1b926756951f965ad5efdf49ad1b21d1e5426b504d271cbf155f373ee769c766",
+          "data": {
+            "schema_version": 1,
+            "run_id": "aa68a39c839c4aaab4255cf59a6653a0",
+            "process_id": 70732,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          }
+        }
+      ],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "upstream-test",
+      "image_kind": "ReferenceC",
+      "case": "empty-prompts",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-empty-prompts.json",
+        "sha256": "783eca5c7b61743fe6ce2c9e7a0d61bfc877d19978ad933b49754ced3a090986"
+      },
+      "capture": {
+        "process_id": 62984,
+        "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+        "arguments": [
+          "-e_PROMPT='' _PROMPT2=''",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:48.4335424Z",
+        "elapsed_milliseconds": 68,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-empty-prompts.stdout",
+          "sha256": "9e52dcf75b70a0207027e993f3ff6eef712d8b621819a566bf065b2a0b8254ef"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-empty-prompts.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-empty-prompts.stdin",
+        "sha256": "ae89ccd425a68ea4c2eaba25d5e1d2933baf1381be73068c6c7fdf9c7a5da24d"
+      },
+      "allocator_ceiling_measured": true,
+      "selected_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-ReferenceC-empty-prompts.allocator.62984.json",
+          "sha256": "70d111714f01292a0916643efa48d80c1e6a4b41f6dc9b194cb812c6254eba70",
+          "data": {
+            "schema_version": 1,
+            "run_id": "8ccd2e6a7791450eb7464bd86ccbc953",
+            "process_id": 62984,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          }
+        }
+      ],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "upstream-test",
+      "image_kind": "ReferenceC",
+      "case": "nonstring-prompt",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-nonstring-prompt.json",
+        "sha256": "fc7dde82cb3dae53770be635d2cfe8be797e4f0effe6472325937576e8cd8c3a"
+      },
+      "capture": {
+        "process_id": 63696,
+        "executable_sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+        "arguments": [
+          "-e",
+          "local C='X'; _PROMPT=setmetatable({}, {__tostring=function() C=C..'X'; return C end})",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:48.5154936Z",
+        "elapsed_milliseconds": 95,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-nonstring-prompt.stdout",
+          "sha256": "a63e9da2fdd3e7253834ae28d2a92aecf330a99e6d8b91d36c3e3bb52270d446"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-nonstring-prompt.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ReferenceC-nonstring-prompt.stdin",
+        "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a"
+      },
+      "allocator_ceiling_measured": true,
+      "selected_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-ReferenceC-nonstring-prompt.allocator.63696.json",
+          "sha256": "0b84cea9e7b70faa8154c9a7891a4fc4bb325c8d09e91e5f376a8df04bea5c62",
+          "data": {
+            "schema_version": 1,
+            "run_id": "4273cb991c6a4f51b0e7840b798676d6",
+            "process_id": 63696,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          }
+        }
+      ],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "upstream-test",
+      "image_kind": "Ada",
+      "case": "custom-prompt",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-custom-prompt.json",
+        "sha256": "b72cd9d218f9a5e69068df251c6172e01bf12e228edb6099f740d3fe0ebe365a"
+      },
+      "capture": {
+        "process_id": 89128,
+        "executable_sha256": "0105841771d912dce117faeea26230763a7fc265802d90747180a68370763d5c",
+        "arguments": [
+          "-e_PROMPT='alo'",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:48.6204568Z",
+        "elapsed_milliseconds": 68,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-custom-prompt.stdout",
+          "sha256": "46611c56dd7573825d32ee7585476ee105592e7dd7bfdf72ff64535de4ae452a"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-custom-prompt.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-custom-prompt.stdin",
+        "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a"
+      },
+      "allocator_ceiling_measured": true,
+      "selected_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-Ada-custom-prompt.allocator.89128.json",
+          "sha256": "fb40f40b85064c9aa7ab29d88ebb8b192bd95bbebfe331d5176eecf0d614457a",
+          "data": {
+            "schema_version": 1,
+            "run_id": "0ec373adabd347258be8729dd84c4af9",
+            "process_id": 89128,
+            "configuration": "upstream-test",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 231414,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          }
+        }
+      ],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "upstream-test",
+      "image_kind": "Ada",
+      "case": "empty-prompts",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-empty-prompts.json",
+        "sha256": "6b028fdb85a90f7af86dfca4f00a460a86d7b269af597c6c209bd91676c84626"
+      },
+      "capture": {
+        "process_id": 22076,
+        "executable_sha256": "0105841771d912dce117faeea26230763a7fc265802d90747180a68370763d5c",
+        "arguments": [
+          "-e_PROMPT='' _PROMPT2=''",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:48.7191246Z",
+        "elapsed_milliseconds": 79,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-empty-prompts.stdout",
+          "sha256": "3d45db20ed055df433eacaf840c54a252f1db35667366225e2ac31edbd64cf9e"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-empty-prompts.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-empty-prompts.stdin",
+        "sha256": "ae89ccd425a68ea4c2eaba25d5e1d2933baf1381be73068c6c7fdf9c7a5da24d"
+      },
+      "allocator_ceiling_measured": true,
+      "selected_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-Ada-empty-prompts.allocator.22076.json",
+          "sha256": "901296dbbc5a2b7149e58c234044cf49a961b88b8f87dd4dd4958c841f1d38b2",
+          "data": {
+            "schema_version": 1,
+            "run_id": "216a5384ecb24ebe943a602e5ddcb816",
+            "process_id": 22076,
+            "configuration": "upstream-test",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 234322,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          }
+        }
+      ],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "upstream-test",
+      "image_kind": "Ada",
+      "case": "nonstring-prompt",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-nonstring-prompt.json",
+        "sha256": "0d0f7ab277c223c78ad0f73c12f70bf31df94011d55b578c42ab52b637c2dcd9"
+      },
+      "capture": {
+        "process_id": 74636,
+        "executable_sha256": "0105841771d912dce117faeea26230763a7fc265802d90747180a68370763d5c",
+        "arguments": [
+          "-e",
+          "local C='X'; _PROMPT=setmetatable({}, {__tostring=function() C=C..'X'; return C end})",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:48.8285772Z",
+        "elapsed_milliseconds": 78,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-nonstring-prompt.stdout",
+          "sha256": "46611c56dd7573825d32ee7585476ee105592e7dd7bfdf72ff64535de4ae452a"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-nonstring-prompt.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-Ada-nonstring-prompt.stdin",
+        "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a"
+      },
+      "allocator_ceiling_measured": true,
+      "selected_telemetry": [
+        {
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\debug-metadata\\main-original-8dc1ce1d728c446fa5f01c261847f335\\upstream-test-Ada-nonstring-prompt.allocator.74636.json",
+          "sha256": "7569bc2b102e9888b2d85195bee943eddec92616a8413541449fda102928a62d",
+          "data": {
+            "schema_version": 1,
+            "run_id": "f292ecf378b448fabd2f6d59eb172a3f",
+            "process_id": 74636,
+            "configuration": "upstream-test",
+            "allocator_limit_bytes": 2147483648,
+            "managed_refusals": 0,
+            "provider_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0,
+            "peak_managed_bytes": 241145,
+            "expected_finalizer_warnings": 0,
+            "shutdown_complete": true,
+            "accounting_fault": false
+          }
+        }
+      ],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "upstream-test",
+      "image_kind": "ProductCLI",
+      "case": "custom-prompt",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ProductCLI-custom-prompt.json",
+        "sha256": "e9f065602831b5e29271b31f05e474dfba47bf7155edf2f2c3bd774d6e45bc40"
+      },
+      "capture": {
+        "process_id": 21592,
+        "executable_sha256": "6c0a279dd31c91f173b116138d7bf043d7c2dede459ca2c7d3da28d6fb061bf7",
+        "arguments": [
+          "-e_PROMPT='alo'",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:49.3266248Z",
+        "elapsed_milliseconds": 297,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ProductCLI-custom-prompt.stdout",
+          "sha256": "46611c56dd7573825d32ee7585476ee105592e7dd7bfdf72ff64535de4ae452a"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ProductCLI-custom-prompt.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ProductCLI-custom-prompt.stdin",
+        "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a"
+      },
+      "allocator_ceiling_measured": false,
+      "selected_telemetry": [],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "upstream-test",
+      "image_kind": "ProductCLI",
+      "case": "empty-prompts",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ProductCLI-empty-prompts.json",
+        "sha256": "465b1c060feac0fc4e1bc9fd9581343d94e6bf3eb4406c259690d4de746111c3"
+      },
+      "capture": {
+        "process_id": 89972,
+        "executable_sha256": "6c0a279dd31c91f173b116138d7bf043d7c2dede459ca2c7d3da28d6fb061bf7",
+        "arguments": [
+          "-e_PROMPT='' _PROMPT2=''",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:49.6534004Z",
+        "elapsed_milliseconds": 64,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ProductCLI-empty-prompts.stdout",
+          "sha256": "3d45db20ed055df433eacaf840c54a252f1db35667366225e2ac31edbd64cf9e"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ProductCLI-empty-prompts.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ProductCLI-empty-prompts.stdin",
+        "sha256": "ae89ccd425a68ea4c2eaba25d5e1d2933baf1381be73068c6c7fdf9c7a5da24d"
+      },
+      "allocator_ceiling_measured": false,
+      "selected_telemetry": [],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "configuration": "upstream-test",
+      "image_kind": "ProductCLI",
+      "case": "nonstring-prompt",
+      "metadata": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ProductCLI-nonstring-prompt.json",
+        "sha256": "17e3804622e8451fae693db512b926f3fc7aaf8792ebe6617b5d89ff3703dbca"
+      },
+      "capture": {
+        "process_id": 24856,
+        "executable_sha256": "6c0a279dd31c91f173b116138d7bf043d7c2dede459ca2c7d3da28d6fb061bf7",
+        "arguments": [
+          "-e",
+          "local C='X'; _PROMPT=setmetatable({}, {__tostring=function() C=C..'X'; return C end})",
+          "-i"
+        ],
+        "started_utc": "2026-11-08T06:17:49.74813Z",
+        "elapsed_milliseconds": 79,
+        "timeout_seconds": 30,
+        "exit_code": 0,
+        "timed_out": false,
+        "capture_exceeded": false,
+        "pipe_drain_failed": false,
+        "process_tree_kill_error": null,
+        "stdout": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ProductCLI-nonstring-prompt.stdout",
+          "sha256": "46611c56dd7573825d32ee7585476ee105592e7dd7bfdf72ff64535de4ae452a"
+        },
+        "stderr": {
+          "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ProductCLI-nonstring-prompt.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr_bytes": 0
+      },
+      "standard_input": {
+        "path": "reports/debug-metadata/main-original-8dc1ce1d728c446fa5f01c261847f335/upstream-test-ProductCLI-nonstring-prompt.stdin",
+        "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a"
+      },
+      "allocator_ceiling_measured": false,
+      "selected_telemetry": [],
+      "primary_original_execution": false,
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    }
+  ],
+  "observations": {
+    "native_baseline_precedes_ada": true,
+    "original_failure_line": 67,
+    "original_failure_call_line": 81,
+    "original_failed_operation": "RUN lua -v redirected to original os.tmpname out",
+    "all_four_original_exit_codes": 1,
+    "host_error": "Access is denied.",
+    "actual_primary_sidecars_each": 2,
+    "all_original_selected_bytes_blocks_zero": true,
+    "all_ada_shutdown_complete_and_no_accounting_fault": true,
+    "main_terminal_ok_reached": false,
+    "final_temporary_file_cleanup_reached": false,
+    "readline_env_warning_shutdown_ctrlc_blocks_reached": false,
+    "module_fixture_block_reached": false,
+    "module_fixtures_built_or_linked_for_this_first_failure_campaign": false,
+    "raw_stdout_equality_claimed": false,
+    "reason_no_raw_stdout_equality": "Original progname prints each actual selected launcher path; the raw role-specific bytes are retained without normalization.",
+    "original_sources_and_pins_changed": false
+  },
+  "protocol_review": {
+    "existing_proposal": {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/file-completion.author-proposal.json",
+      "sha256": "731f841cf93a8d4db535a828b84d62d7219431a07e89d01bb022085803120855"
+    },
+    "expected_entry": "all.lua dump/load then execute",
+    "observed_entry": "direct original file CLI",
+    "expected_result_tuple": "zero values after terminal OK",
+    "main_return_tuple_captured": false,
+    "required_terminal_phases": [
+      "testing warnings",
+      "testing Ctrl C",
+      "done",
+      "done (with at least two kills)",
+      "OK"
+    ],
+    "subprocess_expectations": "Keep original RUN/NoRun status and stdout/stderr assertions, exact warning fragments, finalizer order and close, actual interrupt caught-loop continuation and interrupted long pattern, real child/pipe cleanup and final zero-result tuple.",
+    "original_T_guard_obligations": "Real upstream-test T/MEMLIMIT and stored warning tests remain required; product CLI has no T adapter and supplies no T-body credit.",
+    "completion_protocol_accepted": false
+  },
+  "measured_cli_gap": {
+    "feature": "dynamic _PROMPT/_PROMPT2",
+    "native": "Reads global on each prompt, defaults only for nil, otherwise luaL_tolstring; retains converted value until readline finishes.",
+    "native_custom_prompt": "aloaloalo",
+    "native_nonstring_prompt": "XX then XXX then XXXX",
+    "ada": "Fixed > and >> prompts in both conformance and actual product CLI",
+    "all_isolated_processes_exit_zero_with_empty_stderr": true,
+    "behavior_result": "Ada differs from actual native prompt output; successful process status is not a passing behavior test.",
+    "production_fix_installed": false,
+    "proposed_bounded_scope": "CLI-only session helper/child plus shared REPL calls and focused tests, using real global/metamethod/native continuations and rooted prompt bytes; inspect native nil/nonstring/error semantics before selecting policy.",
+    "root_follow_up_authorized": "Root authorized bounded dynamic prompt work after this dated record; no implementation in this checkpoint."
+  },
+  "native_platform_follow_up": {
+    "status": "proposal-requires-independent-feature-and-exact-review",
+    "first_boundary": "Original Windows tmpnam output targets the current drive root and the host denies redirection. Preserve actual os.tmpname production semantics; no implementation-only change to hide a shared native failure.",
+    "later_boundaries": [
+      "Unix echo quoting and multi-line input",
+      "env and env -i invocation while preserving selected Lua images",
+      "POSIX /dev/null paths",
+      "background pid capture, kill -INT and sleep with real platform process control"
+    ],
+    "preservation": "Any future platform counterpart must retain every public CLI/package/environment/warning/finalization/native-module operation, real selected children and both interrupt obligations; no _port/_soft, skipped body or fabricated output.",
+    "exact_replacements_proposed": [],
+    "adapted_source_emitted": false,
+    "adapted_source_executed": false
+  },
+  "remaining_obligations": [
+    "Resolve the measured dynamic prompt gap with separately named actual native controls; no Lua shim or replaceable global tostring substitution.",
+    "Independently decide native Windows platform counterparts before source adaptation.",
+    "Prepare actual same-image upstream C modules before any full main/native-module-body acceptance.",
+    "Retain parent/bare/arg identity, actual allocator/lifetime sidecars, child deadlines and root/pipe cleanup for every completed subprocess block.",
+    "Require reviewed completion and final-context evidence; the original main remains failed in every measured role."
+  ]
+}
