@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "kind": "verybig-windows-independent-exact-source-review",
+  "author": "Codex /root/runtime_gaps",
+  "reviewer": "Codex /root/remaining_suite",
+  "review_date": "2026-11-08",
+  "reviewed_commit": "d3a3fd721b58f0a575d242962edb768ecddee9af",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "decision": "accepted-source-equivalent-only",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "native_applicability_approval": false,
+  "final_certificate_authority": false,
+  "source_emitted": false,
+  "source_executed": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "inputs": [
+    {
+      "path": "references/lua/testes/verybig.lua",
+      "sha256": "2b6d30c69cbe6974068881108eae297bdedd275b429be8ec614bf5f8ee89707e",
+      "byte_length": 3724,
+      "source_commit": "7579fc9d7ed90240487251dfb69168f8e64e9294"
+    },
+    {
+      "path": "references/lua/loslib.c",
+      "sha256": "3ed70ea013b0c7a5a758db435f76fe5a99e87f07ea02ed19b2012fb728f8aa13",
+      "byte_length": 11861,
+      "source_commit": "7579fc9d7ed90240487251dfb69168f8e64e9294"
+    },
+    {
+      "path": "tests/conformance/platform/windows-verybig-tempfile.lua",
+      "sha256": "25e94daeaa1b5529a57659f624657ef298fdde9e60549de5edc806f027ca9379",
+      "byte_length": 2218,
+      "source_commit": "d3a3fd721b58f0a575d242962edb768ecddee9af"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/verybig-windows-tempfile.author-proposal.json",
+      "sha256": "41ca9ac66f044629018da44d01e168948f8cf28c3154f8f4ba246421b51a49bb",
+      "byte_length": 1993,
+      "source_commit": "d3a3fd721b58f0a575d242962edb768ecddee9af"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/verybig-windows-tempfile.source.author-proposal.json",
+      "sha256": "357e594ec9badeec9a31ddd1430899e8c6338226bbe70a6c29d1724142cb0a9a",
+      "byte_length": 5059,
+      "source_commit": "d3a3fd721b58f0a575d242962edb768ecddee9af"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/verybig-windows.native.author-observation.json",
+      "sha256": "7e0e8c5a80a533063bea6a86b8f7e6eac1c9d3ca4cb07085d7ab4264a403e18d",
+      "byte_length": 39132,
+      "source_commit": "d3a3fd721b58f0a575d242962edb768ecddee9af"
+    },
+    {
+      "path": "scripts/observe-verybig-windows-native.ps1",
+      "sha256": "10fd4ef5edbb96a27a8fd9d8771564b7861ac1c62f2597b3ccee9a22c237cb47",
+      "byte_length": 8368,
+      "source_commit": "d3a3fd721b58f0a575d242962edb768ecddee9af"
+    },
+    {
+      "path": "scripts/test-verybig-windows-proposal.ps1",
+      "sha256": "c581a28b4acc5554a367921aaf04844095fcb6a55ff83d8104781b5e0f7232fe",
+      "byte_length": 9242,
+      "source_commit": "d3a3fd721b58f0a575d242962edb768ecddee9af"
+    }
+  ],
+  "exact_change": {
+    "id": "windows-verybig-tempfile-cwd",
+    "path": "references/lua/testes/verybig.lua",
+    "source_sha256": "2b6d30c69cbe6974068881108eae297bdedd275b429be8ec614bf5f8ee89707e",
+    "source_byte_length": 3724,
+    "start_byte": 3491,
+    "length_bytes": 12,
+    "start_line": 141,
+    "end_line": 141,
+    "original_text": "os.tmpname()",
+    "original_span_sha256": "5877a423400935af8288a4a9d58c43ba23153277ed30fdd2f7448ff190911e7a",
+    "replacement": "'.'..os.tmpname()",
+    "replacement_byte_length": 17,
+    "replacement_sha256": "6c2b35bd3de16c41bc02710f4cb2c8d9a2cfc0c5f711f752e3636cdbf60ce609",
+    "generated_byte_length": 3729,
+    "generated_sha256": "d973c7a66fd1f4d50ec48c7d2bc49ad2bf8aa3e0df9cadf7033c52f1e3ce00dc",
+    "prefix": {
+      "start_byte": 0,
+      "length_bytes": 3491,
+      "sha256": "7c01974cbb614fc300ade895e18a067c7722e2805d304e9ce06f2f83b93a86e4"
+    },
+    "suffix": {
+      "original_start_byte": 3503,
+      "generated_start_byte": 3508,
+      "length_bytes": 221,
+      "sha256": "8fc0e825c636f5fa4289445064b1a53358c17ebfc56b67ca914edaeadf72c8f4"
+    }
+  },
+  "findings": [
+    "Read the full pinned3724-byte original, both exact author proposals, complete63-line counterpart, observer, source/rejection self-test and dated source narrative. Independently reconstructed only the17-byte expression in memory and confirmed the3729-byte preview hash. All untouched prefix/suffix bytes match the original; no transformed whole file was written or executed by this review.",
+    "The native non-POSIX loslib fallback delegates to C tmpnam and returns its bytes unchanged. For a flat current-drive rooted Windows name beginning with backslash, prefixing one dot produces a current-directory-relative path while retaining the actual call and every leaf byte. This avoids the measured inaccessible drive-root output target; it does not replace os.tmpname globally or fabricate a name.",
+    "The original os.tmpname expression is evaluated once in a single-value assignment. The replacement keeps that single real call; its new left operand is a side-effect-free string literal. An additional concatenation/string allocation is inherent in the path translation and is not claimed cost-free. All source flags, original RK assertions, generated70001-field program,50000-entry generator bounds, constructor/list and function-call assertions, I/O, dofile, remove and final return remain byte-identical.",
+    "The counterpart observes only the raw rooted name and never opens/removes it. It requires a nonempty flat leaf distinct from dot/dotdot, constructs dot-plus-raw, and checks local absence with ENOENT2 before any write. An unreadable existing file cannot be mistaken for a fresh output target. Freshness is a controlled disposable-CWD prerequisite, not a universal guarantee from rebasing tmpnam.",
+    "The seven named source checks cover rooted shape, fresh local target, real io.output/io.write/io.close, exact raw CRLF/text reads, loadfile text execution, dofile, separate binary load and actual removal/ENOENT. The eighth observed label is the external wrapper checking return10; it is not an eighth named body hidden in the counterpart. Restoring io.output in this small counterpart does not modify original verybig cleanup behavior.",
+    "The separate binary control is additional focused loader evidence only. Original verybig generates text and calls dofile; no binary call is inserted in, or claimed as an original assertion of, that source. The small counterpart does not exercise the full generated workload or replace it.",
+    "Inspected and rehashed40 committed/frozen/raw content bindings, including the actual native EXE/DLL pairs, configuration probes, original/counterpart raw records, stdout/stderr and PID/run-matched telemetry. Both unchanged originals exit1 at142 with Permission denied for rooted names; both counterparts exit0 with the exact eight-label stdout and empty stderr. These are observed source/platform facts, not this review granting native applicability or runtime pass authority.",
+    "Both real native workload sidecars report the requested2-GiB limit and zero outstanding blocks/bytes. Configuration-only probes correctly have no fabricated sidecar. Existing source/GPR input fingerprints are not promoted to missing actual compile-command receipts. Original failures occur before the generated large workload and receive no passing whole-file credit.",
+    "Approve only this exact expression choice for Windows source equivalence. No slash stripping, fixed filename, second patch, adjacent statement, soft/port control, T omission, output normalization, assertion removal or source exclusion is approved. Linux/macOS retain their original source. Existing private-C policy remains untouched; this review authorizes no further private exclusion.",
+    "The author manifest is still pending in the reviewed snapshot. This independent narrative must be bound by Root through the normal generic Equivalent approval graph before any transformed source emission/execution. It is not a fabricated Root approval or a live applicability/certificate edge. Any changed source, replacement, counterpart or claims require a new exact decision, not a future hash-only update.",
+    "Each final context still needs a distinct post-observation native applicability decision proving this rooted-name/fresh-CWD situation on the actual selected images, followed by complete reviewed whole-file C/Ada and appropriate compiler/VM execution, all original assertions, cleanup and single-result10 protocol. Aggregate/full-target acceptance and immutable image certification remain separate."
+  ],
+  "native_observations_inspected": {
+    "author_root": "C:/Users/Itsuki/.codex/worktrees/remaining-c-api/lua-ada",
+    "raw_summary_path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/observation.json",
+    "raw_summary_sha256": "323ab43edf392c321a77b8fb490413ecf02658cbdd25e36e1dfb2b5c21d3a613",
+    "configurations": [
+      "default",
+      "upstream-test"
+    ],
+    "original_stdout_sha256": "1a4bd1fedd99d8d64b87bfe912f5e832d1f1faa69839b2e90733d9ee01d5bde5",
+    "counterpart_stdout_sha256": "caa61ae082c361317d4cb6bcd42c6dafc43decea729255487c82120b036d08d2",
+    "counterpart_labels": [
+      "rooted-name",
+      "fresh-cwd-name",
+      "write-read",
+      "text-loadfile",
+      "dofile",
+      "binary-load",
+      "remove",
+      "return"
+    ],
+    "original_rooted_failure_names": [
+      "\\s26bo.",
+      "\\s94s."
+    ],
+    "raw_binding_checks": 40,
+    "review_execution_performed": false,
+    "actual_input_copies_checked": 4,
+    "native_source_spans_checked": 2,
+    "fresh_counterpart_cwd_residue": "both retain only the exact counterpart source"
+  },
+  "scope_limits": [
+    "Exact source-only narrative, no authority to bypass the normal approval graph",
+    "No native applicability/applicability matrix decision",
+    "No adapted whole-file emission or execution by this reviewer",
+    "No production, reference, existing policy or author-file changes",
+    "No transformed whole-file runtime, final-context or certificate claim"
+  ],
+  "platform": "windows",
+  "configurations": [
+    "default",
+    "upstream-test"
+  ],
+  "permitted_resolution": "native-platform-equivalent",
+  "exact_replacement_count": 1,
+  "generated_sha256": "d973c7a66fd1f4d50ec48c7d2bc49ad2bf8aa3e0df9cadf7033c52f1e3ce00dc"
+}
