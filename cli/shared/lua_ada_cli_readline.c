@@ -22,6 +22,15 @@ typedef char function_pointer_size_check[
     sizeof(read_line_function) == sizeof(void *) &&
     sizeof(save_line_function) == sizeof(void *) ? 1 : -1];
 
+#if defined(LUA_ADA_CLI_MACOS)
+static void save_system_history(const char *line) {
+    /* Apple's libedit compatibility API returns int; GNU's returns void.
+     * Invoke the declared function normally and discard either result rather
+     * than calling it through an incompatible function-pointer type. */
+    (void)add_history(line);
+}
+#endif
+
 static const char *initialize_readline(int ignore_environment) {
 #if defined(LUA_ADA_CLI_LINUX)
     const char *name = ignore_environment ? NULL : getenv("LUA_READLINELIB");
@@ -48,7 +57,7 @@ static const char *initialize_readline(int ignore_environment) {
     (void)ignore_environment;
     rl_readline_name = "lua";
     read_line = readline;
-    save_line = add_history;
+    save_line = save_system_history;
     return NULL;
 #else
     (void)ignore_environment;

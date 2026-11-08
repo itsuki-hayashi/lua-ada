@@ -123,6 +123,9 @@ try {
     if($LASTEXITCODE -ne 0){throw 'Cannot identify selected console C compiler'}
     $consoleCompiler=($consoleCompilerOutput -join '').Trim()
     Invoke-Alire -Arguments @('exec','--','pwsh','-NoProfile','-File',
+        (Join-Path $PSScriptRoot 'test-cli-readline-portability.ps1'),
+        '-Compiler',$consoleCompiler)
+    Invoke-Alire -Arguments @('exec','--','pwsh','-NoProfile','-File',
         (Join-Path $PSScriptRoot 'check-debug-console-c.ps1'),
         '-Interpreter',(Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
         '-AdaConsumer',(Join-Path $projectRoot "build/c-api/bin/$Profile/$LibraryType/builtin_api_contract$suffix"),

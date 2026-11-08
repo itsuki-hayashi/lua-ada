@@ -32,6 +32,13 @@ Ordinary runtime-library builds do not need readline headers or libraries.
 CLI/test builds use native dlopen on Linux and system readline headers/linking
 on macOS; Windows requires neither.
 
+Apple's [libedit header](https://github.com/apple-oss-distributions/libedit/blob/main/src/editline/readline.h)
+declares add_history with an integer return, while GNU's API returns void.
+The linked macOS branch calls that declared function through a void wrapper
+that discards the result, never an incompatible function-pointer cast. Four
+strict compile-only cases cover both signatures and product/test branches
+using explicitly synthetic declarations; actual SDK builds remain separate.
+
 Ada retains prompt lookup/conversion and its real anonymous C caller. The
 converted Lua string stays rooted through synchronous native input; its
 existing NUL-terminated payload is borrowed without an input-sized stack copy.

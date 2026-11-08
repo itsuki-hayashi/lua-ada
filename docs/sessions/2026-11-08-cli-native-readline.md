@@ -46,3 +46,17 @@ to PowerShell enumeration of an empty byte array. Direct typed assignment now
 preserves that actual zero-byte input. The failed capture remains diagnostic.
 The first test compile exposed a missing visibility clause for C.int equality;
 that cause is fixed without changing flags or suppressing diagnostics.
+
+Follow-up source inspection of Apple's published header found its integer
+add_history return differs from GNU's void return. The macOS branch now uses
+a declared-call wrapper instead of assigning an incompatible function pointer.
+Four actual strict GCC compile-only cases pass with deliberately synthetic
+int/void headers and both product/test macro selections. This verifies the
+transport's type handling, not an Apple SDK build or Unix runtime observation.
+
+At committed 4ca6280, both CLI executables were strictly rebuilt and both full
+112-operation suites passed. Fresh fourteen-pair results are under
+reports/cli-readline/ef73de50211b4aca9c9075cec03f5f90 and
+reports/cli-readline/1dd35caf8ab8446499a3851b99333b79. Suite independently read
+the prompt/input/history lifetime changes while integrating its separate
+message-handler work and reported no high-confidence ownership finding.

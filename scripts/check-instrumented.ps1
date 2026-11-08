@@ -220,6 +220,8 @@ try {
     $consoleCompilerOutput=& alr exec -- pwsh -NoProfile -Command '(Get-Command gcc -ErrorAction Stop).Source'
     if($LASTEXITCODE -ne 0){throw 'Cannot identify selected instrumented console C compiler'}
     $consoleCompiler=($consoleCompilerOutput -join '').Trim()
+    & "$PSScriptRoot/test-cli-readline-portability.ps1" -Compiler $consoleCompiler
+    if($LASTEXITCODE -ne 0){throw 'Readline callback type regressions failed'}
     & "$PSScriptRoot/check-debug-console-c.ps1" -Interpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
         -AdaConsumer "$root/build/c-api/bin/upstream-test/validation/$LibraryType/builtin_api_contract$suffix" `
         -Compiler $consoleCompiler -ReferenceLibrary "$root/build/conformance/upstream-test/lib" `
