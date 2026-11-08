@@ -155,7 +155,16 @@ function Test-NamedConsumerEvidence {
         $expected=(@($names|ForEach-Object{'PASS: buffer-'+$_}) -join "`n")+"`nPASS: public luaL_Buffer contract`n"
         if($kind -ceq 'buffer-private-t'){
             if($parts[0] -cne 'upstream-test'){throw 'Private T buffer receiver cannot run in a default context'}
-            $expected="BUFFER-RECEIVER: private-t-c LUAL_BUFFERSIZE=23 SIZEOF_BUFFER=64 LUA_EXTRASPACE=16`n"+$expected
+            # Both selected receivers compile the pinned private header. Its
+            # long-double alignment gives a 56-byte buffer on macOS arm64 and
+            # 64 bytes on the other measured 64-bit hosts. Retain that actual
+            # native observation, then require the Ada receiver's entire
+            # ordered output to agree. Matching arbitrary layout text cannot
+            # replace the fixed capacity, supported layouts or private role.
+            $native=$outputs['buffer-private-t-oracle'].text.Replace("`r`n","`n")
+            $header=[regex]::Match($native,'\ABUFFER-RECEIVER: private-t-c LUAL_BUFFERSIZE=23 SIZEOF_BUFFER=(?:56|64) LUA_EXTRASPACE=16\n')
+            if(-not $header.Success){throw 'Named private buffer native header layout is unsupported'}
+            $expected=$header.Value+$expected
         }
         $contract=$Report[$kind.Replace('-','_')+'_contract']
         if(($contract.matched_cases -isnot [int] -and $contract.matched_cases -isnot [long]) -or

@@ -501,15 +501,27 @@ $context='upstream-test/windows/validation/static'
 $mapping.cases=@($mapping.cases|Where-Object consumer -CIn @('c-api','foreign-api'))
 function Set-SyntheticTContext($Report){$Report.configuration='upstream-test';foreach($child in $Report.consumers){$child.configuration='upstream-test'}}
 Run-Case 'T target requires the actual private23 buffer receiver without relying on an API route choosing it' {param($r) Set-SyntheticTContext $r} '' -Foreign -RemainingTarget
+Run-Case 'paired native macOS56 private buffer layout retains all seventeen ownership cases' {param($r)
+    Set-SyntheticTContext $r
+    foreach($name in @('buffer-private-t-api','buffer-private-t-oracle')){Replace-Capture $r $name stdout ($privateBuffer.Replace('SIZEOF_BUFFER=64','SIZEOF_BUFFER=56'))}
+} '' -Foreign -RemainingTarget
+Run-Case 'private buffer layout must match its actual paired native receiver' {param($r)
+    Set-SyntheticTContext $r
+    Replace-Capture $r buffer-private-t-api stdout ($privateBuffer.Replace('SIZEOF_BUFFER=64','SIZEOF_BUFFER=56'))
+} 'oracle bytes differ|complete ordered ownership' -Foreign -RemainingTarget
+Run-Case 'matching private receiver output cannot invent an unsupported buffer layout' {param($r)
+    Set-SyntheticTContext $r
+    foreach($name in @('buffer-private-t-api','buffer-private-t-oracle')){Replace-Capture $r $name stdout ($privateBuffer.Replace('SIZEOF_BUFFER=64','SIZEOF_BUFFER=128'))}
+} 'native header layout is unsupported' -Foreign -RemainingTarget
 Run-Case 'T target cannot omit the native private23 counterpart' {param($r)
     Set-SyntheticTContext $r;$r.consumers=@($r.consumers|Where-Object name -CNE buffer-private-t-oracle)
 } 'missing/duplicate' -Foreign -RemainingTarget
 Run-Case 'ordinary1024 buffer markers cannot replace a private23 caller' {param($r)
     Set-SyntheticTContext $r;foreach($name in @('buffer-private-t-api','buffer-private-t-oracle')){Replace-Capture $r $name stdout $bufferFull}
-} 'complete ordered ownership' -Foreign -RemainingTarget
+} 'native header layout is unsupported' -Foreign -RemainingTarget
 Run-Case 'matching private buffer markers cannot alter the actually compiled header capacity' {param($r)
     Set-SyntheticTContext $r;foreach($name in @('buffer-private-t-api','buffer-private-t-oracle')){Replace-Capture $r $name stdout ($privateBuffer.Replace('LUAL_BUFFERSIZE=23','LUAL_BUFFERSIZE=1024'))}
-} 'complete ordered ownership' -Foreign -RemainingTarget
+} 'native header layout is unsupported' -Foreign -RemainingTarget
 Run-Case 'private buffer memory recovery is required after its exact header marker' {param($r)
     Set-SyntheticTContext $r;foreach($name in @('buffer-private-t-api','buffer-private-t-oracle')){Replace-Capture $r $name stdout ($privateBuffer.Replace("PASS: buffer-fault-sweep-growth`n",''))}
 } 'complete ordered ownership' -Foreign -RemainingTarget
