@@ -52,6 +52,7 @@ function Get-ConformanceResourceFeatureSources {
       'src/lua-engine-machine.adb','src/lua-engine-stacks.ads','src/lua-engine-stacks.adb','src/lua-engine-tables.adb',
       'src/lua-engine-collector.adb','src/lua-engine-foreign.adb','src/lua-storage.adb','src/lua-storage-vectors.adb',
       'tests/src/lua-conformance_adapter.adb','tests/c/conformance_adapter.c',
+      'tests/c/conformance_api.c','tests/c/conformance_api.h',
       'tests/src/lua-conformance_allocator.adb','tests/src/lua-conformance_memory.adb',
       'scripts/ConformanceExclusionEligibility.psm1','scripts/ConformanceInventory.psm1',
       'scripts/ConformanceResourceEligibility.ps1','scripts/ConformanceTransforms.psm1')
@@ -69,8 +70,10 @@ function Assert-ConformanceResourceReviews {
                 throw 'V4 source review cannot grant runtime, coverage or adaptation authority'
             }
         }
-        if($value.Contains('synthetic_fixture') -and
-            ($value.synthetic_fixture -isnot [bool] -or ($value.synthetic_fixture -and -not $AllowSyntheticReview))){
+        if(-not $value.Contains('synthetic_fixture') -or $value.synthetic_fixture -isnot [bool]){
+            throw 'V4 source review requires an explicit actual/synthetic boolean label'
+        }
+        if($value.synthetic_fixture -and -not $AllowSyntheticReview){
             throw 'V4 actual target cannot use synthetic review authority'
         }
         foreach($field in @('execution_evidence','source_exclusions')){

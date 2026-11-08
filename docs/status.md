@@ -24,7 +24,7 @@ collation assertion; private table-inspection and final matrix gates remain.
 
 The [V4 resource verifier](sessions/2026-11-08-observable-resource-eligibility.md)
 implements a closed exact memerr allocation-count source rule with retained
-public materialization and optimized zero-allocation obligations. Sixty new
+public materialization and optimized zero-allocation obligations. Sixty-eight
 binding cases and legacy suites pass; no resource policy row, review approval,
 transformation or runtime acceptance is installed. Code's imported verifier
 binding must be independently renewed as a ten-source graph.

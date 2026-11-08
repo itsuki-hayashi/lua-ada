@@ -35,7 +35,7 @@ absence guard; it introduces no general statement/expression grammar.
 A small private helper is dot-sourced into Inventory so existing byte scanning,
 reviewed-file resolution, semantic-field approvals and protected-scope checks
 remain authoritative. The helper requires independent current feature and
-semantic-retention reviews. Feature bindings cover 24 exact primary native,
+semantic-retention reviews. Feature bindings cover 26 exact primary native,
 implementation/provider/checker and verifier paths. Semantic bindings cover
 the four current ordinary/T Lua/Ada counterpart sources and all eight semantic
 and real-refusal contracts. The original optimized workload and actual fault
@@ -51,7 +51,11 @@ nine-source review is intentionally stale and needs a new independent review;
 no actual review is rehashed automatically. Data installation remains a
 separate author/reviewer operation after this verifier checkpoint.
 
-Sixty new source-binding/rejection cases, 42 V3 cases (including the new helper
+All source decisions require an explicit actual/synthetic boolean label.
+The direct public command driver and its count/owner registry-key header are
+included in the source graph; changing them invalidates the feature decision.
+
+Sixty-eight source-binding/rejection cases, 42 V3 cases (including the new helper
 staleness control), 62 inventory cases, 45 legacy exclusion cases and the 35
 transform/53 verifier-equivalent cases validate the bounded rules. Tests create
 only labelled disposable metadata under ignored reports. No Lua execution or

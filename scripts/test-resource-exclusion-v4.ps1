@@ -149,4 +149,28 @@ Case 'unknown exclusion fields cannot acquire approval by omission' {$f=Fixture;
 Case 'approval cannot authorize changed invariant text' {$f=Fixture;$f.exclusion.invariant='changed after review';Reject {Validate $f} 'approved semantics differ'}
 Case 'the original anchor cannot itself be excluded' {$f=Fixture;$x=@{};$x[$row.id]=$f.exclusion;$x[$row.original_anchor.id]=@{source='memerr.lua'};Reject {Parents $f $x} 'must remain'}
 Case 'an unknown retained-materialization field is rejected' {$f=Fixture;$f.exclusion.retained_materialization.extra='ignored';Reject {Validate $f} 'public or mixed'}
+foreach($part in @('feature','retention','narrative')){
+    Case "a missing $part synthetic label cannot become actual authority" {
+        $f=Fixture;[void]$f[$part].Remove('synthetic_fixture');Bind $f
+        Reject {Validate $f} 'explicit actual/synthetic boolean label'
+    }
+}
+Case 'a missing approval synthetic label cannot become actual authority' {
+    $f=Fixture
+    $a=Get-Content (Join-Path $temporary $f.exclusion.review.artifact) -Raw|ConvertFrom-Json -AsHashtable
+    [void]$a.Remove('synthetic_fixture')
+    $f.exclusion.review.artifact_sha256=Save $f.exclusion.review.artifact $a
+    Reject {Validate $f} 'explicit actual/synthetic boolean label'
+}
+foreach($path in @('tests/c/conformance_api.c','tests/c/conformance_api.h')){
+    Case "the actual public command driver dependency cannot be omitted: $path" {
+        $f=Fixture;$f.feature.source_bindings=@($f.feature.source_bindings|Where-Object path -CNE $path);Bind $f
+        Reject {Validate $f} 'source binding set'
+    }
+    Case "stale public command driver bytes invalidate source authority: $path" {
+        $f=Fixture;$binding=@($f.feature.source_bindings|Where-Object path -CEQ $path)[0]
+        $binding.sha256='0'*64;Bind $f
+        Reject {Validate $f} 'Review file hash differs'
+    }
+}
 Write-Output "PASS: $script:cases observable resource source-binding cases; no policy installation or runtime authority"
