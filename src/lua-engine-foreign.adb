@@ -1686,6 +1686,8 @@ package body Lua.Engine.Foreign is
          Record_Address : constant System.Address := Main_Owner.Calls;
          Pending : constant Calls.Object_Pointer :=
            Calls.To_Pointer (Main_Owner.Calls);
+         Pool_Owner : constant Controls.Object_Pointer :=
+           Pending.Storage.Owner;
          Generation : constant C.unsigned_long_long :=
            Pending.Storage.Generation;
          Is_Resume_Entry : constant Boolean := Pending.Is_Resume;
@@ -2088,11 +2090,15 @@ package body Lua.Engine.Foreign is
          when others =>
             Packet.Clear;
             if Main_Owner.Calls = Record_Address and then
+              Calls.To_Pointer (Record_Address).Storage.Owner = Pool_Owner
+              and then
               Calls.To_Pointer (Record_Address).Storage.Generation =
                 Generation
             then
                --  Result publication can reenter C after this record was
-               --  returned. Address reuse alone cannot identify this pump.
+               --  returned. Address and generation alone cannot identify
+               --  it: another context pool may reuse that address with an
+               --  equal per-owner generation. Compare the actual pool too.
                Discard_Pending (Owner.Universe.all, Main_Owner);
             end if;
             if Is_Resume_Entry then

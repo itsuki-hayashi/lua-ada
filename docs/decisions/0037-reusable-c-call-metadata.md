@@ -23,8 +23,8 @@ before publication. Refusal rolls back the unpublished frame and capacity;
 normal emergency collection/retry remains in the owning frame allocator.
 
 A foreign Control owns intrusive all/free lists of scalar Call_Record nodes.
-Records have no Lua values or hidden allocator. A checked owner generation
-distinguishes a live pump from a reused node at the same address, including
+Records have no Lua values or hidden allocator. Checked owner identity and
+per-owner generation distinguish a live pump from a reused node at the same address, including
 reserved reset records. Acquire/return use constant
 time links. A genuinely deeper cold API entry may grow through the selected
 provider; warm depth consumes an existing record. Node construction is

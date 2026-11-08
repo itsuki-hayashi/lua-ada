@@ -80,3 +80,34 @@ checkout's missing tests/modules/busted/busted-scm-1.rockspec fixture, and is
 not reported passing. No reference tree/pin, allocator limit, original warmup,
 upstream assertion or source-exclusion decision changed. Full api.lua,
 memerr.lua, final-head/platform matrix and aggregate acceptance remain open.
+
+Root's subsequent review identified a cross-owner ABA possibility in exceptional
+pump cleanup: generations are per control, so another context pool could reuse
+an address with the same numeric generation. The follow-up captures the actual
+pool owner and compares address, owner and generation before discarding a call.
+Two public nested-context controls grow/shrink real frame pools, transfer normal
+or numeric-error results through both guards, and verify healthy reentry. They
+exercise ownership/recovery without claiming deterministic identical-address
+reuse by the host allocator. The follow-up passes all six strict builds and all 2,450 AUnit cases in
+each mode, plus the same 26/27 ordinary C consumers. All nineteen Lua cases
+match all four raw T compiler/VM roles, stdout SHA256
+97C45B7B97CF39A7AF8126A225A2F43083F4F9078D42BEBA8C7BBB2EDF5C22E3,
+with empty stderr and balanced shutdown. Repeated original errors.lua still
+completes in all four processes within the 2 GiB ceiling; raw evidence is
+reports/hook-top/errors-pool-e6bcef5d188440388403545c9d786b73.
+
+Post-component unreduced memory diagnostics use the existing exact approved
+verifier copy, 7,529 bytes and SHA256
+880D83E6EE5B5CF621C59D410FA928340375AC4F4191913C8092A5F385BBDA76,
+in a fresh disposable suite, with no soft flags, 900-second timeout and 2 GiB.
+The first function-call sweep now requires zero allocations and zero extra
+bytes. Ada advances through state/table/string/coroutine and materialized
+vararg-table sweeps, then fails adapted line 134/original 133's exact b.aloc==3
+assertion: actual Ada count 6 versus native 3. No source decision or optimization
+was made to match that representation count. The retained vararg values, type
+and actual refusal/recovery obligations still require reviewed treatment.
+Ada finishes with zero outstanding bytes/blocks, peak 1,063,891 bytes,
+10,323 managed and 18,083 provider refusals, shutdown_complete=true and no
+accounting fault. Unchanged native T still fails os.tmpname at original 205
+with Permission denied. Both whole-file results remain failures. Raw evidence
+is reports/hook-top/memerr-pool-fd614c25f682469aadbb49c197f88aad.

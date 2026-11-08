@@ -44,6 +44,8 @@ package body Lua.Call_Metadata_Tests is
    procedure Repeated_Entry;
    procedure Outstanding_Shrink;
    procedure Error_After_Shrink;
+   procedure Cross_Context_Return;
+   procedure Cross_Context_Error;
 
    procedure Check (Name : String) is
       State : World;
@@ -458,6 +460,20 @@ package body Lua.Call_Metadata_Tests is
       Check ("Error_After_Shrink");
    end Error_After_Shrink;
 
+   procedure Cross_Context_Return is
+   begin
+      --  Two actual context pools remain active while the child grows and
+      --  physically shrinks its cache, then returns through both guards.
+      Check ("Cross_Context_Return");
+   end Cross_Context_Return;
+
+   procedure Cross_Context_Error is
+   begin
+      --  Independent context generations must not discard another owner
+      --  during nested numeric-error transfer and subsequent healthy entry.
+      Check ("Cross_Context_Error");
+   end Cross_Context_Error;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "C metadata: pure Ada frame capacity",
@@ -516,5 +532,9 @@ package body Lua.Call_Metadata_Tests is
                         Outstanding_Shrink'Access);
       Test_Support.Add (Suite, "C metadata: error after outstanding shrink",
                         Error_After_Shrink'Access);
+      Test_Support.Add (Suite, "C metadata: cross-context return after shrink",
+                        Cross_Context_Return'Access);
+      Test_Support.Add (Suite, "C metadata: cross-context error after shrink",
+                        Cross_Context_Error'Access);
    end Register;
 end Lua.Call_Metadata_Tests;

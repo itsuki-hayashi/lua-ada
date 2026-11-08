@@ -56,6 +56,38 @@ local cases={
     local a,b=T.testC(code,f);assert(a==17 and b=='ERRRUN')
     assert(T.testC('call 0 1;return 1',function()return 29 end)==29)
   end},
+  {'Cross_Context_Return',function()
+    local co=coroutine.create(function()end)
+    deep(48)
+    _METADATA_CROSS_TARGET=function()
+      deep(32);collectgarbage();collectgarbage();return 37
+    end
+    local a,b=T.testC(code,function()
+      local value,status=T.testC(co,
+        'getglobal "_METADATA_CROSS_TARGET";pcall 0 1 0;pushstatus;return 2')
+      assert(value=='37' and status=='OK');return 29
+    end)
+    assert(a==29 and b=='OK')
+    _METADATA_CROSS_TARGET=nil
+    assert(coroutine.close(co))
+    assert(T.testC('call 0 1;return 1',function()return 41 end)==41)
+  end},
+  {'Cross_Context_Error',function()
+    local co=coroutine.create(function()end)
+    deep(48)
+    _METADATA_CROSS_TARGET=function()
+      deep(32);collectgarbage();collectgarbage();error(17)
+    end
+    local a,b=T.testC(code,function()
+      local value,status=T.testC(co,
+        'getglobal "_METADATA_CROSS_TARGET";pcall 0 1 0;pushstatus;return 2')
+      assert(value=='17' and status=='ERRRUN');error(29)
+    end)
+    assert(a==29 and b=='ERRRUN')
+    _METADATA_CROSS_TARGET=nil
+    assert(coroutine.close(co))
+    assert(T.testC('call 0 1;return 1',function()return 43 end)==43)
+  end},
   {'Primitive_Strings',function()
     local a=string.rep('x',4096)
     local b=string.rep('x',4096)
