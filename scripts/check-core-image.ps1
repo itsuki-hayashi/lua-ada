@@ -648,7 +648,9 @@ try {
             matched_cases=17;reference_library_files=$referenceLibraries;header_role='native-private-T-caller-header-role'}
     }
     $allocatorContractSources=@(@{file='c_api/tests/allocator_api_contract.c';sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot 'c_api/tests/allocator_api_contract.c')).Hash.ToLowerInvariant()})
-    $substitutionContractSources=@(@{file='c_api/tests/substitution_api_contract.c';sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot 'c_api/tests/substitution_api_contract.c')).Hash.ToLowerInvariant()})
+    $substitutionContractSources=@(foreach($name in @('substitution_api_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
     $loadfileContractSources=@(foreach($name in @('loadfile_api_contract.c','consumer_allocator.h')){
         @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
     })

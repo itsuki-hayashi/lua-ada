@@ -181,4 +181,5 @@ Case 'unchanged proposal regeneration preserves exact reviewable bytes and key o
         -AdditionalApiRoutes $routes|Out-Null
     foreach($file in Get-ChildItem -LiteralPath $path -File){Assert-True ((Get-FileHash $file.FullName).Hash -ceq $hashes[$file.Name]) 'Unchanged source proposals acquired unrelated byte changes'}
 }
+& (Join-Path $PSScriptRoot 'test-target-oracle-sources.ps1')
 Write-Output "PASS: $script:Cases target witness policy regressions; synthetic source/capture objects only, no executed API acceptance"

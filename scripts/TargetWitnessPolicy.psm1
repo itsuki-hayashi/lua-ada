@@ -269,6 +269,23 @@ function Read-TargetWitnessPolicy {
         source_reviewed=[bool]$RequireReview;runtime_acceptance=$false;coverage_authority=$false}
 }
 
+function Assert-TargetAdditionalOracleSources {
+    param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][Collections.IDictionary]$Consumer,
+          [Parameter(Mandatory)][string]$Kind,[Parameter(Mandatory)][string[]]$Names)
+    $key=$Kind.Replace('-','_')+'_contract'
+    if(-not $Consumer.Contains($key) -or $Consumer[$key] -isnot [Collections.IDictionary] -or
+        -not $Consumer[$key].Contains('sources') -or $Consumer[$key].sources -isnot [Array]){
+        throw "Target additional oracle contract source metadata missing: $Kind"
+    }
+    foreach($name in $Names){
+        $source=@($Consumer[$key].sources|Where-Object file -CEQ $name)
+        if($source.Count -ne 1){
+            throw "Target additional oracle source binding is missing or duplicated: contract=$Kind source=$name expected=1 observed=$($source.Count)"
+        }
+        [void](Resolve-ReviewedFile -Root $Root -Path $name -Sha256 $source[0].sha256)
+    }
+}
+
 function Test-TargetNamedContextEvidence {
     param([Parameter(Mandatory)][string] $Root,[Parameter(Mandatory)][Collections.IDictionary] $Policy,
           [Parameter(Mandatory)][string] $ConsumerReport,[Parameter(Mandatory)][string] $AUnitReport,
@@ -325,11 +342,7 @@ function Test-TargetNamedContextEvidence {
         if($kind -ceq 'macro-compat'){$names+='c_api/tests/macro_api_contract.c'}
         if($kind -ceq 'buffer-private-t'){$names+=@('c_api/tests/buffer_api_contract.c','references/lua/ltests.h','c_api/include/lua_ada_runtime_configuration.h')}
         if($kind -ceq 'builtin'){$names+='tests/c/argument_registry_callbacks.h'}
-        foreach($name in $names){
-            $source=@($consumer[$kind.Replace('-','_')+'_contract'].sources|Where-Object file -CEQ $name)
-            if($source.Count -ne 1){throw 'Target additional oracle source binding is missing or duplicated'}
-            [void](Resolve-ReviewedFile -Root $Root -Path $name -Sha256 $source[0].sha256)
-        }
+        Assert-TargetAdditionalOracleSources -Root $Root -Consumer $consumer -Kind $kind -Names $names
     }}
     $c = Test-NamedConsumerEvidence -Report $consumer -Mapping $Policy.consumer -Revision $Revision -Context $Context `
         -ResolveCapture $resolve -RequireForeignContract -AdditionalContracts $additional -TargetPolicy remaining-upstream-compatibility `
