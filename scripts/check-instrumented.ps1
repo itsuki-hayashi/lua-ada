@@ -158,7 +158,8 @@ try {
         -RuntimeDirectory $library `
         -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
         -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib" `
-        -Configuration upstream-test -LibraryType $LibraryType -Report $cliPairReport
+        -Configuration upstream-test -LibraryType $LibraryType -Report $cliPairReport `
+        -DevelopmentObservation:$TargetDevelopmentObservation
     & "$PSScriptRoot/test-cli-fixtures.ps1" -Report $cliPairReport
     & "$PSScriptRoot/test-cli-fixture-transport.ps1" -Interpreter "$root/build/conformance/default/bin/lua$suffix" `
         -RuntimeDirectory "$root/build/conformance/default/lib"

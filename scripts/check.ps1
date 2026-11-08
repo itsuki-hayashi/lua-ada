@@ -137,12 +137,13 @@ try {
         '-ReferenceLibraryDirectory',(Join-Path $projectRoot 'build/conformance/default/lib'),
         '-Profile',$Profile,'-LibraryType',$LibraryType,'-Report',$configuredReport)
     $cliPairReport=Join-Path (Split-Path -Parent $cliAdaReport) 'pair.json'
-    Invoke-Alire -Arguments @('exec','--','pwsh','-NoProfile','-File',
+    $cliObservationArguments=if($TargetDevelopmentObservation){@('-DevelopmentObservation')}else{@()}
+    Invoke-Alire -Arguments (@('exec','--','pwsh','-NoProfile','-File',
         (Join-Path $PSScriptRoot 'check-configured-cli.ps1'),'-Interpreter',$absoluteCli,
         '-ReferenceInterpreter',(Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
         '-ReferenceLibraryDirectory',(Join-Path $projectRoot 'build/conformance/default/lib'),
         '-Configuration','default','-Profile',$Profile,'-LibraryType',$LibraryType,
-        '-AdaReport',$cliAdaReport,'-Report',$cliPairReport)
+        '-AdaReport',$cliAdaReport,'-Report',$cliPairReport)+$cliObservationArguments)
     & (Join-Path $PSScriptRoot 'test-cli-fixtures.ps1') -Report $cliPairReport
     & (Join-Path $PSScriptRoot 'test-cli-fixture-transport.ps1') `
         -Interpreter (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix") `

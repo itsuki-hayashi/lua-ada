@@ -197,6 +197,11 @@ function Assert-CliFixtureReport {
           [scriptblock]$ResolveFile,[switch]$RequireProtocolReview)
     if($Report.schema_version -ne 1 -or $Report.kind -cne 'cli-fixture-observations' -or
         $Report.mode -cne $Mode -or $Report.synthetic_fixture -isnot [bool] -or $Report.synthetic_fixture){throw 'CLI report identity or actual mode differs'}
+    if(($Report.Contains('development_observation') -and
+         ($Report.development_observation -isnot [bool] -or $Report.development_observation)) -or
+        ($Report.Contains('contract_failures') -and @($Report.contract_failures).Count)){
+        throw 'Development CLI collection cannot supply strict passing evidence'
+    }
     foreach($flag in @('runtime_acceptance','coverage_authority')){
         if($Report[$flag] -isnot [bool] -or $Report[$flag]){throw 'CLI observation cannot claim acceptance'}
     }

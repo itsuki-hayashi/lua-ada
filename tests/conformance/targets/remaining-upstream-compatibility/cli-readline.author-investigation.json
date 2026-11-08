@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "kind": "cli-readline-author-investigation",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": null,
+  "decision": "pending-independent-platform-contract-review",
+  "source_snapshot": {
+    "repository_revision": "173020a0f61f48d04ad2c24caac33b39ffeb9a64",
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294"
+  },
+  "source_bindings": [
+    {
+      "path": "scripts/CliFixtureCases.psm1",
+      "repository_revision": "173020a0f61f48d04ad2c24caac33b39ffeb9a64",
+      "sha256": "7666810b0873d71ac4e2d16760705694d14256bc98babda97ea8cdd061ad80f0"
+    },
+    {
+      "path": "scripts/CliFixtureEvidence.psm1",
+      "repository_revision": "173020a0f61f48d04ad2c24caac33b39ffeb9a64",
+      "sha256": "8892496577efb47616179de544c2473622ccde1f9a1cd1e1182dbd13d50cf0a3"
+    },
+    {
+      "path": "scripts/check-cli.ps1",
+      "repository_revision": "173020a0f61f48d04ad2c24caac33b39ffeb9a64",
+      "sha256": "70b8e2e1b3708d2c7a92306933ed743d698b334c1c4e4463bcf994fb9b1cb8bd"
+    },
+    {
+      "path": "scripts/check-configured-cli.ps1",
+      "repository_revision": "173020a0f61f48d04ad2c24caac33b39ffeb9a64",
+      "sha256": "5d97dbbc683b0676ab4265cdfeb6e8c92c25307d2600df4fcfb29ab1f99e012e"
+    },
+    {
+      "path": "experiments/conformance/reference.gpr",
+      "repository_revision": "173020a0f61f48d04ad2c24caac33b39ffeb9a64",
+      "sha256": "6c79ca4e821634be54685e72a159dc1afef528e13eeac1c59ef9fd4fcb24a676"
+    },
+    {
+      "path": "experiments/conformance/oracle.gpr",
+      "repository_revision": "173020a0f61f48d04ad2c24caac33b39ffeb9a64",
+      "sha256": "05c9640918231db5ee6a09572d833ceb57831458e6c4531f76b14fdbd02366d0"
+    },
+    {
+      "path": "cli/shared/lua_cli.adb",
+      "repository_revision": "173020a0f61f48d04ad2c24caac33b39ffeb9a64",
+      "sha256": "62de30c3309a0693a769c496a9c65fbaad5878b6f3ba0f115bde5de5f6b134bc"
+    },
+    {
+      "path": "references/lua/lua.c",
+      "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+      "sha256": "17ce8e73dd3586b84076ceaad9d638887723a1c60945c6ee086d723a6e61453f"
+    },
+    {
+      "path": "references/lua/luaconf.h",
+      "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+      "sha256": "1e617ae6f206d701018941b64ed61851da4ffc3573a0f96b73ebe64e340bfb5d"
+    },
+    {
+      "path": "references/lua/testes/main.lua",
+      "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+      "sha256": "844d13f96bdbf03a554b8b466fdf21aeac2bcddb907ad2b971814c994898d457"
+    }
+  ],
+  "observations": [
+    {
+      "platform": "linux",
+      "context": "default/linux/validation/static",
+      "artifact": {
+        "id": 13612181410,
+        "run_id": 42466617551,
+        "url": "https://github.com/itsuki-hayashi/lua-ada/actions/runs/42466617551/artifacts/13612181410",
+        "zip_sha256": "bc0c74e9aaff74d474ec2b3f8e43c97505c80b85366446e7f9a4f2f2a18d9b0f"
+      },
+      "native_report": {
+        "archive_path": "core-image/cli-6a46a2d3e2dc4a18be3f922c798a3f62/native.json",
+        "sha256": "a7a869022a376225e9af317a7806a771f486626f40b33b7d7ab9487dfc789a60"
+      },
+      "ada_report": {
+        "archive_path": "core-image/cli-6a46a2d3e2dc4a18be3f922c798a3f62/ada.json",
+        "sha256": "ec851f2ceec54e41cc004085f59530e10f70e75e33d0ddb0928614ac0fb5b370"
+      },
+      "title": "REPL resolves a custom primary prompt",
+      "native": {
+        "executable": "/home/runner/work/lua-ada/lua-ada/build/conformance/default/bin/lua",
+        "executable_sha256": "aa766f05b51e914fa8ce4b9c568f099a5856e2def9c41a978ec5c8102926751d",
+        "process_id": 6521,
+        "arguments": [
+          "-e_PROMPT='alo'",
+          "-i"
+        ],
+        "exit_code": 0,
+        "standard_input": {
+          "archive_path": "core-image/75bb388d82b84194a7d13ef3f1b1cfb8/cli-fixtures/captures/2.stdin",
+          "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a",
+          "byte_length": 10,
+          "write_completed": true,
+          "eof_sent": true
+        },
+        "stdout": {
+          "archive_path": "core-image/75bb388d82b84194a7d13ef3f1b1cfb8/cli-fixtures/captures/2.stdout",
+          "sha256": "95a03c688bd4a5c8721787802f2390eae0a22dd05a9230f7b5143ee42272b92e",
+          "byte_length": 72,
+          "base64": "THVhIDUuNS4xICBDb3B5cmlnaHQgKEMpIDE5OTQtMjAyNiBMdWEub3JnLCBQVUMtUmlvCmFsbyAtLQphbG9hID0gMgphbG8K",
+          "ascii_text": "Lua 5.5.1  Copyright (C) 1994-2026 Lua.org, PUC-Rio\nalo --\naloa = 2\nalo\n"
+        },
+        "stderr": {
+          "archive_path": "core-image/75bb388d82b84194a7d13ef3f1b1cfb8/cli-fixtures/captures/2.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "byte_length": 0,
+          "base64": "",
+          "ascii_text": ""
+        }
+      },
+      "ada": {
+        "executable": "/home/runner/work/lua-ada/lua-ada/cli/bin/static/lua_ada",
+        "executable_sha256": "281ba41e56a1f4810519a70fccb8c2a350378acc7d295b980e24a1662c105db5",
+        "process_id": 6257,
+        "arguments": [
+          "-e_PROMPT='alo'",
+          "-i"
+        ],
+        "exit_code": 0,
+        "standard_input": {
+          "archive_path": "core-image/ef2d3f2e2efd42b3963ee33f0c893c44/cli-fixtures/captures/93.stdin",
+          "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a",
+          "byte_length": 10,
+          "write_completed": true,
+          "eof_sent": true
+        },
+        "stdout": {
+          "archive_path": "core-image/ef2d3f2e2efd42b3963ee33f0c893c44/cli-fixtures/captures/93.stdout",
+          "sha256": "e019671164efc87792886fd803fac1c15d1d510467681d54d089757a17b69ac8",
+          "byte_length": 62,
+          "base64": "THVhIDUuNS4xICBDb3B5cmlnaHQgKEMpIDE5OTQtMjAyNiBMdWEub3JnLCBQVUMtUmlvCmFsb2Fsb2Fsbwo=",
+          "ascii_text": "Lua 5.5.1  Copyright (C) 1994-2026 Lua.org, PUC-Rio\naloaloalo\n"
+        },
+        "stderr": {
+          "archive_path": "core-image/ef2d3f2e2efd42b3963ee33f0c893c44/cli-fixtures/captures/93.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "byte_length": 0,
+          "base64": "",
+          "ascii_text": ""
+        }
+      },
+      "comparison_result": "failed-exact-output-comparison",
+      "observed_difference": "Native GNU readline echoes the two redirected input lines beside three prompts.",
+      "raw_row_label_caveat": "The producer appended the row before validating it. Its clean-operation/passing_execution_evidence labels do not establish a pass: Assert-CliCaseCapture rejected the actual output."
+    },
+    {
+      "platform": "macos",
+      "context": "default/macos/validation/static",
+      "artifact": {
+        "id": 13611931940,
+        "run_id": 42466617551,
+        "url": "https://github.com/itsuki-hayashi/lua-ada/actions/runs/42466617551/artifacts/13611931940",
+        "zip_sha256": "a33a85101c67ef39d7651ec8be4a4fd04fbda79789435f97a4228430333db46e"
+      },
+      "native_report": {
+        "archive_path": "core-image/cli-c4837306f8624c6396f23537759f62bf/native.json",
+        "sha256": "c34d5788e0f3449a73608f61042103cf3148b054fb18f3e540ce2f7ff9901c99"
+      },
+      "ada_report": {
+        "archive_path": "core-image/cli-c4837306f8624c6396f23537759f62bf/ada.json",
+        "sha256": "ba52574a182652aa627bc1acc5e5f4205f244911553a486a1eb3fe14109a3c84"
+      },
+      "title": "REPL resolves a custom primary prompt",
+      "native": {
+        "executable": "/Users/runner/work/lua-ada/lua-ada/build/conformance/default/bin/lua",
+        "executable_sha256": "759e9da3354f936027125d4ce472730579c5fb1d3f4996a4582057f9b3add90e",
+        "process_id": 28764,
+        "arguments": [
+          "-e_PROMPT='alo'",
+          "-i"
+        ],
+        "exit_code": 0,
+        "standard_input": {
+          "archive_path": "core-image/12ac2fa11fe44271a2da3fc3979c1963/cli-fixtures/captures/2.stdin",
+          "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a",
+          "byte_length": 10,
+          "write_completed": true,
+          "eof_sent": true
+        },
+        "stdout": {
+          "archive_path": "core-image/12ac2fa11fe44271a2da3fc3979c1963/cli-fixtures/captures/2.stdout",
+          "sha256": "b6f3320bbb094ee88c5427d23dd2f0edde2b0e08da06ab004658c0df26be8a9b",
+          "byte_length": 53,
+          "base64": "THVhIDUuNS4xICBDb3B5cmlnaHQgKEMpIDE5OTQtMjAyNiBMdWEub3JnLCBQVUMtUmlvCgo=",
+          "ascii_text": "Lua 5.5.1  Copyright (C) 1994-2026 Lua.org, PUC-Rio\n\n"
+        },
+        "stderr": {
+          "archive_path": "core-image/12ac2fa11fe44271a2da3fc3979c1963/cli-fixtures/captures/2.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "byte_length": 0,
+          "base64": "",
+          "ascii_text": ""
+        }
+      },
+      "ada": {
+        "executable": "/Users/runner/work/lua-ada/lua-ada/cli/bin/static/lua_ada",
+        "executable_sha256": "6336c3d272397e259dbc59c3e5cda5808aee817098968a6646052d4071f3ed12",
+        "process_id": 27075,
+        "arguments": [
+          "-e_PROMPT='alo'",
+          "-i"
+        ],
+        "exit_code": 0,
+        "standard_input": {
+          "archive_path": "core-image/932077867af44d5f96595c71da4fd744/cli-fixtures/captures/93.stdin",
+          "sha256": "f4daa3999c07153ef97a0168bbb51323b9853ebf3e15f5d4b34655cae309c62a",
+          "byte_length": 10,
+          "write_completed": true,
+          "eof_sent": true
+        },
+        "stdout": {
+          "archive_path": "core-image/932077867af44d5f96595c71da4fd744/cli-fixtures/captures/93.stdout",
+          "sha256": "e019671164efc87792886fd803fac1c15d1d510467681d54d089757a17b69ac8",
+          "byte_length": 62,
+          "base64": "THVhIDUuNS4xICBDb3B5cmlnaHQgKEMpIDE5OTQtMjAyNiBMdWEub3JnLCBQVUMtUmlvCmFsb2Fsb2Fsbwo=",
+          "ascii_text": "Lua 5.5.1  Copyright (C) 1994-2026 Lua.org, PUC-Rio\naloaloalo\n"
+        },
+        "stderr": {
+          "archive_path": "core-image/932077867af44d5f96595c71da4fd744/cli-fixtures/captures/93.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "byte_length": 0,
+          "base64": "",
+          "ascii_text": ""
+        }
+      },
+      "comparison_result": "failed-exact-output-comparison",
+      "observed_difference": "Native linked readline produces neither prompt nor input echo on this pipe; banner plus final newline only.",
+      "raw_row_label_caveat": "The producer appended the row before validating it. Its clean-operation/passing_execution_evidence labels do not establish a pass: Assert-CliCaseCapture rejected the actual output."
+    }
+  ],
+  "source_findings": [
+    "lua.c lua_readline delegates presentation/input to a loaded or linked readline backend; its fallback writes the prompt then fgets without echo.",
+    "luaconf.h selects dynamic libreadline.so on Linux and linked LUA_USE_READLINE on macOS. The oracle preserves these native platform definitions.",
+    "testes/main.lua uses presence/pattern checks for prompts and line-substring checks for interactive results. The supplemental exact prompt-only expectation came from the Windows/fgets configuration.",
+    "Ada CLI Read_Line currently implements the fgets-like path. External line editing and actual terminal behavior remain a separate implementation/acceptance question."
+  ],
+  "next_required_evidence": [
+    "Collect all 19 native prompt contracts and two setup probes on Linux/macOS without stopping at the first mismatch; preserve each contract error and raw process identity.",
+    "Independently decide a bounded backend-specific native counterpart protocol that retains Lua side effects, prompt values/callback order, errors and statuses. No status-only approval or raw-output normalization.",
+    "Keep native T no-close observations outside the Windows-only diagnostic authority until source-linked same-context applicability has independent review.",
+    "Fresh strict full-context captures and final acceptance remain required after implementation and reviews."
+  ],
+  "expected_output_changes": [],
+  "source_exclusions": [],
+  "source_transforms": [],
+  "execution_acceptance": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "synthetic_fixture": false
+}

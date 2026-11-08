@@ -5,9 +5,15 @@ param(
     [ValidateSet('default','upstream-test')][string]$Configuration='default',
     [ValidateSet('development','validation','release')][string]$Profile='validation',
     [ValidateSet('static','static-pic','relocatable')][string]$LibraryType='static',
-    [string]$Report='', [string]$RuntimeDirectory=''
+    [string]$Report='', [string]$RuntimeDirectory='',
+    [switch]$CollectAllObservations,[switch]$DevelopmentObservation
 )
 $ErrorActionPreference='Stop'
+if(($CollectAllObservations -or $DevelopmentObservation) -and
+    (-not $CollectAllObservations -or -not $DevelopmentObservation -or
+     $RuntimeRole -cne 'ReferenceC' -or -not $PromptProtocol -or $NativeProtocol)){
+    throw 'CollectAllObservations requires explicit development-only native prompt observation'
+}
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
 Import-Module (Join-Path $PSScriptRoot 'CliFixtureEvidence.psm1')
 Import-Module (Join-Path $PSScriptRoot 'CliFixtureCases.psm1')
@@ -72,6 +78,10 @@ $raw=@{schema_version=1;kind='cli-fixture-observations';mode=$mode;runtime_role=
     source_bindings=@(Get-CliFixtureSources|ForEach-Object{@{path=$_;sha256=(Get-FileHash (Join-Path $projectRoot $_)).Hash.ToLowerInvariant()}});
     fixture_files=@(Get-ChildItem $fixtureRoot -File|ForEach-Object{@{name=$_.Name;sha256=(Get-FileHash $_.FullName).Hash.ToLowerInvariant()}});
     processes=@()}
+if($CollectAllObservations){
+    $raw['development_observation']=$true
+    $raw['contract_failures']=@()
+}
 
 function Invoke-Case {
     param([hashtable]$Case,[switch]$ConfigurationProbe)
@@ -92,16 +102,42 @@ function Invoke-Case {
         -ObserveEarlyInputClose:($Case.Contains('InputMayCloseEarly') -and $Case.InputMayCloseEarly)
     $diagnostic=$RuntimeRole -ceq 'ReferenceC' -and $Configuration -ceq 'upstream-test' -and
         $mode -ceq 'prompt' -and $Case.Title -ceq 'REPL prompt typed exit without close retains status'
+    $collect=$CollectAllObservations -and -not $ConfigurationProbe -and $Case.Title.StartsWith('REPL ',[StringComparison]::Ordinal)
+    $unreviewedDiagnostic=$diagnostic -and $platform -cne 'windows'
     $row=@{title=$Case.Title;environment=$environment;process=$process;
         observation_disposition=$(if($diagnostic){'observed-native-test-teardown-diagnostic'}else{'clean-operation'});
         passing_execution_evidence=(-not $diagnostic)}
-    if($diagnostic){
+    if($diagnostic -and -not $unreviewedDiagnostic){
         $row['feature_review']=Assert-CliNativeTestExitDirection -Root $projectRoot
-        if($platform -cne 'windows'){throw 'Native T no-close diagnostic requires fresh platform applicability review'}
     }
     if($ConfigurationProbe){$raw['configuration_probe']=$row}else{$raw.processes+=,$row}
-    $output=Assert-CliCaseCapture -Case $Case -Row $row -Executable $executable `
-        -ExecutableHash $raw.executable_sha256 -Directory $fixtureRoot -NativeTestDiagnostic:$diagnostic
+    try{
+        if($unreviewedDiagnostic){throw 'Native T no-close diagnostic requires fresh platform applicability review'}
+        $output=Assert-CliCaseCapture -Case $Case -Row $row -Executable $executable `
+            -ExecutableHash $raw.executable_sha256 -Directory $fixtureRoot -NativeTestDiagnostic:$diagnostic
+        if($collect){$row['contract_match']=$true}
+    }catch{
+        if(-not $collect){throw}
+        $row['contract_match']=$false
+        $row['contract_error']=$_.Exception.Message
+        $raw.contract_failures+=@{title=$Case.Title;message=$_.Exception.Message;
+            stdout_sha256=$process.stdout_sha256;stderr_sha256=$process.stderr_sha256;exit_code=$process.exit_code}
+        # Preserve the original stream even when a platform backend violates
+        # the current comparison contract. This return value supplies no pass.
+        $output=[IO.File]::ReadAllText($process.stdout_path)
+    }finally{
+        if($collect){
+            # The normal validator above evaluated a provisional contract
+            # row. Serialize only an observation label; no collected process
+            # is promoted to passing evidence by this development campaign.
+            $row.passing_execution_evidence=$false
+            $row.observation_disposition=if($unreviewedDiagnostic){'unreviewed-native-test-teardown-observation'}else{'development-only-observation'}
+        }
+    }
+    if($collect){
+        Write-Host "CLI COLLECTED: $($Case.Title); contract_match=$($row.contract_match); passing evidence=False"
+        return $output
+    }
     if($diagnostic){Write-Host "CLI OBSERVED DIAGNOSTIC: $($Case.Title) (no passing or cleanup evidence)"}
     else{Write-Host "CLI PASS: $($Case.Title)"}
     return $output
@@ -115,8 +151,12 @@ try{
     $definitions=Get-CliCaseDefinitions -DefaultPackagePath $defaultPath `
         -DefaultPackageCPath $defaultCPath -Platform $platform -Mode $mode
     foreach($case in $definitions.cases){$null=Invoke-Case $case}
-    $observed=Assert-CliFixtureReport -Root $projectRoot -Report $raw -Interpreter $executable -Mode $mode
-    Write-Output "OBSERVED: CLI $mode ($($observed.clean_operations.Count) clean operations/$($observed.native_test_diagnostics.Count) native test diagnostics); runtime acceptance=False"
+    if($CollectAllObservations){
+        Write-Output "COLLECTED: CLI native prompt processes; contract_failures=$($raw.contract_failures.Count); development-only, strict pair remains unaccepted"
+    }else{
+        $observed=Assert-CliFixtureReport -Root $projectRoot -Report $raw -Interpreter $executable -Mode $mode
+        Write-Output "OBSERVED: CLI $mode ($($observed.clean_operations.Count) clean operations/$($observed.native_test_diagnostics.Count) native test diagnostics); runtime acceptance=False"
+    }
 }finally{
     [IO.File]::WriteAllText($Report,(ConvertTo-Json -InputObject $raw -Depth 32).Replace("`r`n","`n")+"`n",$utf8)
 }

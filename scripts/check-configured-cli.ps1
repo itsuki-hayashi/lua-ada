@@ -5,7 +5,8 @@ param([Parameter(Mandatory)][string]$Interpreter,
       [ValidateSet('static','static-pic','relocatable')][string]$LibraryType='static',
       [Parameter(Mandatory)][string]$Report,[string]$AdaReport='',
       [string]$ReferenceLibraryDirectory='', [string]$RuntimeDirectory='',
-      [string]$ReferenceDefaultInterpreter='', [string]$ReferenceDefaultLibraryDirectory='')
+      [string]$ReferenceDefaultInterpreter='', [string]$ReferenceDefaultLibraryDirectory='',
+      [switch]$DevelopmentObservation)
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
@@ -14,6 +15,7 @@ $Report=[IO.Path]::GetFullPath($Report)
 $directory=Split-Path -Parent $Report
 [void][IO.Directory]::CreateDirectory($directory)
 $arguments=@{Configuration=$Configuration;Profile=$Profile;LibraryType=$LibraryType}
+$nativeObservationArguments=@{CollectAllObservations=$DevelopmentObservation;DevelopmentObservation=$DevelopmentObservation}
 if($ReferenceLibraryDirectory -eq ''){$ReferenceLibraryDirectory=Join-Path $root "build/conformance/$Configuration/lib"}
 if($AdaReport -eq ''){
     $AdaReport=Join-Path $directory 'ada.json'
@@ -27,7 +29,7 @@ try{
     if($ReferenceLibraryDirectory -ne ''){
         foreach($name in $saved.Keys){[Environment]::SetEnvironmentVariable($name,([IO.Path]::GetFullPath($ReferenceLibraryDirectory)+[IO.Path]::PathSeparator+$saved[$name]))}
     }
-    & (Join-Path $PSScriptRoot 'check-cli.ps1') -Interpreter $ReferenceInterpreter -PromptProtocol -RuntimeRole ReferenceC -Report $nativeReport -RuntimeDirectory $ReferenceLibraryDirectory @arguments
+    & (Join-Path $PSScriptRoot 'check-cli.ps1') -Interpreter $ReferenceInterpreter -PromptProtocol -RuntimeRole ReferenceC -Report $nativeReport -RuntimeDirectory $ReferenceLibraryDirectory @arguments @nativeObservationArguments
     if($LASTEXITCODE -ne 0){throw 'Actual native CLI prompt campaign failed'}
 }finally{foreach($name in $saved.Keys){[Environment]::SetEnvironmentVariable($name,$saved[$name])}}
 $ada=Get-Content $AdaReport -Raw|ConvertFrom-Json -AsHashtable -Depth 48
@@ -44,7 +46,7 @@ if($Configuration -ceq 'upstream-test'){
         foreach($name in $saved.Keys){[Environment]::SetEnvironmentVariable($name,([IO.Path]::GetFullPath($ReferenceDefaultLibraryDirectory)+[IO.Path]::PathSeparator+$saved[$name]))}
         & (Join-Path $PSScriptRoot 'check-cli.ps1') -Interpreter $ReferenceDefaultInterpreter -PromptProtocol -RuntimeRole ReferenceC `
             -Configuration default -Profile $Profile -LibraryType $LibraryType -Report $ordinaryReport `
-            -RuntimeDirectory $ReferenceDefaultLibraryDirectory
+            -RuntimeDirectory $ReferenceDefaultLibraryDirectory @nativeObservationArguments
         if($LASTEXITCODE -ne 0){throw 'Actual native default no-close counterpart failed'}
     }finally{foreach($name in $saved.Keys){[Environment]::SetEnvironmentVariable($name,$saved[$name])}}
     $pair['native_default']=Get-Content $ordinaryReport -Raw|ConvertFrom-Json -AsHashtable -Depth 48
