@@ -16,6 +16,8 @@ Component: [materialized vararg counterparts](2026-11-08-materialized-vararg-cou
 
 Correction: [marked closing-value mutation](2026-11-08-marked-closing-mutation.md).
 
+Observation: [approved Windows-path attrib replay](2026-11-08-attrib-approved-path-replay.md).
+
 Component: [CLI dynamic prompts](2026-11-08-cli-dynamic-prompts.md).
 
 Feature review: [materialized vararg allocation count](2026-11-08-memerr-vararg-feature-review.md).
