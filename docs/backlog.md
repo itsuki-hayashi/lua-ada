@@ -7,6 +7,12 @@ unchanged vararg.lua completes in default/T with native output, nine focused
 cases match all compiler/VM combinations, and 2,194 AUnit cases pass in each
 configuration. Retain final matrix obligations, actual mutable/escaping table
 behavior, and the separately open T API, memory-failure and aggregate gates.
+Base setmetatable has [argument-phase evidence](sessions/2026-11-08-metatable-argument-phases.md):
+fifteen native-paired behaviors, four-way compiler/VM checks in each matching
+configuration and 2,200 passing AUnit cases per configuration. Correct the
+measured function-statement definition store line in unchanged errors.lua
+while preserving closure end-line events. Full T memerr.lua's cold scalar
+output refusal and all remaining full-target obligations remain open.
 
 Table.sort's argument phases have [local evidence](sessions/2026-11-08-sort-argument-phases.md):
 fifteen native-paired behaviors, four-way compiler/VM checks in both matching

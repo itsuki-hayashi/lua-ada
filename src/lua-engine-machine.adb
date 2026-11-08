@@ -4597,9 +4597,21 @@ package body Lua.Engine.Machine is
          end if;
       elsif Name = "base.setmetatable" then
          if Left.Kind /= Table_Kind then
-            Fail (State, "table expected");
-         elsif Right.Kind not in Nil_Kind | Table_Kind then
-            Fail (State, "nil or table expected");
+            --  Left/Right are already Value copies. A diagnostic may
+            --  transfer a failed direct-builtin phase and invoke a registry
+            --  callback; no vector indexing borrow may span that transfer.
+            Diagnostics.Type_Error
+              (State, 1, "table", Left,
+               Present => not Activation.Native_Arguments.Is_Empty);
+         elsif Activation.Native_Arguments.Length < 2 or else
+           Right.Kind not in Nil_Kind | Table_Kind
+         then
+            --  luaB_setmetatable accepts an explicit nil, but not an absent
+            --  second argument. Validate before the protected-metatable
+            --  lookup, preserving its actual second-argument/self origin.
+            Diagnostics.Type_Error
+              (State, 2, "nil or table", Right,
+               Present => Activation.Native_Arguments.Length >= 2);
          elsif Metafield (State, Left, "__metatable").Kind /= Nil_Kind then
             Fail (State, "cannot change a protected metatable");
          end if;

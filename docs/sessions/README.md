@@ -1,6 +1,7 @@
 # Session Records
 
 Component: [hidden named varargs](2026-11-08-hidden-named-varargs.md).
+Component: [base setmetatable arguments](2026-11-08-metatable-argument-phases.md).
 
 Component: [sort argument phases](2026-11-08-sort-argument-phases.md).
 
