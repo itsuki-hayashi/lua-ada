@@ -13,9 +13,6 @@ package body Lua.Sessions is
      (Lua.Engine.World, Lua.Engine.World_Access);
 
    function Failure
-     (Self : Session; Name : String) return Execution_Result;
-
-   function Failure
      (Self : Session; Name : String) return Execution_Result
    is
       Result : Execution_Result;
@@ -39,9 +36,6 @@ package body Lua.Sessions is
       end if;
       return Result;
    end Failure;
-
-   procedure Apply_Exit
-     (Self : in out Session; Result : in out Execution_Result);
 
    procedure Apply_Exit
      (Self : in out Session; Result : in out Execution_Result) is

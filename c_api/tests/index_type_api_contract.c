@@ -11,6 +11,7 @@
 #include "consumer_allocator.h"
 
 static struct allocation_counts counts;
+static int global_refuse;
 
 /* Every Lua helper chunk runs through the public protected loader/call path.
  * An unexpected failure retains its actual diagnostic before the assertion
@@ -326,6 +327,159 @@ static void set_nonindexable_error(lua_State *L) {
         "local plain={};index_seti(plain,1,71);assert(plain[1]==71)");
 }
 
+/* Each fresh zero-argument C call owns LUA_MINSTACK free API slots. Leave
+ * exactly one of those guaranteed slots for getglobal's public [-0,+1,e]
+ * result. A composition must not secretly require a second caller slot. */
+static int get_global_last_slot(lua_State *L) {
+    int i;
+    assert(lua_gettop(L) == 0);
+    for (i = 1; i < LUA_MINSTACK; ++i) lua_pushinteger(L, 700 + i);
+    assert(lua_getglobal(L, "index_global_value") == LUA_TNUMBER);
+    assert(lua_gettop(L) == LUA_MINSTACK);
+    assert(lua_tointeger(L, -1) == 887);
+    for (i = 1; i < LUA_MINSTACK; ++i)
+        assert(lua_tointeger(L, i) == 700 + i);
+    return 0;
+}
+
+static int get_global_value(lua_State *L) {
+    int top = lua_gettop(L);
+    int type;
+    if (global_refuse) counts.refuse = 1;
+    type = lua_getglobal(L, "index_global_value");
+    assert(type == LUA_TNUMBER && lua_tointeger(L, -1) == 887);
+    assert(lua_gettop(L) == top + 1);
+    return 1;
+}
+
+static int get_global_handler(lua_State *L) {
+    int top = lua_gettop(L);
+    int type;
+    if (global_refuse) counts.refuse = 1;
+    type = lua_getglobal(L, "index_global_pending");
+    assert(type == LUA_TNUMBER && lua_tointeger(L, -1) == 991);
+    assert(lua_gettop(L) == top + 1);
+    if (top != 0) {
+        assert(top == 2 && lua_tointeger(L, 1) == 419);
+        assert(strcmp(lua_tostring(L, 2), "prefix") == 0);
+    }
+    return 1;
+}
+
+static void global_last_guaranteed_slot(lua_State *L) {
+    run(L, "index_global_value=887;index_global_last_slot()");
+}
+
+static void global_warm_refusal(lua_State *L) {
+    int status;
+    /* Warm the exact C frame, call record, interned key and result packet.
+     * Refusal starts inside that real C body immediately before getglobal.
+     * The outer protected-entry machinery is not the operation under test. */
+    lua_pushcfunction(L, get_global_value);
+    assert(lua_pcall(L, 0, 1, 0) == LUA_OK);
+    lua_pop(L, 1);
+    lua_pushcfunction(L, get_global_value);
+    global_refuse = 1;
+    status = lua_pcall(L, 0, 1, 0);
+    assert(counts.refuse == 1);
+    counts.refuse = 0;
+    global_refuse = 0;
+    if (status != LUA_OK) fprintf(stderr, "%s\n", lua_tostring(L, -1));
+    assert(status == LUA_OK && lua_gettop(L) == 1);
+    assert(lua_tointeger(L, 1) == 887);
+    lua_pop(L, 1);
+}
+
+static void global_handler_frame_and_prefix(lua_State *L) {
+    run(L, "index_global_key='index_global_pending';"
+        "index_global_marker={};index_global_fail=false;"
+        "setmetatable(_G,{__index=function(t,k)"
+        "assert(t==_G and k==index_global_key);"
+        "if index_global_fail then error(index_global_marker,0)end;"
+        "local d=debug.getinfo(2,'S');assert(d.what=='C');"
+        "local n,v=debug.getlocal(2,1);"
+        "assert(n=='(C temporary)' and v==419);"
+        "n,v=debug.getlocal(2,2);"
+        "assert(n=='(C temporary)' and v=='prefix');"
+        "n,v=debug.getlocal(2,3);"
+        "assert(n=='(C temporary)' and (v==t or v==k));"
+        "assert(debug.getlocal(2,4)==nil);return 991 end});"
+        "assert(index_getglobal_handler(419,'prefix')==991)");
+    /* The collecting/debug-inspecting handler above is for frame semantics.
+     * A separately warmed scalar handler isolates allocation-free dispatch. */
+    run(L, "setmetatable(_G,{__index=function(t,k)"
+        "assert(t==_G and k==index_global_key);"
+        "if index_global_fail then error(index_global_marker,0)end;"
+        "return 991 end})");
+}
+
+static void global_handler_refusal_and_retry(lua_State *L) {
+    int status;
+    size_t growths;
+    const void *marker;
+    /* Warm the actual successful and protected-error paths before imposing
+     * permanent provider refusal. The original marker stays in slot one. */
+    lua_pushcfunction(L, get_global_handler);
+    assert(lua_pcall(L, 0, 1, 0) == LUA_OK); lua_pop(L, 1);
+    lua_pushboolean(L, 1); lua_setglobal(L, "index_global_fail");
+    lua_getglobal(L, "index_global_marker");
+    marker = lua_topointer(L, 1);
+    lua_pushcfunction(L, get_global_handler);
+    assert(lua_pcall(L, 0, 1, 0) == LUA_ERRRUN);
+    assert(lua_rawequal(L, 1, 2)); lua_pop(L, 1);
+    lua_pushcfunction(L, get_global_handler);
+    growths = counts.growths;
+    global_refuse = 1;
+    status = lua_pcall(L, 0, 1, 0);
+    assert(counts.refuse == 1);
+    counts.refuse = 0;
+    global_refuse = 0;
+    assert(lua_gettop(L) == 2 && lua_topointer(L, 1) == marker);
+    if (status == LUA_ERRRUN) assert(lua_rawequal(L, 1, 2));
+    else {
+        /* Native error unwinding can discard reusable CallInfo records.
+         * Repeating an error under permanent refusal may therefore report
+         * memory failure. Admit it only with an actual rejected growth and
+         * the canonical memory object, never as a generic error substitute. */
+        assert(status == LUA_ERRMEM && counts.growths > growths);
+        assert(lua_type(L, 2) == LUA_TSTRING);
+        assert(strcmp(lua_tostring(L, 2), "not enough memory") == 0);
+    }
+    lua_pop(L, 1);
+    lua_pushcfunction(L, get_global_handler);
+    assert(lua_pcall(L, 0, 1, 0) == LUA_ERRRUN);
+    assert(lua_gettop(L) == 2 && lua_rawequal(L, 1, 2)); lua_pop(L, 1);
+    lua_pushboolean(L, 0); lua_setglobal(L, "index_global_fail");
+    lua_pushcfunction(L, get_global_handler);
+    assert(lua_pcall(L, 0, 1, 0) == LUA_OK);
+    assert(lua_gettop(L) == 2 && lua_tointeger(L, 2) == 991); lua_pop(L, 1);
+    lua_pushcfunction(L, get_global_handler);
+    growths = counts.growths;
+    global_refuse = 1;
+    status = lua_pcall(L, 0, 1, 0);
+    assert(counts.refuse == 1);
+    counts.refuse = 0;
+    global_refuse = 0;
+    assert(lua_gettop(L) == 2 && lua_topointer(L, 1) == marker);
+    if (status == LUA_OK) assert(lua_tointeger(L, 2) == 991);
+    else {
+        /* The public e classification permits allocation by the handler or
+         * its scheduler. Refusal safety is required; matching private native
+         * closure/packet allocation counts is not. Preserve the failed strict
+         * native/Ada diagnostic instead of silently claiming M0 success. */
+        assert(status == LUA_ERRMEM && counts.growths > growths);
+        assert(lua_type(L, 2) == LUA_TSTRING);
+        assert(strcmp(lua_tostring(L, 2), "not enough memory") == 0);
+    }
+    lua_pop(L, 1);
+    lua_pushcfunction(L, get_global_handler);
+    assert(lua_pcall(L, 0, 1, 0) == LUA_OK);
+    assert(lua_gettop(L) == 2 && lua_topointer(L, 1) == marker);
+    assert(lua_tointeger(L, 2) == 991);
+    lua_settop(L, 0);
+    run(L, "setmetatable(_G,nil)");
+}
+
 /* Each named case must finish with the same C frame extent it started with.
  * Its PASS line is emitted only after both the operation's assertions and
  * the independent frame-height assertion have completed. */
@@ -345,6 +499,8 @@ int main(void) {
     install(L, "index_seti", set_integer);
     install(L, "index_rawgeti", raw_get_integer);
     install(L, "index_rawseti", raw_set_integer);
+    install(L, "index_global_last_slot", get_global_last_slot);
+    install(L, "index_getglobal_handler", get_global_handler);
     check("version-null-state", version_null_state, L);
     check("version-live-state", version_live_state, L);
     check("builtin-type-names", builtin_type_names, L);
@@ -375,6 +531,10 @@ int main(void) {
     check("set-error-identity-and-recovery", set_error_identity_and_recovery, L);
     check("set-nonyieldable-handler", set_nonyieldable_handler, L);
     check("set-nonindexable-error", set_nonindexable_error, L);
+    check("global-last-guaranteed-slot", global_last_guaranteed_slot, L);
+    check("global-warm-refusal", global_warm_refusal, L);
+    check("global-handler-frame-and-prefix", global_handler_frame_and_prefix, L);
+    check("global-handler-refusal-and-retry", global_handler_refusal_and_retry, L);
     lua_close(L);
     assert(counts.bytes == 0 && counts.blocks == 0);
     puts("PASS: public integer-index and type contract");

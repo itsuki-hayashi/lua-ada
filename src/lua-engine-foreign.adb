@@ -1051,6 +1051,19 @@ package body Lua.Engine.Foreign is
             raise Language_Error;
          end if;
       elsif Status = Action_Abort then
+         if State.Exit_Phase = Exit_Complete and then
+           VM.Is_Complete (Driver) and then
+           VM.Outcome (Driver) = Process_Stopped
+         then
+            --  A Lua callback may complete a typed process exit while its
+            --  real C caller is live. The C guard uses the same nonlocal
+            --  transport as host abort to retire that caller, but the
+            --  scheduler has already published the distinct completed exit.
+            --  Release this borrowed portal without acknowledging its now
+            --  invalidated activation or overwriting the exit with failure.
+            Restore;
+            return;
+         end if;
          if State.Current /= Target and then
            State.Current.Failure_Class = Host_Abort
          then

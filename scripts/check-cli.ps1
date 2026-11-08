@@ -1,7 +1,8 @@
 param(
     [Parameter(Mandatory)]
     [string] $Interpreter,
-    [switch] $NativeProtocol
+    [switch] $NativeProtocol,
+    [switch] $PromptProtocol
 )
 
 $ErrorActionPreference = 'Stop'
@@ -33,6 +34,12 @@ $banner = 'Lua 5.5.1  Copyright (C) 1994-2026 Lua.org, PUC-Rio'
 
 [IO.File]::WriteAllText((Join-Path $fixtureRoot 'large-source.lua'),
     ('--[[' + ('a' * 1000001) + ']] print(42)'), $utf8)
+[IO.File]::Copy((Join-Path $projectRoot 'tests/lua/cli_prompt_controls.lua'),
+    (Join-Path $fixtureRoot 'prompt-controls.lua'))
+if((Get-FileHash (Join-Path $projectRoot 'tests/lua/cli_prompt_controls.lua')).Hash -cne
+    (Get-FileHash (Join-Path $fixtureRoot 'prompt-controls.lua')).Hash){
+    throw 'Prompt callback fixture copy changed bytes'
+}
 
 function Invoke-Case {
     param([hashtable] $Case)
@@ -72,7 +79,8 @@ function Invoke-Case {
         $output = $stdout.GetAwaiter().GetResult()
         $errorOutput = $stderr.GetAwaiter().GetResult()
         if ($Case.ContainsKey('ExitCode')) {
-            if ($process.ExitCode -ne $Case.ExitCode -or $errorOutput -ne '') {
+            $expectedError = if($Case.ContainsKey('StderrExact')){$Case.StderrExact}else{''}
+            if ($process.ExitCode -ne $Case.ExitCode -or $errorOutput -cne $expectedError) {
                 throw "CLI typed exit mismatch: $($Case.Title): $errorOutput"
             }
         }
@@ -428,8 +436,70 @@ $nativeTitles = @(
     'REPL typed exit skips later input',
     '-i runs snippets before the loop'
 )
+$promptInput=" --`na = 2`n"
+$promptSetup="assert(loadfile('prompt-controls.lua'))"
+$promptCases=@(
+    @{Title='REPL resolves a custom primary prompt';Args=@("-e_PROMPT='alo'",'-i');
+      Input=$promptInput;Output=($banner+$newline+'aloaloalo'+$newline)},
+    @{Title='REPL resolves a custom continuation prompt';
+      Args=@("-e_PROMPT='P:';_PROMPT2='C:'",'-i');Input="x={`n1}`n#x`n";
+      Output=($banner+$newline+'P:C:P:1'+$newline+'P:'+$newline)},
+    @{Title='REPL accepts empty primary and continuation prompts';
+      Args=@("-e_PROMPT='' _PROMPT2=''",'-i');
+      Input="(6*2-6) -- ===`na =`n10`nprint(a)`na";
+      Output=($banner+$newline+'6'+$newline+'10'+$newline+'10'+$newline+$newline)},
+    @{Title='REPL converts numeric prompt values';Args=@('-e',"$promptSetup('number')",'-i');
+      Input=$promptInput;Output=($banner+$newline+'17.017.017.0'+$newline)},
+    @{Title='REPL converts boolean prompt values';Args=@('-e',"$promptSetup('boolean')",'-i');
+      Input=$promptInput;Output=($banner+$newline+'falsefalsefalse'+$newline)},
+    @{Title='REPL truncates rendered prompt at NUL';Args=@('-e',"$promptSetup('embedded-nul')",'-i');
+      Input=$promptInput;Output=($banner+$newline+'PPP'+$newline)},
+    @{Title='REPL ignores replaced global tostring';Args=@('-e',"$promptSetup('global-tostring')",'-i');
+      Input=$promptInput;Output=($banner+$newline+'373737'+$newline)},
+    @{Title='REPL resolves dynamic tostring on every prompt';Args=@('-e',"$promptSetup('dynamic-tostring')",'-i');
+      Input=$promptInput;Output=($banner+$newline+'XXXXXXXXX'+$newline)},
+    @{Title='REPL tostring sees the actual anonymous C frame';Args=@('-e',"$promptSetup('tostring-frame')",'-i');
+      Input=$promptInput;Output=($banner+$newline+'frameframeframe'+$newline)},
+    @{Title='REPL global handler sees the actual anonymous C frame';Args=@('-e',"$promptSetup('index-frame')",'-i');
+      Input=$promptInput;Output=($banner+$newline+'frameframeframe'+$newline)},
+    @{Title='REPL invalid tostring terminates without reading input';
+      Args=@('-e',"$promptSetup('bad-tostring')",'-i');Input="error('input ran')`n";
+      ExitCode=1;StderrExact=("'__tostring' must return a string"+$newline);
+      Output=($banner+$newline)},
+    @{Title='REPL prompt error terminates with raw message';
+      Args=@('-e',"$promptSetup('error-tostring')",'-i');Input="error('input ran')`n";
+      ExitCode=1;StderrExact=('prompt-broken'+$newline);Output=($banner+$newline)},
+    @{Title='REPL prompt table error uses raw report fallback';
+      Args=@('-e',"$promptSetup('error-table')",'-i');Input="error('input ran')`n";
+      ExitCode=1;StderrExact=('(error message not a string)'+$newline);
+      Output=($banner+$newline)},
+    @{Title='REPL prompt boolean error uses raw report fallback';
+      Args=@('-e',"$promptSetup('error-boolean')",'-i');Input="error('input ran')`n";
+      ExitCode=1;StderrExact=('(error message not a string)'+$newline);
+      Output=($banner+$newline)},
+    @{Title='REPL prompt NUL error displays only its C prefix';
+      Args=@('-e',"$promptSetup('error-nul')",'-i');Input="error('input ran')`n";
+      ExitCode=1;StderrExact=('prefix'+$newline);Output=($banner+$newline)},
+    @{Title='REPL global lookup error terminates with raw message';
+      Args=@('-e',"$promptSetup('index-error')",'-i');Input="error('input ran')`n";
+      ExitCode=1;StderrExact=('index-broken'+$newline);Output=($banner+$newline)},
+    @{Title='REPL prompt yield is rejected';
+      Args=@('-e',"$promptSetup('yield-tostring')",'-i');Input="error('input ran')`n";
+      ExitCode=1;StderrExact=('attempt to yield from outside a coroutine'+$newline);
+      Output=($banner+$newline)},
+    @{Title='REPL prompt typed exit without close retains status';
+      Args=@('-e',"$promptSetup('exit-no-close')",'-i');Input="error('input ran')`n";
+      ExitCode=37;Output=($banner+$newline)},
+    @{Title='REPL prompt typed exit with close retains status';
+      Args=@('-e',"$promptSetup('exit-close')",'-i');Input="error('input ran')`n";
+      ExitCode=37;Output=($banner+$newline)}
+)
+$cases+=@($promptCases)
+$nativeTitles+=@($promptCases.Title)
 foreach ($case in $cases) {
-    if (-not $NativeProtocol -or $case.Title -cin $nativeTitles) {
+    if (($PromptProtocol -and $case.Title -cin $promptCases.Title) -or
+        (-not $PromptProtocol -and
+         (-not $NativeProtocol -or $case.Title -cin $nativeTitles))) {
         Invoke-Case -Case $case
     }
 }

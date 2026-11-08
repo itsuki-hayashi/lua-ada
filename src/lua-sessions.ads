@@ -173,6 +173,15 @@ package Lua.Sessions is
    --  hooks, coroutine contexts, collector controls and metatable mutations.
 
 private
+   function Failure
+     (Self : Session; Name : String) return Execution_Result;
+   --  Shared internal result publication for session and CLI-only children.
+   --  No engine value or borrowed message escapes through this result.
+
+   procedure Apply_Exit
+     (Self : in out Session; Result : in out Execution_Result);
+   --  Publish the completed typed exit before any requested physical close.
+
    type Session is new Ada.Finalization.Limited_Controlled with record
       State : Lua.Engine.World_Access;
    end record;

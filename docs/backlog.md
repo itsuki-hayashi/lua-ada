@@ -8,15 +8,14 @@ the adapter source hash: existing exact verifier/API/locals bindings must be
 reviewed again rather than silently rehashed. No upstream source was adapted
 or private obligation excluded by this driver checkpoint.
 
-Complete the retained external-string T driver reached by the
-[original strings replay](sessions/2026-11-08-native-string-locales.md).
-Keep borrowed external payload lifetimes and explicit deallocation behavior
-real. Locale availability is native process state: final contexts need matching
-native observations; an unavailable optional locale supplies no non-C coverage.
+Preserve the [native locale behavior](sessions/2026-11-08-native-string-locales.md)
+in final contexts with matching native observations. An unavailable optional
+locale supplies no non-C coverage; borrowed external payload lifetimes and
+explicit deallocation behavior remain real runtime obligations.
 
 Continue the [original-file observations](sessions/2026-11-08-table-error-arguments.md)
-after the public table diagnostic correction. Original strings needs native
-locale collation; instrumented nextvar/sort still require reviewed treatment
+after the public table diagnostic correction. Instrumented nextvar/sort
+still require reviewed treatment
 of private table inspection. Preserve ordinary assertions and all complete
 return protocols; neither a diagnostic pass nor a T omission closes them.
 
@@ -31,9 +30,12 @@ when renewing current locals runtime/checker bindings. Its four ordinary
 counterparts establish the focused nil/false/type-closing behavior, not a
 source-equivalence decision or complete upstream/platform acceptance.
 
-Repair the [measured dynamic prompt gap](sessions/2026-11-08-main-cli-native-baseline.md)
-through a CLI-only session helper and actual native continuations, after native
-nil/conversion/error controls. Separately review Windows main.lua equivalents
+The [dynamic prompt component](sessions/2026-11-08-cli-dynamic-prompts.md) now
+passes 26 named cases within both full 2,571-case AUnit suites and both 112-case
+product CLI suites. Preserve actual anonymous C callers, root-through-flush
+lifetime and typed exit/error behavior during final integration. Native T
+os.exit(false) teardown remains a retained failed diagnostic, not a cleanup pass.
+Separately review Windows main.lua equivalents
 for the shared native shell/temp-file dependencies while preserving every
 public CLI operation and actual interrupt/module/child cleanup obligation.
 Original main.lua fails in every measured role; no body or protocol is waived.
@@ -41,8 +43,9 @@ Original main.lua fails in every measured role; no body or protocol is waived.
 The [IO caller-location cases](sessions/2026-11-08-io-error-locations.md) pass
 both full local AUnit runs and all public binary roles. Preserve immediate C
 caller/stripped-code behavior while continuing original source and CLI gates.
-The reviewed locals T source now fails its later allocator-disabled closing
-recovery block; repair that public behavior without changing its assertions.
+Replay the reviewed locals T source after current exact binding renewal. Its
+previous allocator-disabled closing failure motivated the scalar-link and
+marked-value fixes; focused regressions do not establish whole-file completion.
 
 Independently review the [API941 tail/owner binding proposal](sessions/2026-11-08-api941-tail-owner-bindings.md)
 against its twenty-file snapshot. Preserve userdata/weak/finalizer lifetimes

@@ -2,6 +2,17 @@ with "lua_ada";
 with "config/lua_ada_cli_config.gpr";
 
 project Lua_Ada_Cli is
+   C_Import_Defines := ();
+   case Lua_Ada_Cli_Config.Alire_Host_OS is
+      when "windows" =>
+         case Lua_Ada.Library_Mode is
+            when "relocatable" =>
+               C_Import_Defines := ("-DLUA_BUILD_AS_DLL");
+            when others => null;
+         end case;
+      when others => null;
+   end case;
+   for Languages use ("Ada", "C");
    for Source_Dirs use ("src", "shared");
    for Object_Dir use
      "obj/" & Lua_Ada.Configuration_Subdir &
@@ -13,6 +24,10 @@ project Lua_Ada_Cli is
    for Create_Missing_Dirs use "True";
 
    package Compiler is
+      for Default_Switches ("C") use
+        ("-std=c99", "-Wall", "-Wextra", "-Werror", "-pedantic",
+         "-I" & Project'Project_Dir & "../c_api/include/api") &
+        C_Import_Defines;
       for Default_Switches ("Ada") use
         Lua_Ada_Cli_Config.Ada_Compiler_Switches &
         ("-gnat2022", "-gnatwa", "-gnatwe", "-gnatv", "-gnaty",

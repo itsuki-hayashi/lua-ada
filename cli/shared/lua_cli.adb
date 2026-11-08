@@ -11,6 +11,7 @@ with Ada.Text_IO;
 with Interfaces.C;
 with Lua;
 with Lua.Sessions;
+with Lua.Sessions.CLI;
 with Lua.Sources;
 with Lua.Syntax;
 with System;
@@ -91,8 +92,7 @@ procedure Lua_CLI is
    function Read_Source (Path : String) return String;
    function Read_Stdin return String;
    procedure Prepare_Stdin;
-   function Read_Line
-     (Prompt : String; Line : out Unbounded_String) return Boolean;
+   function Read_Line (Line : out Unbounded_String) return Boolean;
    function Arguments_After (Index : Natural) return Argument_Array;
    function Check_Source
      (Source, Name : String) return Lua.Syntax.Check_Result;
@@ -305,19 +305,17 @@ procedure Lua_CLI is
       return To_String (Text);
    end Read_Stdin;
 
-   function Read_Line
-     (Prompt : String; Line : out Unbounded_String) return Boolean
+   function Read_Line (Line : out Unbounded_String) return Boolean
    is
       Error : aliased Interfaces.C.int := 0;
       Byte : Interfaces.C.int;
    begin
-      --  Prompt, flush, then read bytes up to LF or end of input, as the
-      --  fgets-based lua_readline does without the readline library. A
+      --  The CLI child already resolved, wrote and flushed the rooted prompt.
+      --  Read bytes up to LF or end of input, as fgets-based lua_readline
+      --  does without the readline library. A
       --  final unterminated line is still a line; end of input with no
       --  bytes yields False. The LF itself is not part of the result.
       Prepare_Stdin;
-      Ada.Text_IO.Put (Prompt);
-      Ada.Text_IO.Flush;
       Line := Null_Unbounded_String;
       loop
          Byte := Raw_Get (Standard_Stream (0), Error'Access);
@@ -596,8 +594,8 @@ begin
                --  global require is looked up at call time because the
                --  chunk reads it through its environment. Names are varargs.
                return Run
-                 ("local global, module = ..." & LF &
-                  "_ENV[global] = require(module)" & LF,
+                 ("local target, module = ..." & LF &
+                  "_ENV[target] = require(module)" & LF,
                   "=(command line)",
                   [1 => To_Unbounded_String (Global),
                    2 => To_Unbounded_String (Module)]);
@@ -623,14 +621,46 @@ begin
             procedure Run_REPL;
             procedure Run_REPL is
                Line, Next : Unbounded_String;
+               Prompt_Failed : Boolean := False;
+
+               function Read_Prompted_Line
+                 (First_Line : Boolean; Text : out Unbounded_String)
+                  return Boolean;
+               function Read_Prompted_Line
+                 (First_Line : Boolean; Text : out Unbounded_String)
+                  return Boolean
+               is
+                  Prompt : constant Execution_Result :=
+                    Lua.Sessions.CLI.Write_Prompt (Universe, First_Line);
+               begin
+                  if Prompt.Status = Succeeded then
+                     Report (Prompt, Fail_Process => False);
+                     return Read_Line (Text);
+                  elsif Prompt.Status = Exit_Requested then
+                     Report (Prompt);
+                  else
+                     --  get_prompt executes outside doREPL's per-line
+                     --  protected call. Its lookup/conversion error terminates
+                     --  the interpreter, with raw text and no stdin prefix;
+                     --  neither input evaluation nor a final prompt follows.
+                     Ada.Text_IO.Put_Line
+                       (Ada.Text_IO.Standard_Error,
+                        To_String (Prompt.Error.Message));
+                     Set_Exit_Status (Failure);
+                     Prompt_Failed := True;
+                  end if;
+                  Text := Null_Unbounded_String;
+                  return False;
+               end Read_Prompted_Line;
             begin
                --  Host read-eval-print loop (lua.c doREPL). Each entry is
                --  a separate chunk, so locals never survive a line. Results
                --  are printed by the real global print after the chunk has
                --  returned; there is no bootstrap Lua loop and no extra Lua
-               --  frame. _PROMPT/_PROMPT2, readline and SIGINT are deferred.
+               --  frame. Prompt lookup/conversion uses the CLI-only child and
+               --  real C activation; readline and SIGINT remain separate.
                while not Process_Exit_Requested
-                 and then Read_Line ("> ", Line)
+                 and then Read_Prompted_Line (True, Line)
                loop
                   declare
                      Text : constant String := To_String (Line);
@@ -666,14 +696,17 @@ begin
                            end if;
                            --  Continuation: while the shared checker says
                            --  the statement merely ran out of input, read
-                           --  another line (">> ") and join with LF.
+                           --  another line with the current _PROMPT2 and
+                           --  join with LF. A fatal prompt failure/exit must
+                           --  not evaluate the partially accumulated source.
                            while Incomplete
                              (Check_Source (To_String (Accumulated), "stdin"))
-                             and then Read_Line (">> ", Next)
+                             and then Read_Prompted_Line (False, Next)
                            loop
                               Append (Accumulated, Ada.Characters.Latin_1.LF);
                               Append (Accumulated, Next);
                            end loop;
+                           exit when Prompt_Failed or Process_Exit_Requested;
                            --  Complete code runs; a real syntax error (or
                            --  end of input mid-statement) is reported by
                            --  the same execution path as any other error.
@@ -684,7 +717,7 @@ begin
                end loop;
                --  lua_writeline at end of input, so the shell prompt starts
                --  on a fresh line.
-               if not Process_Exit_Requested then
+               if not Process_Exit_Requested and then not Prompt_Failed then
                   Ada.Text_IO.New_Line;
                   Ada.Text_IO.Flush;
                end if;

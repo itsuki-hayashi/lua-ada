@@ -37,10 +37,13 @@ AUnit cases. Current whole-source bindings and final acceptance remain pending.
 
 The [original main.lua diagnostics](sessions/2026-11-08-main-cli-native-baseline.md)
 fail the same Windows temporary-output redirection in native/Ada default/T.
-Parent/bare/arg identities and measured primary cleanup are verified. Separate
-native-paired probes expose fixed Ada REPL prompts where _PROMPT/_PROMPT2
-require dynamic lookup/conversion. Full main completion, platform equivalents
-and the bounded prompt repair remain open; no source authority is granted.
+Parent/bare/arg identities and measured primary cleanup are verified. The
+[dynamic prompt checkpoint](sessions/2026-11-08-cli-dynamic-prompts.md) implements
+actual lookup/conversion and fatal prompt-error/typed-exit policy through a
+CLI-only child and real C callbacks. Both local modes pass 2,571 AUnit cases and
+112 product CLI process cases. Native T no-close teardown remains an explicit
+failed oracle diagnostic. Full main completion, platform equivalents and final
+immutable acceptance remain open; no source authority is granted here.
 
 The [IO error-location correction](sessions/2026-11-08-io-error-locations.md)
 uses the actual immediate public caller for raising file-open errors. Seven

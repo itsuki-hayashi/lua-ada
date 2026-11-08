@@ -45,9 +45,16 @@ printed by resolving the actual current
 global `print` after the chunk returns, in a second sequential drive with the
 results held in a traced root (`Lua.Sessions.Execute_Display`); a failing
 `print` is reported as `error calling 'print' (...)` and does not end the loop.
-REPL errors never change the exit status. Deferred: `_PROMPT`/`_PROMPT2`
-(prompts are fixed), readline, SIGINT/hook interruption, native module
-loading, and tracebacks in REPL errors.
+Statement and display errors leave the REPL running. Before each read, the
+host resolves the current `_PROMPT` or `_PROMPT2` through the actual global
+environment. Nil selects `> ` or `>> `; other values use auxiliary string
+conversion, including `__tostring`, independently of the public `tostring`
+global. The converted string remains rooted until its C-string prefix is
+written and flushed. Prompt lookup/conversion failure is a fatal raw
+diagnostic, and `os.exit` preserves its typed exit code/close request. The
+[CLI-only prompt transport](decisions/0039-cli-prompt-transport.md) retains the
+actual anonymous C callback frame without a Lua shim. Readline, SIGINT/hook
+interruption and tracebacks in REPL errors remain deferred.
 
 `--check` validates each requested chunk without executing it, creating globals,
 or loading modules. It accepts the same files, snippets, explicit stdin, `--`,

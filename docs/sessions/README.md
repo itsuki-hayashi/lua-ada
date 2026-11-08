@@ -10,6 +10,8 @@ Component: [materialized vararg counterparts](2026-11-08-materialized-vararg-cou
 
 Correction: [marked closing-value mutation](2026-11-08-marked-closing-mutation.md).
 
+Component: [CLI dynamic prompts](2026-11-08-cli-dynamic-prompts.md).
+
 Feature review: [materialized vararg allocation count](2026-11-08-memerr-vararg-feature-review.md).
 
 Source review: [bounded optimizer eligibility](2026-11-08-optimizer-v3-validator-review.md).

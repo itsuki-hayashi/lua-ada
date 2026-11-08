@@ -1,5 +1,8 @@
 # Architecture Decision Log
 
+ADR 0039 records [CLI prompt transport](0039-cli-prompt-transport.md), actual
+anonymous C callbacks, rooted prompt output and typed process-exit preservation.
+
 ADR 0038 records [scalar closing links](0038-scalar-closing-links.md),
 allocation-free canonical marking and actual slot/capture lifetime.
 
