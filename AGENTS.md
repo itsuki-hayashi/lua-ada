@@ -123,6 +123,17 @@ branch, and deliver one major PR. Follow the checkpoints in the
 [M3 acceptance contract](docs/milestones/m3.md) and
 [ADR 0010](docs/decisions/0010-full-upstream-delivery.md). Do not stop after
 contract, harness or isolated library work and describe the full target as done.
-No merge is authorized. Preserve the distinction between reviewed lexical
+That earlier contract did not authorize merge. Preserve the distinction between reviewed lexical
 candidates, actual runtime obligations, unchanged execution and reviewed
 equivalents; a T-absent return never certifies the omitted C tests.
+
+The maintainer's 2026-11-08 early-session instruction supersedes the requirement
+to finish the remaining upstream target before merging this delivery. Freeze
+the completed runtime/tooling checkpoint, preserve unfinished work separately,
+run its explicit checkpoint CI, address automatic PR review and merge that
+checkpoint. This is not full M3 or remaining-target acceptance. Keep all 26
+full-target contexts, pending ledgers and stale-review failures intact; the
+full-target workflow remains manually available. Do not resume the deferred
+implementation as part of this checkpoint. The
+[checkpoint handoff](docs/sessions/2026-11-08-interim-compatibility-checkpoint.md)
+owns the cut, backup refs, verification and remaining obligations.

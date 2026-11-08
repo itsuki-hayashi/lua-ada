@@ -1,6 +1,22 @@
 # Backlog
 
-## Active remaining-suite delivery
+## Deferred remaining-suite delivery
+
+The maintainer paused the full delivery on 2026-11-08 to merge a validated
+[interim checkpoint](sessions/2026-11-08-interim-compatibility-checkpoint.md).
+Resume the remaining work in a new task from updated master. Preserve these
+obligations and the fail-closed ledgers rather than describing them as completed:
+
+- Finish the real persistent CLI host-main, message-handler/print behavior and
+  signal lease; the temporary per-docall draft has a known hook mismatch.
+- Complete current-source approvals for API composition, GC, locals, Memerr,
+  Querystr and Nextvar/Sort. Never renew stale hashes without semantic review.
+- Finish all remaining primary/aggregate/heavy/helper protocols, revalidate
+  accepted files and reconcile the original 26-context final-head matrix.
+- Connect console, typed-argument and readline receipts to final frozen images,
+  review native backend prompt contracts and publish the independent certificate.
+- Complete real TTY/platform evidence and retain explicit native T warning and
+  abrupt-exit diagnostics; component or batch CLI results do not close these gates.
 
 Investigate the [macOS coroutine resident watchdog failure](sessions/2026-11-08-lifecycle-watchdog-evidence.md)
 with the new retained process/raw capture. Preserve the existing threshold and

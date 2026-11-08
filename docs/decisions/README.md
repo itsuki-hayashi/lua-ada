@@ -114,3 +114,6 @@ selection, rooted prompt/input ownership and history refusal recovery.
 
 ADR 0047 records [canonical frame footprint](0047-canonical-frame-footprint.md)
 and removal of unused per-frame register arenas without changing stack limits.
+
+ADR 0048 records the [interim compatibility checkpoint](0048-interim-compatibility-checkpoint.md)
+authorized by the maintainer's early-session instruction.

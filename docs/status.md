@@ -1,5 +1,13 @@
 # Project Status
 
+The maintainer requested a
+[CI-verified interim checkpoint](sessions/2026-11-08-interim-compatibility-checkpoint.md)
+on 2026-11-08 and paused the remaining implementation. Completed runtime and
+tooling progress is being prepared for review/merge; full upstream acceptance
+is not claimed. The unfinished CLI host-main/message-handler/interrupt and
+host-receiver drafts are preserved on separate remote backup branches.
+Checkpoint CI is separate from the unchanged 26-context full-target contract.
+
 ## Remaining upstream compatibility (2026-11-07)
 
 The [frame storage correction](sessions/2026-11-08-canonical-frame-footprint.md)
