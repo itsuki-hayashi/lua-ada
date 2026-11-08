@@ -4,7 +4,7 @@
   "author": "Codex /root",
   "reviewer": "Codex /root/validation_delivery",
   "review_date": "2026-11-08",
-  "decision": "source-correction-supported-pending-committed-identity",
+  "decision": "accepted-source-correction",
   "synthetic_fixture": false,
   "runtime_acceptance": false,
   "coverage_authority": false,
@@ -12,10 +12,10 @@
   "execution_evidence": [],
   "source_exclusions": [],
   "source_snapshot": {
-    "repository_revision": "0570ce8e7d753aaad970f37f190b1861b985b9a9",
-    "repository_dirty": true,
-    "reviewed_source_is_uncommitted": true,
-    "final_implementation_commit": null
+    "repository_revision": "a3447d226a26d363ced2a5045097a20f818ed3ea",
+    "repository_dirty": false,
+    "reviewed_source_is_uncommitted": false,
+    "final_implementation_commit": "a3447d226a26d363ced2a5045097a20f818ed3ea"
   },
   "reviewed_changed_sources": [
     {
@@ -145,6 +145,16 @@
       "path": "reports/exact-equivalent-review/heavy-4d4e0ee6cf74425c833106eeeb62f7b2/results.json",
       "sha256": "cd7f2fcf896e6b14ca468c3cb0403b05529faf35bc17d6f6f816d2fd0fda5ed7",
       "passing_acceptance_authority": false
+    },
+    {
+      "path": "reports/allocator-ceiling/be5672c6cd6f402e9155d683520f6224/result.json",
+      "sha256": "6e510a98cb5a25ac4eebc02c37d9bf7a87723a5987697ec5e88e09b6e73493ae",
+      "passing_acceptance_authority": false
+    },
+    {
+      "path": "reports/allocator-ceiling/68cb5a44d8f24406ba495a0a53d76c38/result.json",
+      "sha256": "a68929bf946035d825dc77f29fa794a78d86ce936f89bd4b9f1c6c054adeb64a",
+      "passing_acceptance_authority": false
     }
   ],
   "independent_observation_checks": [
@@ -152,12 +162,34 @@
     "Independently replayed all ten captured success sidecars through the new identity helper using their actual PID/run_id and original recorded SHA; all identities matched. This is read-only reconciliation of existing observations, not a fresh13-process run after the helper correction.",
     "Read the actual strict C7 stdout, compile/process records and source hashes. The seven named operations complete with exit0. No new compiler, Alire build or Lua/C execution was performed by this reviewer.",
     "Read the fresh four-role Heavy report and independently checked stdout/stderr file hashes, child PID/telemetry identity and measured/requested64MiB. All four children exit0, actual nativeT reports managed2/backing0, Ada reports managed2/provider0 and approximately48.5MiB peak with0/0 shutdown. Native C retains its original progress bytes on stderr; raw C/Ada stdout is not asserted identical.",
-    "Independently executed the22 data-identity guards on hash-verified copies of the exact current helper/test script. Root files were read only. Missing/stale/PID/run/config/type/hash/ownership/ceiling/shutdown cases reject, preserving managed1/provider0 as distinct measurements."
+    "Independently executed the22 data-identity guards on hash-verified copies of the exact current helper/test script. Root files were read only. Missing/stale/PID/run/config/type/hash/ownership/ceiling/shutdown cases reject, preserving managed1/provider0 as distinct measurements.",
+    "Inspected committed a3447d2 diff and owning session, then verified Git blob bytes for all ten reviewed changed/new sources and nine context sources against the independently recorded WIP hashes: all19 match. No changed source was approved by an automatic hash replacement.",
+    "Read the final-helper be567(default) and68cb(instrumented)13-process reports and independently replayed their ten success sidecars with actual PID/run_id, declared configuration/limit and recorded SHA. These dated component observations remain separate from a final clean context build or matrix receipt."
   ],
   "remaining_requirements": [
-    "Inspect final commit diff and bind its exact implementation identity before finalizing this independent source review. No source/hash refresh inherits runtime authority.",
-    "Run fresh13-process/7-C controls against final committed source-built contexts and preserve their raw identities. Dated inspected observations above do not supply final matrix/build provenance.",
-    "Refresh configured102 and CLI14 pending source proposals only after Root commits the new oracle observer, and recapture actual nativeT CLI operations against that new runtime image.",
-    "Final per-file/Heavy contracts, all source/global obligations, complete frozen context matrix and PR review/merge acceptance remain separate and pending."
-  ]
+    "This source-only decision binds exactly the reviewed a3447d2 source bytes. Later source changes require explicit review; it supplies no runtime, exclusion, adaptation or matrix acceptance authority.",
+    "Fresh final-context builds and13-process/7-C controls must preserve actual revision, executable, library, source and raw-capture identities; the inspected dated component observations do not certify final build provenance.",
+    "Refresh the configured corpus and CLI14 pending source proposals only on the combined Root snapshot including the oracle and new adapter/fixture checkpoint, then recapture actual nativeT CLI operations against that runtime.",
+    "Final per-file/Heavy semantic contracts, all source/global obligations, complete frozen context matrix and PR review/merge acceptance remain separate and pending."
+  ],
+  "initial_review_source_snapshot": {
+    "repository_revision": "0570ce8e7d753aaad970f37f190b1861b985b9a9",
+    "repository_dirty": true,
+    "reviewed_source_is_uncommitted": true,
+    "final_implementation_commit": null
+  },
+  "final_commit_review": {
+    "commit": "a3447d226a26d363ced2a5045097a20f818ed3ea",
+    "reviewed_changed_source_count": 10,
+    "reviewed_context_source_count": 9,
+    "first_party_blob_count": 17,
+    "pinned_reference_blob_count": 2,
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+    "reference_gitlink_verified": true,
+    "all_previously_reviewed_bytes_match_commit": true,
+    "source_diff_reinspected": true,
+    "owning_session": "docs/sessions/2026-11-08-heavy-allocator-observation.md",
+    "runtime_acceptance": false,
+    "coverage_authority": false
+  }
 }
