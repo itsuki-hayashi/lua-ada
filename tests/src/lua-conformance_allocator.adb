@@ -183,7 +183,7 @@ package body Lua.Conformance_Allocator is
               "{""schema_version"":1,""run_id"":""" & Run_ID &
               """,""process_id"":" & PID &
               ",""configuration"":""" & Lua.Runtime_Configuration.Name &
-              """,""allocator_limit_bytes"":2147483648," &
+              """,""allocator_limit_bytes"":" & Host_Limit'Image & "," &
               """managed_refusals"":" & Refusals'Image &
               ",""provider_refusals"":" & Provider_Refusals'Image &
               ",""outstanding_bytes"":" & Live_Bytes'Image &

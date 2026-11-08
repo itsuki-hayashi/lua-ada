@@ -2,6 +2,14 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [allocator ceiling correction](sessions/2026-11-08-heavy-allocator-observation.md)
+enforces the selected 64 MiB or 2 GiB limit in the conformance launcher and
+reports its actual stored ceiling. Both configurations pass 13 process checks,
+22 sidecar binding guards and the native observer's seven C checks. Fresh
+unchanged heavy workloads catch real allocation refusal in all four local
+roles at the measured 64 MiB cap. Final matrix and semantic reconciliation
+remain pending; the earlier misconfigured Heavy campaign is invalid.
+
 The [fixed external-string T driver](sessions/2026-11-08-fixed-external-string-driver.md)
 uses the exported external-string API in main and separately created states.
 Both local AUnit runs pass2,574 cases. Original strings now completes in
@@ -12,15 +20,15 @@ The [native locale correction](sessions/2026-11-08-native-string-locales.md)
 connects string ordering, default sorting, recognized pattern classes and case
 conversion to the existing native locale boundary. Both full local AUnit runs
 pass2,570 cases and eight compiler/VM roles agree. Original default strings
-completes with byte-identical native/Ada stdout; instrumented strings reaches
-its missing externKstr driver. Final context and full-target gates remain.
+completes with byte-identical native/Ada stdout; the subsequent fixed-string
+driver completes its instrumented body too. Final context gates remain.
 
 The [table diagnostic correction](sessions/2026-11-08-table-error-arguments.md)
 retains full integer indices in concat errors and argument identity for missing
 pairs/ipairs receivers. Seven focused cases pass within2,556 AUnit cases in
 each local configuration; eight binary compiler/VM roles agree. Original
-default nextvar now completes. Original strings advances to its locale
-collation assertion; private table-inspection and final matrix gates remain.
+default nextvar now completes. The subsequent locale/string driver closes the
+observed strings gaps; private table-inspection and final matrix gates remain.
 
 The [V4 resource verifier](sessions/2026-11-08-observable-resource-eligibility.md)
 implements a closed exact memerr allocation-count source rule with retained

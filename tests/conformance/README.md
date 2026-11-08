@@ -5,6 +5,15 @@ for [M3](../../docs/milestones/m3.md), including accepted bounded scopes and
 unresolved obligations. It contains no second Lua implementation or altered
 upstream source. A completed scope does not establish full M3 acceptance.
 
+The test launcher reads the canonical LUA_ADA_CONFORMANCE_ALLOCATOR selection:
+67108864 for Heavy and 2147483648 for ordinary/aggregate execution. Missing
+selection defaults to 2 GiB; other spellings reject configuration. The live
+owner receives that ceiling before provider attachment, and post-close
+telemetry uses the stored host limit. Real owner refusal may precede the
+provider callback; report those counters separately. The native T observer
+similarly separates all actual debug allocator NULL returns from the narrower
+backing-malloc refusals. See the [validation record](../../docs/sessions/2026-11-08-heavy-allocator-observation.md).
+
 The [independent fixed-buffer feature review](targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json)
 accepts only the exact eighteen-byte private allocation-bound conjunct as
 eligible for an instrumented exclusion. The original mixed assertion remains

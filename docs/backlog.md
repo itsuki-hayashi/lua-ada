@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+Integrate the [actual allocator-ceiling observations](sessions/2026-11-08-heavy-allocator-observation.md)
+into immutable context builds and final Heavy reconciliation. Keep actual
+owner/provider/backing counters distinct, require fresh PID/run/hash-bound
+sidecars and reject the old two-GiB Ada run requested as Heavy64. Native
+progress output and implementation-dependent table sizes need semantic review.
+
 Retain the [complete original strings observations](sessions/2026-11-08-fixed-external-string-driver.md)
 for fresh final-image replay. Its new C-backed fixed-string wrapper changes
 the adapter source hash: existing exact verifier/API/locals bindings must be
