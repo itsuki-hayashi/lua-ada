@@ -507,16 +507,10 @@ private package Lua.Engine is
    type Frame is record
       Context : Context_Access;
       Cache_Next : Frame_Access;
-      Reset_Reserve : Boolean := False;
-      --  Dedicated empty continuation metadata, preserved across Clear_Frame
-      --  and loaned only during an actual reset. It owns no inactive values.
-      Lifecycle : Frame_Lifecycle := Active;
       Stack_Base : Natural := 0;
       Stack_Window_Length : Natural := 0;
       Saved_Stack_Used : Natural := 0;
       Call_Base : Natural := 0;
-      Has_Stack_Window : Boolean := False;
-      Hidden_Varargs : Boolean := False;
       Vararg_Base : Natural := 0;
       Vararg_Count : Natural := 0;
       Stack_Live_Top : Natural := 0;
@@ -525,13 +519,7 @@ private package Lua.Engine is
       --  Indices survive arena growth. Current real-window linkage is
       --  borrowed metadata, never another owner or a hidden GC root.
       Memory : Lua.Storage.Owner_Access;
-      Is_Native : Boolean := False;
       Native_Name : Unbounded_String;
-      Native_Id : Native_Kind := Print_Function;
-      Native_Builtin_Direct : Boolean := False;
-      Return_Window_Published : Boolean := False;
-      --  The scalar source range and Transfer_First/Count are authoritative
-      --  through return closing/hooks, independently of copied result packets.
       Native_Return_First : Natural := 0;
       --  A finishing Ada builtin publishes its real result range once,
       --  before return hooks. Zero means ordinary append placement; a phase
@@ -542,12 +530,9 @@ private package Lua.Engine is
       Native_Arguments : Values.Vector;
       Native_Results : Values.Vector;
       Error_Packet : Values.Vector;
-      Result_Failure_Class : Failure_Kind := No_Failure;
-      Result_Handler_Called : Boolean := False;
       Native_Captures : Values.Vector;
       Native_Self : Object_Access;
       Native_Buffer : Owned_Buffer;
-      Load_Reader_Portal : Boolean := False;
       Load_Reader_Arguments : Natural := 0;
       Load_Reader_Mode_Offset : Natural := 0;
       --  A real base.load reader call runs above a C-owned guard after Step
@@ -563,7 +548,6 @@ private package Lua.Engine is
       Native_Stage : Natural := 0;
       Native_Index : Natural := 0;
       Native_Aux : Natural := 0;
-      Native_Operator : Lua.Lexers.Token_Kind := Lua.Lexers.End_Of_Input;
       C_Closing_Level : Natural := 0;
       --  Intrusive closing links live with actual canonical/C scalar slots.
       --  The historical C name remains private. This head borrows absolute
@@ -575,16 +559,10 @@ private package Lua.Engine is
       Foreign_KContext : Interfaces.C.ptrdiff_t := 0;
       Foreign_KStatus : Interfaces.C.int := 0;
       Foreign_Yield_Count : Natural := 0;
-      Foreign_Suspended : Boolean := False;
       Foreign_Wanted : Integer := 0;
-      Foreign_Protected : Boolean := False;
-      --  C continuations retain scalar metadata, never an abandoned C stack.
-      --  A suspended boundary owns its result adjustment until resumption.
       Error_Guard_Owner : Frame_Access;
       Deferred_Error_Head, Deferred_Error_Next : Frame_Access;
       Deferred_Error_Count : Natural := 0;
-      Deferred_Error_Traceback : Boolean := False;
-      Pending_Error_Transfer : Boolean := False;
       Error_Previous_Prefix : Natural := 0;
       --  An unprotected regular C call first transfers through its exact
       --  live callback guard. Its boundary owns the abandoned scope chain
@@ -592,7 +570,6 @@ private package Lua.Engine is
       --  Protected cleanup retains frozen ownership after retirement. An
       --  unhandled coroutine error instead preserves its original traceback
       --  windows until reset, as recorded by Deferred_Error_Traceback.
-      Warning_Phase : Warning_Event_Phase := No_Pending_Warning;
       Warning_Previous : Frame_Access;
       Warning_View : Stack_View_Lease;
       Warning_Borrow_Depth : Natural := 0;
@@ -602,12 +579,8 @@ private package Lua.Engine is
       Warning_Ticket : Interfaces.C.unsigned_long_long := 0;
       Warning_Message : Byte_String;
       Warning_Root : Value;
-      Warning_To_Continue : Boolean := False;
       Warning_Handler : System.Address := System.Null_Address;
       Warning_Data : System.Address := System.Null_Address;
-      Warning_Failed : Boolean := False;
-      --  A warning borrows its actual current frame. Embedded event storage
-      --  and the linked previous event retain roots across nested C callbacks.
       Foreign_Base : Natural := 0;
       Foreign_Previous_Base : Natural := 0;
       Foreign_Previous_Frame : Frame_Access;
@@ -615,10 +588,6 @@ private package Lua.Engine is
       Hook_View : Stack_View_Lease;
       --  The actual C hook guard and its interrupted scalar view have
       --  distinct lifetimes. A regular C entry saves/restores that view.
-      Foreign_Entered : Boolean := False;
-      --  A C callback has a base-relative public stack window. The previous
-      --  window is explicit frame data so reentrant calls and error unwinding
-      --  never depend on an abandoned Ada or C activation.
       Call_Site : Lua.Lexers.Source_Location;
       --  Native continuation storage is owned by the activation. Pending
       --  arguments/results/captures remain traced while Lua callbacks run.
@@ -634,28 +603,97 @@ private package Lua.Engine is
       Canonical_Top : Natural := 0;
       Canonical_GC_Top : Natural := 0;
       --  Exclusive live scalar stack bound while a caller is suspended.
-      Canonical_Pending : Canonical_Pending_Kind := No_Canonical_Result;
       Canonical_Base : Natural := 0;
       Canonical_Wanted : Integer := 0;
-      Canonical_Test : Boolean := False;
       Canonical_Concat_Last : Natural := 0;
       Varargs    : Values.Vector;
       Vararg_Table : Object_Access;
-      Completion : Completion_Policy := Deliver_Results;
-      Finalizer_Phase : Finalizer_Drive_Phase := Choosing_Finalizer;
-      Finalizer_Charge : Boolean := False;
       Return_To  : Natural := 0;
       Protection : Natural := 0;
       Message_Handler : Value;
+      Slot_Cost : Natural := 0;
+      Callee : Value;
+      Call_Metamethod_Count : Natural range 0 .. 15 := 0;
+      --  Receivers inserted on entry to this logical frame, independently
+      --  of ordinary arguments or varargs. Suspension and Lua tail reuse
+      --  retain this count; a separate native tail frame gets its own count.
+      Call_Name : Unbounded_String;
+      Call_Name_Bytes : Owned_Buffer;
+      --  Owned, trailing-NUL view of an explicit call origin for C debug
+      --  inspection. Publish it when the activation is constructed, never
+      --  allocate scratch bytes during a read-only lua_getinfo query. The
+      --  borrow is valid until this activation is retired/reused.
+      Name_Kind : Unbounded_String;
+      Transfer_Count : Natural := 0;
+      Transfer_First : Positive := 1;
+      --  Actual first transferred slot relative to the callee function.
+      --  Calls start at one; canonical/C returns retain their real offset.
+      Hook_Line : Integer range -1 .. Integer'Last := -1;
+      --  Minus one means unseen; zero is a checked word without line data.
+      --  Keeping them distinct preserves a stripped frame's first event.
+      Hook_PC : Natural := 0;
+      Hook_Trace_PC : Natural := 0;
+      Last_Executed_PC : Natural := 0;
+      Closers : Close_Lists.Vector;
+      Unwind_Owner : Frame_Access;
+      Unwind_Depth : Natural := 0;
+      Unwind_PC : Natural := 0;
+      Unwind_Live : Registers.Vector;
+      Unwind_Results : Values.Vector;
+      Unwind_Error : Value;
+      Unwind_Previous_Prefix : Natural := 0;
+      --  An active close keeps any outer close's real scalar floor. A failed
+      --  handler transfers this floor to fresh recovery before dropping its
+      --  now-abandoned controller and original return temporaries.
+      Lifecycle : Frame_Lifecycle := Active;
+      Native_Id : Native_Kind := Print_Function;
+      Result_Failure_Class : Failure_Kind := No_Failure;
+      Native_Operator : Lua.Lexers.Token_Kind := Lua.Lexers.End_Of_Input;
+      Warning_Phase : Warning_Event_Phase := No_Pending_Warning;
+      Canonical_Pending : Canonical_Pending_Kind := No_Canonical_Result;
+      Completion : Completion_Policy := Deliver_Results;
+      Finalizer_Phase : Finalizer_Drive_Phase := Choosing_Finalizer;
+      Native_Tail_State : Native_Tail_Phase := No_Native_Tail;
+      Unwind : Unwind_Reason := No_Unwind;
+      Unwind_Failure_Class : Failure_Kind := Language_Failure;
+      --  Keep static flags together to avoid alignment padding in every
+      --  retained activation. This private ordering changes no flag default,
+      --  ownership transition or relative order of controlled components.
+      Reset_Reserve : Boolean := False;
+      --  Dedicated empty continuation metadata, preserved across Clear_Frame
+      --  and loaned only during an actual reset. It owns no inactive values.
+      Has_Stack_Window : Boolean := False;
+      Hidden_Varargs : Boolean := False;
+      Is_Native : Boolean := False;
+      Native_Builtin_Direct : Boolean := False;
+      Return_Window_Published : Boolean := False;
+      --  The scalar source range and Transfer_First/Count are authoritative
+      --  through return closing/hooks, independently of copied result packets.
+      Result_Handler_Called : Boolean := False;
+      Load_Reader_Portal : Boolean := False;
+      Foreign_Suspended : Boolean := False;
+      Foreign_Protected : Boolean := False;
+      --  C continuations retain scalar metadata, never an abandoned C stack.
+      --  A suspended boundary owns its result adjustment until resumption.
+      Deferred_Error_Traceback : Boolean := False;
+      Pending_Error_Transfer : Boolean := False;
+      Warning_To_Continue : Boolean := False;
+      Warning_Failed : Boolean := False;
+      --  A warning borrows its actual current frame. Embedded event storage
+      --  and the linked previous event retain roots across nested C callbacks.
+      Foreign_Entered : Boolean := False;
+      --  A C callback has a base-relative public stack window. The previous
+      --  window is explicit frame data so reentrant calls and error unwinding
+      --  never depend on an abandoned Ada or C activation.
+      Canonical_Test : Boolean := False;
+      Finalizer_Charge : Boolean := False;
       Retain_On_Failure : Boolean := False;
       --  Protected holders own their dynamic handler. A foreign sentinel
       --  retains its packet until C takes it; Lua holders deliver on unwind.
-      Slot_Cost : Natural := 0;
       Native_Charge : Boolean := False;
       Message_Charge : Boolean := False;
       Unwind_Charge : Boolean := False;
       Blocks_Yield : Boolean := False;
-      Callee : Value;
       Is_C_Hook_Transport : Boolean := False;
       --  A native hook borrows the interrupted frame. This actual scheduler
       --  wrapper is transport even if the callback replaces/removes its hook
@@ -671,54 +709,19 @@ private package Lua.Engine is
       --  Execution has genuinely abandoned this activation. Cells/closers
       --  remain owned until cleanup; its calls/depth/barriers cannot resume.
       Is_Tail_Call : Boolean := False;
-      Call_Metamethod_Count : Natural range 0 .. 15 := 0;
-      --  Receivers inserted on entry to this logical frame, independently
-      --  of ordinary arguments or varargs. Suspension and Lua tail reuse
-      --  retain this count; a separate native tail frame gets its own count.
-      Native_Tail_State : Native_Tail_Phase := No_Native_Tail;
-      Call_Name : Unbounded_String;
-      Call_Name_Bytes : Owned_Buffer;
-      --  Owned, trailing-NUL view of an explicit call origin for C debug
-      --  inspection. Publish it when the activation is constructed, never
-      --  allocate scratch bytes during a read-only lua_getinfo query. The
-      --  borrow is valid until this activation is retired/reused.
-      Name_Kind : Unbounded_String;
-      Transfer_Count : Natural := 0;
-      Transfer_First : Positive := 1;
-      --  Actual first transferred slot relative to the callee function.
-      --  Calls start at one; canonical/C returns retain their real offset.
       Entry_Hook_Done : Boolean := False;
       Return_Hook_Done : Boolean := False;
       External_Return_Pending : Boolean := False;
       External_Return_Independent : Boolean := False;
       --  Unwind_Results owns a completed raw packet while external release
       --  callbacks borrow this still-live actual departing activation.
-      Hook_Line : Integer range -1 .. Integer'Last := -1;
-      --  Minus one means unseen; zero is a checked word without line data.
-      --  Keeping them distinct preserves a stripped frame's first event.
-      Hook_PC : Natural := 0;
-      Hook_Trace_PC : Natural := 0;
       Hook_Line_Mask : Boolean := False;
       --  Traceexec snapshots its line mask before a count callback can change
       --  hooks. The last actually traced/caller-return PC remains separate
       --  from the executed PC while count-only hooks do not trace lines.
-      Last_Executed_PC : Natural := 0;
       Line_Hook_Checked : Boolean := False;
-      Closers : Close_Lists.Vector;
-      Unwind : Unwind_Reason := No_Unwind;
-      Unwind_Owner : Frame_Access;
-      Unwind_Depth : Natural := 0;
-      Unwind_PC : Natural := 0;
-      Unwind_Live : Registers.Vector;
-      Unwind_Results : Values.Vector;
-      Unwind_Error : Value;
-      Unwind_Failure_Class : Failure_Kind := Language_Failure;
       Unwind_Handler_Called : Boolean := False;
       Unwind_Has_Error : Boolean := False;
-      Unwind_Previous_Prefix : Natural := 0;
-      --  An active close keeps any outer close's real scalar floor. A failed
-      --  handler transfers this floor to fresh recovery before dropping its
-      --  now-abandoned controller and original return temporaries.
    end record;
    --  A packet preserves all results of a call/vararg expression. Scalar
    --  consumers read its first value; parentheses explicitly collapse it.

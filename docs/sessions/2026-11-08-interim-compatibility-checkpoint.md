@@ -79,6 +79,13 @@ compares raw output and requires both coroutine API sections and the hook
 section with zero omissions. The four Windows T file executions pass, with
 separate measured configuration probes. Independent inspection found no
 blocking defect; planner guards distinguish the mandatory T and default stages.
+Repeated macOS default/static execution at 412ddfd exceeds the resident limit
+despite earlier passes. The [private scalar layout correction](2026-11-08-private-frame-scalar-layout.md)
+preserves all fields/defaults and controlled order, reduces Frame from 1,232 to
+1,160 bytes, and passes eight strict local builds, both 2,665-case Windows
+AUnit suites, 26/27 C consumers and actual default/T lifecycle comparisons.
+Fresh matrix evidence must establish macOS margin; earlier failures remain
+failed observations. No resource limit or source workload was reduced.
 The full-target workflow remains manually available and its validators reject
 incomplete receipts, stale approvals and missing global reconciliation. All
 remaining work is retained in the owning backlog and M3 contract.

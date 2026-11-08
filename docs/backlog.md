@@ -20,9 +20,10 @@ obligations and the fail-closed ledgers rather than describing them as completed
 
 Preserve the dated [macOS coroutine resident watchdog failure](sessions/2026-11-08-lifecycle-watchdog-evidence.md).
 The frame-storage correction passes the retained default macOS static/shared
-watchdog at checkpoint 122d642 without changing its threshold. Revalidate that
-operation with the complete future 26-context campaign; the prior failed
-observation remains failed. Readline is a separate operation.
+watchdog at checkpoint 122d642 without changing its threshold, but a repeat at
+412ddfd fails. The [private scalar layout correction](sessions/2026-11-08-private-frame-scalar-layout.md)
+needs fresh checkpoint resident evidence and later full 26-context execution.
+The prior failed observations remain failed. Readline is a separate operation.
 
 Validate the [native readline component](sessions/2026-11-08-cli-native-readline.md)
 on Linux/macOS and real TTYs. Reconcile actual optional-backend selection,

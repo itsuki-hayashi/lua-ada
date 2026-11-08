@@ -2,6 +2,8 @@
 
 Current cut: [interim compatibility checkpoint](2026-11-08-interim-compatibility-checkpoint.md).
 
+Correction: [private frame scalar layout](2026-11-08-private-frame-scalar-layout.md).
+
 Component: [actual C-call argument arena reuse](2026-11-08-c-call-argument-arena.md).
 
 Component: [canonical frame storage reduction](2026-11-08-canonical-frame-footprint.md).

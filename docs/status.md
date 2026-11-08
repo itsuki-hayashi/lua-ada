@@ -17,7 +17,11 @@ falls from 1,968,500,975 to 1,896,476,423 managed bytes with the same 2 GiB
 ceiling and zero cleanup ownership. Eight strict local builds, both 2,665-case
 Windows AUnit suites and 26/27 C consumers pass. Checkpoint CI at 122d642 now
 passes the retained macOS default static/shared lifecycle watchdog with its
-unchanged 2 GiB limit. The complete 26-context matrix remains pending.
+unchanged 2 GiB limit, but a repeat at 412ddfd exceeds it. The subsequent
+[private scalar grouping](sessions/2026-11-08-private-frame-scalar-layout.md)
+reduces the measured frame from 1,232 to 1,160 bytes without changing fields
+or ownership. Fresh checkpoint CI must validate resident margin. The complete
+26-context matrix remains pending.
 
 The [native readline component](sessions/2026-11-08-cli-native-readline.md)
 retains rooted prompts through native input and selected-owner history buffers.

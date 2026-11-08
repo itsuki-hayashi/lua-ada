@@ -1,5 +1,8 @@
 # Architecture Decision Log
 
+ADR 0049 records [private frame scalar placement](0049-private-frame-scalar-layout.md),
+ordinary alignment with preserved field defaults and controlled ownership order.
+
 ADR 0043 records [debug-console continuations](0043-debug-console-continuations.md),
 shared dynamic compilation and the existing protected scheduler path.
 
