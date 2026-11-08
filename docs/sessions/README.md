@@ -1,5 +1,7 @@
 # Session Records
 
+Correction: [marked closing-value mutation](2026-11-08-marked-closing-mutation.md).
+
 Feature review: [materialized vararg allocation count](2026-11-08-memerr-vararg-feature-review.md).
 
 Source review: [bounded optimizer eligibility](2026-11-08-optimizer-v3-validator-review.md).

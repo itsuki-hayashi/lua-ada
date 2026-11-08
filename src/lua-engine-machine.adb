@@ -4205,6 +4205,7 @@ package body Lua.Engine.Machine is
             Reason : Unwind_Reason := Activation.Unwind;
             Closing : Close_Entry;
             Previous_Closing : Natural := 0;
+            Linked_Closing : Boolean;
             Need_Close : Boolean;
          begin
             if Activation.Native_Stage = 1 then
@@ -4237,7 +4238,8 @@ package body Lua.Engine.Machine is
             while not Owner.Closers.Is_Empty or else
               Owner.C_Closing_Level /= 0
             loop
-               if Owner.C_Closing_Level /= 0 then
+               Linked_Closing := Owner.C_Closing_Level /= 0;
+               if Linked_Closing then
                   Previous_Closing := Stacks.Closing_Predecessor
                     (Owner, Owner.C_Closing_Level);
                   --  Links always address absolute scalar slots. Canonical
@@ -4269,7 +4271,7 @@ package body Lua.Engine.Machine is
                        (Activation.Unwind_Previous_Prefix,
                         Closing.Stack_Level));
                end if;
-               if Owner.C_Closing_Level /= 0 then
+               if Linked_Closing then
                   Owner.C_Closing_Level := Previous_Closing;
                   State.Current.C_Close_Links.Replace_Element
                     (Closing.Stack_Level, (Previous => 0));
@@ -4281,7 +4283,12 @@ package body Lua.Engine.Machine is
                   elsif Closing.Stack_Level /= 0 then
                     Stacks.Read (Owner.Context, Closing.Stack_Level)
                   else Closing.Cell.Cell_Value);
-               if Truth (Left) then
+               --  Initial nil/false values never enter the scalar chain.
+               --  Once marked, a debug/C write cannot cancel that obligation:
+               --  dispatch the current value, even nil/false, through its raw
+               --  type metatable and the genuine closing-error continuation.
+               --  The packet backend retains its historical inactive filter.
+               if Linked_Closing or else Truth (Left) then
                   Handler := Metafield (State, Left, "__close");
                   --  Re-read the current handler, including nil/noncallable
                   --  replacements. The protected real dispatch raises its

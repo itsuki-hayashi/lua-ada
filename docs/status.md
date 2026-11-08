@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [marked-slot correction](sessions/2026-11-08-marked-closing-mutation.md)
+preserves a scalar closing obligation after a debugger writes nil/false.
+Four ordinary native-paired cases cover type closers, actual replacement
+errors, weak collection and recovery; both local configurations pass 2,549
+AUnit cases. Current whole-source bindings and final acceptance remain pending.
+
 The [original main.lua diagnostics](sessions/2026-11-08-main-cli-native-baseline.md)
 fail the same Windows temporary-output redirection in native/Ada default/T.
 Parent/bare/arg identities and measured primary cleanup are verified. Separate

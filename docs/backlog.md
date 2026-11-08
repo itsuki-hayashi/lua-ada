@@ -2,6 +2,11 @@
 
 ## Active remaining-suite delivery
 
+Include the [marked-slot mutation correction](sessions/2026-11-08-marked-closing-mutation.md)
+when renewing current locals runtime/checker bindings. Its four ordinary
+counterparts establish the focused nil/false/type-closing behavior, not a
+source-equivalence decision or complete upstream/platform acceptance.
+
 Repair the [measured dynamic prompt gap](sessions/2026-11-08-main-cli-native-baseline.md)
 through a CLI-only session helper and actual native continuations, after native
 nil/conversion/error controls. Separately review Windows main.lua equivalents

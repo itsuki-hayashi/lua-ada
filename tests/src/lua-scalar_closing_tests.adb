@@ -19,6 +19,11 @@ package body Lua.Scalar_Closing_Tests is
    procedure Invalid_Link_Recovery;
    procedure Wrong_Frame_Head;
    procedure Outside_Context_Head;
+   procedure Check_Mutation (Name : String);
+   procedure Nil_Mutation;
+   procedure False_Mutation;
+   procedure False_Type_Closer;
+   procedure Outer_Error_GC_Recovery;
 
    generic
       with procedure Behavior (State : World_Access; Item : Frame_Access);
@@ -332,6 +337,52 @@ package body Lua.Scalar_Closing_Tests is
       Check ("Jump_Scope");
    end Jump_Scope;
 
+   procedure Check_Mutation (Name : String) is
+      State : World;
+      Success : Boolean;
+   begin
+      --  Ordinary public cases have no T installation or provider override.
+      Initialize (State, (others => <>));
+      Success := Execute
+        (State, "_SCALAR_MUTATION_CASE='" & Name &
+         "';dofile('tests/lua/scalar_closing_mutation.lua')",
+         "=scalar-closing-mutation");
+      Assert (Success, Failure_Image (State.Current));
+      Finalize (State);
+      Assert (Lua.Storage.Statistics (State.Memory).Live_Blocks = 0,
+              "mutated closing slot retained physical ownership");
+   exception
+      when others => Finalize (State); raise;
+   end Check_Mutation;
+
+   procedure Nil_Mutation is
+   begin
+      --  A truthily marked slot replaced by nil still dispatches its close
+      --  and raises the native closing call error.
+      Check_Mutation ("Nil_Mutation");
+   end Nil_Mutation;
+
+   procedure False_Mutation is
+   begin
+      --  A truthily marked slot replaced by false still dispatches its
+      --  close and raises the native closing call error.
+      Check_Mutation ("False_Mutation");
+   end False_Mutation;
+
+   procedure False_Type_Closer is
+   begin
+      --  A replaced false value uses its real type closer, while initial
+      --  false stays unmarked; normal/error argument counts remain real.
+      Check_Mutation ("False_Type_Closer");
+   end False_Type_Closer;
+
+   procedure Outer_Error_GC_Recovery is
+   begin
+      --  An outer closer sees the replacement error, discarded old values
+      --  die during GC, and a healthy new closing call succeeds.
+      Check_Mutation ("Outer_Error_GC_Recovery");
+   end Outer_Error_GC_Recovery;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -385,5 +436,17 @@ package body Lua.Scalar_Closing_Tests is
       Test_Support.Add
         (Suite, "scalar closing: Jump_Scope",
          Jump_Scope'Access);
+      Test_Support.Add
+        (Suite, "scalar mutation: Nil_Mutation",
+         Nil_Mutation'Access);
+      Test_Support.Add
+        (Suite, "scalar mutation: False_Mutation",
+         False_Mutation'Access);
+      Test_Support.Add
+        (Suite, "scalar mutation: False_Type_Closer",
+         False_Type_Closer'Access);
+      Test_Support.Add
+        (Suite, "scalar mutation: Outer_Error_GC_Recovery",
+         Outer_Error_GC_Recovery'Access);
    end Register;
 end Lua.Scalar_Closing_Tests;

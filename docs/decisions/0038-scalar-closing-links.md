@@ -32,6 +32,11 @@ retain that descriptor. A child window or a changing Foreign_Top therefore
 cannot substitute for this owner interval. Strict descent keeps predecessors
 inside the same upper bound. Each selected head is removed before calling its
 handler, matching native closing order and existing continuation/error policy.
+The unwind iteration remembers that it selected a linked slot before popping
+its head. A later debug/C write of nil/false cannot cancel that original mark:
+the current type closer is dispatched, or the normal closing call error is
+raised. This does not mark initially nil/false declarations or change the
+migration packet filter. Native ordinary mutation controls verify the rule.
 Return and contradictory-tail guards consider both scalar heads and migration
 Close_Lists. The migration backend retains its separate list/cell semantics.
 
