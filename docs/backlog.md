@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+Argument labels and message formatting have
+[owned-builder evidence](sessions/2026-11-08-owned-argument-labels.md), with
+2,104 passing AUnit cases per local configuration. Migrate the final context
+failure-text store separately, preserving refusal-safe propagation, emergency
+errors and exact cross-context ownership alongside the active hook work.
+
 Type-detail construction has [owned-prefix evidence](sessions/2026-11-08-owned-argument-detail.md),
 four native-paired Lua cases and five AUnit regressions within 2,099 passing
 cases per configuration. Continue the wider failure-text/renderer allocation

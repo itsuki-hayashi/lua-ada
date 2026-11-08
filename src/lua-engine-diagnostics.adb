@@ -25,56 +25,107 @@ package body Lua.Engine.Diagnostics is
       end if;
    end Work;
 
-   function Global_Name
-     (State : in out World; Target, Modules : Value) return String;
-   function Global_Name
-     (State : in out World; Target, Modules : Value) return String
+   function C_Length
+     (State : in out World; Bytes : Byte_String) return Natural;
+   procedure Append_Bytes
+     (State : in out World; Output : in out Owned_Buffer;
+      Bytes : Byte_String; Size : Natural);
+   procedure Global_Name
+     (State : in out World; Target, Modules : Value;
+      Output : in out Owned_Buffer);
+
+   function C_Length
+     (State : in out World; Bytes : Byte_String) return Natural
    is
-      Name : Unbounded_String;
-      function Find (Table : Object_Access; Depth : Natural) return Boolean;
-      function Find (Table : Object_Access; Depth : Natural) return Boolean is
+      View : String (1 .. Bytes.Size)
+        with Import, Address => Bytes.Address;
+      Size : Natural := 0;
+   begin
+      for Byte of View loop
+         Work (State);
+         exit when Byte = ASCII.NUL;
+         Size := Size + 1;
+      end loop;
+      return Size;
+   end C_Length;
+
+   procedure Append_Bytes
+     (State : in out World; Output : in out Owned_Buffer;
+      Bytes : Byte_String; Size : Natural)
+   is
+      View : String (1 .. Size) with Import, Address => Bytes.Address;
+   begin
+      for Byte of View loop
+         Work (State);
+         Output.Append (Byte);
+      end loop;
+   end Append_Bytes;
+
+   procedure Global_Name
+     (State : in out World; Target, Modules : Value;
+      Output : in out Owned_Buffer)
+   is
+      type Located_Name is record
+         First, Second : Value := Nil_Value;
+      end record;
+      Found : Located_Name;
+      First_Size : Natural;
+      function Find
+        (Table : Object_Access; Depth : Natural) return Located_Name;
+      function Find
+        (Table : Object_Access; Depth : Natural) return Located_Name
+      is
       begin
-         if Table = null or else Depth = 0 then return False; end if;
-         --  luaL_argerror searches the actual loaded-module graph to depth
-         --  two. Borrow existing rows; no value snapshot or name cache can
-         --  retain deleted members or hide later registry/module mutations.
+         if Table = null or else Depth = 0 then return (others => <>); end if;
+         --  Borrow at most two matching keys. Speculative traversal never
+         --  creates a text snapshot or an additional Lua graph root.
          for Member of Table.Members loop
             Work (State);
             if Member.Item.Kind /= Nil_Kind and then
               Member.Key.Kind = String_Kind
             then
                if Equal (Member.Item, Target) then
-                  Name := To_Unbounded_String
-                    (To_String (Member.Key.Reference.Bytes));
-                  return True;
-               elsif Depth > 1 and then Member.Item.Kind = Table_Kind and then
-                 Find (Member.Item.Reference, Depth - 1)
-               then
-                  Name := To_Unbounded_String
-                    (To_String (Member.Key.Reference.Bytes) & "." &
-                     To_String (Name));
-                  return True;
+                  return (Member.Key, Nil_Value);
+               elsif Depth > 1 and then Member.Item.Kind = Table_Kind then
+                  declare
+                     Suffix : constant Located_Name :=
+                       Find (Member.Item.Reference, Depth - 1);
+                  begin
+                     if Suffix.First.Kind /= Nil_Kind then
+                        return (Member.Key, Suffix.First);
+                     end if;
+                  end;
                end if;
             end if;
          end loop;
-         return False;
+         return (others => <>);
       end Find;
    begin
-      if Modules.Kind = Table_Kind and then Find (Modules.Reference, 2) then
-         declare
-            Text : constant String := To_String (Name);
-            Rendered : constant String := Call_Names.Name_Image
-              (((Text'Address, Text'Length), Call_Names.Global_Field));
-         begin
-            if Rendered'Length >= 3 and then
-              Rendered (Rendered'First .. Rendered'First + 2) = "_G."
-            then
-               return Rendered (Rendered'First + 3 .. Rendered'Last);
-            end if;
-            return Rendered;
-         end;
+      if Modules.Kind = Table_Kind then
+         Found := Find (Modules.Reference, 2);
       end if;
-      return "?";
+      if Found.First.Kind = Nil_Kind then
+         Output.Append ("?");
+         return;
+      end if;
+      First_Size := C_Length (State, Found.First.Reference.Bytes);
+      Append_Bytes (State, Output, Found.First.Reference.Bytes, First_Size);
+      --  Native concatenation joins counted keys, then consumes a C prefix.
+      --  A NUL in the first key already ends that prefix: no suffix need be
+      --  scanned or materialized, even when its immutable bytes are huge.
+      if First_Size = Found.First.Reference.Bytes.Size and then
+        Found.Second.Kind /= Nil_Kind
+      then
+         Output.Append ('.');
+         Append_Bytes
+           (State, Output, Found.Second.Reference.Bytes,
+            C_Length (State, Found.Second.Reference.Bytes));
+      end if;
+      if Output.Length >= 3 and then Output.Element (1) = '_' and then
+        Output.Element (2) = 'G' and then Output.Element (3) = '.'
+      then
+         Output.Delete (1, 3);
+      end if;
    end Global_Name;
 
    procedure Render_Argument_Error
@@ -91,40 +142,47 @@ package body Lua.Engine.Diagnostics is
       Caller : Frame_Access;
       Position : Natural := Index;
       Extra : Boolean := False;
-      Description : Unbounded_String;
-      Label : Unbounded_String;
+      Description, Label : Owned_Buffer;
+      procedure Put (Text : String);
+      procedure Put_Label (Text : String);
+      procedure Raise_Error (Text : String);
+      function Source (Item : not null Frame_Access) return String;
+
+      procedure Put (Text : String) is
+      begin
+         for Byte of Text loop
+            Work (State);
+            Description.Append (Byte);
+         end loop;
+      end Put;
+      procedure Put_Label (Text : String) is
+      begin
+         Put (Text);
+      end Put_Label;
+      procedure Raise_Error (Text : String) is
+      begin
+         Fail (State, Text);
+      end Raise_Error;
+      function Source (Item : not null Frame_Access) return String is
+      begin
+         if Item.Code.Canonical_Node /= null then
+            declare
+               Bytes : constant Byte_String :=
+                 Canonical.Source_Bytes (Item.Code);
+               View : String (1 .. Bytes.Size)
+                 with Import, Address => Bytes.Address;
+            begin
+               return Inspection.Short_Source (View);
+            end;
+         end if;
+         return Inspection.Short_Source (To_String (Item.Code.Name));
+      end Source;
    begin
-      if Owner = null then
-         Description := To_Unbounded_String
-           ("bad argument #" & Ada.Strings.Fixed.Trim
-              (Index'Image, Ada.Strings.Both) & " (" & Detail & ")");
-      else
+      Description.Set_Owner (Context.Memory);
+      Label.Set_Owner (Context.Memory);
+      if Owner /= null then
          Origin := Inspection.Call_Identity (State, Context, Owner);
          Caller := Inspection.Caller_Frame (State, Context, Owner);
-         Label := To_Unbounded_String
-           ((if Origin.Item.Address /= System.Null_Address then
-                Call_Names.Name_Image (Origin)
-             else Global_Name (State, Owner.Callee, Modules)));
-         Extra := Index <= Owner.Call_Metamethod_Count;
-         if not Extra then
-            Position := Index - Owner.Call_Metamethod_Count;
-            if Origin.Kind = Call_Names.Method_Call then
-               Position := Position - 1;
-            end if;
-         end if;
-         --  Extra __call values keep their original indices. Colon self is
-         --  removed only after those values, and its own error has a distinct
-         --  spelling. These are actual activation counts, not value guesses.
-         if not Extra and then Position = 0 then
-            Description := To_Unbounded_String
-              ("calling '" & To_String (Label) & "' on bad self (" &
-               Detail & ")");
-         else
-            Description := To_Unbounded_String
-              ("bad " & (if Extra then "extra argument #" else "argument #") &
-               Ada.Strings.Fixed.Trim (Position'Image, Ada.Strings.Both) &
-               " to '" & To_String (Label) & "' (" & Detail & ")");
-         end if;
       end if;
       if Caller /= null and then not Caller.Is_Native then
          declare
@@ -134,20 +192,53 @@ package body Lua.Engine.Diagnostics is
                   Canonical.Source_Line (Caller, PC - 1)
                else Caller.Code.Code (PC).Location.Line);
          begin
-            --  luaL_where omits unknown/stripped lines, unlike a VM type
-            --  error's explicit ?:?: prefix. Never borrow an older Lua frame
-            --  through an immediate C caller to manufacture a location.
+            --  Only the immediate Lua caller contributes luaL_where. Render
+            --  this bounded prefix before growing the owned detail; no
+            --  input-sized concatenation or unmanaged source copy is needed.
             if Line > 0 then
-               Fail (State, Inspection.Short_Source
-                 ((if Caller.Code.Canonical_Node /= null then
-                     To_String (Canonical.Source_Bytes (Caller.Code))
-                   else To_String (Caller.Code.Name))) & ":" &
-                 Ada.Strings.Fixed.Trim (Line'Image, Ada.Strings.Both) &
-                 ": " & To_String (Description));
+               Put (Source (Caller) & ":" &
+                 Ada.Strings.Fixed.Trim (Line'Image, Ada.Strings.Both) & ": ");
             end if;
          end;
       end if;
-      Fail (State, To_String (Description));
+      if Owner = null then
+         Put ("bad argument #" & Ada.Strings.Fixed.Trim
+           (Index'Image, Ada.Strings.Both) & " (");
+      else
+         if Origin.Item.Address /= System.Null_Address then
+            Append_Bytes
+              (State, Label, Origin.Item, C_Length (State, Origin.Item));
+         else
+            Global_Name (State, Owner.Callee, Modules, Label);
+         end if;
+         Extra := Index <= Owner.Call_Metamethod_Count;
+         if not Extra then
+            Position := Index - Owner.Call_Metamethod_Count;
+            if Origin.Kind = Call_Names.Method_Call then
+               Position := Position - 1;
+            end if;
+         end if;
+         --  Extra __call values keep their actual indices. Colon self is
+         --  removed only after them, and its own error has distinct spelling.
+         if not Extra and then Position = 0 then
+            Put ("calling '");
+            Label.Query (Put_Label'Access);
+            Put ("' on bad self (");
+         else
+            Put ("bad " &
+              (if Extra then "extra argument #" else "argument #") &
+              Ada.Strings.Fixed.Trim (Position'Image, Ada.Strings.Both) &
+              " to '");
+            Label.Query (Put_Label'Access);
+            Put ("' (");
+         end if;
+      end if;
+      Put (Detail);
+      Put (")");
+      --  Fail still owns the context's diagnostic delivery policy. This
+      --  borrowed view removes growing formatter intermediates; migration of
+      --  the final context failure-text store is a separate ownership gate.
+      Description.Query (Raise_Error'Access);
    end Render_Argument_Error;
 
    procedure Argument_Error
@@ -249,25 +340,11 @@ package body Lua.Engine.Diagnostics is
       Detail.Append (Expected);
       Detail.Append (" expected, got ");
       if Type_Name.Kind = String_Kind then
-         declare
-            Bytes : constant Byte_String := Type_Name.Reference.Bytes;
-            View : String (1 .. Bytes.Size)
-              with Import, Address => Bytes.Address;
-            Size : Natural := 0;
-         begin
-            --  Scan a borrowed C prefix before copying into selected-owner
-            --  storage. A huge name cannot escape the allocator or budget
-            --  through Argument_Type's ordinary Ada String return value.
-            for Byte of View loop
-               Work (State);
-               exit when Byte = ASCII.NUL;
-               Size := Size + 1;
-            end loop;
-            for Index in 1 .. Size loop
-               Work (State);
-               Detail.Append (View (Index));
-            end loop;
-         end;
+         --  Scan and copy the C prefix through the same owned-name helpers
+         --  as inferred labels. The raw string remains in its real C slot.
+         Append_Bytes
+           (State, Detail, Type_Name.Reference.Bytes,
+            C_Length (State, Type_Name.Reference.Bytes));
       else
          Detail.Append (Argument_Type (State, Item, Present));
       end if;

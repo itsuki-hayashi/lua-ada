@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [owned argument labels](2026-11-08-owned-argument-labels.md).
+
 Component: [owned argument details](2026-11-08-owned-argument-detail.md).
 
 Component: [public-boundary integration](2026-11-08-public-boundary-integration.md).

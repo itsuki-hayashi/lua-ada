@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [owned argument formatter](sessions/2026-11-08-owned-argument-labels.md)
+builds labels and complete argument messages in selected-owner buffers,
+without growing unmanaged formatter intermediates. Four native-paired cases
+and a key-scan quota case pass within 2,104 AUnit cases per local configuration.
+The final context failure-text store remains a separate ownership obligation.
+
 The [argument detail checkpoint](sessions/2026-11-08-owned-argument-detail.md)
 uses selected-owner text for type-detail construction, meters raw name
 processing and preserves nonstring raw-name temporaries. Four Lua cases match
