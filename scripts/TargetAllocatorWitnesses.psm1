@@ -192,8 +192,13 @@ function Assert-TawNativeRaw {
     $probe=$directory+'/allocator_observer_probe'+$suffix
     $library=$Raw.library_directory.Replace('\','/')
     if($library -cne $Witness.selected_runtime.library_directory.Replace('\','/')){throw 'Native allocator observer selected library differs'}
-    $arguments=@('-std=c99','-Wall','-Wextra','-Werror','-pedantic','-DLUA_BUILD_AS_DLL',
-        '-DLUA_USER_H=<ltests.h>','-include',($origin.Replace('\','/')+'/experiments/conformance/c/conformance_exports.h'),
+    $arguments=@('-std=c99','-Wall','-Wextra','-Werror','-pedantic')
+    if($parts[1] -ceq 'windows'){$arguments+='-DLUA_BUILD_AS_DLL'}
+    $arguments+='-DLUA_USER_H=<ltests.h>'
+    if($parts[1] -ceq 'windows'){
+        $arguments+=@('-include',($origin.Replace('\','/')+'/experiments/conformance/c/conformance_exports.h'))
+    }
+    $arguments+=@(
         ('-I'+$origin.Replace('\','/')+'/references/lua'),($origin.Replace('\','/')+'/experiments/conformance/c/allocator_observer_probe.c'),
         ('-L'+$library),'-lconformance_lua','-o',$probe)
     if($parts[1] -cne 'windows'){$arguments+='-fPIC'}

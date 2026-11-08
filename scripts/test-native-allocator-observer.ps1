@@ -15,8 +15,16 @@ if($OutputDirectory -eq ''){
 [void][IO.Directory]::CreateDirectory($OutputDirectory)
 $suffix=if($IsWindows){'.exe'}else{''}
 $exe=Join-Path $OutputDirectory ('allocator_observer_probe'+$suffix)
-$arguments=@('-std=c99','-Wall','-Wextra','-Werror','-pedantic','-DLUA_BUILD_AS_DLL',
-    '-DLUA_USER_H=<ltests.h>','-include',(Join-Path $root 'experiments/conformance/c/conformance_exports.h'),
+$arguments=@('-std=c99','-Wall','-Wextra','-Werror','-pedantic')
+if($IsWindows){$arguments+='-DLUA_BUILD_AS_DLL'}
+$arguments+='-DLUA_USER_H=<ltests.h>'
+if($IsWindows){
+    # Only Windows needs explicit imported-data declarations. Forcing this
+    # header on POSIX also reads system headers before the probe's GNU feature
+    # selection, hiding dladdr/Dl_info in a strict C99 build.
+    $arguments+=@('-include',(Join-Path $root 'experiments/conformance/c/conformance_exports.h'))
+}
+$arguments+=@(
     ('-I'+(Join-Path $root 'references/lua')),
     (Join-Path $root 'experiments/conformance/c/allocator_observer_probe.c'),
     ('-L'+$libraryPath),'-lconformance_lua','-o',$exe)
