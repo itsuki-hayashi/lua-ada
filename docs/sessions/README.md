@@ -209,3 +209,7 @@ the user's timezone (currently Asia/Tokyo). Include objective, changes, decision
 commands/tool versions, results, limits, and next steps. Use a suffix for multiple
 records on one date. Historical evidence is immutable except for factual fixes;
 current capability belongs in [status](../status.md).
+
+The [native Windows main transport proposal](2026-11-08-windows-main-transport.md)
+records thirteen authored native controls and pending whole-source/platform
+review; it grants no original main.lua coverage.
