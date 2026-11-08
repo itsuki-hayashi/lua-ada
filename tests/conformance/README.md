@@ -128,6 +128,16 @@ final replay checks its revision/context and every executable, runtime library
 and capture against the frozen file identities. A build log or matching final
 marker cannot replace the configured process set.
 
+`debug_iterator_counts.lua` also runs in both configured campaigns. Its source
+explicitly requires one C-compiled graph when comparing exact hook counts.
+The measured native interpreter loads that exact text file and dumps its
+complete graph to a binary-mode file. Both interpreters then execute
+those same captured bytes, with the complete two-count protocol required.
+Producer arguments, executable/configuration, binary bytes, input identity,
+raw captures and provider cleanup remain bound in the report and frozen image.
+The generic source-compiler comparison consumes this dedicated receipt before
+selecting the fixture through this route.
+
 The image transport permits source-shaped evidence only at the exact generated
 native-module fixture C paths and stdin source fixture path under a unique
 `reports/core-image/` run. Their native-fixture and file-IO consumers retain

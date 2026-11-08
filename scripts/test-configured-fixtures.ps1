@@ -8,11 +8,11 @@ $interpreter=@($baseline.runtimes|Where-Object role -CEQ Ada)[0].executable
 $temporary=Join-Path $root ('reports/configured-fixture-regressions/'+[guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($temporary)
 $script:cases=0
-function Case($Name,[scriptblock]$Change,$Expected=''){
+function Case($Name,[scriptblock]$Change,$Expected='',[scriptblock]$ResolveFile=$null){
     $r=ConvertTo-Json -InputObject $baseline -Depth 48|ConvertFrom-Json -AsHashtable -Depth 48
     & $Change $r
     $failure=$null
-    try{$null=Assert-ConfiguredFixtureReport -Root $root -Report $r -Configuration $baseline.configuration -Interpreter $interpreter}catch{$failure=$_.Exception.Message}
+    try{$null=Assert-ConfiguredFixtureReport -Root $root -Report $r -Configuration $baseline.configuration -Interpreter $interpreter -ResolveFile $ResolveFile}catch{$failure=$_.Exception.Message}
     if(($Expected -eq '' -and $null -ne $failure) -or ($Expected -ne '' -and ($null -eq $failure -or $failure -notmatch $Expected))){throw "Configured fixture regression $Name failed: $failure; expected $Expected"}
     $script:cases++;Write-Output "CONFIGURED FIXTURE PASS: $Name"
 }
@@ -46,6 +46,40 @@ Case 'successful completion alone cannot replace the explicit setup marker' {par
 Case 'rehashed stderr cannot become a passing empty-error observation' {param($r)Replace-Capture (Row $r portal).process stderr 'failure'} 'complete ordered protocol|raw capture|process failed'
 Case 'labelled synthetic observations cannot discharge this actual campaign' {param($r)$r.synthetic_fixture=$true} 'observation authority'
 Case 'component observations cannot claim whole runtime acceptance' {param($r)$r.runtime_acceptance=$true} 'observation authority'
+Case 'iterator instruction counts require the actual C graph producer' {param($r)
+    $r.processes=@($r.processes|Where-Object operation -CNE produce-debug-iterator-counts)
+} 'process set is incomplete'
+Case 'iterator graph producer must load the exact text source' {param($r)
+    @($r.processes|Where-Object operation -CEQ produce-debug-iterator-counts)[0].process.arguments[1]="io.write('replacement graph')"
+} 'native chunk producer source or arguments'
+Case 'iterator execution cannot return to separate source compilation' {param($r)
+    (Row $r debug-iterator-counts).process.arguments[2]=Join-Path $baseline.repository_root 'tests/lua/debug_iterator_counts.lua'
+} 'explicit setup or source'
+Case 'iterator consumers must bind the same actual producer bytes' {param($r)
+    (Row $r debug-iterator-counts).input_chunk.sha256='0'*64
+} 'native chunk producer/input identity'
+Case 'iterator consumers cannot relabel a different chunk path' {param($r)
+    (Row $r debug-iterator-counts).input_chunk.path='other-graph.luac'
+} 'native chunk producer/input identity'
+Case 'tampered native graph identity cannot borrow the producer process' {param($r)
+    @($r.processes|Where-Object operation -CEQ produce-debug-iterator-counts)[0].output_chunk.sha256='0'*64
+    foreach($row in @($r.processes|Where-Object operation -CEQ debug-iterator-counts)){$row.input_chunk.sha256='0'*64}
+} 'observed file identity'
+Case 'iterator producer requires an actual binary output graph' {param($r)
+    $producer=@($r.processes|Where-Object operation -CEQ produce-debug-iterator-counts)[0]
+    $script:originalChunkPath=$producer.output_chunk.path
+    $script:mutatedChunkPath=Join-Path $temporary 'not-binary.luac'
+    [IO.File]::WriteAllText($script:mutatedChunkPath,('text instead of actual binary graph'.PadRight(70)),[Text.UTF8Encoding]::new($false))
+    # ResolveFile maps the declared output to mutated bytes without changing
+    # its expected argv/path. This cannot forge an actual observation.
+    $producer.output_chunk.sha256=(Get-FileHash $script:mutatedChunkPath).Hash.ToLowerInvariant()
+    $producer.output_chunk.bytes=(Get-Item $script:mutatedChunkPath).Length
+    foreach($row in @($r.processes|Where-Object operation -CEQ debug-iterator-counts)){
+        $row.input_chunk.sha256=$producer.output_chunk.sha256;$row.input_chunk.bytes=$producer.output_chunk.bytes
+    }
+} 'did not emit an actual Lua binary graph' {param($path,$hash)
+    if($path -ceq $script:originalChunkPath){return $script:mutatedChunkPath};return $path
+}
 if($baseline.configuration -ceq 'upstream-test'){
     Case 'T-absent configuration cannot certify a real instrumented fixture' {param($r)
         $p=(Row $r configuration).process;$v=Get-Content $p.stdout_path -Raw|ConvertFrom-Json -AsHashtable
@@ -104,6 +138,7 @@ if(-not $baseline.repository_dirty -and @($baseline.runtimes|Where-Object{
     foreach($row in $baseline.processes){
         $candidatePaths+=@($row.process.stdout_path,$row.process.stderr_path)
         if($row.Contains('telemetry')){$candidatePaths+=$row.telemetry.path}
+        if($row.Contains('output_chunk')){$candidatePaths+=$row.output_chunk.path}
     }
     foreach($path in $candidatePaths){$relative=$path.Replace('\','/').Substring($origin.Length)
         $files[$relative]=@{path=$relative;sha256=(Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant()}}

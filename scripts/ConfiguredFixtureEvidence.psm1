@@ -53,7 +53,29 @@ function Get-ConfiguredFixtureDefinitions {
                 ((@('C_Count_To_Line','C_Same_Line','C_Count_Removes_Line','C_Count_Removes_All','C_Line_To_Count')|
                     ForEach-Object{"PASS: C hook transition $_"})-join "`n")+"`nC hook transitions OK`n"}
     }
+    # This fixture deliberately counts instructions. Its own source contract
+    # requires one C-compiled graph, consumed unchanged by both interpreters;
+    # comparing different source compilers would compare optimization choices.
+    $marker="CONFIGURED-FIXTURE: identical C iterator chunk $Configuration"
+    $definitions+=@{id='debug-iterator-counts';source='tests/lua/debug_iterator_counts.lua';
+        execution='native-dumped-chunk';setup="$guard;print('$marker')";
+        stdout="$marker`niterator count`t1`t6`niterator count`t2`t13`nOK`n"}
     return $definitions
+}
+
+function Get-ConfiguredFixtureProducerArguments {
+    param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][Collections.IDictionary]$Definition,
+        [Parameter(Mandatory)][string]$Output)
+    if(-not $Definition.Contains('execution') -or $Definition.execution -cne 'native-dumped-chunk' -or
+        $Definition.id -cne 'debug-iterator-counts' -or $Definition.source -cne 'tests/lua/debug_iterator_counts.lua'){
+        throw 'Configured fixture has no reviewed native chunk producer'
+    }
+    # Use a text-only load of the exact source path. The generated complete
+    # graph is written with wb: Windows text stdout would alter embedded LF
+    # bytes. Ada never compiles this fixture separately in this campaign.
+    $source=(Join-Path $Root $Definition.source).Replace('\','/').Replace("'","\'")
+    $destination=$Output.Replace('\','/').Replace("'","\'")
+    return @('-e',"local f=assert(loadfile('$source','t'));local out=assert(io.open('$destination','wb'));assert(out:write(string.dump(f)));assert(out:close());print('CONFIGURED-FIXTURE: C iterator graph produced')")
 }
 
 function Get-ConfiguredFixtureSources {
@@ -65,6 +87,7 @@ function Get-ConfiguredFixtureSources {
         'tests/lua/coroutine_result_portal.lua','tests/lua/stack_inspection.lua','tests/lua/primitive_not_refusal.lua',
         'tests/lua/public_api_commands.lua','tests/lua/public_panic_controls.lua','tests/lua/public_panic_file.lua',
         'tests/lua/reader_refusal_phases.lua','tests/lua/string_refusal_phases.lua','tests/lua/hook_transition_c.lua',
+        'tests/lua/debug_iterator_counts.lua',
         ('src/configurations/'+$Configuration+'/lua-runtime_configuration.ads'),
         'references/lua/llimits.h','references/lua/ltests.h','references/lua/luaconf.h',
         'experiments/conformance/reference.gpr','experiments/conformance/c/conformance_cli.c',
@@ -158,7 +181,8 @@ function Assert-ConfiguredFixtureReport {
     }
     if($Report.runtimes.Count -ne 2 -or @($Report.runtimes.role|Sort-Object -Unique).Count -ne 2){throw 'Configured fixture runtime pair is incomplete'}
     $definitions=@(Get-ConfiguredFixtureDefinitions $Configuration)
-    if($Report.processes.Count -ne (2*($definitions.Count+1))){throw 'Configured fixture process set is incomplete or duplicated'}
+    $binary=@($definitions|Where-Object{$_.Contains('execution') -and $_.execution -ceq 'native-dumped-chunk'})
+    if($Report.processes.Count -ne (2*($definitions.Count+1)+$binary.Count)){throw 'Configured fixture process set is incomplete or duplicated'}
     foreach($runtime in $Report.runtimes){
         if($runtime.role -cnotin @('Ada','ReferenceC') -or
             [string]::IsNullOrWhiteSpace((Resolve-Observation $runtime.executable $runtime.executable_sha256)) -or
@@ -167,7 +191,9 @@ function Assert-ConfiguredFixtureReport {
         foreach($library in $runtime.library_files){
             [void](Resolve-Observation $library.path $library.sha256)
         }
-        foreach($operation in @('configuration')+@($definitions.id)){
+        $operations=@('configuration')+@($definitions.id)
+        if($runtime.role -ceq 'ReferenceC'){$operations+=@($binary|ForEach-Object{'produce-'+$_.id})}
+        foreach($operation in $operations){
             $rows=@($Report.processes|Where-Object{$_.role -ceq $runtime.role -and $_.operation -ceq $operation})
             if($rows.Count -ne 1){throw 'Configured fixture actual process is missing or duplicated'}
             $row=$rows[0];$p=$row.process
@@ -184,19 +210,52 @@ function Assert-ConfiguredFixtureReport {
                 $captures[$stream]=Resolve-Observation $p[$stream+'_path'] $p[$stream+'_sha256']
                 if((Get-Item -LiteralPath $captures[$stream]).Length -ne $p[$stream+'_bytes']){throw 'Configured fixture raw capture identity differs'}
             }
-            $out=[IO.File]::ReadAllText($captures.stdout).Replace("`r`n","`n")
+            $producer=$operation.StartsWith('produce-',[StringComparison]::Ordinal)
+            $out=if($producer){$null}else{[IO.File]::ReadAllText($captures.stdout).Replace("`r`n","`n")}
             if($operation -ceq 'configuration'){
                 if($p.arguments -isnot [Array] -or $p.arguments.Count -ne 1 -or ($p.arguments -join '|') -cne '--conformance-config'){throw 'Configured fixture configuration arguments differ'}
                 $observed=$out|ConvertFrom-Json -AsHashtable
                 [void](Test-ConformanceConfiguration -Observed $observed -Configuration $Configuration -Target $runtime.role -AllocatorLimitBytes 2147483648)
+            }elseif($producer){
+                $definition=@($binary|Where-Object{('produce-'+$_.id) -ceq $operation})[0]
+                $chunkPath=$p.stdout_path.Substring(0,$p.stdout_path.Length-'.stdout'.Length)+'.luac'
+                $arguments=Get-ConfiguredFixtureProducerArguments -Root $origin -Definition $definition -Output $chunkPath
+                if($p.arguments -isnot [Array] -or $p.arguments.Count -ne $arguments.Count -or
+                    ($p.arguments -join "`0") -cne ($arguments -join "`0")){
+                    throw 'Configured native chunk producer source or arguments differ'
+                }
+                if(-not $row.Contains('output_chunk') -or $row.output_chunk.path -cne $chunkPath -or
+                    [IO.File]::ReadAllText($captures.stdout).Replace("`r`n","`n") -cne "CONFIGURED-FIXTURE: C iterator graph produced`n"){
+                    throw 'Configured native chunk producer completion/output identity differs'
+                }
+                $chunk=Resolve-Observation $row.output_chunk.path $row.output_chunk.sha256
+                $bytes=[IO.File]::ReadAllBytes($chunk)
+                if($bytes.Length -ne $row.output_chunk.bytes){throw 'Configured native chunk byte count differs'}
+                if($bytes.Length -lt 40 -or $bytes[0] -ne 27 -or
+                    [Text.Encoding]::ASCII.GetString($bytes,1,3) -cne 'Lua'){
+                    throw 'Configured native chunk producer did not emit an actual Lua binary graph'
+                }
             }else{
                 $definition=@($definitions|Where-Object id -CEQ $operation)[0]
+                $fixtureInput=$origin.Replace('\','/').TrimEnd('/')+'/'+$definition.source
+                if($definition.Contains('execution') -and $definition.execution -ceq 'native-dumped-chunk'){
+                    $produced=@($Report.processes|Where-Object{$_.role -ceq 'ReferenceC' -and $_.operation -ceq ('produce-'+$definition.id)})
+                    if($produced.Count -ne 1 -or -not $produced[0].Contains('output_chunk') -or -not $row.Contains('input_chunk') -or
+                        $row.input_chunk.path -cne $produced[0].output_chunk.path -or
+                        $row.input_chunk.sha256 -cne $produced[0].output_chunk.sha256 -or
+                        $row.input_chunk.bytes -ne $produced[0].output_chunk.bytes){
+                        throw 'Configured identical native chunk producer/input identity differs'
+                    }
+                    $fixtureInput=$produced[0].output_chunk.path.Replace('\','/')
+                }
                 if($p.arguments -isnot [Array] -or $p.arguments.Count -ne 3 -or $p.arguments[0] -cne '-e' -or
                     $p.arguments[1] -cne $definition.setup -or
-                    $p.arguments[2].Replace('\','/') -cne ($origin.Replace('\','/').TrimEnd('/')+'/'+$definition.source)){
+                    $p.arguments[2].Replace('\','/') -cne $fixtureInput){
                     throw 'Configured fixture explicit setup or source argument differs'
                 }
                 if($out -cne $definition.stdout){throw 'Configured fixture complete ordered protocol or real T witness differs'}
+            }
+            if($operation -cne 'configuration'){
                 $telemetryPath=Resolve-Observation $row.telemetry.path $row.telemetry.sha256
                 $telemetry=Get-Content -LiteralPath $telemetryPath -Raw|ConvertFrom-Json -AsHashtable
                 Assert-ManagedTelemetry -Telemetry $telemetry -RunId $row.telemetry.run_id -ProcessId $p.process_id `
@@ -243,4 +302,4 @@ function Assert-ConfiguredFixtureImageReport {
         -Interpreter (Join-Path $Payload $Image.paths.ada_launcher) -ResolveFile $resolve
 }
 
-Export-ModuleMember -Function Get-ConfiguredFixtureDefinitions,Get-ConfiguredFixtureSources,Get-ConfiguredFixtureAudit,Assert-ConfiguredFixtureReport,Assert-ConfiguredFixtureImageReport
+Export-ModuleMember -Function Get-ConfiguredFixtureDefinitions,Get-ConfiguredFixtureProducerArguments,Get-ConfiguredFixtureSources,Get-ConfiguredFixtureAudit,Assert-ConfiguredFixtureReport,Assert-ConfiguredFixtureImageReport

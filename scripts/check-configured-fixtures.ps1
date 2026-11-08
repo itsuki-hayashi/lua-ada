@@ -54,11 +54,31 @@ try{
         [void](Test-ConformanceConfiguration -Observed (Get-Content $p.stdout_path -Raw|ConvertFrom-Json -AsHashtable) `
             -Configuration $Configuration -Target $role -AllocatorLimitBytes 2147483648)
         foreach($definition in $definitions){
+            $fixtureInput=Join-Path $root $definition.source
+            $binary=$definition.Contains('execution') -and $definition.execution -ceq 'native-dumped-chunk'
+            if($binary){
+                if($role -ceq 'ReferenceC'){
+                    $run=[guid]::NewGuid().ToString('N');$prefix=Join-Path $directory ('ReferenceC-produce-'+$definition.id)
+                    $environment.LUA_ADA_CONFORMANCE_TELEMETRY=$prefix;$environment.LUA_ADA_CONFORMANCE_RUN_ID=$run
+                    $chunkPath=$prefix+'.luac'
+                    $p=Invoke-ConformanceProcess -Executable $exe -Arguments (Get-ConfiguredFixtureProducerArguments -Root $root -Definition $definition -Output $chunkPath) `
+                        -Directory $root -OutputPrefix $prefix -TimeoutSeconds 900 -Environment $environment
+                    $row=@{role=$role;operation=('produce-'+$definition.id);process=$p;telemetry=@{path=($prefix+'.'+$p.process_id+'.json');run_id=$run;sha256=$null}}
+                    $raw.processes+=$row
+                    if(Test-Path -LiteralPath $row.telemetry.path){$row.telemetry.sha256=(Get-FileHash $row.telemetry.path).Hash.ToLowerInvariant()}
+                    if($p.exit_code -ne 0 -or $p.stderr_bytes -ne 0 -or $p.timed_out -or $p.abnormal_exit_kind){throw "Configured fixture native producer failed: $($definition.id); see $directory"}
+                    $row.output_chunk=@{path=$chunkPath;sha256=(Get-FileHash $chunkPath).Hash.ToLowerInvariant();bytes=(Get-Item $chunkPath).Length}
+                }
+                $produced=@($raw.processes|Where-Object{$_.role -ceq 'ReferenceC' -and $_.operation -ceq ('produce-'+$definition.id)})
+                if($produced.Count -ne 1){throw 'Configured fixture requires its actual native chunk producer first'}
+                $fixtureInput=$produced[0].output_chunk.path
+            }
             $run=[guid]::NewGuid().ToString('N');$prefix=Join-Path $directory ($role+'-'+$definition.id)
             $environment.LUA_ADA_CONFORMANCE_TELEMETRY=$prefix;$environment.LUA_ADA_CONFORMANCE_RUN_ID=$run
-            $p=Invoke-ConformanceProcess -Executable $exe -Arguments @('-e',$definition.setup,(Join-Path $root $definition.source)) `
+            $p=Invoke-ConformanceProcess -Executable $exe -Arguments @('-e',$definition.setup,$fixtureInput) `
                 -Directory $root -OutputPrefix $prefix -TimeoutSeconds 900 -Environment $environment
             $row=@{role=$role;operation=$definition.id;process=$p;telemetry=@{path=($prefix+'.'+$p.process_id+'.json');run_id=$run;sha256=$null}}
+            if($binary){$row.input_chunk=@{path=$fixtureInput;sha256=$produced[0].output_chunk.sha256;bytes=$produced[0].output_chunk.bytes}}
             $raw.processes+=$row
             if(Test-Path -LiteralPath $row.telemetry.path){$row.telemetry.sha256=(Get-FileHash $row.telemetry.path).Hash.ToLowerInvariant()}
             if($p.exit_code -ne 0 -or $p.stderr_bytes -ne 0 -or $p.timed_out -or $p.abnormal_exit_kind){throw "Configured fixture actual execution failed: $role/$($definition.id); see $directory"}
