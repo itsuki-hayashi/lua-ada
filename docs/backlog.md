@@ -2,6 +2,13 @@
 
 ## Active remaining-suite delivery
 
+Canonical debug metadata has [selected-interval evidence](sessions/2026-11-08-selected-line-baselines.md):
+the measured native T getbaseline assertion is fixed, seven debug behaviors
+match all four compiler/VM paths in each configuration and all 2,157 AUnit
+cases pass locally in both configurations. Continue unchanged errors.lua
+table.sort naming and trace the next actual unchanged T memerr.lua refusal;
+its line-7 failure is still open. Complete all remaining full-target gates.
+
 Argument labels and message formatting have
 [owned-builder evidence](sessions/2026-11-08-owned-argument-labels.md), with
 2,104 passing AUnit cases per local configuration. Migrate the final context

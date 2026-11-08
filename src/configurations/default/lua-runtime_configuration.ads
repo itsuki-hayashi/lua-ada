@@ -8,6 +8,8 @@ private package Lua.Runtime_Configuration is
    Random_32_Bits : constant Boolean := False;
    Maximum_Stack : constant Positive := 1_000_000;
    Maximum_C_Calls : constant Positive := 200;
+   Absolute_Line_Interval : constant Positive := 128;
+   --  Maximum debug-word gap accepted by pinned ldebug.c:getbaseline.
    Auxiliary_Buffer_Bytes : constant Positive :=
      16 * (System.Address'Size / System.Storage_Unit) *
      (Interfaces.C.double'Size / System.Storage_Unit);

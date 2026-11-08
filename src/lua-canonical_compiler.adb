@@ -3,6 +3,7 @@ with Interfaces;
 with Lua.Integers;
 with Lua.Numbers;
 with Lua.Opcodes; use Lua.Opcodes;
+with Lua.Runtime_Configuration;
 with Lua.Storage.Vectors;
 with Lua.Syntax;
 
@@ -216,11 +217,18 @@ package body Lua.Canonical_Compiler is
                   Fail (Instruction_Budget, Host => True);
                end if;
                Instruction_Count := Instruction_Count + 1;
-               --  Every canonical word receives a line entry. Large deltas
-               --  and periodic checkpoints use real absolute records, keeping
-               --  later debug lookup independent of temporary frontend nodes.
+               --  Every word receives its real source line. Native getbaseline
+               --  estimates an absolute-record index from pc / MAXIWTHABS;
+               --  the writer's maximum gap must not exceed that reader's
+               --  selected interval (128 ordinarily, 3 under ltests.h).
+               --  lcode:savelineinfo resets its post-increment counter to one
+               --  after a marker. Its subsequent periodic gaps equal that
+               --  interval; large line deltas can only add closer markers.
+               --  Our fixed checkpoints, including PC zero, satisfy the same
+               --  lower-bound requirement without copying its private layout.
                if Difference not in -127 .. 127 or else
-                 (PC (Fn) - 1) mod 128 = 0
+                 (PC (Fn) - 1) mod
+                   Lua.Runtime_Configuration.Absolute_Line_Interval = 0
                then
                   Fn.Code.Lines.Append (-128);
                   Fn.Code.Absolute_Lines.Append

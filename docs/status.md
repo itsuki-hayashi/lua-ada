@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [selected debug-line checkpoint](sessions/2026-11-08-selected-line-baselines.md)
+uses the actual native-reader interval (default 128, T 3) for canonical line
+records. Its seven-case debug fixture and all retained string fixtures pass
+fresh four-way compiler/VM campaigns in both configurations. Both local
+configurations pass 2,157 AUnit cases. The measured T writer assertion is
+fixed; unchanged memerr.lua, errors.lua and full acceptance remain open.
+
 The [owned argument formatter](sessions/2026-11-08-owned-argument-labels.md)
 builds labels and complete argument messages in selected-owner buffers,
 without growing unmanaged formatter intermediates. Four native-paired cases

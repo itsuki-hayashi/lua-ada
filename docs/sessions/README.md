@@ -2,6 +2,8 @@
 
 Component: [owned argument labels](2026-11-08-owned-argument-labels.md).
 
+Component: [selected debug-line baselines](2026-11-08-selected-line-baselines.md).
+
 Component: [string arguments and scalar results](2026-11-08-string-arguments-results.md).
 
 Component: [owned argument details](2026-11-08-owned-argument-detail.md).
