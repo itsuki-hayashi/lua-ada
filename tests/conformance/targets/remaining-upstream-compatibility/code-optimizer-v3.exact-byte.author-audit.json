@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "review_status": "pending-independent-exact-review",
+  "independent_reviewer": null,
+  "authority_installation": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_snapshot": {
+    "revision": "25e8bc6ea93b083891db8c4f2ac46e5e6030a771",
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+    "source": "references/lua/testes/code.lua",
+    "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663"
+  },
+  "feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-current-feature-review.json",
+    "sha256": "6ab0b934dff237d1069df303c84d17eadbc7d9e6cfbab8634ee7eb5422a5083a"
+  },
+  "semantic_retention_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+    "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+  },
+  "kind": "code-optimizer-v3-exact-byte-author-audit",
+  "policy_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/code-optimizer-v3.policy.author-proposal.json",
+    "sha256": "3b8e94f9ceebd09e3897faf8c202fabd9385d146815ea6906612c4495fbad487"
+  },
+  "decomposition_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/code-optimizer-v3.decomposition.author-proposal.json",
+    "sha256": "ea12d2d4c5af37600323841834b4eedfe8a8725a52326398bf35f513bfb5a3d2"
+  },
+  "transform_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/code-optimizer-v3.transform.author-proposal.json",
+    "sha256": "bb1cfc7fef67a0edfe814598670745e7c717809ffcf5e4f4c4f854fa1cdfeb6c"
+  },
+  "private_operations": [
+    {
+      "length_bytes": 143,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9001",
+      "start_byte": 800,
+      "replacement": "  -- target proposal excludes private constant-table layout inspection\n",
+      "id": "constant-table-inspection",
+      "source_sha256": "26aad09cfda55023d09d73d23353c892cb5e19ba423488629606efc828ddf3fd",
+      "replacement_sha256": "f0b9262500d4b2519659051b93436965001ff36a2610af02f189088e8c5ce90d"
+    },
+    {
+      "length_bytes": 205,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9002",
+      "start_byte": 1808,
+      "replacement": "  -- target proposal excludes exact C optimizer instruction sequences\n",
+      "id": "opcode-sequence-inspection",
+      "source_sha256": "41b6d2b52bb8f3f0d16dc0cf595c5fd6a4ca1b124b16b1bef028a1dda5f27f6b",
+      "replacement_sha256": "ebfc2be2034d9f194927cdebcf2179bf30c79f37d5e5d8fcb80d9c2ea954704b"
+    },
+    {
+      "length_bytes": 239,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9003",
+      "start_byte": 2288,
+      "replacement": "  -- target proposal excludes equality of optimizer-specific instruction streams\n",
+      "id": "opcode-equality-inspection",
+      "source_sha256": "5b3ddc7feef1ddadfa4a18c2526a31ced0495324141bde683ac399700a67e762",
+      "replacement_sha256": "1da5f73cab420d1ea42ea17d202e1b9e647e74aeef15730139d0126d0fbca1e6"
+    },
+    {
+      "length_bytes": 32,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9004",
+      "start_byte": 13327,
+      "replacement": "  -- target proposal excludes outer prototype constant-storage placement\n",
+      "id": "outer-constant-storage",
+      "source_sha256": "13c9570d19cf580345c831907370413a0a9b7c0c3d39f7b6660459373cd8e8af",
+      "replacement_sha256": "d4e332da242db81c1d87dcc6715c963d7efea8b004e8c3f1d70b48b2f769eaf8"
+    },
+    {
+      "length_bytes": 32,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9005",
+      "start_byte": 13359,
+      "replacement": "  -- target proposal excludes middle prototype constant-storage placement\n",
+      "id": "middle-constant-storage",
+      "source_sha256": "4b1b8301af5f0f06a693bc66df7fa421860fdf06c9821e447ae6d4af791d8907",
+      "replacement_sha256": "b45c29656afcaedf26da1f64fc9cda4d55f4b938f54589017396bb08a4ca2057"
+    },
+    {
+      "length_bytes": 10,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9006",
+      "start_byte": 13587,
+      "replacement": "",
+      "id": "register-inspection-wrapper",
+      "source_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+      "replacement_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "length_bytes": 79,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9007",
+      "start_byte": 13655,
+      "replacement": "  -- target proposal excludes physical MOVE-register numbering\n",
+      "id": "physical-move-registers",
+      "source_sha256": "120c5699b24c0b9102eded9963b92049e2d0f8213c5c43d77a64dc7dd3ecdac9",
+      "replacement_sha256": "2a6df3b0c57d2d6760c2b9c4f2e3d8d4536893101570242b6469939e500869ed"
+    },
+    {
+      "length_bytes": 175,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9008",
+      "start_byte": 14141,
+      "replacement": "  -- target proposal excludes the optimizer-specific SETLIST count\n",
+      "id": "setlist-instruction-count",
+      "source_sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6",
+      "replacement_sha256": "aa2c9fb9e66a366a0ebfb0e00dec3a355d21649a703fabaad41e85efdc34a923"
+    }
+  ],
+  "retention": {
+    "checkR": {
+      "byte_offset": 2079,
+      "byte_length": 127,
+      "anchor_sha256": "324530f639ef49280bcc33a77b56351c3369cdfd13290c63934071985bb880dc"
+    },
+    "original51_unchanged": true,
+    "contained_original_links": 18,
+    "required_semantic_nodes": 9,
+    "all_unpatched_bytes_identical": true,
+    "all_retained_fragments_unmodified": true
+  },
+  "memory_reconstruction": {
+    "output_sha256": "676304c019ee3afe8796da7ddfaf8f14cba43c2c49332d96f19b3f4c84211fe0",
+    "output_bytes": 14299,
+    "source_emitted": false,
+    "source_executed": false
+  },
+  "public_witness_sources": [
+    {
+      "path": "tests/lua/code_public_semantics.lua",
+      "sha256": "a5a6f949bced42fcad5ca68451f64019247f778ef3956907ce1a0dab7b55232a"
+    },
+    {
+      "path": "tests/src/code_public_semantic_tests.adb",
+      "sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "path": "tests/src/code_public_semantic_tests.ads",
+      "sha256": "0e79dc85150a59a2b2d178f472aceffc21ba4d3ab3236ba29d5f846c2daa88db"
+    },
+    {
+      "path": "tests/src/test_runner.adb",
+      "sha256": "b68e8ccfb72964f3229db2a5d9b6417d41d8291e3d54df7518a09c21e5a9e33a"
+    }
+  ],
+  "current_runtime_counterparts": [
+    {
+      "path": "src/lua-engine-canonical.adb",
+      "sha256": "71963fbe8a1c8ac7ca39064ead7e3818c89adc17d940b9576bd638bb86563539"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "sha256": "942935e36b015a5becde354b3eba5b3166f2cd29ba25cb6c9181bc7b8532a8c5"
+    }
+  ],
+  "required_actual_case_names": [
+    "F_Zero",
+    "I_Captured_Zero",
+    "I_Zero_Floor",
+    "K_Reciprocal",
+    "K_Power",
+    "K_Negative_Power",
+    "F_Floor",
+    "I_Modulo",
+    "F_Division",
+    "F_Floor_Modulo",
+    "I_Bitwise_Mixed",
+    "I_Bitwise_Not",
+    "I_Bitwise_Float",
+    "I_Shifts",
+    "Integer_Borders",
+    "Float_Borders",
+    "Maximum_Integer",
+    "Minimum_Integer",
+    "Negative_Hex",
+    "Nested_Constants",
+    "Callback_Sequence",
+    "Assignment_Sequence",
+    "Constructor_49",
+    "Constructor_50",
+    "Constructor_51",
+    "Return_Zero",
+    "Return_One_Nil",
+    "Return_Multiple",
+    "Register_Load"
+  ],
+  "observations": [],
+  "scope_limits": [
+    "Source bytes and review inputs only; all actual runtime observations remain separately required.",
+    "Original native C file remains unchanged. Default public source fixtures remain in the generic differential campaign as well as configured pairs.",
+    "No T=nil, blanket flag, fabricated T facade, executable patch or early return.",
+    "No original lexical anchor is deleted or passed. No policy is installed."
+  ]
+}
