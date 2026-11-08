@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "kind": "verybig-windows-tempfile-source-author-proposal",
+  "author": "Codex /root/runtime_gaps",
+  "review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source": {
+    "path": "references/lua/testes/verybig.lua",
+    "sha256": "2b6d30c69cbe6974068881108eae297bdedd275b429be8ec614bf5f8ee89707e",
+    "byte_length": 3724,
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294"
+  },
+  "platform": "windows",
+  "configurations": [
+    "default",
+    "upstream-test"
+  ],
+  "proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/verybig-windows-tempfile.author-proposal.json",
+    "sha256": "41ca9ac66f044629018da44d01e168948f8cf28c3154f8f4ba246421b51a49bb"
+  },
+  "replacement": {
+    "id": "windows-verybig-tempfile-cwd",
+    "start_byte": 3491,
+    "length_bytes": 12,
+    "start_line": 141,
+    "end_line": 141,
+    "source_sha256": "5877a423400935af8288a4a9d58c43ba23153277ed30fdd2f7448ff190911e7a",
+    "original_text": "os.tmpname()",
+    "replacement": "'.'..os.tmpname()",
+    "invariant": "Retain one actual native os.tmpname call and its leaf bytes, translating only the Windows current-drive rooted result into a fresh disposable CWD path. Keep every generated-program, I/O, loader, assertion, removal and return byte unchanged.",
+    "counterpart_tests": [
+      "tests/conformance/platform/windows-verybig-tempfile.lua#rooted-name",
+      "tests/conformance/platform/windows-verybig-tempfile.lua#fresh-cwd-name",
+      "tests/conformance/platform/windows-verybig-tempfile.lua#write-read",
+      "tests/conformance/platform/windows-verybig-tempfile.lua#text-loadfile",
+      "tests/conformance/platform/windows-verybig-tempfile.lua#dofile",
+      "tests/conformance/platform/windows-verybig-tempfile.lua#binary-load",
+      "tests/conformance/platform/windows-verybig-tempfile.lua#remove"
+    ]
+  },
+  "generated_in_memory": {
+    "sha256": "d973c7a66fd1f4d50ec48c7d2bc49ad2bf8aa3e0df9cadf7033c52f1e3ce00dc",
+    "byte_length": 3729,
+    "emitted": false,
+    "executed": false
+  },
+  "preserved": {
+    "prefix": {
+      "byte_offset": 0,
+      "byte_length": 3491,
+      "sha256": "7c01974cbb614fc300ade895e18a067c7722e2805d304e9ce06f2f83b93a86e4"
+    },
+    "suffix": {
+      "byte_offset": 3503,
+      "byte_length": 221,
+      "sha256": "8fc0e825c636f5fa4289445064b1a53358c17ebfc56b67ca914edaeadf72c8f4"
+    },
+    "all_other_bytes_identical": true,
+    "soft_guard_unchanged": true,
+    "port_flag_added": false,
+    "soft_flag_added": false,
+    "skips": [],
+    "exclusions": [],
+    "assertion_calls_removed": 0,
+    "actual_tmpname_calls": 1,
+    "scope_note": "The original generates text and calls dofile; it has no explicit binary load/dump call. The separate focused counterpart adds a binary-load control without claiming it is an original verybig assertion."
+  },
+  "counterpart": {
+    "path": "tests/conformance/platform/windows-verybig-tempfile.lua",
+    "sha256": "25e94daeaa1b5529a57659f624657ef298fdde9e60549de5edc806f027ca9379",
+    "byte_length": 2218,
+    "requires_T": false,
+    "scope": "Focused native Windows fresh-CWD write/read/text and binary load/remove proof. It does not execute the full 50,000-entry workload or certify whole-file equivalence."
+  },
+  "pending_requirements": [
+    "Independent exact source/semantic review before emitting or executing transformed verybig bytes.",
+    "Actual unchanged native default/T baseline and focused-counterpart frozen-image observations.",
+    "Independent post-observation native applicability decision bound to source, flags, images and raw failures.",
+    "Fresh full reviewed whole-file and binary/context observations after approval; retain every original generator, assertion, cleanup and return10 obligation."
+  ],
+  "native_source_evidence": {
+    "path": "references/lua/loslib.c",
+    "sha256": "3ed70ea013b0c7a5a758db435f76fe5a99e87f07ea02ed19b2012fb728f8aa13",
+    "spans": [
+      {
+        "id": "iso-c-tmpnam",
+        "byte_offset": 3038,
+        "byte_length": 53,
+        "anchor_sha256": "14adc4f7d66b7249aa8f414ab9164ff80635b34604f04ee862a32489b3ad47c7",
+        "original_text": "#define lua_tmpnam(b,e)\t\t{ e = (tmpnam(b) == NULL); }"
+      },
+      {
+        "id": "verbatim-os-tmpname",
+        "byte_offset": 4120,
+        "byte_length": 236,
+        "anchor_sha256": "5389f1e88afeabcb0399d7213f23e21a9d3d1f628e757cc09a5e2877e369c1d6",
+        "original_text": "static int os_tmpname (lua_State *L) {\n  char buff[LUA_TMPNAMBUFSIZE];\n  int err;\n  lua_tmpnam(buff, err);\n  if (l_unlikely(err))\n    return luaL_error(L, \"unable to generate a unique filename\");\n  lua_pushstring(L, buff);\n  return 1;\n}"
+      }
+    ],
+    "interpretation": "The pinned non-POSIX fallback delegates to C tmpnam; os.tmpname returns those bytes without rebasing the path. Frozen native Windows observations, not a universal CRT claim, establish this host applicability."
+  }
+}

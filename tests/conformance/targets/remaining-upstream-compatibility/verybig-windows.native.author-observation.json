@@ -1,0 +1,442 @@
+{
+  "schema_version": 1,
+  "kind": "verybig-windows-native-platform-author-observation",
+  "author": "Codex /root/runtime_gaps",
+  "source_review_status": "pending",
+  "native_applicability_review_status": "pending",
+  "reviewer": null,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "repository_source_base": "4c8fb6cacafed2b657aaf2a3f4af6b9d740c921a",
+  "platform": "windows",
+  "source_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/verybig-windows-tempfile.author-proposal.json",
+    "byte_length": 1993,
+    "sha256": "41ca9ac66f044629018da44d01e168948f8cf28c3154f8f4ba246421b51a49bb"
+  },
+  "author_source_packet": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/verybig-windows-tempfile.source.author-proposal.json",
+    "byte_length": 5059,
+    "sha256": "357e594ec9badeec9a31ddd1430899e8c6338226bbe70a6c29d1724142cb0a9a"
+  },
+  "observer": {
+    "path": "scripts/observe-verybig-windows-native.ps1",
+    "byte_length": 8368,
+    "sha256": "10fd4ef5edbb96a27a8fd9d8771564b7861ac1c62f2597b3ccee9a22c237cb47"
+  },
+  "source_tests": {
+    "path": "scripts/test-verybig-windows-proposal.ps1",
+    "byte_length": 9242,
+    "sha256": "c581a28b4acc5554a367921aaf04844095fcb6a55ff83d8104781b5e0f7232fe"
+  },
+  "counterpart": {
+    "path": "tests/conformance/platform/windows-verybig-tempfile.lua",
+    "byte_length": 2218,
+    "sha256": "25e94daeaa1b5529a57659f624657ef298fdde9e60549de5edc806f027ca9379"
+  },
+  "raw_summary": {
+    "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/observation.json",
+    "byte_length": 6302,
+    "sha256": "323ab43edf392c321a77b8fb490413ecf02658cbdd25e36e1dfb2b5c21d3a613"
+  },
+  "transformed_verybig": {
+    "emitted": false,
+    "executed": false
+  },
+  "build_provenance": "Existing selected native exe/DLL pairs copied byte-exact into separate frozen directories. No native or Alire/GPR build was performed; source/GPR hashes and observed configuration are recorded, without claiming an unavailable compile-command receipt.",
+  "build_input_bindings": [
+    {
+      "sha256": "05c9640918231db5ee6a09572d833ceb57831458e6c4531f76b14fdbd02366d0",
+      "path": "experiments/conformance/oracle.gpr"
+    },
+    {
+      "sha256": "6c79ca4e821634be54685e72a159dc1afef528e13eeac1c59ef9fd4fcb24a676",
+      "path": "experiments/conformance/reference.gpr"
+    },
+    {
+      "sha256": "cfd0f64c1e10e172413cb9d41d7632f1b5b5d519fef30648b142c9e7e3f8ad26",
+      "path": "experiments/conformance/c/conformance_cli.c"
+    },
+    {
+      "sha256": "e0e43f716da5b4d8a9f109e07cee68f42a5d5dd28c5eb34fddd236b55fe5f118",
+      "path": "experiments/conformance/c/allocator_limit.h"
+    },
+    {
+      "sha256": "aca6d357f585d7c279227c4acdf706fe6272f22535368be7e048001f96aa240a",
+      "path": "experiments/conformance/c/conformance_exports.h"
+    },
+    {
+      "sha256": "3ed70ea013b0c7a5a758db435f76fe5a99e87f07ea02ed19b2012fb728f8aa13",
+      "path": "references/lua/loslib.c"
+    }
+  ],
+  "configurations": [
+    {
+      "configuration": "default",
+      "artifacts": [
+        {
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\bin\\lua.exe",
+          "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\default\\oracle\\lua.exe"
+        },
+        {
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\default\\lib\\libconformance_lua.dll",
+          "sha256": "6fd51198bee9770aab18cf42ebaf7ccc133a26d4e3dedb22770c41aba84500b3",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\default\\oracle\\libconformance_lua.dll"
+        }
+      ],
+      "observations": [
+        {
+          "role": "configuration",
+          "raw_record": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/default/configuration-process.json",
+            "byte_length": 5666,
+            "sha256": "6e8d2c8f69cae5192c6f7b9205ef6e7897889741f27759286a47c2eaaf9e4471"
+          },
+          "expected_observation": true,
+          "process_id": 26680,
+          "exit_code": 0,
+          "timed_out": false,
+          "arguments": [
+            "--conformance-config"
+          ],
+          "environment": {
+            "LUA_ADA_CONFORMANCE_RUN_ID": "9c9092bd90cf4768956cae71b7d1f251",
+            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\default\\configuration-allocator",
+            "MEMLIMIT": "2147483648",
+            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648",
+            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\default\\oracle;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources"
+          },
+          "stdout": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/default/configuration.stdout",
+            "byte_length": 451,
+            "sha256": "6c63f956109c778efd508539cfdb94eabe3d06a41a56c2a6a1fae68983e20295",
+            "bytes": 451
+          },
+          "stderr": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/default/configuration.stderr",
+            "byte_length": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "input_sha256": null,
+          "observed_configuration": {
+            "schema_version": 1,
+            "configuration": "default",
+            "implementation": "C Lua",
+            "test_adapter": false,
+            "lua_version": "Lua 5.5",
+            "lua_release": "Lua 5.5.1",
+            "integer_bytes": 8,
+            "number_bytes": 8,
+            "compat_global": 1,
+            "extra_space_bytes": 8,
+            "expected_extra_space_bytes": 8,
+            "pointer_bytes": 8,
+            "max_stack": 1000000,
+            "max_c_calls": 200,
+            "aux_buffer_bytes": 1024,
+            "rand32": false,
+            "compat_math": false,
+            "allocator_limit_bytes": 2147483648,
+            "allocator_accounting": "lua-managed-payload-bytes"
+          },
+          "telemetry": null
+        },
+        {
+          "role": "original",
+          "raw_record": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/default/original-process.json",
+            "byte_length": 5824,
+            "sha256": "7746609b9dbb427a1369416397047aa4b58ce555904d1c48965762e1416a1df3"
+          },
+          "expected_observation": true,
+          "process_id": 72056,
+          "exit_code": 1,
+          "timed_out": false,
+          "arguments": [
+            "-e",
+            "assert(not _soft and not _port);local r=table.pack(assert(loadfile('verybig.lua'))());assert(r.n==1 and r[1]==10);print('SCALE verybig return10 OK')"
+          ],
+          "environment": {
+            "LUA_ADA_CONFORMANCE_RUN_ID": "971231fec5204349a5478f655db4f423",
+            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\default\\original-allocator",
+            "MEMLIMIT": "2147483648",
+            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648",
+            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\default\\oracle;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources"
+          },
+          "stdout": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/default/original.stdout",
+            "byte_length": 43,
+            "sha256": "1a4bd1fedd99d8d64b87bfe912f5e832d1f1faa69839b2e90733d9ee01d5bde5",
+            "bytes": 43
+          },
+          "stderr": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/default/original.stderr",
+            "byte_length": 325,
+            "sha256": "eb11238e173b96e93df16fe2ede2fbe07ab0cf2673ba033338b2467f7c8096f2",
+            "bytes": 325
+          },
+          "input_sha256": "2b6d30c69cbe6974068881108eae297bdedd275b429be8ec614bf5f8ee89707e",
+          "observed_configuration": null,
+          "telemetry": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/default/original-allocator.72056.json",
+            "byte_length": 211,
+            "sha256": "9fb53c36390f3968d4f5848904a6d5f0e79c0eca9cd030c147a262ace8e47b6e",
+            "data": {
+              "schema_version": 1,
+              "run_id": "971231fec5204349a5478f655db4f423",
+              "process_id": 72056,
+              "allocator_limit_bytes": 2147483648,
+              "configuration": "default",
+              "managed_refusals": 0,
+              "outstanding_bytes": 0,
+              "outstanding_blocks": 0
+            }
+          }
+        },
+        {
+          "role": "counterpart",
+          "raw_record": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/default/counterpart-process.json",
+            "byte_length": 5822,
+            "sha256": "572d4a6eeb9dc9fb7fd0cbf8708f2cd8410ed9bd63404aebc7dfdb3ff8731dfa"
+          },
+          "expected_observation": true,
+          "process_id": 71152,
+          "exit_code": 0,
+          "timed_out": false,
+          "arguments": [
+            "-e",
+            "assert(not _soft and not _port);assert(dofile('windows-verybig-tempfile.lua')==10);print('PASS: windows-verybig-tempfile-return')"
+          ],
+          "environment": {
+            "LUA_ADA_CONFORMANCE_RUN_ID": "37ebf3528b9543ffb9fc9d235f3c9c2e",
+            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\default\\counterpart-allocator",
+            "MEMLIMIT": "2147483648",
+            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648",
+            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\default\\oracle;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources"
+          },
+          "stdout": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/default/counterpart.stdout",
+            "byte_length": 341,
+            "sha256": "caa61ae082c361317d4cb6bcd42c6dafc43decea729255487c82120b036d08d2",
+            "bytes": 341
+          },
+          "stderr": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/default/counterpart.stderr",
+            "byte_length": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "input_sha256": "25e94daeaa1b5529a57659f624657ef298fdde9e60549de5edc806f027ca9379",
+          "observed_configuration": null,
+          "telemetry": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/default/counterpart-allocator.71152.json",
+            "byte_length": 211,
+            "sha256": "481d52a9c4ce6ed13a5e8bb73e1e1f9388ca3c13d756d907eda3e642ead9e5ea",
+            "data": {
+              "schema_version": 1,
+              "run_id": "37ebf3528b9543ffb9fc9d235f3c9c2e",
+              "process_id": 71152,
+              "allocator_limit_bytes": 2147483648,
+              "configuration": "default",
+              "managed_refusals": 0,
+              "outstanding_bytes": 0,
+              "outstanding_blocks": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "configuration": "upstream-test",
+      "artifacts": [
+        {
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\bin\\lua.exe",
+          "sha256": "2bb0d62ff7ae53415bf4e8633cc31faf1d558e418dc8e965a4a48913f3e56eaa",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\upstream-test\\oracle\\lua.exe"
+        },
+        {
+          "selected": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\lib\\libconformance_lua.dll",
+          "sha256": "acf15408805f0889c976b89c10ff224b6200a20f8c1c71aaaedcd98515d53738",
+          "frozen": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\upstream-test\\oracle\\libconformance_lua.dll"
+        }
+      ],
+      "observations": [
+        {
+          "role": "configuration",
+          "raw_record": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/upstream-test/configuration-process.json",
+            "byte_length": 5707,
+            "sha256": "fc7d10352d08294037f9950eb39a8b97a99872ab7ee34345aa51405d85666273"
+          },
+          "expected_observation": true,
+          "process_id": 25800,
+          "exit_code": 0,
+          "timed_out": false,
+          "arguments": [
+            "--conformance-config"
+          ],
+          "environment": {
+            "LUA_ADA_CONFORMANCE_RUN_ID": "394debd5e02841f0bbdb60b157b99952",
+            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\upstream-test\\configuration-allocator",
+            "MEMLIMIT": "2147483648",
+            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648",
+            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\upstream-test\\oracle;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources"
+          },
+          "stdout": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/upstream-test/configuration.stdout",
+            "byte_length": 456,
+            "sha256": "65bc59bb7bd1f68dc6670263547590fc5b3878f7cd7c205ec7aa8a9d9775ebfb",
+            "bytes": 456
+          },
+          "stderr": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/upstream-test/configuration.stderr",
+            "byte_length": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "input_sha256": null,
+          "observed_configuration": {
+            "schema_version": 1,
+            "configuration": "upstream-test",
+            "implementation": "C Lua",
+            "test_adapter": true,
+            "lua_version": "Lua 5.5",
+            "lua_release": "Lua 5.5.1",
+            "integer_bytes": 8,
+            "number_bytes": 8,
+            "compat_global": 0,
+            "extra_space_bytes": 16,
+            "expected_extra_space_bytes": 16,
+            "pointer_bytes": 8,
+            "max_stack": 68000,
+            "max_c_calls": 180,
+            "aux_buffer_bytes": 23,
+            "rand32": true,
+            "compat_math": true,
+            "allocator_limit_bytes": 2147483648,
+            "allocator_accounting": "debug-allocator-backing-bytes"
+          },
+          "telemetry": null
+        },
+        {
+          "role": "original",
+          "raw_record": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/upstream-test/original-process.json",
+            "byte_length": 5909,
+            "sha256": "2625db541b5064e4c09d6cd4c798d1f6581aa8f2abb2c26ae9e414c28ee96496"
+          },
+          "expected_observation": true,
+          "process_id": 9372,
+          "exit_code": 1,
+          "timed_out": false,
+          "arguments": [
+            "-e",
+            "assert(not _soft and not _port);local r=table.pack(assert(loadfile('verybig.lua'))());assert(r.n==1 and r[1]==10);print('SCALE verybig return10 OK')"
+          ],
+          "environment": {
+            "LUA_ADA_CONFORMANCE_RUN_ID": "fa52c6a5600d459f9e32e76c3a95be07",
+            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\upstream-test\\original-allocator",
+            "MEMLIMIT": "2147483648",
+            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648",
+            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\upstream-test\\oracle;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources"
+          },
+          "stdout": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/upstream-test/original.stdout",
+            "byte_length": 43,
+            "sha256": "1a4bd1fedd99d8d64b87bfe912f5e832d1f1faa69839b2e90733d9ee01d5bde5",
+            "bytes": 43
+          },
+          "stderr": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/upstream-test/original.stderr",
+            "byte_length": 330,
+            "sha256": "185e70709aeac3002695e005cc19a202c80ca864a3e30135d0e7f96f493eb73d",
+            "bytes": 330
+          },
+          "input_sha256": "2b6d30c69cbe6974068881108eae297bdedd275b429be8ec614bf5f8ee89707e",
+          "observed_configuration": null,
+          "telemetry": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/upstream-test/original-allocator.9372.json",
+            "byte_length": 248,
+            "sha256": "ad86baad8c5eb4fc105035f3da4d723ddcd9082c03d9b5e1a91cfd074fa8ce61",
+            "data": {
+              "schema_version": 1,
+              "run_id": "fa52c6a5600d459f9e32e76c3a95be07",
+              "process_id": 9372,
+              "allocator_limit_bytes": 2147483648,
+              "configuration": "upstream-test",
+              "expected_finalizer_warnings": 0,
+              "managed_refusals": 0,
+              "outstanding_bytes": 0,
+              "outstanding_blocks": 0
+            }
+          }
+        },
+        {
+          "role": "counterpart",
+          "raw_record": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/upstream-test/counterpart-process.json",
+            "byte_length": 5910,
+            "sha256": "47d5fef9e4854b551f662e4cd852e832a34a2d06ec683037ef7a6de08aa9e7e2"
+          },
+          "expected_observation": true,
+          "process_id": 33812,
+          "exit_code": 0,
+          "timed_out": false,
+          "arguments": [
+            "-e",
+            "assert(not _soft and not _port);assert(dofile('windows-verybig-tempfile.lua')==10);print('PASS: windows-verybig-tempfile-return')"
+          ],
+          "environment": {
+            "LUA_ADA_CONFORMANCE_RUN_ID": "4f8cb9f40f2a449d8a7a1edb1fe5135b",
+            "LUA_ADA_CONFORMANCE_TELEMETRY": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\upstream-test\\counterpart-allocator",
+            "MEMLIMIT": "2147483648",
+            "LUA_ADA_CONFORMANCE_ALLOCATOR": "2147483648",
+            "PATH": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-c-api\\lua-ada\\reports\\verybig-windows\\1de31af7c47549c999b93d7a8e513345\\upstream-test\\oracle;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Users\\Itsuki\\.codex\\tmp\\arg0-windows\\codex-arg0h2SbkS;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\powershell;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\libheif\\libheif\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\poppler\\Library\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\override;C:\\Program Files\\FireDaemon OpenSSL 3.5\\bin\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\dotnet\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Calibre2\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Cursor\\resources\\app\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin\\copilot-shim;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Program Files\\Alire\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Google.PlatformTools_Microsoft.Winget.Source_8wekyb3d8bbwe\\platform-tools;C:\\Users\\Itsuki\\.dotnet\\tools;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Common\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Microsoft\\WinGet\\Packages\\AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\perl\\site\\bin;C:\\Users\\Itsuki\\AppData\\Local\\Programs\\Perl\\c\\bin;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\DSCModules\\;C:\\Users\\Itsuki\\AppData\\Local\\PowerToys\\bin\\;C:\\Users\\Itsuki\\.local\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\bin\\fallback;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\bin;C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\native\\git\\cmd;C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1103.4239.0_x64__2p2nqsd0c76g0\\app\\resources"
+          },
+          "stdout": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/upstream-test/counterpart.stdout",
+            "byte_length": 341,
+            "sha256": "caa61ae082c361317d4cb6bcd42c6dafc43decea729255487c82120b036d08d2",
+            "bytes": 341
+          },
+          "stderr": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/upstream-test/counterpart.stderr",
+            "byte_length": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "input_sha256": "25e94daeaa1b5529a57659f624657ef298fdde9e60549de5edc806f027ca9379",
+          "observed_configuration": null,
+          "telemetry": {
+            "path": "reports/verybig-windows/1de31af7c47549c999b93d7a8e513345/upstream-test/counterpart-allocator.33812.json",
+            "byte_length": 249,
+            "sha256": "7cf3f10660155bcb5db214d1ae3416226fc308e450c0e31a4f9b2be14047ddf2",
+            "data": {
+              "schema_version": 1,
+              "run_id": "4f8cb9f40f2a449d8a7a1edb1fe5135b",
+              "process_id": 33812,
+              "allocator_limit_bytes": 2147483648,
+              "configuration": "upstream-test",
+              "expected_finalizer_warnings": 0,
+              "managed_refusals": 0,
+              "outstanding_bytes": 0,
+              "outstanding_blocks": 0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "These are actual Windows default/T observations of existing native images, not all platform/profile/library contexts.",
+    "Unchanged original verybig fails before its generated 50,000-entry workload; it is not a passing whole-file observation.",
+    "The separate focused counterpart proves fresh-CWD I/O/text and binary load/removal/return only. Its extra binary control is not an original verybig assertion.",
+    "Source approval is required before any full transformed emission/execution. A distinct independent native applicability decision must bind original failures, counterpart observations and actual images.",
+    "No source exclusion, port/soft flag, output rewriting or fabricated review is installed."
+  ]
+}
