@@ -8,6 +8,8 @@ Source review: [memory-verifier binding refresh](2026-11-08-verifier-binding-ref
 
 Component: [intern-index refusal and collection](2026-11-08-intern-index-refusal.md).
 
+Observation: [original debug, vararg and Windows package paths](2026-11-08-unreduced-debug-vararg-attrib.md).
+
 Proposal: [exact locals source equivalent](2026-11-08-locals-exact-source-proposal.md).
 
 Proposal: [memory vararg allocation geometry](2026-11-08-memerr-vararg-feature-proposal.md).

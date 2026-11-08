@@ -11,6 +11,13 @@ campaigns pass on the combined images. Original API
 source adaptation, final immutable image replay and whole-target acceptance
 remain pending; these cases supply no passing private C geometry assertion.
 
+The [original debug/vararg observations](sessions/2026-11-08-unreduced-debug-vararg-attrib.md)
+complete both files with matching native/Ada output and balanced shutdown in
+both local modes. Original attrib.lua fails the same Windows expected-path
+literal in all four images; its existing ten-operation public counterpart
+passes. These raw CLI observations neither capture the full file-completion
+protocol nor approve an adapted source or resolve source-ledger obligations.
+
 The [exact locals proposal](sessions/2026-11-08-locals-exact-source-proposal.md)
 and bounded source selector preserve the original deletion/collection/refusal
 sweep while proposing actual storage counts and original-key weak lifetime.

@@ -8,6 +8,13 @@ local configurations. Continue independent exact API string-table source
 review, retained fresh-child workload execution, current-head named evidence
 and final context reconciliation; no querystr source obligation is closed.
 
+Preserve the [unreduced debug/vararg/package observations](sessions/2026-11-08-unreduced-debug-vararg-attrib.md)
+as diagnostics bound to their actual four images. Independently review the
+existing Windows attrib expected-path proposal before emitting any equivalent;
+retain the original package/module operations and final integer-27 return.
+Require reviewed completion protocols and final-context evidence even for the
+matching raw db.lua/vararg.lua CLI runs. No source parent is closed here.
+
 Independently review the [exact locals two-span proposal](sessions/2026-11-08-locals-exact-source-proposal.md)
 outside both original/revision authors, including its current owner/resetCI and
 checker/VM source bindings. Its 38 passing definition/rejection checks supply
