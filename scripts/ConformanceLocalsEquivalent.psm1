@@ -19,6 +19,31 @@ $script:LocalsCounterparts=@(
     'src/lua-engine-canonical.adb','src/lua-canonical_compiler.adb',
     'tests/src/lua-table_storage_inspection_tests.ads','tests/src/table_storage_public_tests.ads',
     'scripts/ConformanceLocalsEquivalent.psm1','scripts/ConformanceReviewedSources.psm1')
+$script:LocalsClosingCounterparts=@(
+    'tests/src/lua-conformance_memory.adb','tests/lua/scalar_closing_refusal.lua',
+    'tests/lua/scalar_closing_mutation.lua',
+    'tests/src/lua-scalar_closing_tests.ads','tests/src/lua-scalar_closing_tests.adb',
+    'tests/src/lua-closing_prefix_tests.adb','tests/src/lua-execution_retirement_tests.adb')
+
+function Get-LocalsCounterpartBindingVersion {
+    param([Collections.IDictionary]$Snapshot)
+    # V1 is the original22-path source contract. Closing metadata changes add
+    # a real checker dependency and its fault/root regressions; select that
+    # closed29-path successor explicitly instead of widening old metadata.
+    if(-not $Snapshot.Contains('binding_schema_version')){return 1}
+    if(($Snapshot.binding_schema_version -isnot [int] -and $Snapshot.binding_schema_version -isnot [long]) -or
+        $Snapshot.binding_schema_version -ne 2){throw 'Unsupported locals counterpart binding schema version'}
+    return 2
+}
+
+function Get-LocalsCounterpartSnapshotHash {
+    param([Collections.IDictionary]$Snapshot)
+    $lines=[string[]]@($Snapshot.bindings|ForEach-Object{$_.path+'|'+$_.sha256})
+    [Array]::Sort($lines,[StringComparer]::Ordinal)
+    $pending=if($Snapshot.pending_owner_guard_and_resetCI_changes_not_included){'1'}else{'0'}
+    $payload=$Snapshot.repository_revision+"`n"+$pending+"`n"+($lines -join "`n")+"`n"
+    return Get-ConformanceHash ([Text.Encoding]::UTF8.GetBytes($payload))
+}
 
 function Assert-LocalsSourceOnlyFlags {
     param([Collections.IDictionary]$Record,[switch]$ActualReview)
@@ -102,7 +127,11 @@ function Assert-TargetLocalsTableEquivalentDefinition {
         @('inspect-deleted-table-storage-and-key-reclamation',2490,110,
           '00b85ae4732a06e844c82cd987ba31de93c22d726a4cbd18f3914cf8fde5f628',
           '42c9256c7ee4e7a32c95c7e01682cd837e7d287cfbd3b8482b721d738e781518'))
-    $counterparts=@($script:LocalsCounterparts|Sort-Object)
+    $snapshot=$Specification.counterpart_source_snapshot
+    $bindingVersion=Get-LocalsCounterpartBindingVersion $snapshot
+    $counterparts=@($script:LocalsCounterparts)
+    if($bindingVersion -eq 2){$counterparts+=@($script:LocalsClosingCounterparts)}
+    $counterparts=@($counterparts|Sort-Object)
     foreach($bound in $bounds){
         $patch=@($Specification.replacements|Where-Object id -CEQ $bound[0])
         if($patch.Count -ne 1 -or
@@ -118,9 +147,10 @@ function Assert-TargetLocalsTableEquivalentDefinition {
             throw 'Locals equivalent differs from the two exact retained operations or counterpart set'
         }
     }
-    $snapshot=$Specification.counterpart_source_snapshot
-    if(@($snapshot.Keys).Count -ne 3 -or
-        @(@('repository_revision','bindings','pending_owner_guard_and_resetCI_changes_not_included')|
+    $snapshotFields=@('repository_revision','bindings','pending_owner_guard_and_resetCI_changes_not_included')
+    if($bindingVersion -eq 2){$snapshotFields+='binding_schema_version'}
+    if(@($snapshot.Keys).Count -ne $snapshotFields.Count -or
+        @($snapshotFields|
             Where-Object{-not $snapshot.Contains($_)}).Count -ne 0 -or
         $snapshot.repository_revision -cnotmatch '^[0-9a-f]{40}$' -or
         $snapshot.bindings -isnot [Array] -or
@@ -152,6 +182,7 @@ function Assert-TargetLocalsTableEquivalentDefinition {
         throw 'Locals planned output hash differs from exact retained source'
     }
     return @{id=$Specification.id;planned_sha256=$planned;definition_validated=$true;source_emission=$false;
+        counterpart_binding_version=$bindingVersion;counterpart_count=$counterparts.Count;
         diagnostic_only=$true;review_status='not-granted';runtime_acceptance=$false;coverage_authority=$false;
         pending_counterpart_changes=$snapshot.pending_owner_guard_and_resetCI_changes_not_included}
 }
@@ -167,6 +198,12 @@ function Get-TargetLocalsTableEquivalentReplay {
     $authors=@($review.author,$Specification.draft_provenance.author,$Specification.draft_provenance.revision_author)
     if($review.status -cne 'accepted' -or [string]::IsNullOrWhiteSpace([string]$review.reviewer) -or
         $review.reviewer -cin $authors){throw 'Locals replay requires a new independent exact source review outside both authors'}
+    $bindingVersion=Get-LocalsCounterpartBindingVersion $Specification.counterpart_source_snapshot
+    if($bindingVersion -eq 1 -and
+        (Get-LocalsCounterpartSnapshotHash $Specification.counterpart_source_snapshot) -cne
+          '981f4ceb94d7a272c41f3e2c29f8836c4e8abd351d36f6edf070f5a24ad01f01'){
+        throw 'Legacy V1 locals approval is frozen to its dated76 counterpart snapshot; current closing requires explicit binding V2'
+    }
     # Inspect source-only review labels before constructing output bytes. A
     # synthetic approval/narrative is a negative-test artifact, never authority
     # to emit the real locals source, even when its other labels say accepted.

@@ -116,6 +116,15 @@ whole locals-source equivalence evidence. The current corpus contains95 Lua
 fixtures, with later uncommitted materialized-vararg controls still outside
 this dated classification.
 
+Locals counterpart binding version1 keeps its original22 paths and its
+independently reviewed dated76 tuple. Current source drift does not renew that
+authority. Explicit binding schema2 requires exactly29 counterpart paths,
+adding the actual memory checker, both scalar-closing fixtures and the closing
+test sources. It retains the same two exact operations, original anchors and
+output54481; a pending definition returns only source hashes, never adapted
+bytes or runtime authority. New independent exact review and fresh runtime
+observations remain required before selecting the successor.
+
 T target contexts also require a separate private-header buffer executable.
 It includes the actual pinned `ltests.h`, reports its 23-byte scratch and actual
 `luaL_Buffer` layout (56 or 64 bytes on the measured 64-bit hosts), and executes the same 17 ownership,
