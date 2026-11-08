@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "kind": "t-private-bound-feature-review",
+  "reviewer": "Codex /root",
+  "author": "Codex /root/validation_delivery",
+  "exclusion_id": "LUA-API-REVIEWED-BLOCK-9001",
+  "decision": "accepted",
+  "review_date": "2026-11-08",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "t_dominance": "Pinned api.lua returns before this block when T is absent; this exclusion applies only to upstream-test.",
+  "private_invariant": "Only the exact 18-byte upper allocation-delta conjunct at byte17053 is private; the original mixed assertion is retained and required.",
+  "third_party_irrelevance": "The pinned lua_load contract permits avoiding internal copies but promises no400-byte allocation delta. Memory use is observable; its exact implementation allocation footprint is not a public compatibility obligation.",
+  "feature_review": {
+    "retained_behaviors": [
+      "original mixed assertion remains required and must execute positive allocation growth",
+      "caller retains fixed buffer while loaded code can use it",
+      "reader supplies complete contiguous aligned fixed block and malformed/truncated blocks remain rejected",
+      "allocation refusal remains catchable with retry and balanced ownership cleanup",
+      "X and Y execute with original results and literal type/value",
+      "counted chunk debug source and actual error at line301 remain required"
+    ],
+    "counterpart_source_bindings": [
+      {
+        "sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989",
+        "path": "c_api/tests/load_dump_contract.h"
+      },
+      {
+        "sha256": "d30c069655d43c095937c916250670b1ec245a6bc51ee7c40ea7158978942a4c",
+        "path": "src/lua-inputs.ads"
+      },
+      {
+        "sha256": "8b681ec3b245bbcd6ac41d20b2260ff25039111b816c7c50feed140518d9844f",
+        "path": "src/lua-chunks.ads"
+      },
+      {
+        "sha256": "f799c90c42236fb22561a83de2a38460044ed57421ea1509a1249c9bf25d079f",
+        "path": "src/lua-chunks.adb"
+      },
+      {
+        "sha256": "93c98589d51546968f8ff84a435f792df5759e70cb57aba93bfecc750b33759f",
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-public.lua"
+      }
+    ],
+    "public_contract_source": {
+      "source_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+      "path": "references/lua/manual/manual.of",
+      "byte_offset": 128635,
+      "anchor_sha256": "5d1e9dce562b304cd7dfb28c8d74a54edcc38fb8204f86ac49006e7228592b6f",
+      "byte_length": 558
+    },
+    "rationale": "Independently read pinned manual and original whole block; recomputed source/child/transformed hashes in memory. Reject excluding the whole assertion or any public reader, lifetime, execution, error or cleanup behavior. Reviewed v2 shape and its44exclusion/35transform/56runner regression results. Earlier independent Haiku review e323bc58-2073-4cf4-9d65-1ed58bdbaf0b supported only this span conditionally; its observability/status/retained-obligation issues are corrected in the v2 packet. Fresh actual nativeT and AdaT public counterparts both print API FIXED BUFFER PUBLIC OK. This accepts feature relevance only, without approving a passing original parent, full file, final matrix or equivalence execution.",
+    "no_public_bound_guarantee": true,
+    "retained_parent_id": "LUA-API-ASSERT-CALL-0125",
+    "module_compatibility_obligation": false,
+    "module_observable": true,
+    "observation_kind": "private-resource-bound"
+  }
+}

@@ -5,6 +5,13 @@ for [M3](../../docs/milestones/m3.md), including accepted bounded scopes and
 unresolved obligations. It contains no second Lua implementation or altered
 upstream source. A completed scope does not establish full M3 acceptance.
 
+The [independent fixed-buffer feature review](targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json)
+accepts only the exact eighteen-byte private allocation-bound conjunct as
+eligible for an instrumented exclusion. The original mixed assertion remains
+required. This feature decision does not install an exclusion or transform,
+approve passing runtime evidence, or complete the file or target; the actual
+exclusion policy remains empty until separately bound installation validates.
+
 The separately authorized [remaining upstream compatibility target](targets/README.md)
 can resolve reviewed T-only private checks as explicit exclusions. Its overlay
 never changes the strict upstream completion rule or counts an exclusion as a
