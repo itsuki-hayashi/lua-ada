@@ -232,7 +232,8 @@ function Assert-TawNativeRaw {
 function Assert-TargetAllocatorWitness {
     param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][Collections.IDictionary]$Witness,
         [Parameter(Mandatory)][string]$ArtifactRoot,[Parameter(Mandatory)][string]$Context,
-        [Parameter(Mandatory)][string]$Revision,[Collections.IDictionary]$Image,[switch]$AllowSynthetic)
+        [Parameter(Mandatory)][string]$Revision,[Collections.IDictionary]$Image,[switch]$AllowSynthetic,
+        [switch]$AllowExternalInput)
     $parts=$Context.Split('/')
     if($Witness.schema_version -ne 1 -or $Witness.kind -cne 'target-context-allocator-witness' -or
         $Witness.target -cne 'remaining-upstream-compatibility' -or $Witness.context -cne $Context -or
@@ -246,6 +247,25 @@ function Assert-TargetAllocatorWitness {
     if($Witness.synthetic_fixture -isnot [bool] -or $Witness.repository_dirty -isnot [bool] -or
         (-not $AllowSynthetic -and ($Witness.synthetic_fixture -or $Witness.repository_dirty))){
         throw 'Target allocator final witness requires actual clean observations'
+    }
+    if($Witness.Contains('external_input_snapshot')){
+        if(-not $AllowExternalInput){throw 'External allocator input observations cannot supply final context build provenance'}
+        $inputPath=Resolve-TawArtifact $Witness.source_repository_root $ArtifactRoot $Witness.external_input_snapshot.path $Witness.external_input_snapshot.sha256
+        $inputs=Get-Content -LiteralPath $inputPath -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+        if($inputs.schema_version -ne 1 -or $inputs.kind -cne 'target-allocator-external-input-snapshot' -or
+            $inputs.context -cne $Context -or $inputs.repository_revision -cnotmatch '^[0-9a-f]{40}$' -or
+            $inputs.repository_dirty -isnot [bool] -or $inputs.source_build_provenance_verified -isnot [bool] -or
+            $inputs.source_build_provenance_verified -or $inputs.synthetic_fixture -isnot [bool] -or $inputs.synthetic_fixture -or
+            $inputs.files -isnot [Array] -or $inputs.files.Count -eq 0){throw 'External allocator input snapshot lacks actual unverified provenance'}
+        foreach($flag in @('runtime_acceptance','coverage_authority')){Assert-TawFalse $inputs[$flag] $flag}
+        foreach($file in $inputs.files){$null=Resolve-TawArtifact $Witness.source_repository_root $ArtifactRoot $file.path $file.sha256}
+        $selected=@($Witness.selected_runtime.library_files)
+        if($Witness.witness_kind -ceq 'ada-ceiling'){$selected+=@($Witness.selected_runtime.executable)}
+        foreach($file in $selected){
+            if(@($inputs.files|Where-Object{$_.path -ceq $file.path -and $_.sha256 -ceq $file.sha256}).Count -ne 1){
+                throw 'External allocator selected product is absent from its immutable input snapshot'
+            }
+        }
     }
     $required=@(Get-TargetAllocatorSourcePaths -Kind $Witness.witness_kind -Configuration $parts[0])
     if($Witness.source_bindings -isnot [Array] -or
@@ -339,14 +359,14 @@ function Assert-TargetAllocatorWitness {
             if($file.Count -ne 1 -or $file[0].sha256 -cne $raw.loaded_runtime.sha256){throw 'Native allocator actual runtime differs from frozen DLL'}
         }
     }
-    $result['diagnostic_only']=[bool]$AllowSynthetic
+    $result['diagnostic_only']=[bool]($AllowSynthetic -or $AllowExternalInput)
     return $result
 }
 
 function New-TargetAllocatorWitness {
     param([string]$Root,[string]$Context,[ValidateSet('ada-ceiling','native-observer')][string]$Kind,
         [string]$ProducerReport,[Collections.IDictionary]$ProducerProcess,[string]$RuntimeDirectory,[string]$Executable='',[string]$Compiler='',
-        [string]$Output)
+        [string]$Output,[Collections.IDictionary]$ExternalInputSnapshot)
     if(Test-Path -LiteralPath $Output){throw 'Target allocator witness output must be new'}
     $configuration=$Context.Split('/')[0]
     $selected=@{library_directory=[IO.Path]::GetFullPath($RuntimeDirectory);
@@ -364,11 +384,12 @@ function New-TargetAllocatorWitness {
         selected_runtime=$selected;synthetic_fixture=$false;runtime_acceptance=$false;coverage_authority=$false;
         source_bindings=@(Get-TargetAllocatorSourcePaths $Kind $configuration|ForEach-Object{@{path=$_;sha256=(Get-TawHash (Join-Path $Root $_))}})}
     if($Kind -ceq 'native-observer'){$witness['compiler']=@{path=[IO.Path]::GetFullPath($Compiler);sha256=(Get-TawHash $Compiler)}}
+    if($null -ne $ExternalInputSnapshot){$witness['external_input_snapshot']=$ExternalInputSnapshot}
     # Creation records observations, including dirty development runs. The
     # final reader independently refuses dirty/synthetic data; this writer
     # never upgrades source provenance or grants acceptance.
     $null=Assert-TargetAllocatorWitness -Root $Root -Witness $witness -ArtifactRoot $Root -Context $Context `
-        -Revision $witness.repository_revision -AllowSynthetic
+        -Revision $witness.repository_revision -AllowSynthetic -AllowExternalInput:($null -ne $ExternalInputSnapshot)
     [IO.File]::WriteAllText($Output,(ConvertTo-Json -InputObject $witness -Depth 64).Replace("`r`n","`n")+"`n",[Text.UTF8Encoding]::new($false))
     return @{path=[IO.Path]::GetFullPath($Output);sha256=(Get-TawHash $Output);runtime_acceptance=$false;coverage_authority=$false}
 }

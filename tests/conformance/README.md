@@ -193,6 +193,11 @@ the final reader requires all their raw artifacts in that same image. The Ada
 ceiling report binds its selected launcher, measured configuration and runtime
 artifacts; it does not claim an OS module-mapping observation for Ada. Source
 and synthetic validator checks do not supply execution or acceptance evidence.
+The collector's explicit `-ExternalInputs` development mode accepts a separate
+hash-bound snapshot of copied products and records unverified source-build
+provenance. It preserves existing generated outputs. The final context reader
+rejects these external observations even when every physical operation passes;
+they cannot replace a fresh context build.
 The seven/eight base witnesses still leave dedicated console Lua/C, typed CLI
 argument and readline report reconciliation pending. The final receiver
 explicitly rejects a context until those receivers exist. The four C console modes are

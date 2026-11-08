@@ -156,11 +156,11 @@ function New-Fixture([string]$Kind){
     else{$w.compiler=$raw.compiler;$image.paths.c_runtime=$library;$image.toolchain.compiler_sha256=$raw.compiler.sha256}
     return @{root=$payload;witness=$w;image=$image;raw=$raw;raw_relative=($rawBase+'/result.json')}
 }
-function Case([string]$Kind,[string]$Name,[scriptblock]$Change,[string]$Expected='',[switch]$Actual){
+function Case([string]$Kind,[string]$Name,[scriptblock]$Change,[string]$Expected='',[switch]$Actual,[switch]$External){
     $f=New-Fixture $Kind;& $Change $f
     $failure=$null;$value=$null
     try{$value=Assert-TargetAllocatorWitness -Root $root -Witness $f.witness -ArtifactRoot $f.root -Context $f.image.context `
-        -Revision $revision -Image $f.image -AllowSynthetic:(-not $Actual)}catch{$failure=$_.Exception.Message}
+        -Revision $revision -Image $f.image -AllowSynthetic:(-not $Actual) -AllowExternalInput:$External}catch{$failure=$_.Exception.Message}
     if(($Expected -eq '' -and $null -ne $failure) -or ($Expected -ne '' -and ($null -eq $failure -or $failure -notmatch $Expected))){
         throw "Allocator fixture failed: $Name; $failure; expected $Expected"
     }
@@ -184,6 +184,19 @@ function Rewrite-Artifact($Fixture,[string]$OriginalPath,[string]$Text){
     $entry.sha256=$hash;$entry.bytes=(Get-Item $path).Length
     return @{sha256=$hash;bytes=$entry.bytes}
 }
+function External-Input($Fixture,[string]$Change=''){
+    $files=@($Fixture.witness.selected_runtime.library_files)
+    if($Fixture.witness.witness_kind -ceq 'ada-ceiling'){$files+=@($Fixture.witness.selected_runtime.executable)}
+    $value=@{schema_version=1;kind='target-allocator-external-input-snapshot';context=$Fixture.image.context;
+        repository_revision=('b'*40);repository_dirty=$true;source_build_provenance_verified=$false;
+        synthetic_fixture=$false;runtime_acceptance=$false;coverage_authority=$false;files=$files}
+    if($Change -ceq 'missing-product'){$value.files=@($files|Select-Object -SkipLast 1)}
+    if($Change -ceq 'invent-build-provenance'){$value.source_build_provenance_verified=$true}
+    $relative=$Fixture.raw_relative.Replace('/raw/result.json','/external-input.json')
+    $path=Join-Path $Fixture.root $relative
+    [IO.File]::WriteAllText($path,(ConvertTo-Json -InputObject $value -Depth 64),$utf8)
+    $Fixture.witness.external_input_snapshot=@{path=($root.Replace('\','/')+'/'+$relative);sha256=(Get-FileHash $path).Hash.ToLowerInvariant()}
+}
 Case ada-ceiling 'thirteen synthetic source-bound rows exercise only binding validation' {}
 Case native-observer 'seven synthetic native rows exercise only source/toolchain/OS-path binding' {}
 Case native-observer 'Windows OS path casing retains raw bytes and identifies the same module' {param($f)
@@ -192,6 +205,10 @@ Case native-observer 'Windows OS path casing retains raw bytes and identifies th
     $id=Rewrite-Artifact $f $p.stdout_path $text;$p.stdout_sha256=$id.sha256;$p.stdout_bytes=$id.bytes;Save-Raw $f
 }
 Case ada-ceiling 'final consumer rejects a labelled synthetic report' {} 'actual clean observations' -Actual
+Case ada-ceiling 'external observations remain explicitly rejected by the final reader' {param($f)External-Input $f} 'cannot supply final context build provenance'
+Case ada-ceiling 'explicit external observation mode retains only unverified provenance' {param($f)External-Input $f} -External
+Case ada-ceiling 'external observations cannot invent a verified source build' {param($f)External-Input $f invent-build-provenance} 'unverified provenance' -External
+Case ada-ceiling 'external input snapshot must retain every selected product' {param($f)External-Input $f missing-product} 'absent from its immutable input snapshot' -External
 Case ada-ceiling 'revision drift cannot reuse raw observations' {param($f)$f.witness.repository_revision='0'*40} 'revision context or role'
 Case ada-ceiling 'another selected context cannot inherit the report' {param($f)$f.witness.context='upstream-test/windows/validation/static'} 'revision context or role'
 Case ada-ceiling 'source hash drift requires new observations' {param($f)$f.witness.source_bindings[0].sha256='0'*64} 'source binding is stale'
