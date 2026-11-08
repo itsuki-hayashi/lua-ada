@@ -110,6 +110,16 @@ if($baseline.configuration -ceq 'upstream-test'){
         $p=(Row $r table-storage-private).process
         Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS: Ada table storage Deleted_Key_Reclamation`n",''))
     } 'complete ordered protocol'
+    Case 'full call metadata campaign cannot disappear from actual paired T observations' {param($r)
+        $r.processes=@($r.processes|Where-Object operation -CNE call-metadata-windows)
+    } 'process set is incomplete'
+    Case 'a call metadata case filter cannot certify the complete provider campaign' {param($r)
+        (Row $r call-metadata-windows).process.arguments[1]="_CALL_METADATA_CASE='First_Protected'"
+    } 'explicit setup'
+    Case 'call metadata completion cannot omit actual cross-context error recovery' {param($r)
+        $p=(Row $r call-metadata-windows).process
+        Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS call metadata Cross_Context_Error`n",''))
+    } 'complete ordered protocol'
     foreach($operation in @('public-api-commands','public-panic-controls','reader-refusal-phases','string-refusal-phases','c-hook-transitions')){
         Case "complete paired T campaign cannot omit $operation" {param($r)
             $r.processes=@($r.processes|Where-Object operation -CNE $operation)

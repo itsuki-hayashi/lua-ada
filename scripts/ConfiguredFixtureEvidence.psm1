@@ -57,6 +57,14 @@ function Get-ConfiguredFixtureDefinitions {
             stdout="CONFIGURED-FIXTURE: actual Ada table storage`n"+
                 ((@('Initial_Live_Entries','Deleted_Key_Reclamation','Same_Table_Reuse')|
                     ForEach-Object{"PASS: Ada table storage $_"})-join "`n")+"`nTable storage private OK`n"}
+        $metadata=@('First_Protected','Nested_Protected','Numeric_Error','False_Result','Byte_Ceiling','Repeated_Entry',
+            'Outstanding_Shrink','Error_After_Shrink','Cross_Context_Return','Cross_Context_Error','ResetCI_Outstanding','ResetCI_Refusal','Primitive_Strings',
+            'Primitive_Numbers','Primitive_False_Nil','Same_Object_Equality','Table_Equality_Yields','Userdata_Equality_Handler',
+            'Assert_Success_Tuple','Assert_Protected_Tuple','Independent_Checkstack_Refusal')
+        $definitions+=@{id='call-metadata-windows';source='tests/lua/call_metadata_windows.lua';
+            setup="$guard;assert(type(T.testC)=='function' and type(T.alloccount)=='function' and type(T.totalmem)=='function' and rawget(_G,'_CALL_METADATA_CASE')==nil);print('CONFIGURED-FIXTURE: real T call metadata')";
+            stdout="CONFIGURED-FIXTURE: real T call metadata`n"+
+                (($metadata|ForEach-Object{"PASS call metadata $_"})-join "`n")+"`n"}
     }
     # This fixture deliberately counts instructions. Its own source contract
     # requires one C-compiled graph, consumed unchanged by both interpreters;
@@ -106,6 +114,7 @@ function Get-ConfiguredFixtureSources {
         'tests/lua/reader_refusal_phases.lua','tests/lua/string_refusal_phases.lua','tests/lua/hook_transition_c.lua',
         'tests/lua/debug_iterator_counts.lua',
         'tests/lua/table_storage_public.lua','tests/lua/table_storage_private.lua',
+        'tests/lua/code_public_semantics.lua','tests/lua/call_metadata_windows.lua','tests/lua/call_metadata_public.lua',
         'tests/src/lua-table_storage_inspection_tests.ads','tests/src/lua-table_storage_inspection_tests.adb',
         'tests/src/lua-engine-table_storage_probe.ads','tests/src/lua-engine-table_storage_probe.adb',
         ('src/configurations/'+$Configuration+'/lua-runtime_configuration.ads'),
@@ -137,6 +146,41 @@ function Get-ConfiguredFixtureAudit {
             [string]::IsNullOrWhiteSpace($record[0].rationale) -or
             (Get-FileHash (Join-Path $Root $path)).Hash.ToLowerInvariant() -cne $record[0].sha256){
             throw "Configured T-only classification requires a fresh mixed/default/T source review: $path"
+        }
+        if($definition.id -ceq 'call-metadata-windows'){
+            # Keep the two T-free public case bodies in ordinary execution,
+            # rather than hiding them behind the full provider campaign's
+            # unconditional T requirement. Both sides are exact source bytes;
+            # a copied case name or successful marker cannot replace a body.
+            if(-not $record[0].Contains('retained_default_counterpart')){throw 'Configured mixed fixture lacks its ordinary counterpart'}
+            $ordinaryCounterpart=$record[0].retained_default_counterpart
+            if($ordinaryCounterpart.path -cne 'tests/lua/call_metadata_public.lua' -or
+                $ordinaryCounterpart.runtime_evidence -isnot [Array] -or $ordinaryCounterpart.runtime_evidence.Count -ne 0 -or
+                $ordinaryCounterpart.case_spans -isnot [Array] -or $ordinaryCounterpart.case_spans.Count -ne 2 -or
+                (($ordinaryCounterpart.case_spans.name|Sort-Object) -join '|') -cne 'Assert_Protected_Tuple|Table_Equality_Yields'){
+                throw 'Configured mixed fixture ordinary correspondence is incomplete or invents evidence'
+            }
+            $ordinaryPath=Join-Path $Root $ordinaryCounterpart.path
+            if((Get-FileHash $ordinaryPath).Hash.ToLowerInvariant() -cne $ordinaryCounterpart.sha256){throw 'Configured mixed fixture ordinary counterpart source is stale'}
+            $originalBytes=[IO.File]::ReadAllBytes((Join-Path $Root $path));$ordinaryBytes=[IO.File]::ReadAllBytes($ordinaryPath)
+            foreach($case in $ordinaryCounterpart.case_spans){
+                $slices=@()
+                foreach($role in @('original','ordinary')){
+                    $span=$case[$role];$data=if($role -ceq 'original'){$originalBytes}else{$ordinaryBytes}
+                    if(($span.byte_offset -isnot [int] -and $span.byte_offset -isnot [long]) -or $span.byte_offset -lt 0 -or
+                        ($span.byte_length -isnot [int] -and $span.byte_length -isnot [long]) -or $span.byte_length -le 0 -or
+                        $span.byte_offset -gt $data.Length -or $span.byte_length -gt $data.Length-$span.byte_offset){
+                        throw 'Configured mixed fixture ordinary correspondence is outside its source'
+                    }
+                    $bytes=[byte[]]::new($span.byte_length);[Array]::Copy($data,$span.byte_offset,$bytes,0,$bytes.Length)
+                    if((Get-ConformanceHash $bytes) -cne $span.sha256 -or
+                        -not ([Text.Encoding]::UTF8.GetString($bytes)).StartsWith("  {'"+$case.name+"',function()",[StringComparison]::Ordinal)){
+                        throw 'Configured mixed fixture ordinary correspondence source bytes differ'
+                    }
+                    $slices+=,(Get-ConformanceHash $bytes)
+                }
+                if($slices[0] -cne $slices[1]){throw 'Configured mixed fixture ordinary correspondence bodies differ'}
+            }
         }
         if($roles.Count -eq 1){
             $links=$record[0].source_linkage

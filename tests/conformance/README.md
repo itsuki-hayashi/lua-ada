@@ -145,6 +145,15 @@ AUnit observations from the source-bound same-context suite report.
 `table_storage_public.lua` retains its three ordinary object-key/liveness
 cases in the generic comparison on both configurations.
 
+The full21 `call_metadata_windows.lua` cases are mandatory in the paired T
+campaign with real allocator/C controls and no `_CALL_METADATA_CASE` filter.
+The two independently ordinary case bodies also execute in
+`call_metadata_public.lua` through the generic default comparison. Exact span
+hashes and byte equality bind both copies to the full provider fixture, so its
+T requirement cannot hide those default public assertions.
+`code_public_semantics.lua` also remains an ordinary source comparison; its29
+source-linked semantic cases grant no private optimizer exclusion authority.
+
 `debug_iterator_counts.lua` also runs in both configured campaigns. Its source
 explicitly requires one C-compiled graph when comparing exact hook counts.
 The measured native interpreter loads that exact text file and dumps its

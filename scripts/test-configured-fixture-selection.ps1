@@ -10,6 +10,8 @@ $sources=@(Get-ConfiguredFixtureDefinitions upstream-test|ForEach-Object source)
 $sourceLinks=@((Get-Content (Join-Path $root $classification) -Raw|ConvertFrom-Json -AsHashtable -Depth 24).entries|
     Where-Object selection -CEQ configured-Ada-internal-counterpart-only)[0].source_linkage.bindings.path
 $sources+=@($sourceLinks)
+$sources+=@((Get-Content (Join-Path $root $classification) -Raw|ConvertFrom-Json -AsHashtable -Depth 24).entries|
+    Where-Object{$_.Contains('retained_default_counterpart')}|ForEach-Object{$_.retained_default_counterpart.path})
 $script:cases=0
 function Case($Name,[scriptblock]$Change,$Expected=''){
     # These are source-selection fixtures only. No copied file is executed and
@@ -68,6 +70,17 @@ Case 'an invented source link is not an actual AUnit case' {
 Case 'source linkage cannot pretend it contains passing runtime evidence' {
     Change-Classification {param($v)@($v.entries|Where-Object selection -CEQ configured-Ada-internal-counterpart-only)[0].source_linkage.runtime_evidence=@('passed')}
 } 'invents execution evidence'
+Case 'mixed public semantics cannot lose their ordinary counterpart' {
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/call_metadata_windows.lua)[0];[void]$row.Remove('retained_default_counterpart')}
+} 'lacks its ordinary counterpart'
+Case 'an ordinary counterpart cannot replace a body with a named marker' {
+    $script:mutatedOrdinaryPath=Join-Path $temporary 'tests/lua/call_metadata_public.lua'
+    [IO.File]::WriteAllText($script:mutatedOrdinaryPath,[IO.File]::ReadAllText($script:mutatedOrdinaryPath).Replace('calls==1','calls==2'),[Text.UTF8Encoding]::new($false))
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/call_metadata_windows.lua)[0];$row.retained_default_counterpart.sha256=(Get-FileHash $script:mutatedOrdinaryPath).Hash.ToLowerInvariant()}
+} 'ordinary correspondence source bytes differ'
+Case 'mixed default correspondence cannot omit a public case' {
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/call_metadata_windows.lua)[0];$row.retained_default_counterpart.case_spans=@($row.retained_default_counterpart.case_spans|Select-Object -Skip 1)}
+} 'ordinary correspondence is incomplete'
 function Link-Case($Name,[scriptblock]$Action,$Expected=''){
     $failure=$null
     try{& $Action}catch{$failure=$_.Exception.Message}

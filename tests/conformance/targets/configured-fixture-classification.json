@@ -146,7 +146,7 @@
         "kind": "source-linkage-only",
         "bindings": [
           {
-            "sha256": "532ac55f963ff15ea259f30f1493639cb862ab76f6e82ee47ebb1438add04bf3",
+            "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3",
             "path": "tests/src/lua-conformance_adapter.adb"
           },
           {
@@ -170,6 +170,45 @@
             "path": "tests/src/lua-engine-table_storage_probe.adb"
           }
         ]
+      }
+    },
+    {
+      "path": "tests/lua/call_metadata_windows.lua",
+      "sha256": "1e603aaa94e4708e46aa17b0f328986a3a88d6c066a29d217f022ec1c37d3b83",
+      "selection": "paired-configured-T-only",
+      "rationale": "The full21-case source unconditionally requires real T and actual allocator/C controls; every case remains mandatory. The two independently T-free ordinary case bodies are also retained byte-identically in the default public companion.",
+      "retained_default_counterpart": {
+        "path": "tests/lua/call_metadata_public.lua",
+        "sha256": "8c441efccdb8c633896d91ae1f84875dfae7633b4dd5801a4f6cb67887d37298",
+        "case_spans": [
+          {
+            "name": "Table_Equality_Yields",
+            "original": {
+              "byte_offset": 4250,
+              "byte_length": 424,
+              "sha256": "51305d42a2a053b3a1dd80e5fd9270daa98265c6fd174b14cbf4b00f6035b5fe"
+            },
+            "ordinary": {
+              "byte_offset": 84,
+              "byte_length": 424,
+              "sha256": "51305d42a2a053b3a1dd80e5fd9270daa98265c6fd174b14cbf4b00f6035b5fe"
+            }
+          },
+          {
+            "name": "Assert_Protected_Tuple",
+            "original": {
+              "byte_offset": 5293,
+              "byte_length": 239,
+              "sha256": "b0f95a6a513389397dc407c9cf21c20589bc013d9a988e03f68ee8c22b0ef5ca"
+            },
+            "ordinary": {
+              "byte_offset": 509,
+              "byte_length": 239,
+              "sha256": "b0f95a6a513389397dc407c9cf21c20589bc013d9a988e03f68ee8c22b0ef5ca"
+            }
+          }
+        ],
+        "runtime_evidence": []
       }
     }
   ]
