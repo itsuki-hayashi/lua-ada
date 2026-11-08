@@ -1,6 +1,6 @@
 {
   "global_api": {
-    "sha256": "3c1f98c77dbef3396753f15825cc3627e9ea68c9fa1ba43506cd12d85689138c",
+    "sha256": "7a6ec74f92e7709b2d5aefb3fd3b73edb6f0948631710ca0129b8c02aecd364d",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/global-api.author-proposal.json"
   },
   "retained_api_routes": 159,
@@ -30,7 +30,7 @@
     },
     "scripts/check.ps1": {
       "previous": "8071c9872cc2244d59cc8de256b530262820e453cd802c5edbf6cee7db16c9e5",
-      "current": "b99d82db89097cbc163645c3a6cec0e62464e501942ede12d25b32f963b30df2"
+      "current": "ae1f448606108da789067d8d5e1f8a15bcb0b84ffd650dfb749ce370734f9ff7"
     },
     "tests/c/foreign_hook_contract.c": {
       "previous": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
@@ -46,7 +46,7 @@
     },
     "scripts/check-instrumented.ps1": {
       "previous": "ae2e8b732e37f09edd0477c862d99950f3c00293aeff39405958dea804fb0ec2",
-      "current": "b7bd0d5e32d4b4da0936ef28b1623cb64be160c8f6f600173854aef5a978c484"
+      "current": "12f82a3b8509412462191edf016502d5365dfc11aa9e6f26df0fbb9f0b4b3833"
     },
     "tests/src/lua-conformance_adapter_tests.adb": {
       "previous": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
@@ -82,9 +82,9 @@
     }
   },
   "retained_consumer_cases": 100,
-  "proposed_aunit_cases": 867,
+  "proposed_aunit_cases": 870,
   "consumer": {
-    "sha256": "d9e243080e75c8a6bf27229c900bb4b7e3adabb320b8873688964e7a9bbf13f1",
+    "sha256": "9ab7784d4f9087b785eaf4549b5e3f6c09da46526a1a2813fbd47ca911ef8e08",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json"
   },
   "retained_aunit_cases": 94,
@@ -93,23 +93,23 @@
   "runtime_acceptance": false,
   "global_api_entries": 473,
   "witness_policy": {
-    "sha256": "c56e8d0a8527e88ec88a1c35f747fc686b5d5011b6a65b0895a7477f9d30a377",
+    "sha256": "377401eae8bb9662b6dd830a704812ada15bf66363b419fdaa2c7a548fcb1d39",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/witness-policy.author-proposal.json"
   },
   "source_snapshot": {
-    "revision": "0b95cc880ce35367ecdd8a5cbdbaa2b9b150d749",
-    "repository_dirty": true,
+    "revision": "0db6e82182c19bad876e1d40632f490b1e409d71",
+    "repository_dirty": false,
     "kind": "repository-source-snapshot"
   },
   "target": "remaining-upstream-compatibility",
   "aunit": {
-    "sha256": "e5e631ab078a642ab87ae97ff40d15574fcf2bdfc18dc6e46acec9e962333fe8",
+    "sha256": "bf0687e295a597d7897dc6b0ea01b260030b1f068a7d6183ecd9fe6ca65edd29",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/aunit-witness.author-proposal.json"
   },
   "pending_conditional_campaigns": [
     {
       "path": "tests/conformance/targets/remaining-upstream-compatibility/debug-console-consumer.author-proposal.json",
-      "sha256": "dd4874815cbb73da421ad79ee5f9a8fcac0804ab28e23fecfbbb9a017dcf110c",
+      "sha256": "385e684fafb317872142070b0fbfbe37f1f0d10525e0d449a3666da9c3b26cae",
       "case_count": 4,
       "coverage_authority": false,
       "runtime_acceptance": false

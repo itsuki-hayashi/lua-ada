@@ -153,11 +153,11 @@
     },
     {
       "path": "scripts/check.ps1",
-      "sha256": "b99d82db89097cbc163645c3a6cec0e62464e501942ede12d25b32f963b30df2"
+      "sha256": "ae1f448606108da789067d8d5e1f8a15bcb0b84ffd650dfb749ce370734f9ff7"
     },
     {
       "path": "scripts/check-instrumented.ps1",
-      "sha256": "b7bd0d5e32d4b4da0936ef28b1623cb64be160c8f6f600173854aef5a978c484"
+      "sha256": "12f82a3b8509412462191edf016502d5365dfc11aa9e6f26df0fbb9f0b4b3833"
     },
     {
       "path": "tests/src/test_runner.adb",

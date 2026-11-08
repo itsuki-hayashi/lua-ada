@@ -9,12 +9,12 @@
   "coverage_authority": false,
   "execution_evidence": [],
   "source_snapshot": {
-    "repository_revision": "0b95cc880ce35367ecdd8a5cbdbaa2b9b150d749",
+    "repository_revision": "0db6e82182c19bad876e1d40632f490b1e409d71",
     "repository_dirty": true
   },
   "ordinary_no_argument_catalog": {
     "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json",
-    "sha256": "d9e243080e75c8a6bf27229c900bb4b7e3adabb320b8873688964e7a9bbf13f1",
+    "sha256": "9ab7784d4f9087b785eaf4549b5e3f6c09da46526a1a2813fbd47ca911ef8e08",
     "case_count": 605
   },
   "source_bindings": [
@@ -40,11 +40,11 @@
     },
     {
       "path": "scripts/check.ps1",
-      "sha256": "b99d82db89097cbc163645c3a6cec0e62464e501942ede12d25b32f963b30df2"
+      "sha256": "ae1f448606108da789067d8d5e1f8a15bcb0b84ffd650dfb749ce370734f9ff7"
     },
     {
       "path": "scripts/check-instrumented.ps1",
-      "sha256": "b7bd0d5e32d4b4da0936ef28b1623cb64be160c8f6f600173854aef5a978c484"
+      "sha256": "12f82a3b8509412462191edf016502d5365dfc11aa9e6f26df0fbb9f0b4b3833"
     }
   ],
   "cases": [
