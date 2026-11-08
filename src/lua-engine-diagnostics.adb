@@ -218,9 +218,19 @@ package body Lua.Engine.Diagnostics is
         Inspection.Logical_Frame (State, State.Current, 0);
       Type_Name : constant Value :=
         (if Present then Metafield (State, Item, "__name") else Nil_Value);
-      Detail : constant String :=
-        Expected & " expected, got " & Argument_Type (State, Item, Present);
+      Detail : Owned_Buffer;
       Message : Value;
+      procedure Publish (Text : String);
+      procedure Publish (Text : String) is
+      begin
+         if Owner /= null and then Owner.Is_Native and then
+           State.Current.Stack_Window = Owner
+         then
+            Message := New_String (State, Text);
+            Machine.Push_Native_Value (State, Owner, Message);
+         end if;
+         Argument_Error (State, Index, Text);
+      end Publish;
    begin
       if Owner /= null then
          Machine.Prepare_Argument_Diagnostic (State, Owner);
@@ -228,16 +238,40 @@ package body Lua.Engine.Diagnostics is
       if Owner /= null and then Owner.Is_Native and then
         State.Current.Stack_Window = Owner
       then
-         --  luaL_typeerror first leaves a supplied raw __name string, then
-         --  its formatted detail, on the actual C stack. A later fallback
+         --  luaL_getmetafield leaves every nonnil raw __name, including a
+         --  nonstring value that cannot supply the type label. A fallback
          --  registry callback can inspect/mutate those ordinary temporaries.
-         if Type_Name.Kind = String_Kind then
+         if Type_Name.Kind /= Nil_Kind then
             Machine.Push_Native_Value (State, Owner, Type_Name);
          end if;
-         Message := New_String (State, Detail);
-         Machine.Push_Native_Value (State, Owner, Message);
       end if;
-      Argument_Error (State, Index, Detail);
+      Detail.Set_Owner (State.Current.Memory);
+      Detail.Append (Expected);
+      Detail.Append (" expected, got ");
+      if Type_Name.Kind = String_Kind then
+         declare
+            Bytes : constant Byte_String := Type_Name.Reference.Bytes;
+            View : String (1 .. Bytes.Size)
+              with Import, Address => Bytes.Address;
+            Size : Natural := 0;
+         begin
+            --  Scan a borrowed C prefix before copying into selected-owner
+            --  storage. A huge name cannot escape the allocator or budget
+            --  through Argument_Type's ordinary Ada String return value.
+            for Byte of View loop
+               Work (State);
+               exit when Byte = ASCII.NUL;
+               Size := Size + 1;
+            end loop;
+            for Index in 1 .. Size loop
+               Work (State);
+               Detail.Append (View (Index));
+            end loop;
+         end;
+      else
+         Detail.Append (Argument_Type (State, Item, Present));
+      end if;
+      Detail.Query (Publish'Access);
    end Type_Error;
 
    function Integer_Argument

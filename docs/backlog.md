@@ -2,6 +2,11 @@
 
 ## Active remaining-suite delivery
 
+Type-detail construction has [owned-prefix evidence](sessions/2026-11-08-owned-argument-detail.md),
+four native-paired Lua cases and five AUnit regressions within 2,099 passing
+cases per configuration. Continue the wider failure-text/renderer allocation
+audit; this component does not establish that every error temporary is owned.
+
 The [combined public-boundary replay](sessions/2026-11-08-public-boundary-integration.md)
 passes 2,094 AUnit cases per local configuration after preserving the checked
 argument-borrow lifetime. Continue original string/self diagnostics, the

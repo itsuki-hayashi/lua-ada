@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [argument detail checkpoint](sessions/2026-11-08-owned-argument-detail.md)
+uses selected-owner text for type-detail construction, meters raw name
+processing and preserves nonstring raw-name temporaries. Four Lua cases match
+native/Ada default/T; each local Ada configuration passes 2,099 AUnit cases.
+The wider failure-rendering/storage audit and remaining full target stay open.
+
 The [combined public-boundary check](sessions/2026-11-08-public-boundary-integration.md)
 passes 2,094 AUnit cases in each local configuration after fixing a checked
 I/O argument-borrow interaction. All twenty-six ordinary standalone C

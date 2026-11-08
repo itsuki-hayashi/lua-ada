@@ -1,5 +1,6 @@
 with Binary_Runtime_Tests;
 with Traceback_API_Tests;
+with Argument_Detail_Tests;
 with Lua.Conformance_Adapter_Tests;
 with Lua.API_Command_Tests;
 with Lua.Foreign_Hook_Tests;
@@ -225,6 +226,7 @@ procedure Test_Runner is
       Source_Tests.Register (Result);
       Binary_Runtime_Tests.Register (Result);
       Traceback_API_Tests.Register (Result);
+      Argument_Detail_Tests.Register (Result);
       return Result;
    end Suite;
 
