@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "kind": "equivalent-source-review",
+  "reviewer": "Codex /root",
+  "author": "Codex /root/validation_delivery",
+  "decision": "accepted",
+  "equivalent_id": "api-finalized-userdata-reclamation",
+  "source": "references/lua/testes/api.lua",
+  "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+  "generated_sha256": "2838c5b9183c835b3581f829657d30451c16be1bfca952e5b8638d67e5966897",
+  "configuration": "upstream-test",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "rationale": "Independently reviewed all three exact source replacements and their unchanged surroundings. The same1000 actual userdata, original stop/two collections/restart and both positive-growth assertions remain. Added callbacks check every original object, transient resurrection, weak-value removal before finalization, retained weak keys during the first cycle, and full second-cycle reclamation. The truthful count observation remains; only the private one-KiB residual tolerance becomes actual ownership assertions. The original parent0195 remains required for fresh runtime equivalent evidence. No source obligation is excluded.",
+  "feature_review": {
+    "sha256": "6738e63cda2f2269cfa776ea70031dcd4dc2aa9cc733d0fe56926b912b7e2288",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.independent-feature-review.json"
+  },
+  "original_required_obligations": [
+    "LUA-API-ASSERT-CALL-0195"
+  ],
+  "source_exclusions": [],
+  "counterpart_bindings": [
+    {
+      "path": "references/lua/manual/manual.of",
+      "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687"
+    },
+    {
+      "path": "src/lua-engine-finalizers.adb",
+      "sha256": "cd29399060bc6f9d045f1d247d76a2419e06e62e9a5ca5055b27213c65c62b62"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "sha256": "8a462ca9c361f595edc85c7d093467da1cc1f7943fef222a36d62b53a869e01c"
+    },
+    {
+      "path": "src/lua-storage-vectors.adb",
+      "sha256": "6795bd60f6d3942eecb253fc089dda1b35c25c5c07e1266c26ea5773b36f3f21"
+    },
+    {
+      "path": "src/lua-storage-vectors.ads",
+      "sha256": "b68454ab6f4e0b30dc69a8fde89ece91674a760c60c672baca7d78b38b06931f"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/api-finalization-lifetimes.author.lua",
+      "sha256": "43213950a0f88258a4dc19f893d73329c685ca5ae944026e4645583b38a9c8ac"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.independent-feature-review.json",
+      "sha256": "6738e63cda2f2269cfa776ea70031dcd4dc2aa9cc733d0fe56926b912b7e2288"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0"
+    }
+  ],
+  "proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api-finalized-userdata-reclamation.equivalent.author-proposal.json",
+    "sha256": "8de28e53ca1a85abf6f72f7651e7c6029347aa344ee98429b2ea2ff3311e2b68"
+  }
+}

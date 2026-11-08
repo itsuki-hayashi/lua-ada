@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "kind": "equivalent-approval",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "decision": "accepted",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "equivalent": {
+    "disposition": "ada-internal-equivalent",
+    "configuration": "upstream-test",
+    "platform": null,
+    "generated_sha256": "ffed3d0bb8241c5258a616950552552316b14a1cc122c034d56550410e4b9b6c",
+    "source": "references/lua/testes/calls.lua",
+    "source_sha256": "e0331ba5557c09ba844c11a54810ca7cc01998638316d5192e252a2ab0a2d407",
+    "id": "calls-undump-constant-pool"
+  },
+  "decisions": [
+    {
+      "review_evidence": {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/calls-undump-constant-pool.independent-exact-review.json",
+        "sha256": "55089fccd42e47f993cfe2c3d4423006486e3e35938d3f9f5fa6c141cf770423"
+      },
+      "length_bytes": 105,
+      "decision": "accepted",
+      "start_byte": 14425,
+      "counterparts": [
+        {
+          "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/calls-undump-constant-pool.independent-feature-review.json",
+          "sha256": "641b9541139b53f56c054b59d29e965c80dfd8f0dee99264465e592f35e72ff4"
+        },
+        {
+          "path": "tests/conformance/targets/remaining-upstream-compatibility/calls-undump-string-values.author.lua",
+          "sha256": "d1ef08edca513407c8906b7f2542a274e00d6e3c46b1091de04620f34ada8795"
+        },
+        {
+          "path": "references/lua/manual/manual.of",
+          "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+        },
+        {
+          "path": "references/lua/ltests.c",
+          "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
+        },
+        {
+          "path": "c_api/tests/pointer_identity_contract.c",
+          "sha256": "818f9704798b6983887ba0b50a6e114b2770c1026ae6a4453b8a09e51f106c14"
+        }
+      ],
+      "author": "Codex /root/validation_delivery",
+      "rationale": "Independently reviewed the exact105-byte private Proto.k-sharing assertion and replacement. Original ifT, actual load(dump)(), full source/dump construction, count==2 and all subsequent source bytes remain. All three decoded functions execute; each must return exactly one52-byte string equal to the original. Public percent-p stays required and stable for the same held string across actual collections. This replaces only cross-prototype allocation-sharing inspection, not public pointer formatting, value semantics, binary loading or function behavior. Original parent0097 remains required for fresh runtime equivalent evidence; no source exclusion.",
+      "replacement_sha256": "e5887588491ee21f67c722ceda7a94ccad3b1a9a8740a9393da99c5f829ba606",
+      "reviewer": "Codex /root",
+      "source_sha256": "d350bbaa91f6e9d428a04e5507d4eb0cfb3596e882bffdbf5c30655054063c8e",
+      "id": "execute-all-decoded-string-results"
+    }
+  ],
+  "review_evidence": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/calls-undump-constant-pool.independent-exact-review.json",
+    "sha256": "55089fccd42e47f993cfe2c3d4423006486e3e35938d3f9f5fa6c141cf770423"
+  }
+}

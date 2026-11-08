@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "kind": "target-api-source-composite-approval",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "decision": "accepted",
+  "composite_id": "api-private-bound-and-userdata-lifetimes",
+  "claims_sha256": "e4c1fd24bc0b1085fad4adc203bd0585b85dc47545c0b9918050aee8c3f104d5",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "review_evidence": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-private-bound-and-userdata-lifetimes.independent-composition-review.json",
+    "sha256": "fef368c2d9df9f8a5f811833c65bf47b59b784985eb2847bc83290bd1c613f83"
+  }
+}

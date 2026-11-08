@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "kind": "target-api-source-composite-review",
+  "reviewer": "Codex /root",
+  "decision": "accepted",
+  "composite_id": "api-private-bound-and-userdata-lifetimes",
+  "claims_sha256": "e4c1fd24bc0b1085fad4adc203bd0585b85dc47545c0b9918050aee8c3f104d5",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "component_reviews_preserved": true,
+  "original_obligations_retained": true,
+  "exact_source_exclusions": true,
+  "disjoint_original_coordinates": true,
+  "rationale": "Independently inspected the selector and both exact inner mappings. Both bind the same pinned original API source and configuration. Only the existing18-byte private allocation conjunct is excluded; lifetime operations remain a reviewed equivalent with no exclusion. All4 exact spans are disjoint in original coordinates and reconstructed once, avoiding offset drift. Both mixed parent assertions0125/0195 remain required and pending. Each inner independent approval/counterpart binding is revalidated before union; no outer review can bypass it. Recomputed complete union output against the author hash. This is source composition permission only, with no file/source/platform passing evidence."
+}

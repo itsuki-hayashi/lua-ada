@@ -1,5 +1,7 @@
 # Session Records
 
+Source review: [exact API/calls equivalents](2026-11-08-exact-api-calls-equivalents.md).
+
 Component: [assert argument presence](2026-11-08-assert-arguments.md).
 
 Component: [runtime failure storage](2026-11-08-runtime-failure-storage.md).
