@@ -460,16 +460,27 @@ Case 'installed API feature approval excludes only its derived child and grants 
     $target=Test-ConformanceInventory -Root $root -TargetPolicy remaining-upstream-compatibility
     $parent=@(Read-ConformanceJsonLines (Join-Path $root 'tests/conformance/coverage/api.jsonl')|
         Where-Object id -CEQ 'LUA-API-ASSERT-CALL-0125')
+    # Code's separately reviewed V3 installation adds eight derived private
+    # children. Keep this API-specific guard exact without depending on the
+    # enumeration order of the inventory's exclusion dictionary.
+    $apiRows=@($target.Exclusions|Where-Object source -CEQ 'api.lua')
+    $expectedIds=@('LUA-API-REVIEWED-BLOCK-9001')+@(
+        9001..9008|ForEach-Object { 'LUA-CODE-REVIEWED-BLOCK-'+$_ })
+    Assert-True ($target.ExcludedSourceObligations -eq 9 -and
+        (($target.Exclusions.id|Sort-Object)-join '|') -ceq
+            (($expectedIds|Sort-Object)-join '|') -and
+        $apiRows.Count -eq 1 -and $apiRows[0].id -ceq 'LUA-API-REVIEWED-BLOCK-9001') `
+        'Installed source policy differs from the closed API18 plus Code8 set'
     Assert-True ($parent.Count -eq 1 -and $parent[0].status -ceq 'pending' -and $parent[0].disposition -ceq 'pending' -and
-        @($parent[0].evidence).Count -eq 0 -and $target.ExcludedSourceObligations -eq 1 -and
-        $target.Exclusions[0].id -ceq 'LUA-API-REVIEWED-BLOCK-9001' -and
+        @($parent[0].evidence).Count -eq 0 -and
         $target.PendingSourceAnchors -eq $strict.PendingSourceAnchors -and
-        $target.RequiredPendingSourceAnchors -eq $strict.PendingSourceAnchors-1 -and
+        $target.RequiredPendingSourceAnchors -eq $strict.PendingSourceAnchors-$expectedIds.Count -and
         -not $target.TargetComplete -and -not $target.Complete) 'Feature approval discharged an original runtime obligation'
     $base='tests/conformance/targets/remaining-upstream-compatibility'
     $spec=Get-Content (Join-Path $root "$base/api-fixed-buffer-private-bound.transform.json") -Raw|ConvertFrom-Json -AsHashtable -Depth 64
     $hash=(Get-FileHash (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility.exclusions.json')).Hash.ToLowerInvariant()
-    $resolved=@{};$resolved[$target.Exclusions[0].id]=$target.Exclusions[0]
+    $resolved=@{}
+    foreach($entry in $target.Exclusions){$resolved[$entry.id]=$entry}
     $pending=$spec|ConvertTo-Json -Depth 64|ConvertFrom-Json -AsHashtable -Depth 64
     $pending.review.status='pending'
     Assert-Rejected {Get-ConformanceTReplay -Root $root -Specification $pending -PolicySha256 $hash -ResolvedExclusions $resolved} 'lacks independent semantic approval'

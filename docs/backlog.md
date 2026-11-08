@@ -62,9 +62,9 @@ still require reviewed treatment
 of private table inspection. Preserve ordinary assertions and all complete
 return protocols; neither a diagnostic pass nor a T omission closes them.
 
-Independently review the [V4 resource verifier](sessions/2026-11-08-observable-resource-eligibility.md),
-renew Code's ten-source dependency bindings and current materialized-counterpart
-sources, then separately author any exact memerr child/source decision. No
+Preserve the [V4 resource verifier](sessions/2026-11-08-observable-resource-eligibility.md)
+and Code's separately installed ten-source graph. Review current materialized
+counterpart sources before separately authoring any exact Memerr child/source decision. No
 policy installation or source execution is authorized by the verifier alone;
 querystr and all mandatory public/refusal/optimized obligations remain separate.
 
@@ -144,11 +144,12 @@ sources and final matrix; no source obligation is closed by this component.
 
 The [source-linked optimizer witnesses](sessions/2026-11-08-code-public-semantics.md)
 pass 29 new cases within 2,468 AUnit cases in each local mode and all eight
-compiler/VM roles. Their [source retention review](sessions/2026-11-08-optimizer-semantic-review.md)
-permits bounded version3 eligibility implementation; validate that implementation
-and independently review exact decisions before any code.lua adaptation or
-exclusion installation. Preserve checkR, actual loads/errors and all original
-semantic parents; public witness passes supply no private-assertion pass.
+compiler/VM roles. The [exact source installation](sessions/2026-11-08-code-v3-source-installation.md)
+now supplies independently bound Code8 decisions, eighteen source references,
+nine pending public nodes and a coherent API18 policy successor. Run fresh
+current-image Code/public-witness and binary-role protocols before runtime
+acceptance. Preserve checkR, actual loads/errors and all original parents;
+neither an exclusion nor source classification is a passing assertion.
 
 The [actual table-storage inspector](sessions/2026-11-08-table-storage-inspection.md)
 and 25 focused cases are implemented; both local modes pass 2,439 AUnit cases.

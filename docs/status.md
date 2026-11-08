@@ -67,9 +67,9 @@ observed strings gaps; private table-inspection and final matrix gates remain.
 The [V4 resource verifier](sessions/2026-11-08-observable-resource-eligibility.md)
 implements a closed exact memerr allocation-count source rule with retained
 public materialization and optimized zero-allocation obligations. Sixty-eight
-binding cases and legacy suites pass; no resource policy row, review approval,
-transformation or runtime acceptance is installed. Code's imported verifier
-binding must be independently renewed as a ten-source graph.
+binding cases and legacy suites pass; no Memerr resource policy row, review
+approval, transformation or runtime acceptance is installed. Code's ten-source
+graph is separately bound by its source-only installation below.
 
 Eight [materialized-vararg counterparts](sessions/2026-11-08-materialized-vararg-counterparts.md)
 separate ordinary table/value/capture semantics from mandatory real T fault
@@ -155,8 +155,11 @@ The [public optimizer witnesses](sessions/2026-11-08-code-public-semantics.md)
 preserve numeric values/kinds, exact result counts, callback/assignment order,
 constant dump/load and constructor boundaries. Both local modes pass 2,468
 AUnit cases, including 29 new cases; the public fixture matches all eight
-producer/VM roles. Private optimizer exclusions and exact code.lua source
-decisions remain separate and pending; no opcode sequence is promised.
+producer/VM roles. The [exact source installation](sessions/2026-11-08-code-v3-source-installation.md)
+now binds eight private Code exclusions, eighteen source-reference
+classifications and nine pending public nodes. Fourteen installed-graph guards
+pass; normal guarded generation preserves checkR and all retained semantics.
+No runtime or whole-file pass follows, and no exact opcode sequence is promised.
 
 The [table-storage inspector](sessions/2026-11-08-table-storage-inspection.md)
 checks actual Ada row/index/free-list safety and reports real row/live counts.

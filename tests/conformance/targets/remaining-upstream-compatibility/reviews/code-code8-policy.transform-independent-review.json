@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-transform-review",
+  "transform_id": "code-private-optimizer-v3",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root/remaining_suite",
+  "review_date": "2026-11-08",
+  "decision": "accepted",
+  "public_assertion_preservation": "I independently checked all eight original spans and exact replacement bytes. Only comments/whitespace or the ten-byte listing wrapper are removed; the 127 checkR bytes, all original argument compilation, ordinary numeric/assertion/loading/error behavior and nine pending public nodes remain. This exact Code output is14299bytes/676304c0..., not a runtime pass.",
+  "author_input_manifest": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.transform.draft.json",
+    "sha256": "6c781957b2726c862bb620887529829b7f43a3aa9c1b5296342d76a84ecac1f2"
+  },
+  "final_policy": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility.exclusions.json",
+    "sha256": "a7ae9b40b57dc48ce5742a7a3baefd2ddc79696a1c028eb8287c0efe5623a5ec"
+  },
+  "installation_source_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3-installation.independent-review.json",
+    "sha256": "faffcd7c683bbcf96ec235e92ec34be85f33f7cc5335df56c548a25e07502bf2"
+  },
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": []
+}

@@ -1,5 +1,7 @@
 # Session Records
 
+Source installation: [exact Code V3 decisions and guarded generation](2026-11-08-code-v3-source-installation.md).
+
 Component: [debug console and actual C calls](2026-11-08-debug-console.md).
 
 Proposal: [exact Nextvar/Sort table source changes](2026-11-08-nextvar-sort-exact-proposal.md).

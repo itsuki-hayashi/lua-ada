@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-transform-review",
+  "transform_id": "api-fixed-buffer-private-bound",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root/remaining_suite",
+  "review_date": "2026-11-08",
+  "decision": "accepted",
+  "public_assertion_preservation": "I checked the original mixed assert at17039/33 and the same18-byte conjunct at17053. Only ` and m2 - m1 < 400` is removed; assert(m2 > m1), the actual loader execution and :301: diagnostic remain. Parent0125 and parent0195 at26638/6 stay pending and required. The changed global policy hash requires this new independent transform approval; API941/composition/runtime authority is not renewed.",
+  "author_input_manifest": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/api18.transform.successor.draft.json",
+    "sha256": "44ebdbdb432e95c0899c815bceb253e0dbf1a41155086e4c90b797841aebdb34"
+  },
+  "final_policy": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility.exclusions.json",
+    "sha256": "a7ae9b40b57dc48ce5742a7a3baefd2ddc79696a1c028eb8287c0efe5623a5ec"
+  },
+  "installation_source_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3-installation.independent-review.json",
+    "sha256": "faffcd7c683bbcf96ec235e92ec34be85f33f7cc5335df56c548a25e07502bf2"
+  },
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": []
+}

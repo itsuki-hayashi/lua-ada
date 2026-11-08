@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-transform",
+  "id": "code-private-optimizer-v3",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": "references/lua/testes/code.lua",
+  "source_sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+  "configuration": "upstream-test",
+  "replacements": [
+    {
+      "length_bytes": 143,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9001",
+      "start_byte": 800,
+      "replacement": "  -- target proposal excludes private constant-table layout inspection\n",
+      "id": "constant-table-inspection",
+      "source_sha256": "26aad09cfda55023d09d73d23353c892cb5e19ba423488629606efc828ddf3fd"
+    },
+    {
+      "length_bytes": 205,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9002",
+      "start_byte": 1808,
+      "replacement": "  -- target proposal excludes exact C optimizer instruction sequences\n",
+      "id": "opcode-sequence-inspection",
+      "source_sha256": "41b6d2b52bb8f3f0d16dc0cf595c5fd6a4ca1b124b16b1bef028a1dda5f27f6b"
+    },
+    {
+      "length_bytes": 239,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9003",
+      "start_byte": 2288,
+      "replacement": "  -- target proposal excludes equality of optimizer-specific instruction streams\n",
+      "id": "opcode-equality-inspection",
+      "source_sha256": "5b3ddc7feef1ddadfa4a18c2526a31ced0495324141bde683ac399700a67e762"
+    },
+    {
+      "length_bytes": 32,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9004",
+      "start_byte": 13327,
+      "replacement": "  -- target proposal excludes outer prototype constant-storage placement\n",
+      "id": "outer-constant-storage",
+      "source_sha256": "13c9570d19cf580345c831907370413a0a9b7c0c3d39f7b6660459373cd8e8af"
+    },
+    {
+      "length_bytes": 32,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9005",
+      "start_byte": 13359,
+      "replacement": "  -- target proposal excludes middle prototype constant-storage placement\n",
+      "id": "middle-constant-storage",
+      "source_sha256": "4b1b8301af5f0f06a693bc66df7fa421860fdf06c9821e447ae6d4af791d8907"
+    },
+    {
+      "length_bytes": 10,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9006",
+      "start_byte": 13587,
+      "replacement": "",
+      "id": "register-inspection-wrapper",
+      "source_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54"
+    },
+    {
+      "length_bytes": 79,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9007",
+      "start_byte": 13655,
+      "replacement": "  -- target proposal excludes physical MOVE-register numbering\n",
+      "id": "physical-move-registers",
+      "source_sha256": "120c5699b24c0b9102eded9963b92049e2d0f8213c5c43d77a64dc7dd3ecdac9"
+    },
+    {
+      "length_bytes": 175,
+      "exclusion_id": "LUA-CODE-REVIEWED-BLOCK-9008",
+      "start_byte": 14141,
+      "replacement": "  -- target proposal excludes the optimizer-specific SETLIST count\n",
+      "id": "setlist-instruction-count",
+      "source_sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6"
+    }
+  ],
+  "output_sha256": "676304c019ee3afe8796da7ddfaf8f14cba43c2c49332d96f19b3f4c84211fe0",
+  "exclusion_policy_sha256": "a7ae9b40b57dc48ce5742a7a3baefd2ddc79696a1c028eb8287c0efe5623a5ec",
+  "author_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/code-optimizer-v3.transform.author-proposal.json",
+    "sha256": "bb1cfc7fef67a0edfe814598670745e7c717809ffcf5e4f4c4f854fa1cdfeb6c"
+  },
+  "source_feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-ten-source-feature-review.json",
+    "sha256": "a0a24b7ee5b8b8cecbe327afced993b44942c0bd93ee85601e09a3083e724635"
+  },
+  "semantic_retention_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+    "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+  },
+  "exact_source_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-v3.independent-exact-source-review.json",
+    "sha256": "db5b49832efe4661a5684e3eb066d64bd0688d4d132e9170ada9c6faa56de740",
+    "binds": "author policy 3b8e94f9...; not candidate bytes"
+  },
+  "policy_binding_status": "Exact source-only successor binds the final installed policy hash. Runtime, API941/composition and original-parent completion remain separate.",
+  "independent_review_status": "accepted-source-only",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "review": {
+    "author": "Codex /root/validation_delivery",
+    "reviewer": "Codex /root/remaining_suite",
+    "status": "accepted",
+    "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-code8-policy.transform-approval.json",
+    "artifact_sha256": "8229df7bd82c1cf5e5f3fee303288ea3e05d927d76352b0d294d059623815b6a"
+  },
+  "installed": true,
+  "source_adaptation_authority": true,
+  "installation_source_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3-installation.independent-review.json",
+    "sha256": "faffcd7c683bbcf96ec235e92ec34be85f33f7cc5335df56c548a25e07502bf2"
+  },
+  "author_input_manifest": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.transform.draft.json",
+    "sha256": "6c781957b2726c862bb620887529829b7f43a3aa9c1b5296342d76a84ecac1f2"
+  }
+}

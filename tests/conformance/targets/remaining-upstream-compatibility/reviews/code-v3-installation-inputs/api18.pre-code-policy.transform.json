@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-transform",
+  "id": "api-fixed-buffer-private-bound",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": "references/lua/testes/api.lua",
+  "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+  "configuration": "upstream-test",
+  "exclusion_policy_sha256": "4917d6bbd7a3048f60a262f2e744a596af5e870039085ce9f2aa6d6945307224",
+  "replacements": [
+    {
+      "id": "fixed-buffer-private-allocation-bound",
+      "exclusion_id": "LUA-API-REVIEWED-BLOCK-9001",
+      "start_byte": 17053,
+      "length_bytes": 18,
+      "source_sha256": "f89400b75cf254feed3cc991449a9e7bc1679e6cd9b5b6be1b6598dfa176bf55",
+      "replacement": ""
+    }
+  ],
+  "output_sha256": "51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc",
+  "author_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.author-proposal.json",
+    "sha256": "6cd1e2c1e912d22c4bcdbaee0c9587d47be903c27668fa7a5fd22f199574cab8"
+  },
+  "policy_binding_status": "Exact private18 source operation independently rereviewed against parser-status witness bindings; composition, runtime and original parent remain separately required.",
+  "independent_review_status": "accepted-exact-transform-only",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "review": {
+    "reviewer": "Codex /root",
+    "status": "accepted",
+    "artifact_sha256": "a97fd8171dc12e836c0599ca67507457d9c6c071bc6db52a9b9ca81309d9992b",
+    "author": "Codex /root/validation_delivery",
+    "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-transform-approval.json"
+  },
+  "source_feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json",
+    "sha256": "e2b2703a870b265b6505e68a7c8b1e52dc81c69f146c9442eb4fd6d1bdd93ab9"
+  }
+}

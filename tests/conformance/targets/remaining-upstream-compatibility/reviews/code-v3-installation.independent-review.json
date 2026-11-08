@@ -1,0 +1,433 @@
+{
+  "schema_version": 1,
+  "kind": "code-v3-installation-independent-source-review",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root/remaining_suite",
+  "review_date": "2026-11-08",
+  "reviewer_revision": "9cb8ff028b1ac488669586a4b8a334fc83797c21",
+  "decision": "accepted-source-only-installation",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "author_input_drafts": [
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/api18-successor.transform-approval.draft.json",
+      "sha256": "323d0af705cafbfa84a259cbae08f7eeeb03fbd277b19308ead6833a348f1205"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/api18-successor.transform-review.draft.json",
+      "sha256": "1bdf7b4d7354b74ddad8341087559ff3e1fea3819cebfe5cbb30d50621da7d68"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/api18.transform.successor.draft.json",
+      "sha256": "44ebdbdb432e95c0899c815bceb253e0dbf1a41155086e4c90b797841aebdb34"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/audit-drafts.ps1",
+      "sha256": "81d2209c398617e3e7c161951ab39caed9f77479561d4f3205c107828bf29a55"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9001.exclusion-approval.draft.json",
+      "sha256": "b94ca64a818ddb64a4ac605b05b7f9e7b2ea922ce2b8e8228be0f13a9aeb9b33"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9001.independent-review.draft.json",
+      "sha256": "c39a6ce0d7a5bf77189256d2e4f6ad96e035747c6eddd1c35ebf84191b5c6d73"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9002.exclusion-approval.draft.json",
+      "sha256": "5763ef7e7f9bab0e729ca25c14077670a29d6146f3b3a43e62b2174bc8dc4a52"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9002.independent-review.draft.json",
+      "sha256": "cd2b57cab1dcca7ef3bc86bb6e873cfd753ea64de1f27148e2e2da942428fcda"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9003.exclusion-approval.draft.json",
+      "sha256": "a870ac11f1c8531228512d6d23ba4a0ec8880b58fe63dfb96714d4ccc221f832"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9003.independent-review.draft.json",
+      "sha256": "fe5c68bb16fefda3760c8fa6fdb6e48dc2ce39fc831d5033419da2f1e4fc97ab"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9004.exclusion-approval.draft.json",
+      "sha256": "fce27baa56f472a284a9d6462951b99b5ca66d2e7c4145cfa92a119ef0fe78a7"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9004.independent-review.draft.json",
+      "sha256": "1a352213d29ece2d469e947bfbd7c96bd5050519b3191df0b437f239a8281d10"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9005.exclusion-approval.draft.json",
+      "sha256": "9cf7a533eb3b25e5beff3638c03cae304b835aea2647eb73c5a33458e6fe5ad6"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9005.independent-review.draft.json",
+      "sha256": "c7d9ce1a465476c4e4d52ee465331d814fcdd485d51fb7343aa7f0fe0c205720"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9006.exclusion-approval.draft.json",
+      "sha256": "2ae3ea3b9e10cdf9962f5ae3ba81bfd9b86957aa3b1e922f12a18107dead4893"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9006.independent-review.draft.json",
+      "sha256": "c99805d497c6b83692eefb8cd6aa9f9d6f3e6fd5d14c0aea499252de984357a6"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9007.exclusion-approval.draft.json",
+      "sha256": "c54e579a9c08491825ca57e5c408e9cbc84e77f98f2a5e431841fd5a97a9840e"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9007.independent-review.draft.json",
+      "sha256": "5bed7aa4d9507497d8337ccc238dd077c6a1baac88e6fb847ecc6bb93eb31bc2"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9008.exclusion-approval.draft.json",
+      "sha256": "a2c9d6f91f9920dceeb4848e61c502eda8948fa8a1c63b64c954f454ca0da6e5"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-9008.independent-review.draft.json",
+      "sha256": "b5d31b9bf1ec562653c1be1ac03989adbc08ef7649f74a86f1a65ad2f38b6531"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.decomposition-approval.draft.json",
+      "sha256": "1710bef32e1f4a031a1b14ed5121771b84f8ae3a6f7389831d7967f314b68a53"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.decomposition.draft.json",
+      "sha256": "cdb54c0505c1923049ac558117cecf71c9b5e7180ce04f70ea2bb1cbd62f54ca"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.ledger-derived.draft.jsonl",
+      "sha256": "74ce09ebc2e8d63a5209cb192138f4e263e4d1520e98856ded4cac55e4e34900"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.policy.candidate.json",
+      "sha256": "5f9d5d03fa75af590e6163291e4145e745e613fb07d27af896e5d189bf2d0b6a"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.policy.draft.json",
+      "sha256": "2ad91919bfab8c66ec9e5fe5b4d8b7a11e525986034bf67d83790308e4e45000"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.transform-approval.draft.json",
+      "sha256": "69798523b512c36b1eede9b9b1e6285480d183d8fa19924cd053d43a01d43541"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.transform-review.draft.json",
+      "sha256": "36ff418f29af292a9994c0217ca18bf100d81cb7b07ffef831d2191168bfeb4d"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/code-v3.transform.draft.json",
+      "sha256": "6c781957b2726c862bb620887529829b7f43a3aa9c1b5296342d76a84ecac1f2"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/README.md",
+      "sha256": "33f14081e1114946357c03591542ac7f77245790547d81123532e4ddb753d5c2"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/drafts/code-v3-installation/review-requests.json",
+      "sha256": "61b9e166bf8479b89a0cb9dda713249bb9012900768c3785cb63915d4aa9d06a"
+    }
+  ],
+  "frozen_original_ledger": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3-installation-inputs/code.original-51.jsonl",
+    "sha256": "27231932dffbd450a7fbdabfbf0de2c9edafd4ab0bbaecf3a16457af98e5fd94"
+  },
+  "frozen_predecessor_policy": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3-installation-inputs/pre-code-policy.exclusions.json",
+    "sha256": "4917d6bbd7a3048f60a262f2e744a596af5e870039085ce9f2aa6d6945307224"
+  },
+  "frozen_api18_transform": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-v3-installation-inputs/api18.pre-code-policy.transform.json",
+    "sha256": "2438260413355164328518f67572e33ee1fc27c859e024cf3aa7534b1636a2f2"
+  },
+  "feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-ten-source-feature-review.json",
+    "sha256": "a0a24b7ee5b8b8cecbe327afced993b44942c0bd93ee85601e09a3083e724635"
+  },
+  "semantic_retention_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+    "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+  },
+  "dated_exact_direction": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-v3.independent-exact-source-review.json",
+    "sha256": "db5b49832efe4661a5684e3eb066d64bd0688d4d132e9170ada9c6faa56de740"
+  },
+  "source": {
+    "path": "references/lua/testes/code.lua",
+    "sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663"
+  },
+  "private_decisions": [
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9001",
+      "byte_offset": 800,
+      "byte_length": 143,
+      "sha256": "26aad09cfda55023d09d73d23353c892cb5e19ba423488629606efc828ddf3fd",
+      "original_text": "  local k = T.listk(func)\n  assert(#k == #list)\n  for i = 1, #k do\n    assert(k[i] == list[i] and math.type(k[i]) == math.type(list[i]))\n  end\n",
+      "decision": "accepted-source-only-exclusion",
+      "independent_rationale": "I read the five-line listk body and all three callers. This span compares constant-pool cardinality/order and numeric tags of pool entries. Those dump-visible representation choices are observable but do not promise the same C pool. The original argument closures and literals remain compiled. Exact numeric values/kinds/one-result cardinality, the eight actual callbacks and fourteen actual assignments remain required through nodes 9011-9014 and the separately reviewed public witnesses.",
+      "required_semantic_contract_ids": [
+        "compile-original",
+        "numeric-values-types-arity",
+        "callback-sequence",
+        "assignment-sequence"
+      ]
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9002",
+      "byte_offset": 1808,
+      "byte_length": 205,
+      "sha256": "41b6d2b52bb8f3f0d16dc0cf595c5fd6a4ca1b124b16b1bef028a1dda5f27f6b",
+      "original_text": "  local arg = {...}\n  local c = T.listcode(f)\n  for i=1, #arg do\n    local opcode = string.match(c[i], \"%u%w+\")\n    -- print(arg[i], opcode)\n    assert(arg[i] == opcode)\n  end\n  assert(c[#arg+2] == undef)\n",
+      "decision": "accepted-source-only-exclusion",
+      "independent_rationale": "I read the listcode matcher and every original check/checkR call. It materializes expected opcode strings and compares exact C instruction count/order only. Removing this body leaves function arguments compiled and checkR 2079/127 byte-identical, including actual f(p), value and numeric-kind assertions. Safe zero/nil/multiple return controls remain required. Intentionally invalid or infinite opcode-only functions must not be indiscriminately invoked.",
+      "required_semantic_contract_ids": [
+        "compile-original",
+        "retained-checkR",
+        "safe-return-cardinality"
+      ]
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9003",
+      "byte_offset": 2288,
+      "byte_length": 239,
+      "sha256": "5b3ddc7feef1ddadfa4a18c2526a31ced0495324141bde683ac399700a67e762",
+      "original_text": "  a = T.listcode(a)\n  b = T.listcode(b)\n  assert(#a == #b)\n  for i = 1, #a do\n    a[i] = string.gsub(a[i], '%b()', '')   -- remove line number\n    b[i] = string.gsub(b[i], '%b()', '')   -- remove line number\n    assert(a[i] == b[i])\n  end\n",
+      "decision": "accepted-source-only-exclusion",
+      "independent_rationale": "I read both listcode conversions, line-number stripping and equality loop. They compare private optimized streams rather than execute either supplied closure. The exact 239-byte body may be omitted while every original closure/call remains compiled and checkR/public numeric execution stays required under nodes 9011/9015. No callable behavior, binary validity or ordinary assertion outside this body is waived.",
+      "required_semantic_contract_ids": [
+        "compile-original",
+        "retained-checkR"
+      ]
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9004",
+      "byte_offset": 13327,
+      "byte_length": 32,
+      "sha256": "13c9570d19cf580345c831907370413a0a9b7c0c3d39f7b6660459373cd8e8af",
+      "original_text": "  assert(T.listk(f1)[1] == nil)\n",
+      "decision": "accepted-source-only-exclusion",
+      "independent_rationale": "I read the nested f1/f2/f3 block and fifty-byte constant. Only assert(T.listk(f1)[1]==nil) is private placement/minimality. Actual nested calls, f3 value comparison and checkK execution remain; node 9017 additionally requires all three layers, one-result cardinality and stripped/unstripped dump/load. This excludes neither string lifetime nor binary interoperability.",
+      "required_semantic_contract_ids": [
+        "nested-constant-lifetimes"
+      ]
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9005",
+      "byte_offset": 13359,
+      "byte_length": 32,
+      "sha256": "4b1b8301af5f0f06a693bc66df7fa421860fdf06c9821e447ae6d4af791d8907",
+      "original_text": "  assert(T.listk(f2)[1] == nil)\n",
+      "decision": "accepted-source-only-exclusion",
+      "independent_rationale": "I independently checked the second 32-byte assertion against f2. Its empty outer pool is a private constant-placement choice. The same exact string, nested calls and actual return/dump/load obligations in node 9017 stay pending and required; no synthetic pool facade is introduced.",
+      "required_semantic_contract_ids": [
+        "nested-constant-lifetimes"
+      ]
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9006",
+      "byte_offset": 13587,
+      "byte_length": 10,
+      "sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+      "original_text": "T.listcode",
+      "decision": "accepted-source-only-exclusion",
+      "independent_rationale": "I checked the exact ten bytes T.listcode and its parentheses. Removing that identifier leaves (assert(load(source))) intact, so the valid maximum-register source still loads. The following physical-register loop is a separately bounded candidate. The oversized load and too-many-registers diagnostic remain unchanged. Node 9018 must run those public load boundaries without calling the deliberately nil callee.",
+      "required_semantic_contract_ids": [
+        "register-load-boundaries"
+      ]
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9007",
+      "byte_offset": 13655,
+      "byte_length": 79,
+      "sha256": "120c5699b24c0b9102eded9963b92049e2d0f8213c5c43d77a64dc7dd3ecdac9",
+      "original_text": "  for i = 1, 254 do\n    assert(string.find(prog[2 + i], \"MOVE%s*\" .. i))\n  end\n",
+      "decision": "accepted-source-only-exclusion",
+      "independent_rationale": "I read the 79-byte MOVE-number loop and both surrounding loads. Only exact physical register numbering is removed. The maximum valid load and one-more-argument error/diagnostic are retained byte-for-byte and remain required under node 9018. Neither stack admission nor actual argument/closure semantics is excluded.",
+      "required_semantic_contract_ids": [
+        "register-load-boundaries"
+      ]
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9008",
+      "byte_offset": 14141,
+      "byte_length": 175,
+      "sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6",
+      "original_text": "  local code = table.concat(T.listcode(func), \"\\n\")\n  local _, count = string.gsub(code, \"SETLIST\", \"\")\n  -- code uses only 1 SETLIST for the constructor\n  assert(count == 1)\n",
+      "decision": "accepted-source-only-exclusion",
+      "independent_rationale": "I read the full SETLIST block. The 175 bytes concatenate private listing text, count SETLIST occurrences and assert exactly one instruction. The original generated fifty-element source and assert(load(source)) remain. Node 9019 requires real 49/50/51 constructors, nil holes, integer/float values, final vararg expansion, iteration and one-table cardinality. No allocation/refusal or executable constructor behavior is waived.",
+      "required_semantic_contract_ids": [
+        "constructor-and-vararg-boundaries"
+      ]
+    }
+  ],
+  "findings": [
+    "I read the pinned full Code source, the exact eight bodies/wrappers, all nine retained contract nodes/fragments, the 18 original-anchor decompositions, current ten-source feature review and separately accepted semantic retention. The source-only split is sound for these exact bytes.",
+    "I independently checked all 51 original identities/anchor bytes, all retained fragment hashes and that no retained fragment intersects an excluded span. Every original ID remains; 18 receive source-reference classification only. All nine public runtime nodes remain pending without evidence.",
+    "The 127 checkR bytes, original T guard, original call/argument compilation, checkK/checkI/checkF/checkints execution and diagnostics remain. Invalid/infinite opcode-only closures are not invented runtime requirements.",
+    "All 18 reference payloads link their exact private child and exactly the required nonexcluded public contract nodes. No original parent is excluded or marked passed.",
+    "The API18 semantic exclusion row and both protected historical scope descriptors are unchanged. Its successor must remove only the same 18-byte allocation conjunct while retaining m2>m1, runtime code, line diagnostics and pending parents 0125/0195.",
+    "I authored the public companion in an earlier component; Root separately reviewed its retention contract. This decision independently reviews Validation authored installation payloads. I do not sign as Root or renew any earlier runtime observation.",
+    "The drafts and old exact Root decision are retained dated inputs. The original 51-row ledger is frozen before current classifications change; no stale input is silently rehashed.",
+    "Independent exclusion/classification decisions precede final policy serialization. Separate exact transform approvals bind the final policy hash and pending author-input manifests, avoiding a self-hash or policy/approval cycle. API941/composition remain explicitly unrenewed."
+  ],
+  "static_audit": {
+    "code_output_sha256": "676304c019ee3afe8796da7ddfaf8f14cba43c2c49332d96f19b3f4c84211fe0",
+    "private_children": 8,
+    "checkR_sha256": "324530f639ef49280bcc33a77b56351c3369cdfd13290c63934071985bb880dc",
+    "retained_runtime_nodes": 9,
+    "original_records": 51,
+    "checkR_byte_length": 127,
+    "draft_checks": 243,
+    "retained_fragments": 39,
+    "checkR_byte_offset": 2079,
+    "source_reference_decompositions": 18,
+    "code_output_bytes": 14299
+  },
+  "derived_metadata_corrections": [
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9001",
+      "draft_line": 40,
+      "draft_end_line": 44,
+      "installed_line": 40,
+      "installed_end_line": 45,
+      "byte_offset": 800,
+      "byte_length": 143,
+      "anchor_sha256": "26aad09cfda55023d09d73d23353c892cb5e19ba423488629606efc828ddf3fd",
+      "reason": "The normal manual-block validator counts through the exclusive byte end, including a trailing LF; preserve every source byte and correct derived metadata only."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9002",
+      "draft_line": 92,
+      "draft_end_line": 99,
+      "installed_line": 92,
+      "installed_end_line": 100,
+      "byte_offset": 1808,
+      "byte_length": 205,
+      "anchor_sha256": "41b6d2b52bb8f3f0d16dc0cf595c5fd6a4ca1b124b16b1bef028a1dda5f27f6b",
+      "reason": "The normal manual-block validator counts through the exclusive byte end, including a trailing LF; preserve every source byte and correct derived metadata only."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9003",
+      "draft_line": 113,
+      "draft_end_line": 120,
+      "installed_line": 113,
+      "installed_end_line": 121,
+      "byte_offset": 2288,
+      "byte_length": 239,
+      "anchor_sha256": "5b3ddc7feef1ddadfa4a18c2526a31ced0495324141bde683ac399700a67e762",
+      "reason": "The normal manual-block validator counts through the exclusive byte end, including a trailing LF; preserve every source byte and correct derived metadata only."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9004",
+      "draft_line": 455,
+      "draft_end_line": 455,
+      "installed_line": 455,
+      "installed_end_line": 456,
+      "byte_offset": 13327,
+      "byte_length": 32,
+      "anchor_sha256": "13c9570d19cf580345c831907370413a0a9b7c0c3d39f7b6660459373cd8e8af",
+      "reason": "The normal manual-block validator counts through the exclusive byte end, including a trailing LF; preserve every source byte and correct derived metadata only."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9005",
+      "draft_line": 456,
+      "draft_end_line": 456,
+      "installed_line": 456,
+      "installed_end_line": 457,
+      "byte_offset": 13359,
+      "byte_length": 32,
+      "anchor_sha256": "4b1b8301af5f0f06a693bc66df7fa421860fdf06c9821e447ae6d4af791d8907",
+      "reason": "The normal manual-block validator counts through the exclusive byte end, including a trailing LF; preserve every source byte and correct derived metadata only."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9007",
+      "draft_line": 465,
+      "draft_end_line": 467,
+      "installed_line": 465,
+      "installed_end_line": 468,
+      "byte_offset": 13655,
+      "byte_length": 79,
+      "anchor_sha256": "120c5699b24c0b9102eded9963b92049e2d0f8213c5c43d77a64dc7dd3ecdac9",
+      "reason": "The normal manual-block validator counts through the exclusive byte end, including a trailing LF; preserve every source byte and correct derived metadata only."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9008",
+      "draft_line": 479,
+      "draft_end_line": 482,
+      "installed_line": 479,
+      "installed_end_line": 483,
+      "byte_offset": 14141,
+      "byte_length": 175,
+      "anchor_sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6",
+      "reason": "The normal manual-block validator counts through the exclusive byte end, including a trailing LF; preserve every source byte and correct derived metadata only."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9011",
+      "draft_line": 1,
+      "draft_end_line": 39,
+      "installed_line": 1,
+      "installed_end_line": 40,
+      "byte_offset": 0,
+      "byte_length": 800,
+      "anchor_sha256": "dd62fe1e3e31ffbee79ffc6072c2cd4dc3d1af3949357c9fe4b7ecb8dd5b9e8d",
+      "reason": "The normal manual-block validator counts through the exclusive byte end, including a trailing LF; preserve every source byte and correct derived metadata only."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9012",
+      "draft_line": 104,
+      "draft_end_line": 108,
+      "installed_line": 104,
+      "installed_end_line": 109,
+      "byte_offset": 2079,
+      "byte_length": 127,
+      "anchor_sha256": "324530f639ef49280bcc33a77b56351c3369cdfd13290c63934071985bb880dc",
+      "reason": "The normal manual-block validator counts through the exclusive byte end, including a trailing LF; preserve every source byte and correct derived metadata only."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9015",
+      "draft_line": 104,
+      "draft_end_line": 108,
+      "installed_line": 104,
+      "installed_end_line": 109,
+      "byte_offset": 2079,
+      "byte_length": 127,
+      "anchor_sha256": "324530f639ef49280bcc33a77b56351c3369cdfd13290c63934071985bb880dc",
+      "reason": "The normal manual-block validator counts through the exclusive byte end, including a trailing LF; preserve every source byte and correct derived metadata only."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9017",
+      "draft_line": 441,
+      "draft_end_line": 454,
+      "installed_line": 441,
+      "installed_end_line": 455,
+      "byte_offset": 12971,
+      "byte_length": 356,
+      "anchor_sha256": "b89bd45a28ed3a05bcc0f4f9045626f4928f367d858d6606215b47d1b6673cba",
+      "reason": "The normal manual-block validator counts through the exclusive byte end, including a trailing LF; preserve every source byte and correct derived metadata only."
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9019",
+      "draft_line": 475,
+      "draft_end_line": 478,
+      "installed_line": 475,
+      "installed_end_line": 479,
+      "byte_offset": 13956,
+      "byte_length": 185,
+      "anchor_sha256": "b3bd59b46a7e0946dc86f20240e7b0e3145c5dde99b937abdc0d5661ab9da178",
+      "reason": "The normal manual-block validator counts through the exclusive byte end, including a trailing LF; preserve every source byte and correct derived metadata only."
+    }
+  ],
+  "initial_normal_gate": "The first normal inventory rejected derived block9001 end_line before any adapted Lua was emitted. All12 trailing-LF metadata corrections below are independently checked; no validator or byte span is changed. The dated243audit did not cover accepted manual-block line validation.",
+  "limitations": [
+    "Source approval and exclusion resolution provide no runtime pass, unchanged C-private inspection credit, API completion or final context acceptance.",
+    "Current Code/public witness/native/Ada binary roles and full file observations remain mandatory after integration.",
+    "API941, its 20-source runtime graph and composition approval require separate renewal; this API18 policy successor cannot grant that authority.",
+    "The new guard implementation is authored by Suite and will be independently reviewed by Root; this narrative does not claim independent review of my own new guard code."
+  ]
+}

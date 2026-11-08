@@ -25,6 +25,15 @@ composition retains the eighteen-byte exclusion as a separate disposition.
 Source approvals supply no passing runtime or whole-target evidence. Fresh
 execution and final reconciliation remain required.
 
+The [Code V3 source installation](../../docs/sessions/2026-11-08-code-v3-source-installation.md)
+adds exactly eight independently reviewed private optimizer children. All 51
+original identities remain; eighteen source references link their private
+child and pending public obligations. The original input ledger is frozen
+before classification. Exact Code8 and API18 successor transforms bind the
+same final policy, with acyclic independent approval hashes. These decisions
+and guarded source generation supply no runtime pass or API941/composition
+renewal; current native/Ada execution and final reconciliation remain required.
+
 The [parser-status binding refresh](../../docs/sessions/2026-11-08-api18-binding-refresh.md)
 renews the same eighteen-byte policy/transform against the preserved public C
 witness header. Earlier review files remain dated evidence. API941/composition
