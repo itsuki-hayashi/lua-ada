@@ -60,6 +60,13 @@ continuations retain whether their range is already a complete packet.
 The migration packet backend retains its previous separate packet lifetime;
 it has no canonical scalar return window to borrow.
 
+A retained Lua frame waiting for a native tail callee must publish the
+callee's raw results back into its original canonical CALL A range before
+return-hook inspection. Its delivery packet stays rooted until reservation
+succeeds; then real scalar writes and transfer metadata describe that same
+range. Reading a stale pre-call window is not a valid substitute for this
+publication, even if a later hook happens to replace the result.
+
 Nine separately named public C regressions cover real scalar edits, hook
 removal/nested calls, protected and unprotected errors, blocked nested yield,
 direct hook yield, weak argument/upvalue release, and allocator reentry into

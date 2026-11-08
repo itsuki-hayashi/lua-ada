@@ -13,6 +13,11 @@ Fifteen native-paired cases match four-way compiler/VM campaigns in both
 configurations; each local configuration passes 2,200 AUnit cases. Unchanged
 errors.lua now reaches function-statement store-line attribution. Full
 source/T and immutable final-head acceptance remain open.
+The [native tail correction](sessions/2026-11-08-native-tail-return-windows.md)
+publishes results into the retained Lua frame before return-hook inspection.
+Three additional cases pass within 2,205 AUnit cases per isolated configuration;
+the eighteen-case Lua fixture matches all four native/Ada producer/VM pairs.
+
 The [return-hook checkpoint](sessions/2026-11-08-return-hook-windows.md)
 delivers actual edited result slots and removes stale packet roots before
 callback collection. Seventeen new named cases pass within 2,202 AUnit cases

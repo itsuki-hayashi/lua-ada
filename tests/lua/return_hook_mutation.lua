@@ -189,4 +189,32 @@ do
   assert(r.n==3 and r[1]==11 and r[2]==37 and r[3]==23)
 end
 
+-- Native_Tail_Observe
+do
+  local r=mutate(function()return math.abs(-11)end,function(i)
+    local name,value=debug.getlocal(3,i.ftransfer)
+    assert(name and i.ntransfer==1 and value==11)
+  end)
+  assert(r.n==1 and r[1]==11)
+end
+
+-- Native_Tail_Mutate
+do
+  local r=mutate(function(a,b)return math.abs(a-b)end,function(i)
+    local name,value=debug.getlocal(3,i.ftransfer)
+    assert(name and i.ntransfer==1 and value==11)
+    assert(debug.setlocal(3,i.ftransfer,37))
+  end,3,14)
+  assert(r.n==1 and r[1]==37)
+end
+
+-- Native_Tail_Zero_Results
+do
+  local t={}
+  local r=mutate(function()return table.insert(t,11)end,function(i)
+    assert(i.ntransfer==0)
+  end)
+  assert(r.n==0 and #t==1 and t[1]==11)
+end
+
 print('PASS: return hook actual result mutation')

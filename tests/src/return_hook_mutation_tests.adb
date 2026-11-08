@@ -454,6 +454,43 @@ package body Return_Hook_Mutation_Tests is
          "end");
    end Vararg_Return_Range;
 
+   procedure Native_Tail_Observe;
+   procedure Native_Tail_Observe is
+   begin
+      --  Merely observing the retained Lua frame after its C tail callee
+      --  returns cannot replace a real 11 with an unpublished nil cell.
+      Check
+        ("do local r=mutate(function()return math.abs(-11)end," &
+         "function(i)local name,value=debug.getlocal(3,i.ftransfer);" &
+         "assert(name and i.ntransfer==1 and value==11)end);" &
+         "assert(r.n==1 and r[1]==11)end");
+   end Native_Tail_Observe;
+
+   procedure Native_Tail_Mutate;
+   procedure Native_Tail_Mutate is
+   begin
+      --  Parameters remain below the tail call's actual A range. Inspect
+      --  the result at its metadata offset, edit it, and deliver that cell.
+      Check
+        ("do local r=mutate(function(a,b)return math.abs(a-b)end," &
+         "function(i)local name,value=debug.getlocal(3,i.ftransfer);" &
+         "assert(name and i.ntransfer==1 and value==11);" &
+         "assert(debug.setlocal(3,i.ftransfer,37))end,3,14);" &
+         "assert(r.n==1 and r[1]==37)end");
+   end Native_Tail_Mutate;
+
+   procedure Native_Tail_Zero_Results;
+   procedure Native_Tail_Zero_Results is
+   begin
+      --  A native tail callee returning no values still has a real empty
+      --  result range. Its Lua parent must neither invent nil nor lose it.
+      Check
+        ("do local t={};local r=mutate(function()" &
+         "return table.insert(t,11)end,function(i)" &
+         "assert(i.ntransfer==0)end);" &
+         "assert(r.n==0 and #t==1 and t[1]==11)end");
+   end Native_Tail_Zero_Results;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "Return hooks: closure scalar",
@@ -486,5 +523,11 @@ package body Return_Hook_Mutation_Tests is
                         Zero_Result_Return'Access);
       Test_Support.Add (Suite, "Return hooks: vararg return range",
                         Vararg_Return_Range'Access);
+      Test_Support.Add (Suite, "Return hooks: observe native tail result",
+                        Native_Tail_Observe'Access);
+      Test_Support.Add (Suite, "Return hooks: mutate native tail result",
+                        Native_Tail_Mutate'Access);
+      Test_Support.Add (Suite, "Return hooks: native tail zero results",
+                        Native_Tail_Zero_Results'Access);
    end Register;
 end Return_Hook_Mutation_Tests;

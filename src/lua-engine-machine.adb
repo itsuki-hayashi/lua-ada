@@ -5451,6 +5451,44 @@ package body Lua.Engine.Machine is
             elsif State.Current.Stack.Last_Element.Native_Tail_State =
               Ready_Native_Tail
             then
+               declare
+                  Owner : constant Frame_Access :=
+                    State.Current.Stack.Last_Element;
+                  Count : constant Natural :=
+                    Natural (Owner.Native_Results.Length);
+               begin
+                  if Owner.Has_Stack_Window then
+                     --  A native tail callee has returned into this retained
+                     --  Lua frame. Its delivery packet must be published in
+                     --  the original CALL A range before a Lua return hook
+                     --  can inspect or edit the real cells. The native
+                     --  callee's retired window no longer owns those slots.
+                     --  Keep the packet rooted until reservation succeeds.
+                     if Count > Natural'Last - Owner.Canonical_Base then
+                        Fail (State, "stack overflow");
+                     elsif State.Policy = Bounded then
+                        if Count > State.Bounds.Instructions - Natural'Min
+                          (State.Steps, State.Bounds.Instructions)
+                        then
+                           Fail (State, "instruction limit exceeded", True);
+                        end if;
+                        State.Steps := State.Steps + Count;
+                     end if;
+                     Resize_Stack_Window
+                       (State, Owner, Natural'Max
+                          (Owner.Stack_Window_Length,
+                           Owner.Canonical_Base + Count));
+                     for Index in 1 .. Count loop
+                        Stacks.Write
+                          (State, State.Current,
+                           Owner.Stack_Base + Owner.Canonical_Base + Index,
+                           Owner.Native_Results.Element (Index));
+                     end loop;
+                     Owner.Canonical_GC_Top := Owner.Canonical_Base + Count;
+                     Owner.Transfer_First := Owner.Canonical_Base + 1;
+                     Owner.Transfer_Count := Count;
+                  end if;
+               end;
                Complete
                  (Self, State.Current.Stack.Last_Element.Native_Results);
             elsif Before_Step (Self) then
