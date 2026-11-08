@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [hidden named-vararg checkpoint](sessions/2026-11-08-hidden-named-varargs.md)
+completes unchanged vararg.lua in local default and T-enabled execution,
+matching the native output. Nine focused cases pass all eight C/Ada
+compiler/VM roles; both local configurations pass 2,194 AUnit cases. This is
+component evidence; final platform/source acceptance remains open.
+
 The [sort argument checkpoint](sessions/2026-11-08-sort-argument-phases.md)
 preserves actual receiver/comparator argument names, validation order and
 failed-capture retirement. Fifteen native-paired cases match four-way

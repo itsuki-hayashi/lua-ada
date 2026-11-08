@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [hidden named varargs](2026-11-08-hidden-named-varargs.md).
+
 Component: [sort argument phases](2026-11-08-sort-argument-phases.md).
 
 Component: [binary source display](2026-11-08-binary-source-nul.md).

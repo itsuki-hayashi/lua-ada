@@ -3,6 +3,7 @@ with Traceback_API_Tests;
 with Argument_Detail_Tests;
 with Argument_Label_Tests;
 with Binary_Source_Tests;
+with Lazy_Vararg_Tests;
 with Lua.Conformance_Adapter_Tests;
 with Lua.API_Command_Tests;
 with Lua.Foreign_Hook_Tests;
@@ -239,6 +240,7 @@ procedure Test_Runner is
       Argument_Detail_Tests.Register (Result);
       Argument_Label_Tests.Register (Result);
       Binary_Source_Tests.Register (Result);
+      Lazy_Vararg_Tests.Register (Result);
       return Result;
    end Suite;
 

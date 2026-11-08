@@ -74,6 +74,9 @@ package body Lua.Canonical_Compiler is
       Depth : Positive := 1;
       Last_Line : Natural := 0;
       Has_Closing : Boolean := False;
+      Hidden_Vararg : Symbol_Id := No_Symbol;
+      --  A named vararg used only by direct read indexing has no table.
+      --  Its resolved symbol still has its real debug slot, holding nil.
    end record;
    type Index_Kind is (Register_Key, Constant_Key, Integer_Key);
    type Lvalue is record
@@ -139,6 +142,45 @@ package body Lua.Canonical_Compiler is
             function Fetch (Id : Node_Id) return
               Nodes.Constant_Reference_Type is
               (Unit.Tree.Constant_Reference (Positive (Id)));
+            function Read_Only_Vararg
+              (Id : Node_Id; Symbol : Symbol_Id;
+               Direct_Base : Boolean := False; Writing : Boolean := False)
+               return Boolean;
+            function Read_Only_Vararg
+              (Id : Node_Id; Symbol : Symbol_Id;
+               Direct_Base : Boolean := False; Writing : Boolean := False)
+               return Boolean
+            is
+               Item : constant Nodes.Constant_Reference_Type := Fetch (Id);
+            begin
+               --  Use resolved frontend identities, never source spelling or
+               --  a second grammar. A bare use, environment use, write or
+               --  capture needs the ordinary materialized table. Direct read
+               --  indexing can use GETVARG over the real hidden arguments.
+               --  Assignment targets require a table only when their direct
+               --  receiver is this symbol. Keys and right-hand expressions
+               --  remain ordinary reads, including nested table receivers.
+               if Item.Kind = Name_Reference then
+                  if Item.Environment = Symbol then return False; end if;
+                  return Item.Symbol /= Symbol or else Direct_Base;
+               elsif Item.Kind = Function_Expression then
+                  return not Item.Captures.Contains (Symbol);
+               end if;
+               for Position in Item.Children.First_Index ..
+                 Item.Children.Last_Index
+               loop
+                  if not Read_Only_Vararg
+                    (Item.Children (Position), Symbol,
+                     Direct_Base => Item.Kind = Index_Expression and then
+                       Position = 1 and then not Writing,
+                     Writing => Item.Kind = Assignment and then
+                       Position /= Item.Children.Last_Index)
+                  then
+                     return False;
+                  end if;
+               end loop;
+               return True;
+            end Read_Only_Vararg;
             function Binding_Kind (Id : Symbol_Id) return Byte;
             function Binding_Kind (Id : Symbol_Id) return Byte is
               (case Unit.Names (Positive (Id)).Mode is
@@ -953,13 +995,28 @@ package body Lua.Canonical_Compiler is
                                  Constant_Value'(Kind => Nil_Constant));
                      end case;
                   when Name_Reference | Index_Expression =>
-                     Where := Address (Fn, Id);
-                     --  Index preparation can run effectful base/key code.
-                     --  Discharge the selected value only at its consumer's
-                     --  real token line, after that preparation completes.
-                     Site := Item.Site;
-                     Site.Line := Materialization_Line;
-                     Read_Target (Fn, Where, Destination);
+                     if Item.Kind = Index_Expression and then
+                       Fn.Hidden_Vararg /= No_Symbol and then
+                       Fetch (Item.Children (1)).Kind = Name_Reference and then
+                       Fetch (Item.Children (1)).Symbol = Fn.Hidden_Vararg
+                     then
+                        --  Reading a virtual vararg key does not create a
+                        --  table or consult handlers. Evaluate the key once
+                        --  in source order, including effectful expressions.
+                        Right := Register_Operand
+                          (Fn, Item.Children (2),
+                           End_Line (Item.Children (2)));
+                        Site := Item.Site;
+                        Site.Line := Materialization_Line;
+                        Put (Fn, ABC (Op_GETVARG, Destination, 0, Right));
+                     else
+                        Where := Address (Fn, Id);
+                        --  Index preparation can run effectful base/key code.
+                        --  Read at the consumer's token after preparation.
+                        Site := Item.Site;
+                        Site.Line := Materialization_Line;
+                        Read_Target (Fn, Where, Destination);
+                     end if;
                   when Parenthesized =>
                      Expression (Fn, Item.Children (1), Destination,
                                  At_Line => Materialization_Line);
@@ -1800,8 +1857,14 @@ package body Lua.Canonical_Compiler is
                   Fn.Last_Line := Item.Site.Line;
                   if Item.Symbols.Length > 200 then Fail (Local_Limit); end if;
                   Fn.Code.Parameters := Byte (Item.Symbols.Length);
+                  if Item.Flag and then Item.Symbol /= No_Symbol and then
+                    Read_Only_Vararg (Item.Children (1), Item.Symbol)
+                  then
+                     Fn.Hidden_Vararg := Item.Symbol;
+                  end if;
                   Fn.Code.Flags :=
                     (if not Item.Flag then 0 elsif Item.Symbol = No_Symbol
+                       or else Fn.Hidden_Vararg /= No_Symbol
                      then 1 else 2);
                   for Symbol of Item.Captures loop Capture (Symbol); end loop;
                end if;
