@@ -2,6 +2,8 @@
 
 Component: [debug console and actual C calls](2026-11-08-debug-console.md).
 
+Proposal: [exact Nextvar/Sort table source changes](2026-11-08-nextvar-sort-exact-proposal.md).
+
 Component: [bounded Nextvar storage counterparts](2026-11-08-nextvar-storage-counterparts.md).
 
 Component: [typed CLI script arguments](2026-11-08-cli-typed-arguments.md).

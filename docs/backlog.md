@@ -8,6 +8,12 @@ Preserve actual C prefix publication and closing before argument release.
 The component does not replace main.lua's subprocess, signal, environment,
 message-handler or complete file protocol obligations.
 
+Review the [exact Nextvar/Sort author proposal](sessions/2026-11-08-nextvar-sort-exact-proposal.md)
+before any source emission. Keep useful storage invariants separate from the
+private positive constructor allowance candidate; current V4 eligibility and
+the reviewed-source selector do not admit this packet. Preserve all original
+anchors/mixed behavior and require current independent source/retention review.
+
 Independently review the [bounded Nextvar storage counterparts](sessions/2026-11-08-nextvar-storage-counterparts.md)
 before any exact mixed-source equivalent. Preserve all construction/warm-call,
 GC, values, expected mp2 evaluations and original 100,000-cycle churn. Actual
