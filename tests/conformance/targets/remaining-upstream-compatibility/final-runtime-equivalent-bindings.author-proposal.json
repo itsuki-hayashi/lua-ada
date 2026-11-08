@@ -1,0 +1,468 @@
+{
+  "schema_version": 1,
+  "kind": "committed-runtime-equivalent-binding-author-proposal",
+  "id": "verifier-api941-locals-fce313c",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "review_status": "pending-independent-current-source-review",
+  "independent_reviewer": null,
+  "authority_installation": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_snapshot": {
+    "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+    "scope": "committed pool+owner-generation+resetCI runtime; future harness proposals do not extend runtime authority",
+    "combined_runtime_build_evidence": "not-supplied-by-this-packet"
+  },
+  "dated_predecessor_packets": [
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/memerr-verifier-committed-bindings.author-proposal.json",
+      "sha256": "b167dcbb4c9c48fd0ce45d9e27fd9c827002364c98bce28dafb47db889fb228e"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/api941-committed-bindings.author-proposal.json",
+      "sha256": "95375d61b16347301dfdb1c7190b15759391c0bacb27a0217b09c3b27072a2f7"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/api941-pool-lifetimes.author-proposal.json",
+      "sha256": "68b30a3a868f952ba8b783fc348f3e6a30c0eb5e0f70440e58acecc9a1fa2ef1"
+    }
+  ],
+  "verifier": {
+    "manifest": {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/memerr-verifier-allocation.equivalent.json",
+      "sha256": "aa8c14698b25d95564b1f736e49277b4312fb4b2d7574807c4e67d58ce8b93bb"
+    },
+    "counterparts": [
+      {
+        "path": "references/lua/ltests.c",
+        "previous_sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199",
+        "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199",
+        "revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/src/lua-conformance_adapter.adb",
+        "previous_sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0",
+        "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/src/lua-conformance_allocator.adb",
+        "previous_sha256": "c5f0347be0e16db96e1d93d7fb7aa4a3ac316fdc7efc3355d8d19f591b548b36",
+        "sha256": "c5f0347be0e16db96e1d93d7fb7aa4a3ac316fdc7efc3355d8d19f591b548b36",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/c/conformance_adapter.c",
+        "previous_sha256": "4141d51fbabd31aae0d7f1c529d2caab381c2a15f980fd7750bfb360f757ceb2",
+        "sha256": "4141d51fbabd31aae0d7f1c529d2caab381c2a15f980fd7750bfb360f757ceb2",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/src/lua-sessions-conformance.adb",
+        "previous_sha256": "15666c173f37041d24b59737b0051964487c28806cb3a5c26eb2ce144bcb2ae9",
+        "sha256": "15666c173f37041d24b59737b0051964487c28806cb3a5c26eb2ce144bcb2ae9",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/memerr-verifier.author.lua",
+        "previous_sha256": "453c9d685bb1dce92f956975ce05e7358b2b0d8e0f54248b2b147fbf07ccb32a",
+        "sha256": "453c9d685bb1dce92f956975ce05e7358b2b0d8e0f54248b2b147fbf07ccb32a",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "scripts/ConformanceVerifierEquivalents.psm1",
+        "previous_sha256": "3a0f01431471c7793284efe338ae2c3142ce40233aa9d3e784cb95db892029c1",
+        "sha256": "3a0f01431471c7793284efe338ae2c3142ce40233aa9d3e784cb95db892029c1",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      }
+    ],
+    "operation": {
+      "replacement": "  T.alloccount()\n",
+      "start_byte": 140,
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "length_bytes": 0
+    },
+    "retained_spans": [
+      {
+        "byte_offset": 106,
+        "sha256": "24a6f919689ea609ba03232fe8612d54ca4045810431ba6b84a26ad61765c852",
+        "id": "protected-call",
+        "byte_length": 34
+      },
+      {
+        "byte_offset": 140,
+        "sha256": "2258cf6e841baf2afb792c687ed09a87dfa0c813db3c5999f155f1b0d224f5a5",
+        "id": "status-message-assertion",
+        "byte_length": 44
+      },
+      {
+        "byte_offset": 861,
+        "sha256": "e92064b5113699458891aea05278493425d514f81d6cc3e7c176677b2587ba8d",
+        "id": "oversized-application",
+        "byte_length": 57
+      },
+      {
+        "byte_offset": 993,
+        "sha256": "8b1b01f67f1b82177438ac34727289f0abb9478557a96a7bba40bd70ef4d9ebc",
+        "id": "limited-application-and-reset",
+        "byte_length": 79
+      },
+      {
+        "byte_offset": 1075,
+        "sha256": "b522c996d34e1643b84e3e9dfcbc013d06abb078ffc4fa8287bc70d5987a83ba",
+        "id": "later-campaigns",
+        "byte_length": 6437
+      }
+    ],
+    "output_sha256": "880d83e6ee5b5cf621c59d410fa928340375ac4f4191913c8092a5f385bbda76",
+    "exclusions": [],
+    "new_semantic_sha256": "92d6573423cfe1c34c6deaf8f4dd4cd05e8d6fead741084251d7480648f5f711",
+    "successor_review": {
+      "narrative": null,
+      "approval": null,
+      "reviewer": null,
+      "status": "pending"
+    },
+    "required_review": [
+      "Assess final adapter resetCI release through Engine.Free_Frame: physical capacity count and metadata trim follow owning frame release, preserving exact pcall-before-reset order.",
+      "Compare all seven current counterparts, unchanged application/status spans and later campaigns; issue new independent semantic hash/narrative/approval.",
+      "Do not reuse prior fault observations as final runtime acceptance."
+    ]
+  },
+  "api941": {
+    "manifest": {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/api-finalized-userdata-reclamation.equivalent.json",
+      "sha256": "d9dfb864e595b2c22471150e526d4e59359f4e651d94a98561e084cf7d234fb8"
+    },
+    "original_nine_counterparts": [
+      {
+        "path": "references/lua/manual/manual.of",
+        "previous_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+        "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+        "revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-engine-collector.adb",
+        "previous_sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687",
+        "sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-engine-finalizers.adb",
+        "previous_sha256": "cd29399060bc6f9d045f1d247d76a2419e06e62e9a5ca5055b27213c65c62b62",
+        "sha256": "cd29399060bc6f9d045f1d247d76a2419e06e62e9a5ca5055b27213c65c62b62",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-engine.adb",
+        "previous_sha256": "8a462ca9c361f595edc85c7d093467da1cc1f7943fef222a36d62b53a869e01c",
+        "sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-storage-vectors.adb",
+        "previous_sha256": "6795bd60f6d3942eecb253fc089dda1b35c25c5c07e1266c26ea5773b36f3f21",
+        "sha256": "6795bd60f6d3942eecb253fc089dda1b35c25c5c07e1266c26ea5773b36f3f21",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-storage-vectors.ads",
+        "previous_sha256": "b68454ab6f4e0b30dc69a8fde89ece91674a760c60c672baca7d78b38b06931f",
+        "sha256": "b68454ab6f4e0b30dc69a8fde89ece91674a760c60c672baca7d78b38b06931f",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/api-finalization-lifetimes.author.lua",
+        "previous_sha256": "43213950a0f88258a4dc19f893d73329c685ca5ae944026e4645583b38a9c8ac",
+        "sha256": "43213950a0f88258a4dc19f893d73329c685ca5ae944026e4645583b38a9c8ac",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.independent-feature-review.json",
+        "previous_sha256": "6738e63cda2f2269cfa776ea70031dcd4dc2aa9cc733d0fe56926b912b7e2288",
+        "sha256": "6738e63cda2f2269cfa776ea70031dcd4dc2aa9cc733d0fe56926b912b7e2288",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/src/lua-conformance_adapter.adb",
+        "previous_sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0",
+        "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      }
+    ],
+    "expanded_pool_implementation_counterparts": [
+      {
+        "path": "src/lua-engine.ads",
+        "previous_sha256": "f1ffa345f1d6a50c097c2c59053364069a49f77918e7f429ec453f4eda28e7c0",
+        "sha256": "87341b09c731c5d5389d56db55e0da942d348e720c30eb822e7be0b8324035f9",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-engine.adb",
+        "previous_sha256": "a82b1e9aa69b39bd54289067827e89e74aa6683adb156a2f3b38addcd4ded9ad",
+        "sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-engine-foreign.ads",
+        "previous_sha256": "f5dc6e460d30e000405c41f843a3d1178a10609e2dd1368f7fad516cef852c39",
+        "sha256": "f5dc6e460d30e000405c41f843a3d1178a10609e2dd1368f7fad516cef852c39",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-engine-foreign.adb",
+        "previous_sha256": "4801adb799dfe01fa59791ec56f6806be6e726442d999d4a519e0bb774ffdc0f",
+        "sha256": "c0d3add249a5a2ef9d59f6a34ec9b6ad917da0d7a9ebb43ee6d13320bd679216",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-engine-machine.ads",
+        "previous_sha256": "87b122e678df3b2ada80209bf90c523fb4f5082eac0e8392b280af4237ae8049",
+        "sha256": "87b122e678df3b2ada80209bf90c523fb4f5082eac0e8392b280af4237ae8049",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-engine-machine.adb",
+        "previous_sha256": "f0c770d98a387b19cf9d3abfade4e3ae52c48cfae85976d48681f98eb320f06f",
+        "sha256": "f0c770d98a387b19cf9d3abfade4e3ae52c48cfae85976d48681f98eb320f06f",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-engine-canonical.ads",
+        "previous_sha256": "8dac74cfbbf410f7a53b31b0f6f14766916968353781b64e697d791975dd49ce",
+        "sha256": "8dac74cfbbf410f7a53b31b0f6f14766916968353781b64e697d791975dd49ce",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-engine-canonical.adb",
+        "previous_sha256": "71963fbe8a1c8ac7ca39064ead7e3818c89adc17d940b9576bd638bb86563539",
+        "sha256": "71963fbe8a1c8ac7ca39064ead7e3818c89adc17d940b9576bd638bb86563539",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      }
+    ],
+    "output_sha256": "2838c5b9183c835b3581f829657d30451c16be1bfca952e5b8638d67e5966897",
+    "replacements_unchanged": true,
+    "source_exclusions": [],
+    "required_pending_parent": "LUA-API-ASSERT-CALL-0195",
+    "successor_review": {
+      "narrative": null,
+      "approval": null,
+      "reviewer": null,
+      "status": "pending"
+    },
+    "required_review": [
+      "Revisit all owner/reserve/rollback/ACK/rooting questions in the dated pool packet against final bytes.",
+      "bd04911 checks generation plus actual pool owner before exceptional cleanup. Verify genuine controlling-context ownership across normal/error cross-context completion, shrink and ACK.",
+      "fce313c declares Free_Frame in the private Engine specification and routes resetCI cache disposal through checked physical release. Inspect decrement/trim and repeated/refused resetCI with an outstanding call record.",
+      "Retain1000 unique finalizations, first-cycle live userdata/weak keys, cleared weak values, second-cycle full reclamation, no repeated callbacks and selected-owner0/0/shutdown.",
+      "Independently redecide all3 exact operations with expanded counterparts, then renew composition separately."
+    ]
+  },
+  "locals": {
+    "feature_input": {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/locals-dead-table-storage.independent-feature-review.json",
+      "sha256": "110246c59dbb2765133b718b24aa3256cd7457b5286fa4a0878b6a152a812f91"
+    },
+    "original_source": {
+      "path": "references/lua/testes/locals.lua",
+      "sha256": "56b5126c40f48bb1a701f041af28cd72a3a7d50b3db9b05da5659f2485f740c1"
+    },
+    "original_anchors": [
+      {
+        "id": "LUA-LOCALS-INTERNAL-REFERENCE-0001",
+        "byte_offset": 2367,
+        "byte_length": 10,
+        "anchor_sha256": "85a7feb78cbcd09da43e8e0bcdcc4894d236ac4f886fac9806a595ea873261d9",
+        "status": "pending"
+      },
+      {
+        "id": "LUA-LOCALS-ASSERT-CALL-0023",
+        "byte_offset": 2540,
+        "byte_length": 6,
+        "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "status": "pending"
+      }
+    ],
+    "candidate_spans": [
+      {
+        "byte_offset": 2355,
+        "byte_length": 26,
+        "sha256": "04035d9ee038af9e7f37506bbf2f8c5ae6917c7ecd8de5a99c5205551cd00bc6",
+        "original_bytes": "  local t = T.querytab(a)\n"
+      },
+      {
+        "byte_offset": 2490,
+        "byte_length": 110,
+        "sha256": "00b85ae4732a06e844c82cd987ba31de93c22d726a4cbd18f3914cf8fde5f628",
+        "original_bytes": "  for i=0,t-1 do\n    local k = querytab(a, i)\n    assert(k == nil or type(k) == 'number' or k == 'alo')\n  end\n"
+      }
+    ],
+    "source_bindings": [
+      {
+        "path": "references/lua/ltests.c",
+        "previous_sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199",
+        "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199",
+        "revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-engine-collector.adb",
+        "previous_sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687",
+        "sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-engine-tables.adb",
+        "previous_sha256": "31db4043d6b387c08b61a2ff6f6197d9a5495626200d67cf56cfad66f0821173",
+        "sha256": "31db4043d6b387c08b61a2ff6f6197d9a5495626200d67cf56cfad66f0821173",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-engine.ads",
+        "previous_sha256": "dc25ffbb543cf19bac085bed357aa967f912b35d50e5facdcac41f1b934e5f8f",
+        "sha256": "87341b09c731c5d5389d56db55e0da942d348e720c30eb822e7be0b8324035f9",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/src/lua-conformance_adapter.adb",
+        "previous_sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0",
+        "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "references/lua/manual/manual.of",
+        "previous_sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+        "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+        "revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "src/lua-engine.adb",
+        "previous_sha256": null,
+        "sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/src/lua-engine-table_storage_probe.ads",
+        "previous_sha256": null,
+        "sha256": "67d9cb92e436c029c76f85e25ce8f8528ceea01265ae384ef33d50b51e687ab2",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/src/lua-engine-table_storage_probe.adb",
+        "previous_sha256": null,
+        "sha256": "a30f62f83f16307ed0180de33dc80c61a03dd5e455a000880ab5eb9ca1933579",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/src/lua-table_storage_inspection_tests.adb",
+        "previous_sha256": null,
+        "sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/src/lua-table_storage_inspection_tests.ads",
+        "previous_sha256": null,
+        "sha256": "882397a1afd8d1024353b82d402f478a7718d07cee9cc0f4d1cf07a702820a43",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/lua/table_storage_private.lua",
+        "previous_sha256": null,
+        "sha256": "9a4bc32f8a2dd37863c4f7e702f8600a8da8a7f7d887a829aa4ba9f6f3dd9576",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/lua/table_storage_public.lua",
+        "previous_sha256": null,
+        "sha256": "4e7c949594d81e29b4f065485ab6dd7060a88c68392a63acd4fef00dc6ba8838",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/src/table_storage_public_tests.adb",
+        "previous_sha256": null,
+        "sha256": "d72e02ad4a62b20a5809ed08c098dfea032e02f5b3c9ac9faf97e4e379c58d0c",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      },
+      {
+        "path": "tests/src/table_storage_public_tests.ads",
+        "previous_sha256": null,
+        "sha256": "acd25837f1d39ca66fe6b89eaa705a358d4b869f6b85aede063cb10460fae77e",
+        "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+        "independent_source_review": "pending"
+      }
+    ],
+    "exact_candidate": "Separately authored by Suite; not modified or approved by this binding packet.",
+    "source_exclusions": [],
+    "required_review": [
+      "Bind actual checker/probe bodies,22 corruption/lifetime/refusal cases and3 ordinary public cases; source links are not passing evidence.",
+      "Preserve original deletion/collection/Tguard and later insertion-refusal sweep byte-identically. Counts must be real entries, not C geometry or a zero-loop shortcut.",
+      "Verify membership/tag safety before dereference/hash, bounded acyclic links, legal tombstones/revived rows and no checker repair/allocation/reset.",
+      "Retain anonymous-key weak reclamation, live key and same-table reuse under final scalar/packet roots; require distinct exact review and fresh whole locals captures."
+    ]
+  },
+  "current_metadata_fixture": {
+    "source": {
+      "path": "tests/lua/call_metadata_windows.lua",
+      "previous_sha256": null,
+      "sha256": "1e603aaa94e4708e46aa17b0f328986a3a88d6c066a29d217f022ec1c37d3b83",
+      "revision": "fce313c604f284b7c4f153fa8778402de8a46e28",
+      "independent_source_review": "pending"
+    },
+    "required_real_t_cases": 21,
+    "cross_context_cases": [
+      "Cross_Context_Return",
+      "Cross_Context_Error"
+    ],
+    "resetci_cases": [
+      "ResetCI_Outstanding",
+      "ResetCI_Refusal"
+    ],
+    "ordinary_two_body_companion": "Separate source-bound default witness; no T-absent credit."
+  },
+  "preservation": [
+    "No accepted predecessor artifact, original ledger, protected scope or dated observation changes.",
+    "No adapted source is written/executed; unchanged output hashes identify source operations only.",
+    "Fresh exact/composition decisions must independently bind current bytes; future production drift invalidates this snapshot.",
+    "Fresh same-image runtime/context captures and post-observation envelopes remain mandatory."
+  ]
+}
