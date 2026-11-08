@@ -271,6 +271,10 @@ package body Lua.Conformance_Adapter is
           External_Name => "lua_ada_test_adapter_callback";
    function Address is new Ada.Unchecked_Conversion
      (Foreign.C_Function, System.Address);
+   function Signed_Hash is new Ada.Unchecked_Conversion
+     (Interfaces.Unsigned_64, Integer_Value);
+   --  A reversible representation of the actual Ada hash, not C's private
+   --  signed-32-bit hash format. Both scalar representations have 64 bits.
    procedure Inspect
      (Pointer : System.Address; Operation : C.int;
       Result : not null access Adapter_Result)
@@ -678,6 +682,25 @@ package body Lua.Conformance_Adapter is
                Result.Integers :=
                  [C.long_long (Rows), C.long_long (Live), others => 0];
             end;
+         when 40 =>
+            declare
+               Item : constant Value := Argument (1);
+            begin
+               --  The active C argument window roots this actual string.
+               --  Read its cached key hash without scanning bytes, allocating,
+               --  collecting or changing execution/provider controls. The
+               --  pinned attrib test compares same-content strings, not C's
+               --  numeric hash width or physical table main-position layout.
+               if Context.Foreign_Top - Context.Foreign_Base /= 1 then
+                  Text ("hash expects exactly one string argument");
+                  Result.Count := -1;
+               elsif Item.Kind /= String_Kind then
+                  Text ("string expected");
+                  Result.Count := -1;
+               else
+                  Integer_Result (Signed_Hash (Item.Reference.String_Hash));
+               end if;
+            end;
          when others => raise Invalid_Argument;
       end case;
    exception
@@ -729,7 +752,7 @@ package body Lua.Conformance_Adapter is
          --  Public C test drivers are actual light C functions: hidden
          --  captures would make testC's absent-upvalue queries observe two
          --  values and change its C identity and allocation behavior.
-         if Operation in 1 .. 10 | 12 | 13 | 37 | 38 then
+         if Operation in 1 .. 10 | 12 | 13 | 37 | 38 | 40 then
             Append_Root (State, Captures,
                          (Integer_Kind, Integer_Value (Operation)));
             Append_Root (State, Captures,
@@ -782,6 +805,7 @@ package body Lua.Conformance_Adapter is
       Add ("checkpanic", 35);
       Add ("stacklevel", 37);
       Add ("ada_check_table_storage", 38);
+      Add ("hash", 40);
       --  The source's regcodes roots these actual status strings before
       --  refusal tests. The driver can then push them without resurrecting
       --  an unrooted weak short string while allocator growth is disabled.

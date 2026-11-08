@@ -1,5 +1,8 @@
 # Architecture Decision Log
 
+ADR 0041 records the [test-only string-hash invariant](0041-test-string-hash-invariant.md),
+actual cached 64-bit reading and explicitly narrower main-state adapter scope.
+
 ADR 0039 records [CLI prompt transport](0039-cli-prompt-transport.md), actual
 anonymous C callbacks, rooted prompt output and typed process-exit preservation.
 

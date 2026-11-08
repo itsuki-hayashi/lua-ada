@@ -10,6 +10,13 @@ unchanged heavy workloads catch real allocation refusal in all four local
 roles at the measured 64 MiB cap. Final matrix and semantic reconciliation
 remain pending; the earlier misconfigured Heavy campaign is invalid.
 
+The [cached string-hash counterpart](sessions/2026-11-08-test-string-hash.md)
+reads the actual Ada key hash without cloning private C geometry. Both local
+configurations pass 2,612 AUnit cases and the public T fixture matches all four
+compiler/VM roles. The approved-path attrib T pair now completes its dump/load
+and single-result-27 protocol with matching stdout and balanced selected
+providers. Source-review renewals and final image/target acceptance remain.
+
 The [fixed external-string T driver](sessions/2026-11-08-fixed-external-string-driver.md)
 uses the exported external-string API in main and separately created states.
 Both local AUnit runs pass2,574 cases. Original strings now completes in

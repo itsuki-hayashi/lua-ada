@@ -8,6 +8,12 @@ owner/provider/backing counters distinct, require fresh PID/run/hash-bound
 sidecars and reject the old two-GiB Ada run requested as Heavy64. Native
 progress output and implementation-dependent table sizes need semantic review.
 
+Preserve the [actual cached string-hash invariant](sessions/2026-11-08-test-string-hash.md)
+and completed approved-path attrib T observation in final contexts. Its adapter
+source changes require renewed verifier/API/locals reviews. Do not interpret
+the narrower main-state string query as C's physical-position or numerical-width
+contract, or waive the original external-string key/iteration assertions.
+
 Retain the [complete original strings observations](sessions/2026-11-08-fixed-external-string-driver.md)
 for fresh final-image replay. Its new C-backed fixed-string wrapper changes
 the adapter source hash: existing exact verifier/API/locals bindings must be

@@ -2,6 +2,8 @@
 
 Correction: [Heavy allocator ceilings and observation](2026-11-08-heavy-allocator-observation.md).
 
+Component: [actual cached string hash](2026-11-08-test-string-hash.md).
+
 Component: [fixed external-string T driver](2026-11-08-fixed-external-string-driver.md).
 
 Correction: [native string locales](2026-11-08-native-string-locales.md).
