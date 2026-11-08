@@ -215,3 +215,7 @@ current capability belongs in [status](../status.md).
 The [native Windows main transport proposal](2026-11-08-windows-main-transport.md)
 records thirteen authored native controls and pending whole-source/platform
 review; it grants no original main.lua coverage.
+
+The [Windows real-signal broker observation](2026-11-08-windows-real-signals.md)
+preserves real native Ctrl-C delivery and the failing abrupt T teardown; its
+complete native-positive gate remains false.
