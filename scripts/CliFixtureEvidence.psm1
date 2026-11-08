@@ -56,7 +56,7 @@ function Assert-CliHostClassification {
     param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][Collections.IDictionary]$Classification)
     $path='tests/lua/cli_prompt_controls.lua'
     if(-not $Classification.Contains('host_entries') -or $Classification.host_entries -isnot [Array] -or
-        $Classification.host_entries.Count -ne 1){throw 'Host CLI fixture classification is incomplete'}
+        $Classification.host_entries.Count -ne 2){throw 'Host CLI fixture classification is incomplete'}
     $row=$Classification.host_entries[0]
     $cases=@('primary-nil','secondary-nil','custom-string','empty-string','number','boolean','embedded-nul',
         'global-tostring','dynamic-tostring','numeric-tostring','index-value','tostring-frame','index-frame',
@@ -88,7 +88,48 @@ function Assert-CliHostClassification {
         (($row.aunit_named_cases|ForEach-Object{$_.case+'|'+$_.required_stdout_line}|Sort-Object)-join "`n")){
         throw 'Host CLI setup requires all26 actual named source registrations'
     }
-    return $path
+    $argumentPath='tests/lua/cli_argument_controls.lua'
+    $argument=$Classification.host_entries[1]
+    $argumentCases=@('unchanged-strings','numeric-slot','boolean-slot','replace-table','replace-empty','mixed-object-identity',
+        'metalen-holes','raw-indexing','metalen-number-string','metalen-float-integer','metalen-mutates-values',
+        'metalen-replaces-global-gc','global-handler','non-table-number','non-table-nil','metalen-fraction',
+        'metalen-table-result','metalen-error','metalen-yield','arg-zero-does-not-retarget','negative-index-does-not-retarget',
+        'length-real-c-frame','global-real-c-frame','syntax-before-length','missing-file-before-length',
+        'loaded-initial-environment','length-exit-close','length-refusal-recovery','refused-script-entry')
+    if($argument.path -cne $argumentPath -or $argument.selection -cne 'configured-host-CLI-only' -or
+        $argument.sha256 -cne (Get-FileHash (Join-Path $Root $argumentPath)).Hash.ToLowerInvariant() -or
+        $argument.driver -cne 'scripts/observe-cli-dynamic-arg.ps1' -or
+        $argument.lifecycle_driver -cne 'scripts/observe-cli-arg-lifecycle.ps1' -or
+        $argument.required_vararg_cases -isnot [Array] -or
+        (($argument.required_vararg_cases|Sort-Object)-join '|') -cne (($argumentCases|Sort-Object)-join '|') -or
+        $argument.runtime_acceptance -isnot [bool] -or $argument.runtime_acceptance -or
+        $argument.coverage_authority -isnot [bool] -or $argument.coverage_authority -or
+        $argument.context_reconciliation -cne 'pending-portable-frozen-context-protocol' -or
+        $argument.execution_evidence -isnot [Array] -or $argument.execution_evidence.Count){
+        throw 'CLI argument helper requires its closed source setup; author observations are not context acceptance'
+    }
+    $requiredArgumentBindings=@('scripts/observe-cli-dynamic-arg.ps1','scripts/observe-cli-arg-lifecycle.ps1',
+        'tests/conformance/targets/remaining-upstream-compatibility/cli-dynamic-arg.author-cases.json',
+        'tests/conformance/targets/remaining-upstream-compatibility/cli-arg-lifecycle.author-cases.json',
+        'tests/conformance/platform/cli-dynamic-arg.lua','tests/src/lua-sessions-cli_argument_tests.adb',
+        'tests/src/lua-sessions-cli_argument_tests.ads')
+    if($argument.bindings -isnot [Array] -or
+        (($argument.bindings.path|Sort-Object)-join '|') -cne (($requiredArgumentBindings|Sort-Object)-join '|')){
+        throw 'CLI argument helper source linkage is incomplete'
+    }
+    foreach($binding in $argument.bindings){
+        if((Get-FileHash (Join-Path $Root $binding.path)).Hash.ToLowerInvariant() -cne $binding.sha256){throw 'CLI argument helper source linkage is stale'}
+    }
+    $argumentSource='tests/src/lua-sessions-cli_argument_tests.adb'
+    $actualArgumentNames=@([regex]::Matches((Get-Content (Join-Path $Root $argumentSource) -Raw),
+        "(?s)Test_Support\.Add\s*\(Suite,\s*`"([^`"]+)`"\s*,\s*([A-Za-z0-9_]+)'Access")|
+        ForEach-Object{$argumentSource+'#'+$_.Groups[2].Value+'|OK '+$_.Groups[1].Value}|Sort-Object)
+    if($actualArgumentNames.Count -ne 28 -or $argument.aunit_named_cases.Count -ne 28 -or
+        ($actualArgumentNames -join "`n") -cne
+        (($argument.aunit_named_cases|ForEach-Object{$_.case+'|'+$_.required_stdout_line}|Sort-Object)-join "`n")){
+        throw 'CLI argument helper requires all28 actual named source registrations'
+    }
+    return @($path,$argumentPath)
 }
 
 function Get-CliProbeCases {
@@ -368,8 +409,14 @@ function Assert-CliNamedCounterparts {
         -not $NamedEvidence.runtime_observed){throw 'CLI counterparts require actual same-context named AUnit receipts'}
     $classification=Get-Content (Join-Path $Root 'tests/conformance/targets/configured-fixture-classification.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 24
     $null=Assert-CliHostClassification -Root $Root -Classification $classification
-    foreach($case in $classification.host_entries[0].aunit_named_cases.case){
+    foreach($case in $classification.host_entries.aunit_named_cases.case){
         if($case -cnotin $NamedEvidence.named_aunit_cases){throw 'CLI setup lacks an actual required named AUnit counterpart'}
+    }
+    # The source-only author observers are Windows/static component packets.
+    # Their existence and the 28 actual Ada names do not supply mandatory
+    # paired CLI process receipts for the final portable frozen context.
+    if($classification.host_entries[1].context_reconciliation -ceq 'pending-portable-frozen-context-protocol'){
+        throw 'CLI argument helper still needs its actual portable frozen-context process protocol'
     }
 }
 

@@ -105,6 +105,9 @@ try {
     $mismatches = @()
     foreach ($script in Get-ChildItem tests/lua -Filter *.lua | Sort-Object Name) {
         if($script.Name -cin $hostOnly){
+            if($script.Name -ceq 'cli_argument_controls.lua'){
+                throw 'CLI argument setup still requires its actual portable frozen-context process protocol; no generic execution is omitted as passing'
+            }
             Write-Output "HOST CLI OBSERVED: $($script.Name) (explicit CLI case protocol; no standalone-script pass)"
             continue
         }

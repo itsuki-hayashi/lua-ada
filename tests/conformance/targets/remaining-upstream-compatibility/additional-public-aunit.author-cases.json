@@ -5755,6 +5755,406 @@
       "execution_evidence": [],
       "runtime_obligation_coverage": false,
       "coverage_boundary": "Negative T-absence control only; cannot discharge any omitted string-hash or public API operation."
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Library_Case",
+      "required_stdout_line": "OK nextvar storage: library live entries",
+      "registered_label": "nextvar storage: library live entries",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Constructors_Case",
+      "required_stdout_line": "OK nextvar storage: 529 real constructors",
+      "registered_label": "nextvar storage: 529 real constructors",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Open_Case",
+      "required_stdout_line": "OK nextvar storage: open constructor results",
+      "registered_label": "nextvar storage: open constructor results",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Dense_Case",
+      "required_stdout_line": "OK nextvar storage: dynamic dense keys",
+      "registered_label": "nextvar storage: dynamic dense keys",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Hash_Case",
+      "required_stdout_line": "OK nextvar storage: dynamic string keys",
+      "registered_label": "nextvar storage: dynamic string keys",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Reverse_Case",
+      "required_stdout_line": "OK nextvar storage: reverse fill",
+      "registered_label": "nextvar storage: reverse fill",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Sparse_Case",
+      "required_stdout_line": "OK nextvar storage: sparse fill",
+      "registered_label": "nextvar storage: sparse fill",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Array_Churn_Case",
+      "required_stdout_line": "OK nextvar storage: bounded array churn",
+      "registered_label": "nextvar storage: bounded array churn",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Hash_Churn_Case",
+      "required_stdout_line": "OK nextvar storage: bounded hash churn",
+      "registered_label": "nextvar storage: bounded hash churn",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Lifetime_Case",
+      "required_stdout_line": "OK nextvar storage: collected key row reuse",
+      "registered_label": "nextvar storage: collected key row reuse",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Vararg_Case",
+      "required_stdout_line": "OK nextvar storage: vararg values and count",
+      "registered_label": "nextvar storage: vararg values and count",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Refused_Header",
+      "required_stdout_line": "OK nextvar constructor: header provider refusal",
+      "registered_label": "nextvar constructor: header provider refusal",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Refused_Payload",
+      "required_stdout_line": "OK nextvar constructor: payload provider refusal",
+      "registered_label": "nextvar constructor: payload provider refusal",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Refused_Partial",
+      "required_stdout_line": "OK nextvar constructor: partial provider refusal",
+      "registered_label": "nextvar constructor: partial provider refusal",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Refused_Later",
+      "required_stdout_line": "OK nextvar constructor: later provider refusal",
+      "registered_label": "nextvar constructor: later provider refusal",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Missing_Inspector",
+      "required_stdout_line": "OK nextvar storage: mandatory actual inspector",
+      "registered_label": "nextvar storage: mandatory actual inspector",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-nextvar_storage_tests.adb#Explicit_Mode",
+      "required_stdout_line": "OK nextvar storage: explicit mode and case",
+      "registered_label": "nextvar storage: explicit mode and case",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Unchanged_Strings",
+      "required_stdout_line": "OK CLI arguments: unchanged-strings",
+      "registered_label": "CLI arguments: unchanged-strings",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Numeric_Slot",
+      "required_stdout_line": "OK CLI arguments: numeric-slot",
+      "registered_label": "CLI arguments: numeric-slot",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Boolean_Slot",
+      "required_stdout_line": "OK CLI arguments: boolean-slot",
+      "registered_label": "CLI arguments: boolean-slot",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Replace_Table",
+      "required_stdout_line": "OK CLI arguments: replace-table",
+      "registered_label": "CLI arguments: replace-table",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Replace_Empty",
+      "required_stdout_line": "OK CLI arguments: replace-empty",
+      "registered_label": "CLI arguments: replace-empty",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Mixed_Object_Identity",
+      "required_stdout_line": "OK CLI arguments: mixed-object-identity",
+      "registered_label": "CLI arguments: mixed-object-identity",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Holes",
+      "required_stdout_line": "OK CLI arguments: metalen-holes",
+      "registered_label": "CLI arguments: metalen-holes",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Raw_Indexing",
+      "required_stdout_line": "OK CLI arguments: raw-indexing",
+      "registered_label": "CLI arguments: raw-indexing",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Number_String",
+      "required_stdout_line": "OK CLI arguments: metalen-number-string",
+      "registered_label": "CLI arguments: metalen-number-string",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Float_Integer",
+      "required_stdout_line": "OK CLI arguments: metalen-float-integer",
+      "registered_label": "CLI arguments: metalen-float-integer",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Mutates_Values",
+      "required_stdout_line": "OK CLI arguments: metalen-mutates-values",
+      "registered_label": "CLI arguments: metalen-mutates-values",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Replaces_Global_Gc",
+      "required_stdout_line": "OK CLI arguments: metalen-replaces-global-gc",
+      "registered_label": "CLI arguments: metalen-replaces-global-gc",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Global_Handler",
+      "required_stdout_line": "OK CLI arguments: global-handler",
+      "registered_label": "CLI arguments: global-handler",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Non_Table_Number",
+      "required_stdout_line": "OK CLI arguments: non-table-number",
+      "registered_label": "CLI arguments: non-table-number",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Non_Table_Nil",
+      "required_stdout_line": "OK CLI arguments: non-table-nil",
+      "registered_label": "CLI arguments: non-table-nil",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Fraction",
+      "required_stdout_line": "OK CLI arguments: metalen-fraction",
+      "registered_label": "CLI arguments: metalen-fraction",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Table_Result",
+      "required_stdout_line": "OK CLI arguments: metalen-table-result",
+      "registered_label": "CLI arguments: metalen-table-result",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Error",
+      "required_stdout_line": "OK CLI arguments: metalen-error",
+      "registered_label": "CLI arguments: metalen-error",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Yield",
+      "required_stdout_line": "OK CLI arguments: metalen-yield",
+      "registered_label": "CLI arguments: metalen-yield",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Arg_Zero_Does_Not_Retarget",
+      "required_stdout_line": "OK CLI arguments: arg-zero-does-not-retarget",
+      "registered_label": "CLI arguments: arg-zero-does-not-retarget",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Negative_Index_Does_Not_Retarget",
+      "required_stdout_line": "OK CLI arguments: negative-index-does-not-retarget",
+      "registered_label": "CLI arguments: negative-index-does-not-retarget",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Length_Real_C_Frame",
+      "required_stdout_line": "OK CLI arguments: length-real-c-frame",
+      "registered_label": "CLI arguments: length-real-c-frame",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Global_Real_C_Frame",
+      "required_stdout_line": "OK CLI arguments: global-real-c-frame",
+      "registered_label": "CLI arguments: global-real-c-frame",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Syntax_Before_Length",
+      "required_stdout_line": "OK CLI arguments: syntax-before-length",
+      "registered_label": "CLI arguments: syntax-before-length",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Loaded_Initial_Environment",
+      "required_stdout_line": "OK CLI arguments: loaded-initial-environment",
+      "registered_label": "CLI arguments: loaded-initial-environment",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Length_Exit_Close",
+      "required_stdout_line": "OK CLI arguments: length-exit-close",
+      "registered_label": "CLI arguments: length-exit-close",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Length_Refusal_Recovery",
+      "required_stdout_line": "OK CLI arguments: length-refusal-recovery",
+      "registered_label": "CLI arguments: length-refusal-recovery",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_argument_tests.adb#Refused_Script_Entry",
+      "required_stdout_line": "OK CLI arguments: refused-script-entry",
+      "registered_label": "CLI arguments: refused-script-entry",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-length_result_tests.adb#First_Result",
+      "required_stdout_line": "OK length result: first only",
+      "registered_label": "length result: first only",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-length_result_tests.adb#Empty_Result",
+      "required_stdout_line": "OK length result: empty becomes nil",
+      "registered_label": "length result: empty becomes nil",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-length_result_tests.adb#Error_Recovery",
+      "required_stdout_line": "OK length result: error recovery",
+      "registered_label": "length result: error recovery",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-length_result_tests.adb#Actual_Refusal",
+      "required_stdout_line": "OK length result: callback leaves M0",
+      "registered_label": "length result: callback leaves M0",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-length_result_tests.adb#Empty_Refusal",
+      "required_stdout_line": "OK length result: empty callback leaves M0",
+      "registered_label": "length result: empty callback leaves M0",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
     }
   ]
 }

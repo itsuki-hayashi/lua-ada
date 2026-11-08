@@ -146,28 +146,28 @@
         "kind": "source-linkage-only",
         "bindings": [
           {
-            "sha256": "80a6c4b17e0dd1c2758c4bc79d159cf22bd74ccedb41f70ed82066f658abfd1c",
-            "path": "tests/src/lua-conformance_adapter.adb"
+            "path": "tests/src/lua-conformance_adapter.adb",
+            "sha256": "80a6c4b17e0dd1c2758c4bc79d159cf22bd74ccedb41f70ed82066f658abfd1c"
           },
           {
-            "sha256": "d787cde6feab4ecc8ee9e80c96a33de473b4d31b5e91b638399dda0641ece269",
-            "path": "tests/c/conformance_adapter.c"
+            "path": "tests/c/conformance_adapter.c",
+            "sha256": "d787cde6feab4ecc8ee9e80c96a33de473b4d31b5e91b638399dda0641ece269"
           },
           {
-            "sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8",
-            "path": "tests/src/lua-table_storage_inspection_tests.adb"
+            "path": "tests/src/lua-table_storage_inspection_tests.adb",
+            "sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
           },
           {
-            "sha256": "882397a1afd8d1024353b82d402f478a7718d07cee9cc0f4d1cf07a702820a43",
-            "path": "tests/src/lua-table_storage_inspection_tests.ads"
+            "path": "tests/src/lua-table_storage_inspection_tests.ads",
+            "sha256": "882397a1afd8d1024353b82d402f478a7718d07cee9cc0f4d1cf07a702820a43"
           },
           {
-            "sha256": "67d9cb92e436c029c76f85e25ce8f8528ceea01265ae384ef33d50b51e687ab2",
-            "path": "tests/src/lua-engine-table_storage_probe.ads"
+            "path": "tests/src/lua-engine-table_storage_probe.ads",
+            "sha256": "67d9cb92e436c029c76f85e25ce8f8528ceea01265ae384ef33d50b51e687ab2"
           },
           {
-            "sha256": "a30f62f83f16307ed0180de33dc80c61a03dd5e455a000880ab5eb9ca1933579",
-            "path": "tests/src/lua-engine-table_storage_probe.adb"
+            "path": "tests/src/lua-engine-table_storage_probe.adb",
+            "sha256": "a30f62f83f16307ed0180de33dc80c61a03dd5e455a000880ab5eb9ca1933579"
           }
         ]
       }
@@ -399,6 +399,132 @@
       "sha256": "19492201c7f4171900cadb9cbbc4ecdf5cba0c590fbbd0fb94e33a0a312126f2",
       "selection": "paired-configured-T-only",
       "rationale": "All eight actual string hash/external copy/borrow/key/GC/type cases require real T and run unfiltered in the mandatory native/Ada instrumented pair. Numeric hash literals, C widths, physical bucket positions and the Ada-only extra-argument contract are not asserted equivalent. Default absence is an explicit negative control, never omitted hash coverage."
+    },
+    {
+      "path": "tests/lua/length_result_refusal.lua",
+      "sha256": "0c11d36935ada988554f1c999ddb731df50b9a7c230766ee6843083406924638",
+      "selection": "paired-configured-T-only",
+      "rationale": "The complete real-T campaign faults allocation inside a __len handler, retains the first actual result and verifies allocator recovery. T absence is a required negative control, never coverage."
+    },
+    {
+      "path": "tests/lua/length_empty_result_refusal.lua",
+      "sha256": "deaba8c234c00080d091f93b2ce9eecf8ae14324014b5cabafc34eb9052cf319",
+      "selection": "paired-configured-T-only",
+      "rationale": "The complete real-T campaign faults allocation inside an empty-result __len handler and requires actual nil plus recovery. It must execute on both instrumented runtimes; T absence cannot pass."
+    },
+    {
+      "path": "tests/lua/nextvar_storage_invariants.lua",
+      "sha256": "6bc3f00826389003ab17d4a84b7ca825ac71bd0a4d55032537eaf527b569b1a9",
+      "selection": "configured-Ada-internal-counterpart-only",
+      "rationale": "The full public mode remains a mandatory native/Ada default and T pair over the same unchanged source. The separate ada-storage mode additionally walks actual Ada storage through T.ada_check_table_storage; it has no native facade, cannot credit a C private layout, and retains all eleven public workloads and its single integer29 return.",
+      "source_linkage": {
+        "kind": "source-linkage-only",
+        "runtime_evidence": [],
+        "bindings": [
+          {
+            "path": "tests/src/lua-conformance_adapter.adb",
+            "sha256": "80a6c4b17e0dd1c2758c4bc79d159cf22bd74ccedb41f70ed82066f658abfd1c"
+          },
+          {
+            "path": "tests/c/conformance_adapter.c",
+            "sha256": "d787cde6feab4ecc8ee9e80c96a33de473b4d31b5e91b638399dda0641ece269"
+          },
+          {
+            "path": "tests/src/lua-table_storage_inspection_tests.adb",
+            "sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8"
+          },
+          {
+            "path": "tests/src/lua-table_storage_inspection_tests.ads",
+            "sha256": "882397a1afd8d1024353b82d402f478a7718d07cee9cc0f4d1cf07a702820a43"
+          },
+          {
+            "path": "tests/src/lua-engine-table_storage_probe.ads",
+            "sha256": "67d9cb92e436c029c76f85e25ce8f8528ceea01265ae384ef33d50b51e687ab2"
+          },
+          {
+            "path": "tests/src/lua-engine-table_storage_probe.adb",
+            "sha256": "a30f62f83f16307ed0180de33dc80c61a03dd5e455a000880ab5eb9ca1933579"
+          },
+          {
+            "path": "tests/src/lua-nextvar_storage_tests.adb",
+            "sha256": "b5f81984be22ed7adb89434f964d68952c6896d9decc1d515370d6c3ba92078f"
+          },
+          {
+            "path": "tests/src/lua-nextvar_storage_tests.ads",
+            "sha256": "d7b3e8e22b0cfd4e02ca6f3410e756091104dee562d41e8a028d05e797e9b8ed"
+          }
+        ],
+        "aunit_named_cases": [
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Library_Case",
+            "required_stdout_line": "OK nextvar storage: library live entries"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Constructors_Case",
+            "required_stdout_line": "OK nextvar storage: 529 real constructors"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Open_Case",
+            "required_stdout_line": "OK nextvar storage: open constructor results"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Dense_Case",
+            "required_stdout_line": "OK nextvar storage: dynamic dense keys"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Hash_Case",
+            "required_stdout_line": "OK nextvar storage: dynamic string keys"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Reverse_Case",
+            "required_stdout_line": "OK nextvar storage: reverse fill"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Sparse_Case",
+            "required_stdout_line": "OK nextvar storage: sparse fill"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Array_Churn_Case",
+            "required_stdout_line": "OK nextvar storage: bounded array churn"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Hash_Churn_Case",
+            "required_stdout_line": "OK nextvar storage: bounded hash churn"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Lifetime_Case",
+            "required_stdout_line": "OK nextvar storage: collected key row reuse"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Vararg_Case",
+            "required_stdout_line": "OK nextvar storage: vararg values and count"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Refused_Header",
+            "required_stdout_line": "OK nextvar constructor: header provider refusal"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Refused_Payload",
+            "required_stdout_line": "OK nextvar constructor: payload provider refusal"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Refused_Partial",
+            "required_stdout_line": "OK nextvar constructor: partial provider refusal"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Refused_Later",
+            "required_stdout_line": "OK nextvar constructor: later provider refusal"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Missing_Inspector",
+            "required_stdout_line": "OK nextvar storage: mandatory actual inspector"
+          },
+          {
+            "case": "tests/src/lua-nextvar_storage_tests.adb#Explicit_Mode",
+            "required_stdout_line": "OK nextvar storage: explicit mode and case"
+          }
+        ]
+      }
     }
   ],
   "host_entries": [
@@ -451,7 +577,7 @@
         },
         {
           "path": "scripts/check-cli.ps1",
-          "sha256": "70b8e2e1b3708d2c7a92306933ed743d698b334c1c4e4463bcf994fb9b1cb8bd"
+          "sha256": "fb9a159f790d82509ec2a988b08ba900dd4baed1baf875aa65736b3c8897aacc"
         }
       ],
       "aunit_named_cases": [
@@ -560,6 +686,193 @@
           "required_stdout_line": "OK CLI prompt: actual allocation refusal"
         }
       ],
+      "execution_evidence": []
+    },
+    {
+      "path": "tests/lua/cli_argument_controls.lua",
+      "sha256": "1961ccc840e27557ba1c08a4db02b7eb64be07f825fdbf78184f2065b6ab8793",
+      "selection": "configured-host-CLI-only",
+      "rationale": "This setup chunk requires its exact vararg selector and returns before a separately selected CLI script loads. All29 source branches are tied to the real21+8 author driver contracts and28 named Ada API tests. The two real-T fault branches remain mandatory instrumented operations. Existing author observers are dated Windows/static components; portable frozen-context CLI reconciliation is explicitly pending and blocks final host receipt authority. No unselected generic default execution or T-absent credit is claimed.",
+      "driver": "scripts/observe-cli-dynamic-arg.ps1",
+      "lifecycle_driver": "scripts/observe-cli-arg-lifecycle.ps1",
+      "required_vararg_cases": [
+        "unchanged-strings",
+        "numeric-slot",
+        "boolean-slot",
+        "replace-table",
+        "replace-empty",
+        "mixed-object-identity",
+        "metalen-holes",
+        "raw-indexing",
+        "metalen-number-string",
+        "metalen-float-integer",
+        "metalen-mutates-values",
+        "metalen-replaces-global-gc",
+        "global-handler",
+        "non-table-number",
+        "non-table-nil",
+        "metalen-fraction",
+        "metalen-table-result",
+        "metalen-error",
+        "metalen-yield",
+        "arg-zero-does-not-retarget",
+        "negative-index-does-not-retarget",
+        "length-real-c-frame",
+        "global-real-c-frame",
+        "syntax-before-length",
+        "missing-file-before-length",
+        "loaded-initial-environment",
+        "length-exit-close",
+        "length-refusal-recovery",
+        "refused-script-entry"
+      ],
+      "bindings": [
+        {
+          "path": "scripts/observe-cli-dynamic-arg.ps1",
+          "sha256": "c6a2e89b706872f46213fcac9aae5df7f07baa82871dc78625ccaa9e73ee25c1"
+        },
+        {
+          "path": "scripts/observe-cli-arg-lifecycle.ps1",
+          "sha256": "7c94f3d58279aced18d7ad50feaf883da8498c4548fd489fd638d2c99d88140e"
+        },
+        {
+          "path": "tests/conformance/targets/remaining-upstream-compatibility/cli-dynamic-arg.author-cases.json",
+          "sha256": "8c2229b6b8970e04cb6b8c8cad8187b5ec3e10bc54807c7d598be1cd508eceec"
+        },
+        {
+          "path": "tests/conformance/targets/remaining-upstream-compatibility/cli-arg-lifecycle.author-cases.json",
+          "sha256": "4c6f8a663d26ecdc9018af12e48c3a73c6a4b9bac56405539b7e8fd846f06077"
+        },
+        {
+          "path": "tests/conformance/platform/cli-dynamic-arg.lua",
+          "sha256": "faebaa48ee366dcb6d8072f2652b75edfa70fd35ab871b20c266e290e912194f"
+        },
+        {
+          "path": "tests/src/lua-sessions-cli_argument_tests.adb",
+          "sha256": "988f253804761ceadd47732e3975678b6592d512a1d6891fb066827a2abd143c"
+        },
+        {
+          "path": "tests/src/lua-sessions-cli_argument_tests.ads",
+          "sha256": "6d905efbf47221be887dd191724f44fddcc60a3141b79d57e34e18b964f29b62"
+        }
+      ],
+      "aunit_named_cases": [
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Unchanged_Strings",
+          "required_stdout_line": "OK CLI arguments: unchanged-strings"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Numeric_Slot",
+          "required_stdout_line": "OK CLI arguments: numeric-slot"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Boolean_Slot",
+          "required_stdout_line": "OK CLI arguments: boolean-slot"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Replace_Table",
+          "required_stdout_line": "OK CLI arguments: replace-table"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Replace_Empty",
+          "required_stdout_line": "OK CLI arguments: replace-empty"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Mixed_Object_Identity",
+          "required_stdout_line": "OK CLI arguments: mixed-object-identity"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Holes",
+          "required_stdout_line": "OK CLI arguments: metalen-holes"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Raw_Indexing",
+          "required_stdout_line": "OK CLI arguments: raw-indexing"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Number_String",
+          "required_stdout_line": "OK CLI arguments: metalen-number-string"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Float_Integer",
+          "required_stdout_line": "OK CLI arguments: metalen-float-integer"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Mutates_Values",
+          "required_stdout_line": "OK CLI arguments: metalen-mutates-values"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Replaces_Global_Gc",
+          "required_stdout_line": "OK CLI arguments: metalen-replaces-global-gc"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Global_Handler",
+          "required_stdout_line": "OK CLI arguments: global-handler"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Non_Table_Number",
+          "required_stdout_line": "OK CLI arguments: non-table-number"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Non_Table_Nil",
+          "required_stdout_line": "OK CLI arguments: non-table-nil"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Fraction",
+          "required_stdout_line": "OK CLI arguments: metalen-fraction"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Table_Result",
+          "required_stdout_line": "OK CLI arguments: metalen-table-result"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Error",
+          "required_stdout_line": "OK CLI arguments: metalen-error"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Metalen_Yield",
+          "required_stdout_line": "OK CLI arguments: metalen-yield"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Arg_Zero_Does_Not_Retarget",
+          "required_stdout_line": "OK CLI arguments: arg-zero-does-not-retarget"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Negative_Index_Does_Not_Retarget",
+          "required_stdout_line": "OK CLI arguments: negative-index-does-not-retarget"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Length_Real_C_Frame",
+          "required_stdout_line": "OK CLI arguments: length-real-c-frame"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Global_Real_C_Frame",
+          "required_stdout_line": "OK CLI arguments: global-real-c-frame"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Syntax_Before_Length",
+          "required_stdout_line": "OK CLI arguments: syntax-before-length"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Loaded_Initial_Environment",
+          "required_stdout_line": "OK CLI arguments: loaded-initial-environment"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Length_Exit_Close",
+          "required_stdout_line": "OK CLI arguments: length-exit-close"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Length_Refusal_Recovery",
+          "required_stdout_line": "OK CLI arguments: length-refusal-recovery"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_argument_tests.adb#Refused_Script_Entry",
+          "required_stdout_line": "OK CLI arguments: refused-script-entry"
+        }
+      ],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "context_reconciliation": "pending-portable-frozen-context-protocol",
       "execution_evidence": []
     }
   ]

@@ -96,7 +96,7 @@ evidence. Its C rows and all 473 global classifications remain pending until
 review and fresh paired observations in the required immutable contexts.
 
 The successor author inputs preserve the historical 100 C and 94 AUnit
-identities and currently regenerate 605 C and 817 AUnit witnesses. The checked-in
+identities and currently regenerate 605 C and 867 AUnit witnesses. The checked-in
 catalogue records its own dated source snapshot and needs regeneration before
 reviewing new inputs. Additional return/closing, reader, self-value and diagnostic
 cases are named source candidates with empty execution evidence. All 473 global
@@ -140,13 +140,24 @@ the twenty-six prompt unit cases, have empty execution evidence. The host CLI
 prompt setup chunk requires its separate invocation contract and cannot serve
 as a standalone ordinary script.
 
-The current source audit classifies103 Lua fixtures. The complete eight-case
+The current source audit classifies108 Lua fixtures. The complete eight-case
 string-hash fixture requires real T in both interpreters. It exercises string
 content/key/GC invariants without equating private numeric hash values, widths
 or physical table positions. The twelve named Ada source candidates include
 two actual cached-field probes and an explicitly negative default-absence
 control; that control does not discharge any omitted hash operation. Their
 source candidacy supplies no runtime or global-ledger acceptance.
+
+The nextvar helper requires explicit public and Ada-storage modes. All eleven
+public bodies and its single integer29 result remain mandatory in the default
+and T native/Ada pair; a separate Ada-only T operation checks actual storage.
+The three ordinary length-result selectors also run in both configurations;
+the two allocation-refusal helpers require full real-T pairs. The CLI argument
+setup has 29 explicit selectors and 28 named Ada source counterparts. Its
+existing 21+8 author process drivers retain dated component evidence, while
+portable frozen-context reconciliation remains pending. Generic comparison and
+final named-context reconciliation reject that pending delegation explicitly;
+the setup chunk cannot acquire a standalone or T-absent pass.
 
 The closed host CLI route
 requires all112 actual Ada CLI operations, the nineteen native prompt operations
@@ -157,6 +168,10 @@ case contracts in `CliFixtureCases.psm1`; default comparison delegates the setup
 chunk only after validating a fresh host CLI pair receipt. The instrumented
 build runs the full CLI campaign too. Context images freeze the selected CLI,
 all generated setup/input captures and a sixth mandatory build witness.
+That base image schema still needs the allocator and console witness extensions
+before it can represent the complete target. The four C console modes are
+separate actual invocations; the ordinary 605 C source candidates cannot borrow
+their evidence or count them as no-argument consumer operations.
 
 The Windows native T no-close event is separately labelled
 `observed-native-test-teardown-diagnostic`, with passing execution evidence

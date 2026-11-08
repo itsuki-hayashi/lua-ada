@@ -8,7 +8,7 @@ $temporary=Join-Path $root ('reports/configured-selection-regressions/'+[guid]::
 $classification='tests/conformance/targets/configured-fixture-classification.json'
 $sources=@(Get-ConfiguredFixtureDefinitions upstream-test|ForEach-Object source)
 $sourceLinks=@((Get-Content (Join-Path $root $classification) -Raw|ConvertFrom-Json -AsHashtable -Depth 24).entries|
-    Where-Object selection -CEQ configured-Ada-internal-counterpart-only)[0].source_linkage.bindings.path
+    Where-Object selection -CEQ configured-Ada-internal-counterpart-only|ForEach-Object{$_.source_linkage.bindings.path})
 $sources+=@($sourceLinks)
 $sourceClassification=Get-Content (Join-Path $root $classification) -Raw|ConvertFrom-Json -AsHashtable -Depth 24
 $sources+=@($sourceClassification.host_entries.path)+@($sourceClassification.host_entries.bindings.path)
@@ -57,6 +57,15 @@ Case 'host CLI delegation cannot omit required case arguments' {
 } 'closed source setup'
 Case 'host CLI source links do not invent actual executions' {
     Change-Classification {param($v)$v.host_entries[0].execution_evidence=@('passed')}
+} 'closed source setup'
+Case 'CLI argument setup cannot be generic unselected execution' {
+    Change-Classification {param($v)$v.host_entries[1].selection='generic-default-source-comparison'}
+} 'closed source setup'
+Case 'CLI argument setup cannot omit a fault or public selector' {
+    Change-Classification {param($v)$v.host_entries[1].required_vararg_cases=@($v.host_entries[1].required_vararg_cases|Select-Object -SkipLast 1)}
+} 'closed source setup'
+Case 'dated CLI argument author observers cannot invent execution authority' {
+    Change-Classification {param($v)$v.host_entries[1].execution_evidence=@(@{synthetic_fixture=$true;result='passed'})}
 } 'closed source setup'
 Case 'ordinary sources cannot acquire the host-only exception' {
     Change-Classification {param($v)$v.host_entries[0].path='tests/lua/new-fixture.lua'}
@@ -131,7 +140,7 @@ function Link-Case($Name,[scriptblock]$Action,$Expected=''){
 # passing this small linkage unit test never claims that a case was executed.
 $context='upstream-test/windows/validation/static'
 $namedCases=@((Get-Content (Join-Path $root $classification) -Raw|ConvertFrom-Json -AsHashtable -Depth 24).entries|
-    Where-Object selection -CEQ configured-Ada-internal-counterpart-only)[0].source_linkage.aunit_named_cases.case
+    Where-Object selection -CEQ configured-Ada-internal-counterpart-only|ForEach-Object{$_.source_linkage.aunit_named_cases.case})
 $codeSource='tests/src/code_public_semantic_tests.adb'
 $codeCases=@([regex]::Matches((Get-Content (Join-Path $root $codeSource) -Raw),
     "(?s)Test_Support\.Add\s*\(Suite,\s*`"([^`"]+)`"\s*,\s*([A-Za-z0-9_]+)'Access")|
@@ -144,9 +153,30 @@ Link-Case 'only Ada can supply the actual owned-storage inspector role' {
 Link-Case 'native T cannot be declared an Ada inspector facade' {
     $null=Get-ConfiguredFixtureRoles @{id='table-storage-private';roles=@('ReferenceC')}
 } 'internal counterpart roles differ'
-Link-Case 'all22 storage and29 public code identities satisfy only the source-linkage guard' {
+Link-Case 'all39 storage and29 public code identities satisfy only the source-linkage guard' {
     Assert-ConfiguredFixtureNamedCounterparts -Root $root -Context $context -NamedEvidence @{context=$context;runtime_observed=$true;named_aunit_cases=$namedCases}
 }
+Link-Case 'nextvar public mode remains a native and Ada pair in both configurations' {
+    foreach($configuration in @('default','upstream-test')){
+        $d=@(Get-ConfiguredFixtureDefinitions $configuration|Where-Object id -CEQ nextvar-storage-public)[0]
+        if((@(Get-ConfiguredFixtureRoles $d)-join '|') -cne 'ReferenceC|Ada' -or $d.script_arguments[0] -cne 'public'){
+            throw 'Public nextvar mode lost its native counterpart'
+        }
+    }
+}
+Link-Case 'nextvar actual storage cannot borrow a native inspector facade' {
+    $null=Get-ConfiguredFixtureRoles @{id='nextvar-storage-private';roles=@('ReferenceC')}
+} 'internal counterpart roles differ'
+Link-Case 'nextvar explicit public mode cannot silently call the private inspector' {
+    $d=@(Get-ConfiguredFixtureDefinitions default|Where-Object id -CEQ nextvar-storage-public)[0]
+    $d.script_arguments=@('ada-storage')
+    $null=Get-ConfiguredFixtureArguments -Root $root -Definition $d
+} 'mode or return protocol differs'
+Link-Case 'nextvar source helper must retain its actual one-integer return protocol' {
+    $d=@(Get-ConfiguredFixtureDefinitions default|Where-Object id -CEQ nextvar-storage-public)[0]
+    $d.call_return=0
+    $null=Get-ConfiguredFixtureArguments -Root $root -Definition $d
+} 'mode or return protocol differs'
 Link-Case 'default public code counterparts require all29 actual named identities too' {
     $ordinaryContext='default/windows/validation/static'
     Assert-ConfiguredFixtureNamedCounterparts -Root $root -Context $ordinaryContext -NamedEvidence @{context=$ordinaryContext;runtime_observed=$true;named_aunit_cases=$codeCases}

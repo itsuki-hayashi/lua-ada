@@ -81,8 +81,10 @@ if($baseline.context.StartsWith('upstream-test/',[StringComparison]::Ordinal)){
 # These named receipts are explicitly synthetic linkage fixtures. The final
 # image obtains the names from fresh verified AUnit reports, not this list.
 $classification=Get-Content (Join-Path $root 'tests/conformance/targets/configured-fixture-classification.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 24
-$names=@($classification.host_entries[0].aunit_named_cases.case)
-Assert-CliNamedCounterparts -Root $root -Context $baseline.context -NamedEvidence @{context=$baseline.context;runtime_observed=$true;named_aunit_cases=$names}
+$names=@($classification.host_entries.aunit_named_cases.case)
+$failure=$null
+try{Assert-CliNamedCounterparts -Root $root -Context $baseline.context -NamedEvidence @{context=$baseline.context;runtime_observed=$true;named_aunit_cases=$names}}catch{$failure=$_.Exception.Message}
+if($failure -notmatch 'actual portable frozen-context process protocol'){throw 'Author CLI argument observers were incorrectly treated as final context authority'}
 $failure=$null
 try{Assert-CliNamedCounterparts -Root $root -Context $baseline.context -NamedEvidence @{context=$baseline.context;runtime_observed=$true;named_aunit_cases=@($names|Select-Object -Skip 1)}}catch{$failure=$_.Exception.Message}
 if($failure -notmatch 'actual required named'){throw 'CLI required named operation omission was not rejected'}

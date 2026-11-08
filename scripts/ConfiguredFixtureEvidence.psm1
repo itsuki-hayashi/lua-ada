@@ -93,6 +93,15 @@ function Get-ConfiguredFixtureDefinitions {
             setup="$guard;assert(type(T.hash)=='function' and type(T.externstr)=='function' and type(T.externKstr)=='function');print('CONFIGURED-FIXTURE: real T string hash')";
             stdout="CONFIGURED-FIXTURE: real T string hash`n"+
                 (($hashCases|ForEach-Object{"PASS string hash $_"})-join "`n")+"`n"}
+        foreach($name in @('length-result-refusal','length-empty-result-refusal')){
+            $definitions+=@{id=$name;source=('tests/lua/'+$name.Replace('-','_')+'.lua');
+                setup="$guard;assert(type(T.alloccount)=='function');print('CONFIGURED-FIXTURE: real T $name')";
+                stdout="CONFIGURED-FIXTURE: real T $name`nPASS: $name`n"}
+        }
+        $definitions+=@{id='nextvar-storage-private';source='tests/lua/nextvar_storage_invariants.lua';roles=@('Ada');
+            script_arguments=@('ada-storage');call_return=29;
+            setup="$guard;assert(type(T.ada_check_table_storage)=='function');print('CONFIGURED-FIXTURE: actual Ada nextvar storage')";
+            stdout="CONFIGURED-FIXTURE: actual Ada nextvar storage`n"+(Get-NextvarStorageProtocol)}
     }
     # This fixture deliberately counts instructions. Its own source contract
     # requires one C-compiled graph, consumed unchanged by both interpreters;
@@ -107,7 +116,36 @@ function Get-ConfiguredFixtureDefinitions {
     $definitions+=@{id='code-public-semantics';source='tests/lua/code_public_semantics.lua';generic_default=$true;
         setup="$guard;print('CONFIGURED-FIXTURE: public optimizer semantics')";
         stdout="CONFIGURED-FIXTURE: public optimizer semantics`nCode public semantics OK`n"}
+    foreach($case in @('first','empty','failure')){
+        $definitions+=@{id=('length-result-'+$case);source='tests/lua/length_result_semantics.lua';script_arguments=@($case);
+            setup="$guard;print('CONFIGURED-FIXTURE: public length result $case')";
+            stdout="CONFIGURED-FIXTURE: public length result $case`nPASS: length-result-$case`n"}
+    }
+    $definitions+=@{id='nextvar-storage-public';source='tests/lua/nextvar_storage_invariants.lua';script_arguments=@('public');call_return=29;
+        setup="$guard;print('CONFIGURED-FIXTURE: public nextvar storage')";
+        stdout="CONFIGURED-FIXTURE: public nextvar storage`n"+(Get-NextvarStorageProtocol)}
     return $definitions
+}
+
+function Get-NextvarStorageProtocol {
+    return ((@('Library','Constructors','Open_Constructor','Dense','Hash','Reverse','Sparse','Array_Churn',
+        'Hash_Churn','Vararg','Object_Lifetime')|ForEach-Object{"PASS nextvar storage $_"})-join "`n")+"`n"
+}
+
+function Get-ConfiguredFixtureArguments {
+    param([string]$Root,[Collections.IDictionary]$Definition,[string]$FixtureInput='')
+    if($FixtureInput -eq ''){$FixtureInput=$Root.Replace('\','/').TrimEnd('/')+'/'+$Definition.source}
+    $arguments=@('-e',$Definition.setup,$FixtureInput)
+    if($Definition.Contains('call_return')){
+        # These two source-owned modes execute the complete unchanged helper
+        # and retain its one integer result. No original primary is patched.
+        $mode=if($Definition.id -ceq 'nextvar-storage-public'){'public'}elseif($Definition.id -ceq 'nextvar-storage-private'){'ada-storage'}else{throw 'Unknown configured source-call protocol'}
+        if($Definition.call_return -ne 29 -or ($Definition.script_arguments -join '|') -cne $mode){throw 'Configured nextvar mode or return protocol differs'}
+        $quoted=$FixtureInput.Replace('\','/').Replace("'","\'")
+        return @('-e',($Definition.setup+";local r=table.pack(assert(loadfile('$quoted'))('$mode'));assert(r.n==1 and math.type(r[1])=='integer' and r[1]==29)"))
+    }
+    if($Definition.Contains('script_arguments')){$arguments+=@($Definition.script_arguments)}
+    return $arguments
 }
 
 function Get-ConfiguredFixtureRoles {
@@ -115,7 +153,7 @@ function Get-ConfiguredFixtureRoles {
     if(-not $Definition.Contains('roles')){return @('ReferenceC','Ada')}
     # This is a real Ada invariant inspector, not a querytab implementation or
     # a facade on native T. Its separate observation cannot credit a C pair.
-    if($Definition.id -cne 'table-storage-private' -or $Definition.roles -isnot [Array] -or
+    if($Definition.id -cnotin @('table-storage-private','nextvar-storage-private') -or $Definition.roles -isnot [Array] -or
         $Definition.roles.Count -ne 1 -or $Definition.roles[0] -cne 'Ada'){
         throw 'Configured fixture internal counterpart roles differ'
     }
@@ -154,6 +192,14 @@ function Get-ConfiguredFixtureSources {
         'tests/lua/scalar_closing_mutation.lua','tests/lua/materialized_vararg.lua','tests/lua/materialized_vararg_refusal.lua',
         'tests/lua/fixed_external_strings.lua','tests/lua/table_error_arguments.lua','tests/lua/locale_strings.lua',
         'tests/lua/string_hash_invariants.lua','tests/src/lua-string_hash_tests.adb','tests/src/lua-string_hash_tests.ads',
+        'tests/lua/nextvar_storage_invariants.lua','tests/src/lua-nextvar_storage_tests.adb','tests/src/lua-nextvar_storage_tests.ads',
+        'tests/lua/length_result_semantics.lua','tests/lua/length_result_refusal.lua','tests/lua/length_empty_result_refusal.lua',
+        'tests/src/lua-sessions-length_result_tests.adb','tests/src/lua-sessions-length_result_tests.ads',
+        'tests/lua/cli_argument_controls.lua','tests/src/lua-sessions-cli_argument_tests.adb','tests/src/lua-sessions-cli_argument_tests.ads',
+        'scripts/observe-cli-dynamic-arg.ps1','scripts/observe-cli-arg-lifecycle.ps1',
+        'tests/conformance/targets/remaining-upstream-compatibility/cli-dynamic-arg.author-cases.json',
+        'tests/conformance/targets/remaining-upstream-compatibility/cli-arg-lifecycle.author-cases.json',
+        'tests/conformance/platform/cli-dynamic-arg.lua',
         'tests/lua/cli_prompt_controls.lua','scripts/CliFixtureCases.psm1','scripts/CliFixtureEvidence.psm1',
         'scripts/check-configured-cli.ps1','scripts/check-cli.ps1',
         'tests/src/lua-sessions-cli_prompt_tests.adb','tests/src/lua-sessions-cli_prompt_tests.ads',
@@ -172,7 +218,8 @@ function Get-ConfiguredFixtureAudit {
     param([Parameter(Mandatory)][string]$Root)
     $ordinary=@(Get-ConfiguredFixtureDefinitions default|ForEach-Object source)
     $instrumented=@(Get-ConfiguredFixtureDefinitions upstream-test|ForEach-Object source)
-    $only=@(Get-ConfiguredFixtureDefinitions upstream-test|Where-Object{$_.source -cnotin $ordinary})
+    $ordinaryIds=@(Get-ConfiguredFixtureDefinitions default|ForEach-Object id)
+    $only=@(Get-ConfiguredFixtureDefinitions upstream-test|Where-Object{$_.id -cnotin $ordinaryIds})
     $classification=Get-Content (Join-Path $Root 'tests/conformance/targets/configured-fixture-classification.json') -Raw|ConvertFrom-Json -AsHashtable
     $hostOnly=@(Assert-CliHostClassification -Root $Root -Classification $classification)
     if($classification.schema_version -ne 1 -or $classification.kind -cne 'first-party-configured-fixture-classification' -or
@@ -263,8 +310,12 @@ function Get-ConfiguredFixtureAudit {
             $requiredLinks=@('tests/src/lua-conformance_adapter.adb','tests/c/conformance_adapter.c',
                 'tests/src/lua-table_storage_inspection_tests.adb','tests/src/lua-table_storage_inspection_tests.ads',
                 'tests/src/lua-engine-table_storage_probe.ads','tests/src/lua-engine-table_storage_probe.adb')
+            if($definition.id -ceq 'nextvar-storage-private'){
+                $requiredLinks+=@('tests/src/lua-nextvar_storage_tests.adb','tests/src/lua-nextvar_storage_tests.ads')
+            }
+            $expectedNames=if($definition.id -ceq 'nextvar-storage-private'){17}else{22}
             if($links.kind -cne 'source-linkage-only' -or $links.runtime_evidence -isnot [Array] -or $links.runtime_evidence.Count -ne 0 -or
-                $links.aunit_named_cases -isnot [Array] -or $links.aunit_named_cases.Count -ne 22 -or
+                $links.aunit_named_cases -isnot [Array] -or $links.aunit_named_cases.Count -ne $expectedNames -or
                 $links.bindings -isnot [Array] -or (($links.bindings.path|Sort-Object) -join '|') -cne (($requiredLinks|Sort-Object) -join '|')){
                 throw 'Configured Ada invariant source linkage is incomplete or invents execution evidence'
             }
@@ -274,12 +325,13 @@ function Get-ConfiguredFixtureAudit {
                     throw 'Configured Ada invariant implementation linkage is stale'
                 }
             }
-            $source='tests/src/lua-table_storage_inspection_tests.adb'
+            $source=if($definition.id -ceq 'nextvar-storage-private'){'tests/src/lua-nextvar_storage_tests.adb'}else{'tests/src/lua-table_storage_inspection_tests.adb'}
             $text=Get-Content (Join-Path $Root $source) -Raw
             $named=@([regex]::Matches($text,"(?s)Test_Support\.Add\s*\(Suite,\s*`"([^`"]+)`"\s*,\s*([A-Za-z0-9_]+)'Access")|
                 ForEach-Object{$source+'#'+$_.Groups[2].Value+'|OK '+$_.Groups[1].Value}|Sort-Object)
             $declared=@($links.aunit_named_cases|ForEach-Object{$_.case+'|'+$_.required_stdout_line}|Sort-Object)
-            if($named.Count -ne 22 -or ($named -join "`n") -cne ($declared -join "`n")){
+            $expectedNames=if($definition.id -ceq 'nextvar-storage-private'){17}else{22}
+            if($named.Count -ne $expectedNames -or ($named -join "`n") -cne ($declared -join "`n")){
                 throw 'Configured Ada invariant named AUnit linkage differs; links are not runtime evidence'
             }
         }
@@ -288,7 +340,7 @@ function Get-ConfiguredFixtureAudit {
         $path='tests/lua/'+$file.Name
         $tokens=Get-ConformanceTokens -Bytes ([IO.File]::ReadAllBytes($file.FullName))
         $references=@($tokens|Where-Object{$_.Text -ceq 'T' -and -not $_.IsString})
-        if($references.Count -and $path -cnotin $instrumented){
+        if($references.Count -and $path -cnotin $instrumented -and $path -cnotin $hostOnly){
             throw "Unclassified T-bearing fixture requires an explicit mixed/default/T campaign audit: $path"
         }
         # This is an explicit selection audit, not a Lua scope parser or proof
@@ -322,8 +374,8 @@ function Assert-ConfiguredFixtureNamedCounterparts {
     # separately requires independent source review and frozen membership.
     $classification=Get-Content (Join-Path $Root 'tests/conformance/targets/configured-fixture-classification.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 24
     $row=@($classification.entries|Where-Object selection -CEQ configured-Ada-internal-counterpart-only)
-    if($row.Count -ne 1 -or $row[0].source_linkage.aunit_named_cases.Count -ne 22){throw 'Configured Ada invariant named linkage is incomplete'}
-    foreach($case in $row[0].source_linkage.aunit_named_cases){
+    if($row.Count -ne 2 -or @($row.source_linkage.aunit_named_cases).Count -ne 39){throw 'Configured Ada invariant named linkage is incomplete'}
+    foreach($case in @($row.source_linkage.aunit_named_cases)){
         if($case.case -cnotin $NamedEvidence.named_aunit_cases){throw 'Configured Ada invariant lacks an actual required named AUnit counterpart'}
     }
 }
@@ -445,9 +497,10 @@ function Assert-ConfiguredFixtureReport {
                     }
                     $fixtureInput=$produced[0].output_chunk.path.Replace('\','/')
                 }
-                if($p.arguments -isnot [Array] -or $p.arguments.Count -ne 3 -or $p.arguments[0] -cne '-e' -or
-                    $p.arguments[1] -cne $definition.setup -or
-                    $p.arguments[2].Replace('\','/') -cne $fixtureInput){
+                $expectedArguments=Get-ConfiguredFixtureArguments -Root $origin -Definition $definition -FixtureInput $fixtureInput
+                $actualArguments=@($p.arguments)
+                if($actualArguments.Count -ge 3){$actualArguments[2]=$actualArguments[2].Replace('\','/')}
+                if($p.arguments -isnot [Array] -or ($actualArguments -join "`0") -cne ($expectedArguments -join "`0")){
                     throw 'Configured fixture explicit setup or source argument differs'
                 }
                 if($out -cne $definition.stdout){throw 'Configured fixture complete ordered protocol or real T witness differs'}
@@ -500,4 +553,4 @@ function Assert-ConfiguredFixtureImageReport {
         -Interpreter (Join-Path $Payload $Image.paths.ada_launcher) -ResolveFile $resolve
 }
 
-Export-ModuleMember -Function Get-ConfiguredFixtureDefinitions,Get-ConfiguredFixtureRoles,Get-ConfiguredFixtureProducerArguments,Get-ConfiguredFixtureSources,Get-ConfiguredFixtureAudit,Assert-ConfiguredFixtureReport,Assert-ConfiguredFixtureNamedCounterparts,Assert-ConfiguredFixtureImageReport
+Export-ModuleMember -Function Get-ConfiguredFixtureDefinitions,Get-ConfiguredFixtureRoles,Get-ConfiguredFixtureArguments,Get-ConfiguredFixtureProducerArguments,Get-ConfiguredFixtureSources,Get-ConfiguredFixtureAudit,Assert-ConfiguredFixtureReport,Assert-ConfiguredFixtureNamedCounterparts,Assert-ConfiguredFixtureImageReport

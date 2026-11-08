@@ -76,7 +76,7 @@ try{
             }
             $run=[guid]::NewGuid().ToString('N');$prefix=Join-Path $directory ($role+'-'+$definition.id)
             $environment.LUA_ADA_CONFORMANCE_TELEMETRY=$prefix;$environment.LUA_ADA_CONFORMANCE_RUN_ID=$run
-            $p=Invoke-ConformanceProcess -Executable $exe -Arguments @('-e',$definition.setup,$fixtureInput) `
+            $p=Invoke-ConformanceProcess -Executable $exe -Arguments (Get-ConfiguredFixtureArguments -Root $root -Definition $definition -FixtureInput $fixtureInput) `
                 -Directory $root -OutputPrefix $prefix -TimeoutSeconds 900 -Environment $environment
             $row=@{role=$role;operation=$definition.id;process=$p;telemetry=@{path=($prefix+'.'+$p.process_id+'.json');run_id=$run;sha256=$null}}
             if($binary){$row.input_chunk=@{path=$fixtureInput;sha256=$produced[0].output_chunk.sha256;bytes=$produced[0].output_chunk.bytes}}
