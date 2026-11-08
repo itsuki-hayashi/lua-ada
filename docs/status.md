@@ -8,6 +8,12 @@ focused cases pass within2,528 AUnit cases in each local mode, and all eight
 compiler/VM roles match the public fixture. Full source/CLI/platform and final
 immutable acceptance remain pending.
 
+The [dated API941 tail/owner proposal](sessions/2026-11-08-api941-tail-owner-bindings.md)
+binds twenty actual counterparts and fifty ownership regions at c10ba1c. It
+preserves source operations and identifies stale inner/composition edges.
+Independent exact and composition decisions remain pending; no mapping,
+approval, adapted source, runtime evidence or original obligation is renewed.
+
 Three [intern-index fault witnesses](sessions/2026-11-08-intern-index-refusal.md)
 check actual provider-refused replacement, live roots under disabled-growth
 collection and dead-header disposal. The combined local checkout passes 2,510

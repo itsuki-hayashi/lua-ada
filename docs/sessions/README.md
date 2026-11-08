@@ -4,6 +4,8 @@ Source review: [bounded optimizer eligibility](2026-11-08-optimizer-v3-validator
 
 Component: [actual IO error caller locations](2026-11-08-io-error-locations.md).
 
+Proposal: [API941 tail and owner source bindings](2026-11-08-api941-tail-owner-bindings.md).
+
 Source review: [current target GC mapping](2026-11-08-gc-current-source-review.md).
 
 Source review: [optimizer semantic retention](2026-11-08-optimizer-semantic-review.md).

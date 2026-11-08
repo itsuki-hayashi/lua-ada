@@ -8,6 +8,13 @@ caller/stripped-code behavior while continuing original source and CLI gates.
 The reviewed locals T source now fails its later allocator-disabled closing
 recovery block; repair that public behavior without changing its assertions.
 
+Independently review the [API941 tail/owner binding proposal](sessions/2026-11-08-api941-tail-owner-bindings.md)
+against its twenty-file snapshot. Preserve userdata/weak/finalizer lifetimes
+while renewing three exact decisions, then separately renew composition with
+concrete current private18/policy identities. Capture subsequent Machine drift
+again; this dated author packet supplies no automatic renewal, adapted-source
+execution or final acceptance.
+
 The [intern-index fault cases](sessions/2026-11-08-intern-index-refusal.md)
 pass actual provider refusal/retry, live-root and dead-header checks in both
 local configurations. Continue independent exact API string-table source
