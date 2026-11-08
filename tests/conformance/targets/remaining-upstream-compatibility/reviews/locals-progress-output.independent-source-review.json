@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "locals-progress-output-independent-source-review",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "review_date": "2026-11-08",
+  "decision": "accepted-output-contract-direction",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "proposal": {
+    "sha256": "dbcec9e93830b6430558a38529e75a6eee1844fb7578bcfeeb5cee0069664582",
+    "path": "tests\\conformance\\targets\\remaining-upstream-compatibility\\locals-tracegc-stderr.author-proposal.json"
+  },
+  "source_bindings": [
+    {
+      "sha256": "b064a642e2d5d22c2101ec4fe0a5d805ba633ca5b69470d20ec48b4ee5ca360b",
+      "path": "references/lua/testes/tracegc.lua"
+    },
+    {
+      "sha256": "56b5126c40f48bb1a701f041af28cd72a3a7d50b3db9b05da5659f2485f740c1",
+      "path": "references/lua/testes/locals.lua"
+    },
+    {
+      "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24",
+      "path": "references/lua/manual/manual.of"
+    },
+    {
+      "sha256": "d366c500a8f08baa0f4f9673cbe01dff165b9ad3bec90093221c93af7ea7739c",
+      "path": "tests/conformance/target-file-completion.lua"
+    },
+    {
+      "sha256": "249f86e108691b24d975fb7b691b6658a4c328c3f8655ad7477c5d0cc974823d",
+      "path": "scripts/ConformanceFileProtocols.psm1"
+    }
+  ],
+  "review": [
+    "Read the complete pinned tracegc.lua, locals stop/restart workload and manual finalization section. The original finalizer writes literal ASCII dot and remarks its object while active. Collection frequency and therefore total progress count are not public equality requirements.",
+    "A completed locals workload restarts tracking after its overflow test. The marked object must finalize during subsequent collection or state closure; at least one progress dot is required. Empty stderr must fail alongside all non-dot bytes, including whitespace, warnings, newlines and control bytes.",
+    "Retain raw bytes, hash and count without filtering or substitution. Limit this stderr language to locals.lua in both configurations and both actual implementations. Preserve exact two-result integer5/function completion, source marker, unchanged runtime assertions and owner cleanup.",
+    "The proposal binds an earlier checker hash; this review instead records the current synthetic-authority-hardened checker. It authorizes a bounded implementation direction only. A new exact checker/source review must precede accepted final-target source authority.",
+    "Historical observations motivate the defect but are not passing runtime evidence. No current adapted locals execution or exclusion is authorized by this decision."
+  ],
+  "required_regressions": [
+    "empty rejected",
+    "ASCII dots accepted and count retained",
+    "newline rejected",
+    "warning rejected",
+    "nonASCII rejected",
+    "control byte rejected",
+    "other files remain strict",
+    "completion and return checks remain mandatory"
+  ]
+}
