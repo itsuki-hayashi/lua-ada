@@ -108,6 +108,15 @@ evidence. Binding regressions may opt into labelled synthetic reviews through
 an explicit test-only parameter. The target runner and final matrix never
 select that parameter, and raw report fields cannot enable it.
 
+The locals completion proposal binds the independent literal-progress
+direction, pinned tracker/source/manual, original wrapper and actual current
+validator. It accepts one or more raw ASCII dot bytes, preserves their hash
+and count and rejects every other byte. Its replay requires a typed recorded
+progress receipt; dots cannot replace the actual integer5/function two-result
+return or original completion marker. This observer protocol grants no final
+source authority: accepted File reconciliation still requires fresh independent
+per-file review and the current source-bound context/compiled image.
+
 The full twelve-case scalar-closing fixture is a mandatory unfiltered T pair.
 Its five T-free public upvalue, mutable-local, weak-root, suspension and jump
 bodies also remain byte-identical in an ordinary default companion. Source

@@ -924,10 +924,13 @@ try {
         -TimeoutSeconds $evidence.timeout_seconds -Environment $environment
     $evidence.outcome = Get-ConformanceOutcome -Process $evidence.process -Marker $marker
     if ($null -ne $evidence.file_completion_protocol -and -not $nativeOriginalObservation) {
-        $completed = Assert-TargetFileCompletion -File $File -Configuration $Configuration -Process $evidence.process
+        $progress=if($File -ceq 'locals.lua'){@($protocol.manifest.files|Where-Object file -CEQ $File)[0].stderr_progress}else{$null}
+        $completed = Assert-TargetFileCompletion -File $File -Configuration $Configuration -Process $evidence.process `
+            -Root $root -StderrProgress $progress
         foreach ($field in @('disposition','terminal_witness','source_completed')) {
             $evidence.file_completion_protocol[$field] = $completed[$field]
         }
+        if($File -ceq 'locals.lua'){$evidence.file_completion_protocol.stderr_progress=$completed.stderr_progress}
     } elseif ($null -ne $evidence.file_completion_protocol) {
         # Original C native assumptions are allowed to fail as captured Lua
         # errors. Keep protocol/source bytes and failure telemetry, while

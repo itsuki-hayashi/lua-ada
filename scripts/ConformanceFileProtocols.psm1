@@ -2,6 +2,49 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 
+function Assert-LocalsProgressSourceContract {
+    param([string]$Root,[Collections.IDictionary]$Contract)
+    $reviewPath='tests/conformance/targets/remaining-upstream-compatibility/reviews/locals-progress-output.independent-source-review.json'
+    $reviewHash='34df68857cd9b39732804f6e8ee3a2e98bb121160fba118d3870dfff9612d9fb'
+    if($null -eq $Contract -or (($Contract.Keys|Sort-Object)-join '|') -cne 'dependency|kind|source_review|validator' -or
+        $Contract.kind -cne 'locals-literal-dot-progress' -or $Contract.source_review.path -cne $reviewPath -or
+        $Contract.source_review.sha256 -cne $reviewHash -or
+        $Contract.dependency.path -cne 'references/lua/testes/tracegc.lua' -or
+        $Contract.dependency.sha256 -cne 'b064a642e2d5d22c2101ec4fe0a5d805ba633ca5b69470d20ec48b4ee5ca360b' -or
+        $Contract.validator.path -cne 'scripts/ConformanceFileProtocols.psm1'){
+        throw 'Locals progress lacks its bounded independent source contract'
+    }
+    [void](Resolve-ReviewedFile -Root $Root -Path $Contract.dependency.path -Sha256 $Contract.dependency.sha256)
+    [void](Resolve-ReviewedFile -Root $Root -Path $Contract.validator.path -Sha256 $Contract.validator.sha256)
+    $review=Get-Content (Resolve-ReviewedFile -Root $Root -Path $reviewPath -Sha256 $reviewHash) -Raw|
+        ConvertFrom-Json -AsHashtable -Depth 48
+    Assert-TargetCompletionSourceReviewFlags $review
+    if($review.schema_version -ne 1 -or $review.kind -cne 'locals-progress-output-independent-source-review' -or
+        $review.decision -cne 'accepted-output-contract-direction' -or $review.author -ceq $review.reviewer -or
+        $review.source_adaptation_authority -isnot [bool] -or $review.source_adaptation_authority -or
+        $review.source_exclusions -isnot [Array] -or $review.source_exclusions.Count -ne 0){
+        throw 'Locals progress source direction cannot grant adaptation or runtime authority'
+    }
+    [void](Resolve-ReviewedFile -Root $Root -Path $review.proposal.path.Replace('\','/') -Sha256 $review.proposal.sha256)
+    $expected=@('references/lua/testes/tracegc.lua','references/lua/testes/locals.lua','references/lua/manual/manual.of',
+        'tests/conformance/target-file-completion.lua','scripts/ConformanceFileProtocols.psm1')
+    if($review.source_bindings -isnot [Array] -or
+        (($review.source_bindings.path|Sort-Object)-join '|') -cne (($expected|Sort-Object)-join '|')){
+        throw 'Locals progress source direction lacks its exact dependency set'
+    }
+    foreach($binding in $review.source_bindings){
+        if($binding.path -ceq 'scripts/ConformanceFileProtocols.psm1'){
+            # This is the reviewed pre-change checker, a direction input rather
+            # than current implementation authority. The manifest above binds
+            # the actual new validator; final acceptance additionally requires
+            # a fresh independent per-file source decision over that manifest.
+            if($binding.sha256 -cne '249f86e108691b24d975fb7b691b6658a4c328c3f8655ad7477c5d0cc974823d'){
+                throw 'Locals progress reviewed baseline checker differs'
+            }
+        }else{[void](Resolve-ReviewedFile -Root $Root -Path $binding.path -Sha256 $binding.sha256)}
+    }
+}
+
 function Assert-TargetCompletionSourceReviewFlags {
     param([Collections.IDictionary]$Artifact,[switch]$AllowSyntheticReview)
     # Source decisions may authorize only this observation protocol. Labelled
@@ -106,6 +149,10 @@ function Read-TargetFileProtocolManifest {
                 throw 'Completion source span hash or rationale differs'
             }
         }
+        if($item.file -ceq 'locals.lua'){
+            if(-not $item.Contains('stderr_progress')){throw 'Locals completion lacks its source-bound literal progress contract'}
+            Assert-LocalsProgressSourceContract -Root $Root -Contract $item.stderr_progress
+        }elseif($item.Contains('stderr_progress')){throw 'Locals progress contract cannot relax another file'}
     }
     if ($RequireReview) {
         $review = $manifest.review
@@ -147,7 +194,8 @@ function Read-TargetFileProtocolManifest {
 function Assert-TargetFileCompletion {
     param([Parameter(Mandatory)][string] $File,
           [Parameter(Mandatory)][ValidateSet('default','upstream-test')][string] $Configuration,
-          [Parameter(Mandatory)][Collections.IDictionary] $Process)
+          [Parameter(Mandatory)][Collections.IDictionary] $Process,
+          [string]$Root=(Split-Path -Parent $PSScriptRoot),[Collections.IDictionary]$StderrProgress)
     $definition = Get-TargetFileProtocolDefinition -File $File
     if ($null -eq $definition) { throw 'File has no remaining-target completion protocol' }
     if ($Process.exit_code -ne 0 -or $Process.timed_out -ne $false -or $Process.capture_exceeded -ne $false -or
@@ -185,6 +233,8 @@ function Assert-TargetFileCompletion {
     # The API's continued warning fragments are two exact complete warnings.
     # memerr's progress counter is dynamic: require its whole increasing
     # sequence, rather than permitting arbitrary numeric stderr or hiding it.
+    $progress=$null
+    if($File -cne 'locals.lua' -and $null -ne $StderrProgress){throw 'Locals progress contract cannot relax another file'}
     $lines = @($stderr -split '\r\n|\n|\r' | Where-Object { $_ -ne '' })
     if ($File -ceq 'api.lua' -and -not $absent) {
         if (($lines -join '|') -cne 'Lua warning: #This should be a single warning|Lua warning: #This should be another one') {
@@ -195,6 +245,26 @@ function Assert-TargetFileCompletion {
         for ($i=0;$i -lt $lines.Count;$i++) {
             if ($lines[$i] -cne [string]($i + 1)) { throw 'Memory-error progress sequence differs' }
         }
+    } elseif($File -ceq 'locals.lua'){
+        Assert-LocalsProgressSourceContract -Root $Root -Contract $StderrProgress
+        $bytes=[IO.File]::ReadAllBytes($Process.stderr_path)
+        $hash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)).ToLowerInvariant()
+        if(-not $Process.Contains('stderr_bytes') -or
+            ($Process.stderr_bytes -isnot [int] -and $Process.stderr_bytes -isnot [long]) -or
+            $Process.stderr_bytes -ne $bytes.Length -or -not $Process.Contains('stderr_sha256') -or
+            $Process.stderr_sha256 -cne $hash){throw 'Locals progress raw byte count or hash differs'}
+        # Inspect raw octets without decoding or allocating a filtered copy.
+        # In particular CR/LF, warnings and replacement-decoder characters can
+        # never be reclassified as the original finalizer's literal progress.
+        $onlyDots=$bytes.Length -gt 0
+        foreach($octet in $bytes){if($octet -ne 46){$onlyDots=$false;break}}
+        if(-not $onlyDots){
+            throw 'Locals progress requires one or more literal ASCII dots only'
+        }
+        $progress=@{kind='locals-literal-dot-progress';observed_count=$bytes.Length;raw_bytes=$bytes.Length;
+            raw_sha256=$hash;source_review_sha256=$StderrProgress.source_review.sha256;
+            dependency_sha256=$StderrProgress.dependency.sha256;validator_sha256=$StderrProgress.validator.sha256;
+            runtime_acceptance=$false;coverage_authority=$false}
     } elseif ($File -cne 'main.lua' -and $lines.Count -ne 0) { throw 'Unexpected target file protocol stderr' }
     if ($File -ceq 'main.lua') {
         # Subprocess outputs/warnings are asserted inside unchanged main.lua.
@@ -213,7 +283,7 @@ function Assert-TargetFileCompletion {
         }
     }
     return @{file=$File;entry=$definition.entry;disposition=$disposition;terminal_witness=$terminal;
-        source_completed=(-not $absent);coverage_authority=$false;runtime_acceptance=$false}
+        source_completed=(-not $absent);stderr_progress=$progress;coverage_authority=$false;runtime_acceptance=$false}
 }
 
 function Assert-TargetFileProtocolBinding {
@@ -256,9 +326,32 @@ function Assert-TargetFileProtocolBinding {
         default { $Report.equivalent.output_sha256 }
     }
     if ($identity.executed_sha256 -cne $executedHash) { throw 'Completion protocol selected chunk hash differs' }
-    $actual = Assert-TargetFileCompletion -File $file -Configuration $Report.requested_configuration -Process $Report.process
+    $progress=if($file -ceq 'locals.lua'){@($reviewed.manifest.files|Where-Object file -CEQ $file)[0].stderr_progress}else{$null}
+    $actual = Assert-TargetFileCompletion -File $file -Configuration $Report.requested_configuration -Process $Report.process `
+        -Root $Root -StderrProgress $progress
     foreach ($field in @('disposition','terminal_witness','source_completed')) {
         if ($identity[$field] -cne $actual[$field]) { throw 'Recorded completion result differs from captured protocol' }
+    }
+    if($file -ceq 'locals.lua'){
+        if(-not $identity.Contains('stderr_progress') -or $identity.stderr_progress -isnot [Collections.IDictionary]){
+            throw 'Recorded locals progress receipt is missing'
+        }
+        if((($identity.stderr_progress.Keys|Sort-Object)-join '|') -cne
+            (($actual.stderr_progress.Keys|Sort-Object)-join '|')){throw 'Recorded locals progress field set differs'}
+        foreach($field in $actual.stderr_progress.Keys){
+            if(-not $identity.stderr_progress.Contains($field) -or
+                $identity.stderr_progress[$field] -cne $actual.stderr_progress[$field]){
+                throw 'Recorded locals progress differs from the unchanged raw capture'
+            }
+            $value=$identity.stderr_progress[$field]
+            if(($field -cin @('observed_count','raw_bytes') -and $value -isnot [int] -and $value -isnot [long]) -or
+                ($field -cin @('runtime_acceptance','coverage_authority') -and $value -isnot [bool]) -or
+                ($field -cnotin @('observed_count','raw_bytes','runtime_acceptance','coverage_authority') -and $value -isnot [string])){
+                throw 'Recorded locals progress types differ'
+            }
+        }
+    }elseif($identity.Contains('stderr_progress') -and $null -ne $identity.stderr_progress){
+        throw 'Locals progress receipt cannot relax another file'
     }
     if ($RequireReview -and ($null -eq $Contract -or
         -not $Contract.Contains('file_completion_protocol_sha256') -or

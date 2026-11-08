@@ -9,6 +9,8 @@ $temporary = Join-Path $root ('reports/file-protocol-selftests/' + [Guid]::NewGu
 $utf8 = [Text.UTF8Encoding]::new($false)
 $script:Cases = 0; $script:Serial = 0; $script:LuaCases = 0
 $relative = 'tests/conformance/targets/remaining-upstream-compatibility/file-completion.author-proposal.json'
+$localsProgress=@((Get-Content (Join-Path $root $relative) -Raw|ConvertFrom-Json -AsHashtable -Depth 48).files|
+    Where-Object file -CEQ locals.lua)[0].stderr_progress
 
 # The default tests are synthetic parser/capture fixtures, not executions of
 # upstream sources. Review labels in the disposable root have no coverage or
@@ -33,6 +35,8 @@ function New-Capture([string] $Output, [string] $ErrorText = '') {
     [IO.File]::WriteAllText("$prefix.stdout",$Output,$utf8)
     [IO.File]::WriteAllText("$prefix.stderr",$ErrorText,$utf8)
     return @{stdout_path="$prefix.stdout";stderr_path="$prefix.stderr";exit_code=0;timed_out=$false;
+        stdout_bytes=(Get-Item "$prefix.stdout").Length;stdout_sha256=(Get-FileHash "$prefix.stdout").Hash.ToLowerInvariant();
+        stderr_bytes=(Get-Item "$prefix.stderr").Length;stderr_sha256=(Get-FileHash "$prefix.stderr").Hash.ToLowerInvariant();
         capture_exceeded=$false;pipe_drain_failed=$false;abnormal_exit_kind=$null;process_tree_kill_error=$null}
 }
 function Full-Output([string] $File) {
@@ -45,15 +49,21 @@ function Full-Output([string] $File) {
 function Error-Output([string] $File) {
     if ($File -ceq 'api.lua') { return "Lua warning: #This should be a single warning`nLua warning: #This should be another one`n" }
     if ($File -ceq 'memerr.lua') { return "1`n2`n3`n" }
+    if ($File -ceq 'locals.lua') { return '...' }
     return ''
 }
 function New-ManifestFixture {
     $fixture = Join-Path $temporary ([Guid]::NewGuid().ToString('N'))
     $m = Get-Content (Join-Path $root $relative) -Raw | ConvertFrom-Json -AsHashtable -Depth 48
-    foreach ($identity in @($m.wrapper,$m.orchestrator) + @($m.files | ForEach-Object source)) {
+    $progress=@($m.files|Where-Object file -CEQ locals.lua)[0].stderr_progress
+    $progressReview=Get-Content (Join-Path $root $progress.source_review.path) -Raw|ConvertFrom-Json -AsHashtable
+    $more=@($progress.dependency,$progress.validator,$progress.source_review,
+        @{path=$progressReview.proposal.path.Replace('\','/');sha256=$progressReview.proposal.sha256})+@($progressReview.source_bindings|
+            Where-Object path -CNE scripts/ConformanceFileProtocols.psm1)
+    foreach ($identity in @($m.wrapper,$m.orchestrator) + @($m.files | ForEach-Object source)+$more) {
         $destination = Join-Path $fixture $identity.path
         [void][IO.Directory]::CreateDirectory((Split-Path -Parent $destination))
-        [IO.File]::Copy((Join-Path $root $identity.path),$destination)
+        [IO.File]::Copy((Join-Path $root $identity.path),$destination,$true)
     }
     $m.synthetic_fixture = $true
     $null = Write-Json (Join-Path $fixture $relative) $m
@@ -96,7 +106,8 @@ foreach ($file in @('api','attrib','big','calls','code','cstack','db','errors','
     'nextvar','sort','strings','vararg','verybig' | ForEach-Object { $_ + '.lua' })) {
     Case "synthetic $file completion requires its return phase and source marker" {
         $p = New-Capture (Full-Output $file) (Error-Output $file)
-        $r = Assert-TargetFileCompletion -File $file -Configuration upstream-test -Process $p
+        $progress=if($file -ceq 'locals.lua'){$localsProgress}else{$null}
+        $r = Assert-TargetFileCompletion -File $file -Configuration upstream-test -Process $p -StderrProgress $progress
         Assert-True ($r.source_completed -and -not $r.coverage_authority -and -not $r.runtime_acceptance) 'Capture gained authority'
     }
 }
@@ -106,6 +117,101 @@ foreach ($file in @('api.lua','code.lua','memerr.lua')) {
         $r = Assert-TargetFileCompletion -File $file -Configuration default -Process $p
         Assert-True (-not $r.source_completed) 'T absence passed the instrumented body'
         Reject { Assert-TargetFileCompletion -File $file -Configuration upstream-test -Process $p } 'terminal return witness'
+    }
+}
+Case 'locals literal dots preserve actual raw count and hash in both configurations'{
+    foreach($configuration in @('default','upstream-test')){
+        foreach($count in @(1,2,9)){
+            $p=New-Capture (Full-Output locals.lua) ('.'*$count)
+            $before=(Get-FileHash $p.stderr_path).Hash.ToLowerInvariant()
+            $r=Assert-TargetFileCompletion locals.lua $configuration $p -StderrProgress $localsProgress
+            if($r.stderr_progress.observed_count -ne $count -or $r.stderr_progress.raw_bytes -ne $count -or
+                $r.stderr_progress.raw_sha256 -cne $before -or
+                (Get-FileHash $p.stderr_path).Hash.ToLowerInvariant() -cne $before -or
+                $r.stderr_progress.runtime_acceptance -or $r.stderr_progress.coverage_authority){
+                throw 'Literal progress was filtered, rewritten or promoted to acceptance'
+            }
+        }
+    }
+}
+foreach($entry in @(@('empty',''),@('newline',".`n"),@('space','. .'),@('warning','.Lua warning: hidden'),
+    @('control',('.'+[char]0)),@('nonASCII',('.'+[char]173)))){
+    Case "locals progress rejects $($entry[0]) even with correct raw identities"{
+        $p=New-Capture (Full-Output locals.lua) $entry[1]
+        Reject {Assert-TargetFileCompletion locals.lua upstream-test $p -StderrProgress $localsProgress} 'literal ASCII dots only'
+    }
+}
+Case 'locals progress cannot hide an invalid UTF8 octet through decoding'{
+    $p=New-Capture (Full-Output locals.lua) '.'
+    [IO.File]::WriteAllBytes($p.stderr_path,[byte[]]@(46,255))
+    $p.stderr_bytes=2;$p.stderr_sha256=(Get-FileHash $p.stderr_path).Hash.ToLowerInvariant()
+    Reject {Assert-TargetFileCompletion locals.lua upstream-test $p -StderrProgress $localsProgress} 'literal ASCII dots only'
+}
+Case 'locals progress raw count hash and typed identities remain mandatory'{
+    foreach($change in @('count','hash','missing','string-count')){
+        $p=New-Capture (Full-Output locals.lua) '...'
+        switch($change){'count'{$p.stderr_bytes=4};'hash'{$p.stderr_sha256='0'*64};
+            'missing'{[void]$p.Remove('stderr_sha256')};'string-count'{$p.stderr_bytes='3'}}
+        Reject {Assert-TargetFileCompletion locals.lua upstream-test $p -StderrProgress $localsProgress} 'raw byte count or hash'
+    }
+}
+Case 'dots cannot substitute for the original marker and actual return observation'{
+    $out=(Full-Output locals.lua).Replace("target file phase locals.lua: returned 5`n",'')
+    Reject {Assert-TargetFileCompletion locals.lua upstream-test (New-Capture $out '.') -StderrProgress $localsProgress} 'return or yield phase'
+}
+Case 'the literal progress language cannot relax another remaining file'{
+    Reject {Assert-TargetFileCompletion calls.lua upstream-test (New-Capture (Full-Output calls.lua) '.') -StderrProgress $localsProgress} 'cannot relax another file'
+    Reject {Assert-TargetFileCompletion calls.lua upstream-test (New-Capture (Full-Output calls.lua) '.')} 'Unexpected target file protocol stderr'
+}
+Case 'locals cannot select an unbound progress contract or override its byte language'{
+    Reject {Assert-TargetFileCompletion locals.lua upstream-test (New-Capture (Full-Output locals.lua) '.')} 'bounded independent source contract'
+    $c=$localsProgress|ConvertTo-Json -Depth 16|ConvertFrom-Json -AsHashtable
+    $c.minimum_bytes=0
+    Reject {Assert-TargetFileCompletion locals.lua upstream-test (New-Capture (Full-Output locals.lua) '.') -StderrProgress $c} 'bounded independent source contract'
+}
+Case 'missing or transplanted manifest progress metadata fails source reconciliation'{
+    $f=New-ManifestFixture;[void]@($f.manifest.files|Where-Object file -CEQ locals.lua)[0].Remove('stderr_progress')
+    $null=Write-Json $f.path $f.manifest
+    Reject {Read-TargetFileProtocolManifest $f.root $relative} 'source-bound literal progress contract'
+    $f=New-ManifestFixture;@($f.manifest.files|Where-Object file -CEQ calls.lua)[0].stderr_progress=$localsProgress
+    $null=Write-Json $f.path $f.manifest
+    Reject {Read-TargetFileProtocolManifest $f.root $relative} 'cannot relax another file'
+}
+Case 'stale trace tracker or current checker bytes need a fresh source decision'{
+    foreach($path in @('references/lua/testes/tracegc.lua','scripts/ConformanceFileProtocols.psm1')){
+        $f=New-ManifestFixture;[IO.File]::AppendAllText((Join-Path $f.root $path),"-- stale source fixture`n")
+        Reject {Read-TargetFileProtocolManifest $f.root $relative} 'Review file hash differs'
+    }
+}
+Case 'locals replay records actual progress and rejects forged count hash or authority fields'{
+    $f=New-ManifestFixture;$m=Read-TargetFileProtocolManifest $f.root $relative
+    $definition=@($f.manifest.files|Where-Object file -CEQ locals.lua)[0]
+    $p=New-Capture (Full-Output locals.lua) '...'
+    $wrapper=Join-Path $f.root $f.manifest.wrapper.path
+    $setup="assert(_soft==nil and _port==nil and _U==nil and _nomsg==nil); warn('@on'); "+
+        "assert(type(T)=='table' and type(T.checkmemory)=='function'); T.checkmemory(); dofile('equivalent-source-profile-witness.lua')"
+    $p.arguments=@('-e',$setup,$wrapper,'locals.lua','locals.lua')
+    $actual=Assert-TargetFileCompletion locals.lua upstream-test $p -Root $f.root -StderrProgress $definition.stderr_progress
+    $identity=@{file='locals.lua';entry='dump';manifest_path=$relative;manifest_sha256=$m.sha256;
+        wrapper_artifact=$wrapper;wrapper_sha256=$f.manifest.wrapper.sha256;chunk_path='locals.lua';
+        executed_sha256=$definition.source.sha256;runtime_acceptance=$false;coverage_authority=$false;
+        disposition='complete';terminal_witness=$actual.terminal_witness;source_completed=$true;
+        stderr_progress=$actual.stderr_progress}
+    $report=@{operation='file:locals.lua';requested_configuration='upstream-test';execution_disposition='unchanged';
+        process=$p;file_completion_protocol=$identity;synthetic_fixture=$true}
+    $r=Assert-TargetFileProtocolBinding -Root $f.root -Report $report -WrapperPath $wrapper
+    if($r.stderr_progress.observed_count -ne 3 -or $r.runtime_acceptance){throw 'Raw progress was promoted to acceptance'}
+    foreach($change in @('missing','count','hash','string-count','string-authority','extra')){
+        $copy=$report|ConvertTo-Json -Depth 48|ConvertFrom-Json -AsHashtable -Depth 48
+        switch($change){
+            'missing'{[void]$copy.file_completion_protocol.Remove('stderr_progress')}
+            'count'{$copy.file_completion_protocol.stderr_progress.observed_count=4}
+            'hash'{$copy.file_completion_protocol.stderr_progress.raw_sha256='0'*64}
+            'string-count'{$copy.file_completion_protocol.stderr_progress.observed_count='3'}
+            'string-authority'{$copy.file_completion_protocol.stderr_progress.runtime_acceptance='False'}
+            'extra'{$copy.file_completion_protocol.stderr_progress.hidden_warning_allowed=$true}
+        }
+        Reject {Assert-TargetFileProtocolBinding -Root $f.root -Report $copy -WrapperPath $wrapper} 'Recorded locals progress'
     }
 }
 Case 'OK plus exit zero without the terminal return observation fails' {
@@ -338,8 +444,8 @@ if ($ReferenceInterpreter -ne '') {
             Assert-True ($p.exit_code -ne 0) "Wrapper accepted wrong return protocol for $($item.file)"
             $script:LuaCases++
         }
-        $p = Run-Chunk locals.lua "print('OK'); return 5, function() end"
-        $null = Assert-TargetFileCompletion locals.lua default $p
+        $p = Run-Chunk locals.lua "io.stderr:write'.'; print('OK'); return 5, function() end"
+        $null = Assert-TargetFileCompletion locals.lua default $p -StderrProgress $localsProgress
         $script:LuaCases++
     }
 }

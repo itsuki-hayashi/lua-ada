@@ -303,7 +303,22 @@
           "rationale": "The original returns integer 5 and the local function f; preserve both values and arity."
         }
       ],
-      "return_protocol": "integer-5-and-function"
+      "return_protocol": "integer-5-and-function",
+      "stderr_progress": {
+        "kind": "locals-literal-dot-progress",
+        "dependency": {
+          "path": "references/lua/testes/tracegc.lua",
+          "sha256": "b064a642e2d5d22c2101ec4fe0a5d805ba633ca5b69470d20ec48b4ee5ca360b"
+        },
+        "source_review": {
+          "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/locals-progress-output.independent-source-review.json",
+          "sha256": "34df68857cd9b39732804f6e8ee3a2e98bb121160fba118d3870dfff9612d9fb"
+        },
+        "validator": {
+          "path": "scripts/ConformanceFileProtocols.psm1",
+          "sha256": "6c558e0e468eccf76d92e0129d6423dd55bb2ad2d568b0ea06c2d4c7839b8563"
+        }
+      }
     },
     {
       "file": "main.lua",
