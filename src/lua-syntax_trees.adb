@@ -84,7 +84,8 @@ package body Lua.Syntax_Trees is
         (Unit.Texts.Equal (Left, Right));
       procedure Error
         (Message : String; Resource : Boolean := False;
-         Incomplete : Boolean := False; Near_Token : Boolean := True);
+         Incomplete : Boolean := False; Near_Token : Boolean := True;
+         At_Line : Positive := Current.After.Line);
       function Expected_Name (Item : Token_Kind) return String;
       function Line_Text (Line : Positive) return String;
       procedure Advance;
@@ -167,7 +168,8 @@ package body Lua.Syntax_Trees is
 
       procedure Error
         (Message : String; Resource : Boolean := False;
-         Incomplete : Boolean := False; Near_Token : Boolean := True)
+         Incomplete : Boolean := False; Near_Token : Boolean := True;
+         At_Line : Positive := Current.After.Line)
       is
          Diagnostic : Lua.Storage.Buffers.Buffer;
          Truncated : Boolean := False;
@@ -191,7 +193,10 @@ package body Lua.Syntax_Trees is
          Unit.Result.Status :=
            (if Resource then Lua.Syntax.Resource_Error
             else Lua.Syntax.Syntax_Error);
-         Unit.Result.Error.Line := Current.After.Line;
+         --  Ordinary syntax errors use the scanned token's final line.
+         --  A completed semantic operation can explicitly retain its last
+         --  consumed token line instead of a later lookahead/EOF position.
+         Unit.Result.Error.Line := At_Line;
          Unit.Result.Error.Column := Here.Column;
          Unit.Result.Incomplete_Input := Incomplete and then not Resource;
          Diagnostic.Set_Owner (Selected);
@@ -839,6 +844,34 @@ package body Lua.Syntax_Trees is
          Parent : constant Natural := Scope;
          Was_Return : Boolean;
          Item : Node_Id;
+         First_Label : Natural := 0;
+         procedure Check_Label_Run;
+         procedure Check_Label_Run is
+            Current_Label : Node;
+         begin
+            --  Native labelstat finishes the following labels/semicolons
+            --  before checking this label. Preserve that semantic order with
+            --  a bounded run over existing metadata, not parser recursion.
+            --  Later run entries are already defined; earlier entries in the
+            --  same run are still pending. Earlier runs remain visible.
+            for Index in reverse First_Label .. Labels.Last_Index loop
+               Current_Label := Fetch (Labels (Index).Item);
+               for Previous in Labels.First_Index .. Labels.Last_Index loop
+                  if (Previous < First_Label or else Previous > Index) and then
+                    Labels (Previous).Owner = Function_Node and then
+                    Matches (Fetch (Labels (Previous).Item).Text,
+                             Current_Label.Text)
+                  then
+                     Error
+                       ("label '" & Image (Current_Label.Text) &
+                        "' already defined on line " & Line_Text
+                          (Fetch (Labels (Previous).Item).Site.Line),
+                        Near_Token => False, At_Line => Last_Line);
+                  end if;
+               end loop;
+            end loop;
+            First_Label := 0;
+         end Check_Label_Run;
       begin
          Enter;
          if Own_Scope then
@@ -851,6 +884,15 @@ package body Lua.Syntax_Trees is
             Was_Return := Kind = Return_Word;
             Item := Statement;
             Child (Result, Item);
+            if Fetch (Item).Kind = Label_Statement then
+               if First_Label = 0 then
+                  First_Label := Labels.Last_Index;
+               end if;
+               --  Statement has consumed intervening semicolons. Delay the
+               --  semantic check while another label follows: its own syntax
+               --  or lexical failure must take precedence over this duplicate.
+               if Kind /= Double_Colon then Check_Label_Run; end if;
+            end if;
             if Fetch (Item).Kind = Label_Statement and then
               Kind in End_Of_Input | End_Word | Else_Word | Elseif_Word
             then
@@ -1159,16 +1201,9 @@ package body Lua.Syntax_Trees is
                Unit.Unsupported := Result;
                if Label then
                   Expect (Double_Colon);
-                  for Previous of Labels loop
-                     if Previous.Owner = Function_Node and then
-                       Matches (Fetch (Previous.Item).Text, Value.Text)
-                     then
-                        Error ("label '" & Image (Value.Text) &
-                               "' already defined on line " & Line_Text
-                                 (Fetch (Previous.Item).Site.Line),
-                               Near_Token => False);
-                     end if;
-                  end loop;
+                  --  Block checks a complete no-op run in native definition
+                  --  order. Keep source-order records here for scope/goto
+                  --  resolution and the unchanged terminal-label handling.
                   Labels.Append
                     (Jump_Record'
                        (Result, Scope, Function_Node, Active, False));

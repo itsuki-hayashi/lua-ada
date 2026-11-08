@@ -13,6 +13,12 @@ calls.lua's retained reader invariants. Review its remaining T constant-pool
 identity check with a retained three-function semantic witness. Private arena
 size assertions elsewhere still require feature review; whole-target and
 platform acceptance remain open despite both local 2,248-case AUnit passes.
+Label diagnostics have [semantic-boundary evidence](sessions/2026-11-08-label-semantic-boundaries.md):
+nineteen native-paired behaviors, four-way compiler/VM control paths in each
+matching configuration and 2,263 passing AUnit cases per configuration.
+Continue unchanged errors.lua from local <close> a, b at its trailing LF/EOF
+boundary. Keep full T memerr.lua's cold scalar output refusal and all other
+remaining full-target obligations open.
 
 Public C seti/setfield self assignments have [focused evidence](sessions/2026-11-08-c-api-self-values.md).
 Continue instrumented api.lua from line941 with independent review of the

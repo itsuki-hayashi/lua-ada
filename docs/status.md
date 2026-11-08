@@ -12,6 +12,12 @@ Relevant T reader checks now use [actual Ada stack inspection](sessions/2026-11-
 All 2,248 AUnit cases pass in both local configurations. Original calls.lua
 completes by default; its T run reaches private constant-pool identity
 inspection at line586, whose treatment and semantic witness remain pending.
+The [label semantic checkpoint](sessions/2026-11-08-label-semantic-boundaries.md)
+preserves no-op definition order, last-consumed source lines and later syntax
+precedence. Nineteen native-paired cases and direct goto controls pass in both
+configurations, within 2,263 passing AUnit cases each. Unchanged errors.lua
+now reaches the multiple-closing declaration's trailing-newline source line.
+Full source/T and immutable final-head acceptance remain open.
 
 The [C API self-value correction](sessions/2026-11-08-c-api-self-values.md)
 preserves the target cell when seti/setfield consume that same table. Thirty

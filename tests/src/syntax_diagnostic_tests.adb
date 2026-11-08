@@ -131,8 +131,10 @@ package body Syntax_Diagnostic_Tests is
 
    procedure Duplicate_Label_Line is
    begin
+      --  Native labelstat defines the following adjacent label first; the
+      --  earlier duplicate consequently cites that second definition's line.
       Check ("::L::" & Character'Val (10) & "::L::",
-             "label 'L' already defined on line 1");
+             "label 'L' already defined on line 2");
    end Duplicate_Label_Line;
 
    procedure Goto_Scope_Line is
