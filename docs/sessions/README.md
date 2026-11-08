@@ -1,5 +1,7 @@
 # Session Records
 
+Source review: [bounded optimizer eligibility](2026-11-08-optimizer-v3-validator-review.md).
+
 Component: [actual IO error caller locations](2026-11-08-io-error-locations.md).
 
 Source review: [current target GC mapping](2026-11-08-gc-current-source-review.md).
