@@ -96,7 +96,7 @@ evidence. Its C rows and all 473 global classifications remain pending until
 review and fresh paired observations in the required immutable contexts.
 
 The successor author inputs preserve the historical 100 C and 94 AUnit
-identities and currently regenerate 605 C and 750 AUnit witnesses. The checked-in
+identities and currently regenerate 605 C and 805 AUnit witnesses. The checked-in
 catalogue records its own dated source snapshot and needs regeneration before
 reviewing new inputs. Additional return/closing, reader, self-value and diagnostic
 cases are named source candidates with empty execution evidence. All 473 global
@@ -130,9 +130,15 @@ The full twelve-case scalar-closing fixture is a mandatory unfiltered T pair.
 Its five T-free public upvalue, mutable-local, weak-root, suspension and jump
 bodies also remain byte-identical in an ordinary default companion. Source
 classification preserves both routes; it supplies no fresh runtime receipt or
-whole locals-source equivalence evidence. The current corpus contains95 Lua
-fixtures, with later uncommitted materialized-vararg controls still outside
-this dated classification.
+whole locals-source equivalence evidence. Materialized-vararg refusal also
+requires its complete four-case count/byte/release/recovery T pair; its separate
+four-case public companion remains ordinary. All four fixed external-string
+operations require the actual instrumented C wrapper and reject a case filter
+or T-absent return. Ordinary scalar mutation, table-error and locale fixtures
+remain in generic comparison. The newly registered source candidates, including
+the twenty-six prompt unit cases, have empty execution evidence. The host CLI
+prompt setup chunk requires its separate invocation contract and cannot serve
+as a standalone ordinary script.
 
 Locals counterpart binding version1 keeps its original22 paths and its
 independently reviewed dated76 tuple. Current source drift does not renew that

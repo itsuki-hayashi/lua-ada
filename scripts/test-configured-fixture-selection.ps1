@@ -144,6 +144,16 @@ Link-Case 'ordinary public code remains selected for generic default execution t
         throw 'Public code semantics lost its ordinary default route'
     }
 }
+Link-Case 'ordinary mutation materialization diagnostics and locale bodies keep their default route' {
+    $audit=Get-ConfiguredFixtureAudit -Root $root
+    foreach($path in @('tests/lua/scalar_closing_mutation.lua','tests/lua/materialized_vararg.lua',
+        'tests/lua/table_error_arguments.lua','tests/lua/locale_strings.lua')){
+        $row=@($audit.entries|Where-Object path -CEQ $path)
+        if($row.Count -ne 1 -or $row[0].selection -cne 'generic-default-source-comparison'){
+            throw 'An ordinary public fixture lost its generic default route'
+        }
+    }
+}
 Link-Case 'source labels alone cannot replace actual named observations' {
     Assert-ConfiguredFixtureNamedCounterparts -Root $root -Context $context -NamedEvidence @{context=$context;runtime_observed=$false;named_aunit_cases=$namedCases}
 } 'actual same-context named'

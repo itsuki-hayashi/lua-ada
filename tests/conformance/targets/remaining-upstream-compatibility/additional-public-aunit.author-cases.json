@@ -5284,6 +5284,391 @@
       "required_stdout_line": "OK scalar closing: Jump_Scope",
       "runtime_acceptance": false,
       "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-scalar_closing_tests.adb#Nil_Mutation",
+      "registered_label": "scalar mutation: Nil_Mutation",
+      "required_stdout_line": "OK scalar mutation: Nil_Mutation",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-scalar_closing_tests.adb#False_Mutation",
+      "registered_label": "scalar mutation: False_Mutation",
+      "required_stdout_line": "OK scalar mutation: False_Mutation",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-scalar_closing_tests.adb#False_Type_Closer",
+      "registered_label": "scalar mutation: False_Type_Closer",
+      "required_stdout_line": "OK scalar mutation: False_Type_Closer",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-scalar_closing_tests.adb#Outer_Error_GC_Recovery",
+      "registered_label": "scalar mutation: Outer_Error_GC_Recovery",
+      "required_stdout_line": "OK scalar mutation: Outer_Error_GC_Recovery",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Payload_Types",
+      "registered_label": "materialized vararg: Payload_Types",
+      "required_stdout_line": "OK materialized vararg: Payload_Types",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Nil_Holes",
+      "registered_label": "materialized vararg: Nil_Holes",
+      "required_stdout_line": "OK materialized vararg: Nil_Holes",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Fresh_Aliases",
+      "registered_label": "materialized vararg: Fresh_Aliases",
+      "required_stdout_line": "OK materialized vararg: Fresh_Aliases",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Captured_Table",
+      "registered_label": "materialized vararg: Captured_Table",
+      "required_stdout_line": "OK materialized vararg: Captured_Table",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Count_Faults",
+      "registered_label": "materialized vararg: Count_Faults",
+      "required_stdout_line": "OK materialized vararg: Count_Faults",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Byte_Faults",
+      "registered_label": "materialized vararg: Byte_Faults",
+      "required_stdout_line": "OK materialized vararg: Byte_Faults",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Partial_Release",
+      "registered_label": "materialized vararg: Partial_Release",
+      "required_stdout_line": "OK materialized vararg: Partial_Release",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-materialized_vararg_tests.adb#Retained_Recovery",
+      "registered_label": "materialized vararg: Retained_Recovery",
+      "required_stdout_line": "OK materialized vararg: Retained_Recovery",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/table_algorithm_tests.adb#Concat_Maximum",
+      "registered_label": "table errors: Concat_Maximum",
+      "required_stdout_line": "OK table errors: Concat_Maximum",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/table_algorithm_tests.adb#Concat_Minimum",
+      "registered_label": "table errors: Concat_Minimum",
+      "required_stdout_line": "OK table errors: Concat_Minimum",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/table_algorithm_tests.adb#Concat_Zero",
+      "registered_label": "table errors: Concat_Zero",
+      "required_stdout_line": "OK table errors: Concat_Zero",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/table_algorithm_tests.adb#Concat_Proxy",
+      "registered_label": "table errors: Concat_Proxy",
+      "required_stdout_line": "OK table errors: Concat_Proxy",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/table_algorithm_tests.adb#Concat_Separator",
+      "registered_label": "table errors: Concat_Separator",
+      "required_stdout_line": "OK table errors: Concat_Separator",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/table_algorithm_tests.adb#Pairs_Missing",
+      "registered_label": "table errors: Pairs_Missing",
+      "required_stdout_line": "OK table errors: Pairs_Missing",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/table_algorithm_tests.adb#Ipairs_Missing",
+      "registered_label": "table errors: Ipairs_Missing",
+      "required_stdout_line": "OK table errors: Ipairs_Missing",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/library_runtime_tests.adb#C_Collation",
+      "registered_label": "locale strings: C_Collation",
+      "required_stdout_line": "OK locale strings: C_Collation",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/library_runtime_tests.adb#C_Classes",
+      "registered_label": "locale strings: C_Classes",
+      "required_stdout_line": "OK locale strings: C_Classes",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/library_runtime_tests.adb#C_Case",
+      "registered_label": "locale strings: C_Case",
+      "required_stdout_line": "OK locale strings: C_Case",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/library_runtime_tests.adb#Non_C_Collation",
+      "registered_label": "locale strings: NonC_Collation availability",
+      "required_stdout_line": "OK locale strings: NonC_Collation availability",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/library_runtime_tests.adb#Non_C_Classes_Case",
+      "registered_label": "locale strings: NonC_Classes_Case availability",
+      "required_stdout_line": "OK locale strings: NonC_Classes_Case availability",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/library_runtime_tests.adb#Unavailable_Locale_Unchanged",
+      "registered_label": "locale strings: Unavailable_Unchanged",
+      "required_stdout_line": "OK locale strings: Unavailable_Unchanged",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Fixed_Short_Binary",
+      "registered_label": "fixed external: Short_Binary",
+      "required_stdout_line": "OK fixed external: Short_Binary",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Fixed_Long_Borrow",
+      "registered_label": "fixed external: Long_Borrow",
+      "required_stdout_line": "OK fixed external: Long_Borrow",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Fixed_Child_State",
+      "registered_label": "fixed external: Child_State",
+      "required_stdout_line": "OK fixed external: Child_State",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Fixed_Invalid_Type",
+      "registered_label": "fixed external: Invalid_Type",
+      "required_stdout_line": "OK fixed external: Invalid_Type",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Primary_Nil",
+      "registered_label": "CLI prompt: nil primary",
+      "required_stdout_line": "OK CLI prompt: nil primary",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Secondary_Nil",
+      "registered_label": "CLI prompt: nil secondary",
+      "required_stdout_line": "OK CLI prompt: nil secondary",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Custom_String",
+      "registered_label": "CLI prompt: custom string",
+      "required_stdout_line": "OK CLI prompt: custom string",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Empty_String",
+      "registered_label": "CLI prompt: empty string",
+      "required_stdout_line": "OK CLI prompt: empty string",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Numeric_Prompt",
+      "registered_label": "CLI prompt: numeric value",
+      "required_stdout_line": "OK CLI prompt: numeric value",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Boolean_Prompt",
+      "registered_label": "CLI prompt: boolean value",
+      "required_stdout_line": "OK CLI prompt: boolean value",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Embedded_Nul",
+      "registered_label": "CLI prompt: embedded NUL",
+      "required_stdout_line": "OK CLI prompt: embedded NUL",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Replaced_Tostring",
+      "registered_label": "CLI prompt: replaced global tostring",
+      "required_stdout_line": "OK CLI prompt: replaced global tostring",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Numeric_Handler",
+      "registered_label": "CLI prompt: numeric handler result",
+      "required_stdout_line": "OK CLI prompt: numeric handler result",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Global_Handler",
+      "registered_label": "CLI prompt: global handler",
+      "required_stdout_line": "OK CLI prompt: global handler",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Tostring_Frame",
+      "registered_label": "CLI prompt: actual tostring C frame",
+      "required_stdout_line": "OK CLI prompt: actual tostring C frame",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Global_Frame",
+      "registered_label": "CLI prompt: actual global C frame",
+      "required_stdout_line": "OK CLI prompt: actual global C frame",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Invalid_Handler_Result",
+      "registered_label": "CLI prompt: invalid handler result",
+      "required_stdout_line": "OK CLI prompt: invalid handler result",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Handler_Error",
+      "registered_label": "CLI prompt: handler error",
+      "required_stdout_line": "OK CLI prompt: handler error",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Table_Error",
+      "registered_label": "CLI prompt: table error report",
+      "required_stdout_line": "OK CLI prompt: table error report",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Boolean_Error",
+      "registered_label": "CLI prompt: boolean error report",
+      "required_stdout_line": "OK CLI prompt: boolean error report",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Nul_Error",
+      "registered_label": "CLI prompt: NUL error display",
+      "required_stdout_line": "OK CLI prompt: NUL error display",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Global_Error",
+      "registered_label": "CLI prompt: global error",
+      "required_stdout_line": "OK CLI prompt: global error",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Handler_Yield",
+      "registered_label": "CLI prompt: handler yield",
+      "required_stdout_line": "OK CLI prompt: handler yield",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Dynamic_Handler",
+      "registered_label": "CLI prompt: dynamic handler",
+      "required_stdout_line": "OK CLI prompt: dynamic handler",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Retired_Root",
+      "registered_label": "CLI prompt: retired weak argument",
+      "required_stdout_line": "OK CLI prompt: retired weak argument",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Budget_Recovery",
+      "registered_label": "CLI prompt: charged callback recovery",
+      "required_stdout_line": "OK CLI prompt: charged callback recovery",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Output_Budget",
+      "registered_label": "CLI prompt: output policy",
+      "required_stdout_line": "OK CLI prompt: output policy",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Exit_Without_Close",
+      "registered_label": "CLI prompt: exit without close",
+      "required_stdout_line": "OK CLI prompt: exit without close",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Exit_With_Close",
+      "registered_label": "CLI prompt: exit with close",
+      "required_stdout_line": "OK CLI prompt: exit with close",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Refusal_Recovery",
+      "registered_label": "CLI prompt: actual allocation refusal",
+      "required_stdout_line": "OK CLI prompt: actual allocation refusal",
+      "execution_evidence": []
     }
   ]
 }

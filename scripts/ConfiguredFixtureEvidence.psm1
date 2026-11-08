@@ -77,6 +77,16 @@ function Get-ConfiguredFixtureDefinitions {
             setup="$guard;assert(type(T.alloccount)=='function' and rawget(_G,'_SCALAR_CLOSING_CASE')==nil);print('CONFIGURED-FIXTURE: real T scalar closing')";
             stdout="CONFIGURED-FIXTURE: real T scalar closing`n"+
                 (($closing|ForEach-Object{"PASS scalar closing $_"})-join "`n")+"`n"}
+        $materialized=@('Count_Faults','Byte_Faults','Partial_Release','Retained_Recovery')
+        $definitions+=@{id='materialized-vararg-refusal';source='tests/lua/materialized_vararg_refusal.lua';
+            setup="$guard;assert(type(T.testC)=='function' and type(T.alloccount)=='function' and type(T.totalmem)=='function' and rawget(_G,'_MATERIALIZED_VARARG_CASE')==nil);print('CONFIGURED-FIXTURE: real T materialized vararg refusal')";
+            stdout="CONFIGURED-FIXTURE: real T materialized vararg refusal`n"+
+                (($materialized|ForEach-Object{"PASS materialized vararg refusal $_"})-join "`n")+"`n"}
+        $external=@('Short_Binary','Long_Borrow','Child_State','Invalid_Type')
+        $definitions+=@{id='fixed-external-strings';source='tests/lua/fixed_external_strings.lua';
+            setup="$guard;assert(type(T.externKstr)=='function' and rawget(_G,'_FIXED_EXTERNAL_CASE')==nil);print('CONFIGURED-FIXTURE: real T fixed external strings')";
+            stdout="CONFIGURED-FIXTURE: real T fixed external strings`n"+
+                (($external|ForEach-Object{"PASS fixed external $_"})-join "`n")+"`n"}
     }
     # This fixture deliberately counts instructions. Its own source contract
     # requires one C-compiled graph, consumed unchanged by both interpreters;
@@ -135,6 +145,8 @@ function Get-ConfiguredFixtureSources {
         'tests/lua/code_public_semantics.lua','tests/lua/call_metadata_windows.lua','tests/lua/call_metadata_public.lua',
         'tests/lua/canonical_tail_ownership.lua','tests/lua/canonical_tail_public.lua',
         'tests/lua/scalar_closing_refusal.lua','tests/lua/scalar_closing_public.lua',
+        'tests/lua/scalar_closing_mutation.lua','tests/lua/materialized_vararg.lua','tests/lua/materialized_vararg_refusal.lua',
+        'tests/lua/fixed_external_strings.lua','tests/lua/table_error_arguments.lua','tests/lua/locale_strings.lua',
         'tests/src/code_public_semantic_tests.adb','tests/src/code_public_semantic_tests.ads',
         'tests/src/lua-table_storage_inspection_tests.ads','tests/src/lua-table_storage_inspection_tests.adb',
         'tests/src/lua-engine-table_storage_probe.ads','tests/src/lua-engine-table_storage_probe.adb',

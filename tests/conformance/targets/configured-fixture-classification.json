@@ -146,11 +146,11 @@
         "kind": "source-linkage-only",
         "bindings": [
           {
-            "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3",
+            "sha256": "ece21d89d07963cf86191316e0ca7d3ce0c8f45de44a5fb91fee3356265e2c01",
             "path": "tests/src/lua-conformance_adapter.adb"
           },
           {
-            "sha256": "4141d51fbabd31aae0d7f1c529d2caab381c2a15f980fd7750bfb360f757ceb2",
+            "sha256": "d787cde6feab4ecc8ee9e80c96a33de473b4d31b5e91b638399dda0641ece269",
             "path": "tests/c/conformance_adapter.c"
           },
           {
@@ -381,6 +381,18 @@
           }
         ]
       }
+    },
+    {
+      "path": "tests/lua/materialized_vararg_refusal.lua",
+      "sha256": "7c0e8c9e0e38f1ef59d0b61122b8c5327085808ebcf905b0a03432134c539b5f",
+      "selection": "paired-configured-T-only",
+      "rationale": "All four count/byte/partial-release/retained-recovery cases use real T refusal controls and fail on T absence; they must run fully and unfiltered in the mandatory native/Ada instrumented pair. The separate ordinary materialized_vararg.lua has four T-free public payload/type/hole/alias/capture bodies and remains in generic default comparison. No exact positive native allocation threshold or source waiver is claimed."
+    },
+    {
+      "path": "tests/lua/fixed_external_strings.lua",
+      "sha256": "20b93ffca9aeafab840cf299e1cd22f18d758076a47d5fc6402bf251d5f19373",
+      "selection": "paired-configured-T-only",
+      "rationale": "All four real T.externKstr C-wrapper cases require actual instrumented public external-string operations, including binary payload, rooted borrow and key, remote source copied before child closure, and invalid-type recovery. Run the complete unfiltered native/Ada T pair; T absence is failure, never ordinary coverage."
     }
   ]
 }

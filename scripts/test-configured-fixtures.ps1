@@ -154,6 +154,26 @@ if($baseline.configuration -ceq 'upstream-test'){
     Case 'the full instrumented campaign cannot omit scalar closing observations' {param($r)
         $r.processes=@($r.processes|Where-Object operation -CNE scalar-closing-refusal)
     } 'process set is incomplete'
+    Case 'materialized vararg filter cannot replace the complete fault campaign' {param($r)
+        (Row $r materialized-vararg-refusal).process.arguments[1]="_MATERIALIZED_VARARG_CASE='Count_Faults'"
+    } 'explicit setup'
+    Case 'materialized vararg completion cannot omit actual partial payload release' {param($r)
+        $p=(Row $r materialized-vararg-refusal).process
+        Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS materialized vararg refusal Partial_Release`n",''))
+    } 'complete ordered protocol'
+    Case 'the instrumented campaign cannot omit materialized count byte and recovery operations' {param($r)
+        $r.processes=@($r.processes|Where-Object operation -CNE materialized-vararg-refusal)
+    } 'process set is incomplete'
+    Case 'fixed external selector cannot narrow binary rooting and remote-state controls' {param($r)
+        (Row $r fixed-external-strings).process.arguments[1]="_FIXED_EXTERNAL_CASE='Short_Binary'"
+    } 'explicit setup'
+    Case 'fixed external completion must retain the remote copy before state closure' {param($r)
+        $p=(Row $r fixed-external-strings).process
+        Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS fixed external Child_State`n",''))
+    } 'complete ordered protocol'
+    Case 'instrumented execution cannot substitute a T-absent external string return' {param($r)
+        $r.processes=@($r.processes|Where-Object operation -CNE fixed-external-strings)
+    } 'process set is incomplete'
     foreach($pair in @(@('reader-refusal-phases','PASS: reader refusal Refused_Partial_Source'),
         @('string-refusal-phases','PASS: string refusal Refused_Error'),
         @('c-hook-transitions','PASS: C hook transition C_Count_Removes_All'))){
