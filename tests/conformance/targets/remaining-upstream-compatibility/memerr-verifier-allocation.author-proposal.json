@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "runtime_acceptance": false,
+  "kind": "memerr-verifier-allocation-author-proposal",
+  "native_source_semantics": {
+    "source_lines": [
+      236,
+      949
+    ],
+    "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199",
+    "path": "references/lua/ltests.c",
+    "exhaustion": "test allocator returns NULL while countlimit remains zero; failure does not restore it.",
+    "reset": "alloc_count with no argument sets countlimit to unsigned all-ones and returns no values; there is no getter for remaining count."
+  },
+  "proposed_insertion": {
+    "replacement_base64": "ICBULmFsbG9jY291bnQoKSAgLS0gcmVzdG9yZSBhbGxvY2F0aW9uIG9ubHkgZm9yIHRoZSB2ZXJpZmllcgo=",
+    "length_bytes": 0,
+    "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "offset_bytes": 140,
+    "replacement_utf8": "  T.alloccount()  -- restore allocation only for the verifier\n"
+  },
+  "coverage_authority": false,
+  "preserved_spans": [
+    {
+      "byte_length": 34,
+      "anchor_sha256": "24a6f919689ea609ba03232fe8612d54ca4045810431ba6b84a26ad61765c852",
+      "original_bytes": "  local stat, err = pcall(f, ...)\n",
+      "byte_offset": 106
+    },
+    {
+      "byte_length": 44,
+      "anchor_sha256": "2258cf6e841baf2afb792c687ed09a87dfa0c813db3c5999f155f1b0d224f5a5",
+      "original_bytes": "  assert(not stat and string.find(err, msg))",
+      "byte_offset": 140
+    },
+    {
+      "byte_length": 79,
+      "anchor_sha256": "8b1b01f67f1b82177438ac34727289f0abb9478557a96a7bba40bd70ef4d9ebc",
+      "original_bytes": "T.alloccount(10)\ncheckerr(MEMERRMSG, f)\nT.alloccount()          -- remove limit",
+      "byte_offset": 993
+    }
+  ],
+  "existing_verifier_order": "testalloc resets allocation count immediately after T.testC pcall and before validation; testbytes similarly restores total memory before checking status/error text.",
+  "source": {
+    "path": "references/lua/testes/memerr.lua",
+    "sha256": "02cc2a754e688bdfcbf507e009d899c4d367f27ced45094b68fdf208a6912491"
+  },
+  "author_observations": {
+    "results": "Native T completes both diagnostic phases; Ada T limited-verifier fails at its assertion with memory exhaustion, restored-verifier completes. Restored phases assert both actual failed applications and a typed 100000-element successful retry. These are first-party component diagnostics, not original memerr execution or approval.",
+    "sha256": "3b4dd266af9849fc74fada9fd851e70ba1bc9e7a18f71d2ed0e1c28a096e0963",
+    "path": "reports/memerr-verifier-author/0f9e6c93e57042bb8fb381cf94e18aff/observations.json",
+    "probe": {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/memerr-verifier.author.lua",
+      "sha256": "453c9d685bb1dce92f956975ce05e7358b2b0d8e0f54248b2b147fbf07ccb32a"
+    }
+  },
+  "in_memory_output_sha256": "741faddfa9876909e3fda0d61ab24e48f8cd041e64922335f6c49e6d4f5c2353",
+  "configurations": [
+    "upstream-test"
+  ],
+  "helper_definition_t_dominance": "Helper definition is before the top-level T-absent return, so it is ineligible for the lexical exclusion guard. Its only two calls occur in the T-only suffix. This is a mixed status/text verifier and cannot use a pure-bound exclusion.",
+  "classification": "proposed-reviewed-equivalent-not-source-exclusion",
+  "independent_review_status": "pending",
+  "reason": "The actual application operation keeps its active allocator refusal. Only the subsequent verifier is allowed fresh scratch storage. A failed allocation, false status, original error-text assertion, retry, roots and cleanup remain required.",
+  "author": "Codex /root/validation_delivery",
+  "adapted_upstream_written": false,
+  "required_next_actions": [
+    "Independent source/configuration/feature review before any transformation authority.",
+    "Design a separately reviewed exact-byte equivalent schema; current pure-private-bound exclusion/transform authority does not authorize this insertion.",
+    "Fresh original native and approved Ada whole-file observations in every required context, retaining complete failure campaigns.",
+    "Final matrix and ledger reconciliation remain required."
+  ],
+  "adapted_upstream_executed": false,
+  "callsites": [
+    {
+      "byte_length": 57,
+      "anchor_sha256": "e92064b5113699458891aea05278493425d514f81d6cc3e7c176677b2587ba8d",
+      "original_bytes": "checkerr(\"block too big\", T.newuserdata, math.maxinteger)",
+      "byte_offset": 861
+    },
+    {
+      "byte_length": 22,
+      "anchor_sha256": "534dbfecffe015914956d4272cec08aa74563ee68b0d69547c1b8d64ade1ac0d",
+      "original_bytes": "checkerr(MEMERRMSG, f)",
+      "byte_offset": 1010
+    }
+  ],
+  "retained_requirements": [
+    "Both original protected application calls run before reset with original arguments and active controls.",
+    "The exact false-status and string.find error-text assertion remains unchanged.",
+    "The original line42 reset remains; the insertion adds no application operation under unlimited control.",
+    "All testalloc and testbytes failure sweeps, actual status/error checks, increments and eventual successful retries remain unchanged.",
+    "Public allocation failure, roots, coroutine/close behavior, cleanup, subsequent healthy execution and balanced shutdown remain required.",
+    "No exact allocation-count assertion or minimum-count output elsewhere in memerr.lua is classified or waived by this proposal."
+  ],
+  "target": "remaining-upstream-compatibility"
+}
