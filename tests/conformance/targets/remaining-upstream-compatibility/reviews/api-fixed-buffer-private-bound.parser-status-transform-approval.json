@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-transform-approval",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "decision": "accepted",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "transform": {
+    "id": "api-fixed-buffer-private-bound",
+    "target": "remaining-upstream-compatibility",
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+    "source": "references/lua/testes/api.lua",
+    "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+    "configuration": "upstream-test",
+    "exclusion_policy_sha256": "4917d6bbd7a3048f60a262f2e744a596af5e870039085ce9f2aa6d6945307224",
+    "output_sha256": "51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc"
+  },
+  "decisions": [
+    {
+      "replacement_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "id": "fixed-buffer-private-allocation-bound",
+      "rationale": "New independent exact-byte decision bound to refreshed feature and exclusion policy; all original bytes outside the private18 span remain unchanged. No parent, runtime or final-target acceptance is implied.",
+      "decision": "accepted",
+      "preserves_public_assertions": true,
+      "length_bytes": 18,
+      "start_byte": 17053,
+      "source_sha256": "f89400b75cf254feed3cc991449a9e7bc1679e6cd9b5b6be1b6598dfa176bf55",
+      "private_only": true,
+      "exclusion_id": "LUA-API-REVIEWED-BLOCK-9001"
+    }
+  ],
+  "review_evidence": {
+    "sha256": "8c40ab3021f0279409f8478ce770daf1033742d93444125fdb004a537756a6c2",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-transform-review.json"
+  }
+}

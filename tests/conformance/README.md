@@ -16,6 +16,12 @@ composition retains the eighteen-byte exclusion as a separate disposition.
 Source approvals supply no passing runtime or whole-target evidence. Fresh
 execution and final reconciliation remain required.
 
+The [parser-status binding refresh](../../docs/sessions/2026-11-08-api18-binding-refresh.md)
+renews the same eighteen-byte policy/transform against the preserved public C
+witness header. Earlier review files remain dated evidence. API941/composition
+and memory-verifier implementation bindings require separate review after
+hook/pool/adapter changes; they acquire no renewed authority through this edit.
+
 The separately authorized [remaining upstream compatibility target](targets/README.md)
 can resolve reviewed T-only private checks as explicit exclusions. Its overlay
 never changes the strict upstream completion rule or counts an exclusion as a

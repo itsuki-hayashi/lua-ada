@@ -41,11 +41,11 @@
       },
       "evidence": [],
       "review": {
-        "artifact_sha256": "ca513dc6dbd79ead0ea56b19fda23de9bc6596746893c7442837fc87717113b9",
-        "author": "Codex /root/validation_delivery",
         "reviewer": "Codex /root",
-        "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.exclusion-approval.json",
-        "status": "accepted"
+        "status": "accepted",
+        "artifact_sha256": "640f4265c736ec5508601a9abbb0e7167a64188f9c64bb371c268a72e6b3ca4b",
+        "author": "Codex /root/validation_delivery",
+        "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-exclusion-approval.json"
       },
       "eligibility_schema_version": 2,
       "module_compatibility_obligation": false,

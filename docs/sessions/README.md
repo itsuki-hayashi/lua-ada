@@ -1,5 +1,7 @@
 # Session Records
 
+Source review: [fixed-buffer binding refresh](2026-11-08-api18-binding-refresh.md).
+
 Component: [actual table-storage inspection](2026-11-08-table-storage-inspection.md).
 
 Correction: [declaration activation](2026-11-08-declaration-activation-correction.md).

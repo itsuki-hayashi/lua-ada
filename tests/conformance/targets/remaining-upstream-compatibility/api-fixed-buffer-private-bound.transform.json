@@ -7,7 +7,7 @@
   "source": "references/lua/testes/api.lua",
   "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
   "configuration": "upstream-test",
-  "exclusion_policy_sha256": "c197e57cb129f0378b6d108c0807423a5577f4fc47cb107272d9caccfbed79ff",
+  "exclusion_policy_sha256": "4917d6bbd7a3048f60a262f2e744a596af5e870039085ce9f2aa6d6945307224",
   "replacements": [
     {
       "id": "fixed-buffer-private-allocation-bound",
@@ -23,16 +23,16 @@
     "path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.author-proposal.json",
     "sha256": "6cd1e2c1e912d22c4bcdbaee0c9587d47be903c27668fa7a5fd22f199574cab8"
   },
-  "policy_binding_status": "Exact private child and disposable transformation independently reviewed; runtime, mixed parent and whole-target acceptance remain required.",
+  "policy_binding_status": "Exact private18 source operation independently rereviewed against parser-status witness bindings; composition, runtime and original parent remain separately required.",
   "independent_review_status": "accepted-exact-transform-only",
   "runtime_acceptance": false,
   "coverage_authority": false,
   "review": {
-    "author": "Codex /root/validation_delivery",
-    "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.transform-approval.json",
+    "reviewer": "Codex /root",
     "status": "accepted",
-    "artifact_sha256": "0c756a649ecc78a6e3b2490e35a06361ced41abb5fe7373f5214e63f5969aaef",
-    "reviewer": "Codex /root"
+    "artifact_sha256": "a97fd8171dc12e836c0599ca67507457d9c6c071bc6db52a9b9ca81309d9992b",
+    "author": "Codex /root/validation_delivery",
+    "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-transform-approval.json"
   },
   "source_feature_review": {
     "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-feature-review.json",

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "t-private-transform-source-review",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "decision": "accepted",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "transform_id": "api-fixed-buffer-private-bound",
+  "configuration": "upstream-test",
+  "feature_review": {
+    "sha256": "ddf0e8cd59e985eb0a280cd20498d80678d697e064718b970d9a70e871b7c064",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-feature-review.json"
+  },
+  "exclusion_approval": {
+    "sha256": "640f4265c736ec5508601a9abbb0e7167a64188f9c64bb371c268a72e6b3ca4b",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-exclusion-approval.json"
+  },
+  "exclusion_policy_sha256": "4917d6bbd7a3048f60a262f2e744a596af5e870039085ce9f2aa6d6945307224",
+  "observed_removed_bytes": " and m2 - m1 < 400",
+  "output_sha256": "51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc",
+  "public_assertion_preservation": "Independently reread unchanged original source550-605 and reconstructed the exact original-coordinate deletion. It removes only the18-byte upper-bound conjunct and leaves every other byte untouched, including m2>m1, complete binary program construction/size witness, actual B-mode load, X/Y execution, source retention and line301 error. Current feature bindings preserve all28 previous C witness bodies; added parser status tests do not relax them. Parent0125 remains required and pending. This new exact source decision supplies no runtime/whole-file acceptance or composition approval."
+}
