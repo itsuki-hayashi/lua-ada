@@ -448,11 +448,76 @@ package body Lua.Engine is
         (if Zero = 0 then Text'Last else Zero - 1));
    end C_Option;
 
+   procedure Diagnostic_Work (State : in out World; Bytes : Natural)
+   is
+   begin
+      --  The fixed inline path is bounded bookkeeping. Longer immutable
+      --  payload construction copies every byte and consumes the same host
+      --  budget as other native input-sized loops, before allocating.
+      if Bytes > Lua.Diagnostic_Text.Inline_Capacity and then
+        State.Policy = Bounded and then State.Memory_Ready
+      then
+         if Bytes > State.Bounds.Instructions - Natural'Min
+           (State.Steps, State.Bounds.Instructions)
+         then
+            Fail (State, "instruction limit exceeded", Resource => True);
+         end if;
+         State.Steps := State.Steps + Bytes;
+      end if;
+   end Diagnostic_Work;
+
+   procedure Set_Failure_Text
+     (State : in out World; Context : not null Context_Access;
+      Message : String)
+   is
+   begin
+      Diagnostic_Work (State, Message'Length);
+      Lua.Diagnostic_Text.Set_Value
+        (Context.Failure_Text, Context.Memory, Message);
+   end Set_Failure_Text;
+
+   function Failure_Image (Context : not null Context_Access) return String is
+   begin
+      --  Failure text is only the pending builder representation. Once a real
+      --  Lua error exists, preserve its original bytes/identity instead of
+      --  requiring another allocation during error delivery or propagation.
+      if Lua.Diagnostic_Text.Length (Context.Failure_Text) = 0 and then
+        Context.Has_Failure_Value
+      then
+         return Image (Context.Memory, Context.Failure);
+      end if;
+      return Lua.Diagnostic_Text.To_String (Context.Failure_Text);
+   end Failure_Image;
+
+   function Ensure_Error_Object
+     (State : in out World; Context : not null Context_Access) return Value
+   is
+      procedure Publish (Bytes : String);
+      procedure Publish (Bytes : String) is
+      begin
+         --  The Lua string constructor hashes and copies the pending bytes.
+         --  Charge both real passes; existing Lua error objects skip them.
+         Diagnostic_Work (State, Bytes'Length);
+         Diagnostic_Work (State, Bytes'Length);
+         Context.Failure := New_String (State, Bytes);
+         Root_Barrier (State, Context.Failure);
+         Context.Has_Failure_Value := True;
+      end Publish;
+   begin
+      if not Context.Has_Failure_Value then
+         --  Query's immutable snapshot survives collection/refusal, and its
+         --  bounded handle copy cannot allocate while reporting another error.
+         Lua.Diagnostic_Text.Query (Context.Failure_Text, Publish'Access);
+      end if;
+      Lua.Diagnostic_Text.Clear (Context.Failure_Text);
+      return Context.Failure;
+   end Ensure_Error_Object;
+
    procedure Fail (State : in out World; Message : String;
                    Resource : Boolean := False)
    is
    begin
-      State.Current.Failure_Text := To_Unbounded_String (Message);
+      Set_Failure_Text (State, State.Current, Message);
       State.Current.Failure := Nil_Value;
       State.Current.Has_Failure_Value := False;
       State.Current.Failure_Handled := False;
@@ -528,7 +593,7 @@ package body Lua.Engine is
       Lua.Storage.Acknowledge_Refusal (State.Memory);
       State.Current.Failure := State.Memory_Error_Value;
       State.Current.Has_Failure_Value := True;
-      State.Current.Failure_Text := To_Unbounded_String ("not enough memory");
+      Set_Failure_Text (State, State.Current, "not enough memory");
       State.Current.Failure_Class := Memory_Failure;
       State.Current.Failure_Handled := False;
    end Record_Memory_Error;
@@ -2732,7 +2797,7 @@ package body Lua.Engine is
       State.Current.Status := Running_Context;
       State.Current.Failure := Nil_Value;
       State.Current.Has_Failure_Value := False;
-      State.Current.Failure_Text := Null_Unbounded_String;
+      Lua.Diagnostic_Text.Clear (State.Current.Failure_Text);
       State.Current.Failure_Class := No_Failure;
       State.Current.Failure_Handled := False;
       State.Current.Protected_Failure_Class := No_Failure;
@@ -2794,8 +2859,7 @@ package body Lua.Engine is
          Machine.Clear_Frames (State);
          State.Current.Failure_Class := Host_Abort;
          State.Current.Transfer := (Kind => Host_Stopped, others => <>);
-         State.Current.Failure_Text := To_Unbounded_String
-           ("host storage exhausted");
+         Set_Failure_Text (State, State.Current, "host storage exhausted");
          return False;
       when Error : Constraint_Error | Program_Error =>
          State.Entry_Code := null;
@@ -2809,8 +2873,9 @@ package body Lua.Engine is
          --  Keep the embedding boundary exception-safe, but make an internal
          --  check failure explicit so tests cannot mistake it for Lua parity.
          Machine.Clear_Frames (State);
-         State.Current.Failure_Text := To_Unbounded_String
-           ("internal Ada check: " & Ada.Exceptions.Exception_Message (Error));
+         Set_Failure_Text
+           (State, State.Current,
+            "internal Ada check: " & Ada.Exceptions.Exception_Message (Error));
          return False;
    end Execute;
 end Lua.Engine;

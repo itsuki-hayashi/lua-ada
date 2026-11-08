@@ -1,3 +1,4 @@
+with Lua.Diagnostic_Text;
 with Lua.Engine.Unicode;
 
 separate (Lua.Engine.Foreign)
@@ -111,7 +112,7 @@ begin
          Context.Has_Failure_Value := False;
          Context.Failure_Class := No_Failure;
          Context.Failure_Handled := False;
-         Context.Failure_Text := Null_Unbounded_String;
+         Lua.Diagnostic_Text.Clear (Context.Failure_Text);
       end if;
       return;
    end if;

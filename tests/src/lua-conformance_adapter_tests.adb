@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Conformance_Adapter;
 with Lua.Conformance_Memory;
@@ -18,7 +17,7 @@ package body Lua.Conformance_Adapter_Tests is
          Conformance_Adapter.Install (State);
          if Platform then Conformance_Adapter.Install_Platform (State); end if;
          Assert (Execute (State, Source, "adapter"),
-                 To_String (State.Current.Failure_Text));
+                 Failure_Image (State.Current));
       exception
          when others =>
             Lua.Storage.Clear_Failures (State.Memory);

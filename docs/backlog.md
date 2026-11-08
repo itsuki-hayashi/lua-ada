@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+The [Context failure-text migration](sessions/2026-11-08-runtime-failure-storage.md)
+is implemented and locally verified. Continue the actual C call metadata and
+canonical return-packet refusal paths, legacy input-sized builders, registry
+traceback callbacks and linear reader integration. Both local 2,300-case AUnit
+passes and focused C/binary witnesses leave all final target gates required.
+
 Integrate the [managed diagnostic-text component](sessions/2026-11-08-managed-diagnostic-text.md)
 into failure delivery after the pending return/close checkpoint. Preserve
 original Lua error values, allocation-free propagation/recovery and selected

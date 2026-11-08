@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Unchecked_Conversion;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
@@ -44,7 +43,7 @@ package body Lua.C_Operator_Tests is
       Assert (State.Current.Failure_Class = Host_Abort,
               "operator host abort remains uncatchable across C portal");
       Assert (Execute (State, "return 37", "C-operator-recovery"),
-              To_String (State.Current.Failure_Text));
+              Failure_Image (State.Current));
       Finalize (State);
       Assert (Lua.Storage.Statistics (State.Memory).Live_Blocks = 0,
               "operator abort retires helper/guard/driver owners");

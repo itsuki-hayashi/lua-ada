@@ -1,3 +1,4 @@
+with Lua.Diagnostic_Text;
 with Ada.Exceptions;
 with Ada.Unchecked_Deallocation;
 with Lua.Engine.Compiler;
@@ -33,7 +34,8 @@ package body Lua.Sessions is
          Result.Output := Self.State.Output;
          Result.Error.Line := Self.State.Current.Failure_At.Line;
          Result.Error.Column := Self.State.Current.Failure_At.Column;
-         Result.Error.Message := Self.State.Current.Failure_Text;
+         Result.Error.Message := To_Unbounded_String
+           (Lua.Engine.Failure_Image (Self.State.Current));
       end if;
       return Result;
    end Failure;
@@ -239,7 +241,7 @@ package body Lua.Sessions is
          State.Current.Status := Lua.Engine.Running_Context;
          State.Current.Failure := Lua.Engine.Nil_Value;
          State.Current.Has_Failure_Value := False;
-         State.Current.Failure_Text := Null_Unbounded_String;
+         Lua.Diagnostic_Text.Clear (State.Current.Failure_Text);
          State.Current.Failure_Class := Lua.Engine.No_Failure;
          State.Current.Failure_Handled := False;
          State.Current.Protected_Failure_Class := Lua.Engine.No_Failure;
@@ -316,8 +318,9 @@ package body Lua.Sessions is
          if Lua.Storage.Refusal_Pending (Self.State.Memory) then
             Lua.Engine.Record_Memory_Error (Self.State.all);
          else
-            Self.State.Current.Failure_Text := To_Unbounded_String
-              ("internal Ada check: " &
+            Lua.Engine.Set_Failure_Text
+              (Self.State.all, Self.State.Current,
+               "internal Ada check: " &
                Ada.Exceptions.Exception_Message (Error));
          end if;
          Unwind (Collect_After => False);
@@ -349,7 +352,7 @@ package body Lua.Sessions is
          --  callback event; changing the public warn binding has no effect.
          State.Current.Failure := Lua.Engine.Nil_Value;
          State.Current.Has_Failure_Value := False;
-         State.Current.Failure_Text := Null_Unbounded_String;
+         Lua.Diagnostic_Text.Clear (State.Current.Failure_Text);
          State.Current.Failure_Class := Lua.Engine.No_Failure;
          State.Current.Failure_Handled := False;
          State.Current.Protected_Failure_Class := Lua.Engine.No_Failure;
@@ -410,7 +413,7 @@ package body Lua.Sessions is
          --  external-string release uses its real guarded C callback portal.
          State.Current.Failure := Lua.Engine.Nil_Value;
          State.Current.Has_Failure_Value := False;
-         State.Current.Failure_Text := Null_Unbounded_String;
+         Lua.Diagnostic_Text.Clear (State.Current.Failure_Text);
          State.Current.Failure_Class := Lua.Engine.No_Failure;
          State.Current.Failure_Handled := False;
          State.Current.Protected_Failure_Class := Lua.Engine.No_Failure;

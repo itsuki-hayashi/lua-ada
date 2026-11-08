@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [runtime failure-storage migration](sessions/2026-11-08-runtime-failure-storage.md)
+uses selected immutable diagnostics and preserves original Lua error values.
+Both local configurations pass 2,300 AUnit cases, all standalone C consumers
+and the eight compiler/VM roles for its public fixture. Long C-prefix mode
+errors and instruction-policy distinctions have focused regressions. The
+complete allocation audit and final source/platform acceptance remain open.
+
 The [managed diagnostic-text component](sessions/2026-11-08-managed-diagnostic-text.md)
 passes fourteen focused ownership/refusal cases; both local configurations
 pass 2,281 AUnit cases. The private component is available, while actual engine

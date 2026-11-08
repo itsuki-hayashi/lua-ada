@@ -1,5 +1,4 @@
 with Ada.Strings.Fixed;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Conformance_Adapter;
 with Lua.Conformance_Allocator;
@@ -74,7 +73,7 @@ package body Lua.API_Command_Tests is
          Conformance_Allocator.Set_Byte_Limit (0);
       end if;
       Assert (Success,
-              To_String (State.Current.Failure_Text));
+              Failure_Image (State.Current));
       Finalize (State);
       if Interpose then Conformance_Allocator.Finish; end if;
       Assert (Lua.Storage.Statistics (State.Memory).Live_Blocks = 0,
@@ -315,7 +314,7 @@ package body Lua.API_Command_Tests is
       Assert (State.Current.Failure_Class = Host_Abort,
               "cross-context host quota became a catchable error");
       Assert (Ada.Strings.Fixed.Index
-        (To_String (State.Current.Failure_Text), "instruction limit") > 0,
+        (Failure_Image (State.Current), "instruction limit") > 0,
         "cross-context transfer lost the original host failure diagnostic");
       Assert (Execute (State, "return 37", "=cross-context-recovery"),
               "cross-context host stop did not restore the original driver");

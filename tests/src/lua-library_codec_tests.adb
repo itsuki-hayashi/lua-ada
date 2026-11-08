@@ -1,5 +1,4 @@
 with Ada.Strings.Fixed;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
 with Lua.Engine.Packing;
@@ -119,7 +118,7 @@ package body Lua.Library_Codec_Tests is
                Assert (not (State.Current.Failure_Class = Host_Abort),
                        "semantic overflow is catchable");
                Assert (Ada.Strings.Fixed.Index
-                 (To_String (State.Current.Failure_Text), "too long") /= 0,
+                 (Failure_Image (State.Current), "too long") /= 0,
                        "overflow explains the format result");
          end;
       end Check;

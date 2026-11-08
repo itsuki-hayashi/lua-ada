@@ -220,7 +220,7 @@ package body Lua.String_Helper_Tests is
          when Language_Error =>
             --  The pinned Windows configuration deliberately uses Lua's
             --  C89 hex formatter, which rejects every modifier.
-            Assert (State.Current.Failure_Text =
+            Assert (Failure_Image (State.Current) =
               "modifiers for format '%a'/'%A' not implemented",
               "documented C89 hex format boundary");
       end;

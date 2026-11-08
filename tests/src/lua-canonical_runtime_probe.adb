@@ -156,7 +156,7 @@ exception
       Write_Output;
       Ada.Text_IO.Put_Line (Ada.Text_IO.Standard_Error,
         "Lua error at line" & Positive'Image (State.Current.Failure_At.Line) &
-        ": " & Ada.Strings.Unbounded.To_String (State.Current.Failure_Text));
+        ": " & Failure_Image (State.Current));
       Close;
       Set_Exit_Status (Failure);
    when Error : others =>

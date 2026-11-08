@@ -1,6 +1,7 @@
 # ADR 0035: Managed immutable diagnostic text
 
-Status: scoped component implemented; engine failure-field migration pending.
+Status: scoped component and engine failure-field migration implemented;
+complete allocation audit and final acceptance pending.
 
 Runtime failure state still contains unbounded Ada strings. Replacing them
 with ordinary mutable buffers alone would make controlled assignment allocate
@@ -39,6 +40,10 @@ pool-identity question is answered by Storage.Pool's existing subpool owner,
 and its synchronization caveat is explicit in the spec. Positive reference
 count overflow is checked; no billion-handle test or proof claim is made.
 
-This decision does not claim that Context.Failure_Text has migrated or that
-all input-sized temporary formatting has been audited. Those changes require
-separate actual error/refusal/lifetime and final-head matrix evidence.
+Context.Failure_Text now uses this representation. Captured Lua errors keep
+their original value and clear duplicate text; pending diagnostics publish
+through a borrowed view. Saved compiler error values receive an actual traced
+activation capture until restoration. Host reports materialize their public
+result explicitly. See the [runtime migration record](../sessions/2026-11-08-runtime-failure-storage.md).
+This closes that storage path, while the complete allocation/temporary audit
+and final-head matrix evidence remain open.

@@ -1,3 +1,4 @@
+with Lua.Diagnostic_Text;
 with Lua.Engine.Finalizers;
 with Lua.Engine.Garbage_Collection;
 with Lua.Engine.IO_Libraries;
@@ -693,8 +694,7 @@ package body Lua.Engine.Machine is
          Context.Has_Failure_Value := True;
          Context.Failure_Class := Handling_Failure;
          Context.Failure_Handled := True;
-         Context.Failure_Text :=
-           To_Unbounded_String ("error in error handling");
+         Set_Failure_Text (State, Context, "error in error handling");
          raise Language_Error;
       end Handling_Overflow;
    begin
@@ -1991,8 +1991,7 @@ package body Lua.Engine.Machine is
       State.Current.Failure := Error_Value;
       Root_Barrier (State, State.Current.Failure);
       State.Current.Has_Failure_Value := True;
-      State.Current.Failure_Text := To_Unbounded_String
-        (Image (State.Current.Memory, Error_Value));
+      Lua.Diagnostic_Text.Clear (State.Current.Failure_Text);
       State.Current.Failure_Class := Language_Failure;
       State.Current.Failure_Handled := False;
       raise Language_Error;
@@ -2737,8 +2736,8 @@ package body Lua.Engine.Machine is
             raise;
          end if;
          if not State.Current.Has_Failure_Value then
-            State.Current.Failure := New_String
-              (State, To_String (State.Current.Failure_Text));
+            State.Current.Failure :=
+              Ensure_Error_Object (State, State.Current);
             Root_Barrier (State, State.Current.Failure);
          end if;
          Packet.Clear;
@@ -2791,16 +2790,13 @@ package body Lua.Engine.Machine is
          State.Current.Has_Failure_Value := True;
          State.Current.Failure_Class := Handling_Failure;
          State.Current.Failure_Handled := True;
-         State.Current.Failure_Text :=
-           To_Unbounded_String
-             (Image (State.Current.Memory, State.Handling_Error_Value));
+         Lua.Diagnostic_Text.Clear (State.Current.Failure_Text);
          return;
       elsif State.Current.Message_Depth + 1 = Limit then
          State.Current.Failure := New_String (State, "C stack overflow");
          Root_Barrier (State, State.Current.Failure);
          State.Current.Has_Failure_Value := True;
-         State.Current.Failure_Text :=
-           To_Unbounded_String ("C stack overflow");
+         Set_Failure_Text (State, State.Current, "C stack overflow");
       end if;
       Arguments.Append (State.Current.Failure);
       Pin (State, Handler);
@@ -2841,8 +2837,8 @@ package body Lua.Engine.Machine is
          raise Language_Error;
       end if;
       if not State.Current.Has_Failure_Value then
-         State.Current.Failure := New_String
-           (State, To_String (State.Current.Failure_Text));
+         State.Current.Failure :=
+           Ensure_Error_Object (State, State.Current);
          Root_Barrier (State, State.Current.Failure);
          State.Current.Has_Failure_Value := True;
       end if;
@@ -2865,8 +2861,7 @@ package body Lua.Engine.Machine is
          --  including the absent first result from a successful handler.
          State.Current.Failure := New_String (State, "<no error object>");
          Root_Barrier (State, State.Current.Failure);
-         State.Current.Failure_Text :=
-           To_Unbounded_String ("<no error object>");
+         Set_Failure_Text (State, State.Current, "<no error object>");
       end if;
       for Index in reverse State.Current.Stack.First_Index ..
         State.Current.Stack.Last_Index
@@ -3524,8 +3519,7 @@ package body Lua.Engine.Machine is
                     (Context, Context.Foreign_Top);
                   Root_Barrier (State, Context.Failure);
                   Context.Has_Failure_Value := True;
-                  Context.Failure_Text := To_Unbounded_String
-                    (Image (Context.Memory, Context.Failure));
+                  Lua.Diagnostic_Text.Clear (Context.Failure_Text);
                   Context.Failure_Class := Activation.Result_Failure_Class;
                   Context.Failure_Handled := Activation.Result_Handler_Called;
                   Caller.Native_Stage := 3;
@@ -3640,8 +3634,7 @@ package body Lua.Engine.Machine is
          State.Current.Has_Failure_Value := True;
          State.Current.Failure_Class := Language_Failure;
          State.Current.Failure_Handled := True;
-         State.Current.Failure_Text :=
-           To_Unbounded_String (Image (State.Current.Memory, Left));
+         Lua.Diagnostic_Text.Clear (State.Current.Failure_Text);
          Recover (Self);
          return;
       elsif Name = "base.primitive" then
@@ -3955,9 +3948,7 @@ package body Lua.Engine.Machine is
                   State.Current.Failure := Error_Value;
                   Root_Barrier (State, State.Current.Failure);
                   State.Current.Has_Failure_Value := Failed;
-                  State.Current.Failure_Text :=
-                    To_Unbounded_String
-                      (Image (State.Current.Memory, Error_Value));
+                  Lua.Diagnostic_Text.Clear (State.Current.Failure_Text);
                   State.Current.Failure_Class := Failure;
                   State.Current.Failure_Handled := Handler_Called;
                end if;
@@ -5687,9 +5678,8 @@ package body Lua.Engine.Machine is
                         raise;
                      end if;
                      if not State.Current.Has_Failure_Value then
-                        State.Current.Failure := New_String
-                          (State, To_String
-                            (State.Current.Failure_Text));
+                        State.Current.Failure :=
+                          Ensure_Error_Object (State, State.Current);
                         Root_Barrier (State, State.Current.Failure);
                         State.Current.Has_Failure_Value := True;
                      end if;
@@ -5725,8 +5715,8 @@ package body Lua.Engine.Machine is
                   raise;
                end if;
                if not State.Current.Has_Failure_Value then
-                  State.Current.Failure := New_String
-                    (State, To_String (State.Current.Failure_Text));
+                  State.Current.Failure :=
+                    Ensure_Error_Object (State, State.Current);
                   Root_Barrier (State, State.Current.Failure);
                   State.Current.Has_Failure_Value := True;
                end if;
@@ -6470,8 +6460,7 @@ package body Lua.Engine.Machine is
          Context.Failure := Stacks.Read (Context, Context.Foreign_Top);
          Root_Barrier (State, Context.Failure);
          Context.Has_Failure_Value := True;
-         Context.Failure_Text := To_Unbounded_String
-           (Image (Context.Memory, Context.Failure));
+         Lua.Diagnostic_Text.Clear (Context.Failure_Text);
          Context.Failure_Class :=
            (if Error_Status = 4 then Memory_Failure
             elsif Error_Status = 5 then Handling_Failure

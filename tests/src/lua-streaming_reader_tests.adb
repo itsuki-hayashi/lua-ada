@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Unchecked_Conversion;
 with AUnit.Assertions; use AUnit.Assertions;
 with Interfaces.C;
@@ -90,7 +89,7 @@ package body Lua.Streaming_Reader_Tests is
       Assert (Execute (State,
         "local ok,e=pcall(reader); " &
         "assert(not ok and type(e)=='table' and e.code==99)",
-        "reader-table-error"), To_String (State.Current.Failure_Text));
+        "reader-table-error"), Failure_Image (State.Current));
       Dispose (State);
    exception
       when others => Finalize (State); raise;

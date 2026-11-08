@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Unchecked_Conversion;
 with AUnit.Assertions; use AUnit.Assertions;
 with Interfaces.C;
@@ -173,7 +172,7 @@ package body Lua.C_Thread_Reset_Tests is
          Assert (not Success and State.Current.Failure_Class = Host_Abort,
                  "reset closer bypassed or caught the original host quota");
       else
-         Assert (Success, To_String (State.Current.Failure_Text));
+         Assert (Success, Failure_Image (State.Current));
       end if;
       if Mode = 1 then
          Assert (Reader_Calls = 2,
@@ -181,7 +180,7 @@ package body Lua.C_Thread_Reset_Tests is
       end if;
       Assert (Returned = 0, "an abandoned C body resumed after self close");
       Assert (Execute (State, "return 37", "=reset-recovery"),
-              To_String (State.Current.Failure_Text));
+              Failure_Image (State.Current));
       Finalize (State);
       Assert (Lua.Storage.Statistics (State.Memory).Live_Blocks = 0,
               "borrowed reset leaked callback/frontend/frame ownership");

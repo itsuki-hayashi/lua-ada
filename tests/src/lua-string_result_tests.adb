@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Conformance_Adapter;
 with Lua.Conformance_Allocator;
@@ -23,7 +22,7 @@ package body Lua.String_Result_Tests is
          Conformance_Allocator.Clear_Count_Limit;
          Conformance_Allocator.Set_Byte_Limit (0);
       end if;
-      Assert (Success, To_String (State.Current.Failure_Text));
+      Assert (Success, Failure_Image (State.Current));
       Finalize (State);
       if Interpose then Conformance_Allocator.Finish; end if;
       Assert (Lua.Storage.Statistics (State.Memory).Live_Blocks = 0,

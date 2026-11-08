@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [runtime failure storage](2026-11-08-runtime-failure-storage.md).
+
 Component: [managed diagnostic text](2026-11-08-managed-diagnostic-text.md).
 
 Component: [memory-verifier ordering](2026-11-08-memerr-verifier.md).

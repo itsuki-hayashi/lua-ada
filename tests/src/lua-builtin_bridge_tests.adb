@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Unchecked_Conversion;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
@@ -71,7 +70,7 @@ package body Lua.Builtin_Bridge_Tests is
         "local marker={};local t=setmetatable({}," &
         "{__pairs=function()error(marker)end});" &
         "local ok,e=pcall(forward,t);assert(not ok and e==marker)",
-        "builtin-table-error"), To_String (State.Current.Failure_Text));
+        "builtin-table-error"), Failure_Image (State.Current));
       Dispose (State);
    exception
       when others => Finalize (State); raise;

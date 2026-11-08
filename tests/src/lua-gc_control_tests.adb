@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
 with Lua.Storage;
@@ -28,7 +27,7 @@ package body Lua.GC_Control_Tests is
    procedure Check (State : in out World; Source : String) is
    begin
       Assert (Execute (State, Source, "gc-control"),
-              To_String (State.Current.Failure_Text));
+              Failure_Image (State.Current));
    end Check;
 
    procedure Stop_And_Restart (State : in out World);

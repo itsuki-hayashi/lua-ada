@@ -1,5 +1,4 @@
 with Ada.Containers;
-with Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Interfaces.C;
 with Lua.Engine; use Lua.Engine;
@@ -395,7 +394,7 @@ package body Lua.Userdata_Tests is
       exception
          when Language_Error =>
             Assert (State.Current.Failure_Class = Language_Failure and then
-              Ada.Strings.Unbounded.To_String (State.Current.Failure_Text) =
+              Failure_Image (State.Current) =
                 "block too big", "oversized userdata lost runtime error");
       end;
       Assert (Statistics (State.Memory).Growth_Attempts = Before,

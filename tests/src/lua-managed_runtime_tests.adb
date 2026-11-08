@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
 with Lua.Engine.Compiler;
@@ -169,7 +168,7 @@ package body Lua.Managed_Runtime_Tests is
         "local value={}; local weak=setmetatable({value}," &
         "{__mode='\0v'}); value=nil; collectgarbage(); " &
         "assert(type(weak[1])=='table')", "weak-mode-nul"),
-        "weak mode after NUL: " & To_String (State.Current.Failure_Text));
+        "weak mode after NUL: " & Failure_Image (State.Current));
    end Weak_Mode_Nul;
 
    procedure Metafield_Case is new Fixture (Raw_Metafield_Allocation);

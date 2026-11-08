@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Conformance_Adapter;
 with Lua.Engine; use Lua.Engine;
@@ -64,7 +63,7 @@ package body Lua.Stack_Inspection_Tests is
          Lua.Conformance_Adapter.Install (State);
          Assert (Execute (State, Prelude & "cases[" &
                    Positive'Image (Which) & "]()", "=stack-inspection"),
-                 To_String (State.Current.Failure_Text));
+                 Failure_Image (State.Current));
       exception
          when others =>
             Lua.Storage.Clear_Failures (State.Memory);

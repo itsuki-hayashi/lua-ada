@@ -11,6 +11,7 @@ with Lua.Storage;
 with Lua.Storage.Vectors;
 with Lua.Storage.Buffers;
 with Lua.Runtime_Configuration;
+with Lua.Diagnostic_Text;
 with System;
 
 private package Lua.Engine is
@@ -796,7 +797,7 @@ private package Lua.Engine is
       --  A synchronous foreign call borrows it without changing ownership.
       Failure      : Value;
       Has_Failure_Value : Boolean := False;
-      Failure_Text : Unbounded_String;
+      Failure_Text : Lua.Diagnostic_Text.Text;
       Failure_At   : Lua.Lexers.Source_Location;
       Failure_Class : Failure_Kind := No_Failure;
       Failure_Handled : Boolean := False;
@@ -1029,6 +1030,22 @@ private package Lua.Engine is
    procedure Fail (State : in out World; Message : String;
                    Resource : Boolean := False);
    --  Record a diagnostic before raising the internal transfer exception.
+
+   procedure Set_Failure_Text
+     (State : in out World; Context : not null Context_Access;
+      Message : String);
+   --  Copy a diagnostic through the selected owner, charging input-sized
+   --  work. Short emergency messages remain allocation-free under refusal.
+   procedure Diagnostic_Work (State : in out World; Bytes : Natural);
+   --  Charge an input-sized diagnostic pass before copying/scanning bytes.
+   --  The fixed inline bound is covered by ordinary activation bookkeeping.
+   function Failure_Image (Context : not null Context_Access) return String;
+   --  Materialize a host diagnostic. An actual Lua error is authoritative
+   --  and remains rooted in Context; its string is never copied for storage.
+   function Ensure_Error_Object
+     (State : in out World; Context : not null Context_Access) return Value;
+   --  Publish an existing error value, or build it directly from a borrowed
+   --  managed diagnostic. No input-sized unmanaged intermediate is created.
 
    procedure Begin_Operation (State : in out World);
    procedure End_Operation (State : in out World);

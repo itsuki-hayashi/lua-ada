@@ -1,3 +1,4 @@
+with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
@@ -53,8 +54,9 @@ package body Lua.Context_Tests is
       Assert (not Execute (State, "error('retained')", "first"), "Lua error");
       Select_Context (State, Other);
       Assert (Execute (State, "assert(true)", "second"), "other recovery");
-      Assert (Length (State.Current.Failure_Text) = 0, "clean other error");
-      Assert (Index (Main.Failure_Text, "retained") > 0, "retained error");
+      Assert (Failure_Image (State.Current)'Length = 0, "clean other error");
+      Assert (Ada.Strings.Fixed.Index (Failure_Image (Main), "retained") > 0,
+              "retained error");
       Select_Context (State, 1);
       Assert (Execute (State, "assert(true)", "recovery"), "main recovery");
       Assert (not (Main.Status = Running_Context),

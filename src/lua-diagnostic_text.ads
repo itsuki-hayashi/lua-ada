@@ -8,6 +8,8 @@ private package Lua.Diagnostic_Text is
    --  All handles sharing a payload follow that owner's serialization rule;
    --  copying or releasing them concurrently requires caller synchronization.
    type Text is new Ada.Finalization.Controlled with private;
+   Inline_Capacity : constant := 96;
+   --  Private-runtime bound for charging the allocation-free emergency path.
 
    function Length (Self : Text) return Natural;
    --  Count bytes, including embedded NULs; this operation never allocates.
@@ -32,7 +34,6 @@ private package Lua.Diagnostic_Text is
    --  and never allocate, including failure propagation between contexts.
 
 private
-   Inline_Capacity : constant := 96;
    type Payload (Size : Natural) is record
       References : Positive := 1;
       Bytes : String (1 .. Size);

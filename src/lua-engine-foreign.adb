@@ -1,3 +1,4 @@
+with Lua.Diagnostic_Text;
 with Ada.Exceptions;
 with Ada.Strings.Fixed;
 with Ada.Unchecked_Conversion;
@@ -856,8 +857,7 @@ package body Lua.Engine.Foreign is
          if State.Current.Failure_Class /= Host_Abort then
             State.Current.Failure_Class := Host_Abort;
             State.Current.Transfer.Kind := Host_Stopped;
-            State.Current.Failure_Text :=
-              To_Unbounded_String ("foreign host abort");
+            Set_Failure_Text (State, State.Current, "foreign host abort");
          end if;
          raise Language_Error;
       end if;
@@ -884,8 +884,7 @@ package body Lua.Engine.Foreign is
             Target.Failure := Stacks.Read (Target, Target.Foreign_Top);
             Root_Barrier (State, Target.Failure);
             Target.Has_Failure_Value := True;
-            Target.Failure_Text := To_Unbounded_String
-              (Image (Target.Memory, Target.Failure));
+            Lua.Diagnostic_Text.Clear (Target.Failure_Text);
             Target.Failure_Class :=
               (if Status = Action_Memory then Memory_Failure
                elsif Status = Action_Handling then Handling_Failure
@@ -1196,6 +1195,7 @@ package body Lua.Engine.Foreign is
 
       procedure Leave_Context;
       procedure Error_Result (Text : String);
+      procedure Current_Error_Result;
       procedure Memory_Result;
       function Require_Table return Value;
       procedure Get_Raw (Key : Value);
@@ -1396,6 +1396,21 @@ package body Lua.Engine.Foreign is
          when others => null;
       end Error_Result;
 
+      procedure Current_Error_Result is
+         Item : Value;
+      begin
+         if Context /= null then
+            --  Preserve an actual Lua error's identity and existing storage.
+            --  Pending diagnostic bytes are borrowed directly only when the
+            --  runtime has not published a Lua error object yet.
+            Item := Ensure_Error_Object (Owner.Universe.all, Context);
+            Push (Owner.Universe.all, Context, Item);
+            Output.Pointer :=
+              (if Item.Kind = String_Kind then Item.Reference.C_Bytes
+               else System.Null_Address);
+         end if;
+      end Current_Error_Result;
+
       procedure Memory_Result is
          Saved : Context_Access;
       begin
@@ -1480,8 +1495,8 @@ package body Lua.Engine.Foreign is
               (Owner.Universe.all, Packet,
                (if Owner.Universe.Current.Has_Failure_Value then
                    Owner.Universe.Current.Failure else
-                   New_String (Owner.Universe.all, To_String
-                     (Owner.Universe.Current.Failure_Text))));
+                   Ensure_Error_Object
+                     (Owner.Universe.all, Owner.Universe.Current)));
          end if;
          loop
             if External_Releases.Pending (Owner.Universe.all) then
@@ -1619,8 +1634,8 @@ package body Lua.Engine.Foreign is
                     (Owner.Universe.all, Packet,
                      (if Owner.Universe.Current.Has_Failure_Value then
                          Owner.Universe.Current.Failure else
-                         New_String (Owner.Universe.all, To_String
-                           (Owner.Universe.Current.Failure_Text))));
+                         Ensure_Error_Object
+                           (Owner.Universe.all, Owner.Universe.Current)));
                   exit;
             end;
          end loop;
@@ -2509,8 +2524,7 @@ package body Lua.Engine.Foreign is
                     Stacks.Read (Context, Context.Foreign_Top);
                   Root_Barrier (Owner.Universe.all, Context.Failure);
                   Context.Has_Failure_Value := True;
-                  Context.Failure_Text := To_Unbounded_String
-                    (Image (Context.Memory, Context.Failure));
+                  Lua.Diagnostic_Text.Clear (Context.Failure_Text);
                   Context.Failure_Class :=
                     (if Input.Index = 4 then Memory_Failure
                      elsif Input.Index = 5 then Handling_Failure
@@ -3706,7 +3720,7 @@ package body Lua.Engine.Foreign is
                Leave_Context;
                return Action_Memory;
             end if;
-            Error_Result (To_String (Context.Failure_Text));
+            Current_Error_Result;
             if Memory.Refusal_Pending (Owner.Universe.Memory) then
                Memory_Result;
                Leave_Context;

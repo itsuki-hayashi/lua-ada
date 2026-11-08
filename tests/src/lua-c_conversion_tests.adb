@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Unchecked_Conversion;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
@@ -41,7 +40,7 @@ package body Lua.C_Conversion_Tests is
       Assert (State.Current.Failure_Class = Host_Abort,
               "fixed numeric scratch does not bypass host scan limits");
       Assert (Execute (State, "return 37", "numeric-C-scan-recovery"),
-              To_String (State.Current.Failure_Text));
+              Failure_Image (State.Current));
       Finalize (State);
       Assert (Lua.Storage.Statistics (State.Memory).Live_Blocks = 0,
               "quota recovery retires real C records and numeric scratch");

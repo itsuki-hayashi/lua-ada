@@ -1,5 +1,4 @@
 with Ada.Containers;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
 with Test_Support;
@@ -212,7 +211,7 @@ package body Lua.Table_Storage_Tests is
         "{__mode='k'}); a=nil; collectgarbage(); " &
         "assert(rawlen(weak)==0 and weak[2]==b); " &
         "assert(keys[b]==2); weak[1]=b; assert(#weak==2)", "weak-index"),
-        "weak indexes and border: " & To_String (State.Current.Failure_Text));
+        "weak indexes and border: " & Failure_Image (State.Current));
    end Weak_Index_Cleanup;
 
    procedure Deleted_Key_Churn (State : in out World) is

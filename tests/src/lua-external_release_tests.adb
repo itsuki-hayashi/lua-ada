@@ -1,4 +1,3 @@
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Unchecked_Conversion;
 with AUnit.Assertions; use AUnit.Assertions;
 with Interfaces.C;
@@ -51,7 +50,7 @@ package body Lua.External_Release_Tests is
               Release_Count = Before + 1,
               "one actual free precedes an uncatchable shared-budget abort");
       Assert (Execute (State, "return 37", "external-release-recovery"),
-              To_String (State.Current.Failure_Text));
+              Failure_Image (State.Current));
       Finalize (State);
       Assert (Lua.Storage.Statistics (State.Memory).Live_Blocks = 0,
               "guard abort releases detached headers and driver records");
