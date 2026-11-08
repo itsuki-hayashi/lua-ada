@@ -36,6 +36,9 @@ package body Lua.API_Command_Tests is
    procedure Absent_Upvalue;
    procedure Stack_Reordering;
    procedure Raw_Table;
+   procedure Integer_Self_Value;
+   procedure Field_Self_Value;
+   procedure Integer_Self_Handler;
    procedure Metatable_Delegation;
    procedure Arithmetic_Commands;
    procedure C_Function_Identity;
@@ -537,8 +540,35 @@ package body Lua.API_Command_Tests is
       Check_Not ("function()end", False);
    end Not_Function;
 
+   --  The destination's top cell also supplies the consumed value. Key
+   --  insertion must follow that cell instead of indexing the new key.
+   procedure Integer_Self_Value is
+   begin
+      Check ("local a={};T.testC('seti -1 200',a);assert(a[200]==a)");
+   end Integer_Self_Value;
+
+   procedure Field_Self_Value is
+   begin
+      Check ("local a={};T.testC('setfield -1 self',a);" &
+             "assert(a.self==a)");
+   end Field_Self_Value;
+
+   --  A real callback sees identity-preserving operands and may collect.
+   procedure Integer_Self_Handler is
+   begin
+      Check ("local a=setmetatable({},{__newindex=function(t,k,v)" &
+             "assert(t==v and k==200);collectgarbage();rawset(t,k,v)" &
+             "end});T.testC('seti -1 200',a);assert(a[200]==a)");
+   end Integer_Self_Handler;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
+      Test_Support.Add (Suite, "API driver: integer self value",
+                        Integer_Self_Value'Access);
+      Test_Support.Add (Suite, "API driver: field self value",
+                        Field_Self_Value'Access);
+      Test_Support.Add (Suite, "API driver: integer self handler",
+                        Integer_Self_Handler'Access);
       Test_Support.Add (Suite, "API driver: light C upvalues",
                         Light_Upvalues'Access);
       Test_Support.Add (Suite, "API driver: acceptable absent upvalue",

@@ -2,6 +2,11 @@
 
 ## Active remaining-suite delivery
 
+Public C seti/setfield self assignments have [focused evidence](sessions/2026-11-08-c-api-self-values.md).
+Continue instrumented api.lua from line941 with independent review of the
+private retained-capacity bound and actual finalizer/reclamation witnesses.
+Keep the full API parent/runtime, all remaining source and platform gates open.
+
 Read-only named varargs now have [fresh local evidence](sessions/2026-11-08-hidden-named-varargs.md):
 unchanged vararg.lua completes in default/T with native output, nine focused
 cases match all compiler/VM combinations, and 2,194 AUnit cases pass in each

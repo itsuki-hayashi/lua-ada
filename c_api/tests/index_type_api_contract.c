@@ -244,6 +244,37 @@ static void set_relative_index_before_pop(lua_State *L) {
     lua_settop(L, 0);
 }
 
+/* The top table is simultaneously destination and consumed value. Retain
+ * another alias only for verification after the public operation pops it. */
+static void set_integer_self_value(lua_State *L) {
+    lua_newtable(L); lua_pushvalue(L, 1);
+    lua_seti(L, -1, 200);
+    assert(lua_gettop(L) == 1);
+    lua_rawgeti(L, 1, 200);
+    assert(lua_rawequal(L, 1, 2));
+    lua_settop(L, 0);
+}
+
+static void set_field_self_value(lua_State *L) {
+    lua_newtable(L); lua_pushvalue(L, 1);
+    lua_setfield(L, 2, "self");
+    assert(lua_gettop(L) == 1);
+    lua_getfield(L, 1, "self");
+    assert(lua_rawequal(L, 1, 2));
+    lua_settop(L, 0);
+}
+
+static void set_integer_self_handler(lua_State *L) {
+    run(L, "global self_target=setmetatable({},{__newindex="
+        "function(t,k,v)assert(t==v and k==200);collectgarbage();"
+        "rawset(t,k,v)end})");
+    lua_getglobal(L, "self_target"); lua_pushvalue(L, 1);
+    lua_seti(L, -1, 200);
+    assert(lua_gettop(L) == 1);
+    lua_rawgeti(L, 1, 200); assert(lua_rawequal(L, 1, 2));
+    lua_settop(L, 0);
+}
+
 static void set_newindex_handler_operands(lua_State *L) {
     run(L, "local marker={};local calls=0;local t;"
         "t=setmetatable({},{__newindex=function(self,key,value)"
@@ -334,6 +365,9 @@ int main(void) {
     check("set-integer-value-and-pop", set_integer_value_and_pop, L);
     check("set-signed-integer-extremes", set_signed_integer_extremes, L);
     check("set-relative-index-before-pop", set_relative_index_before_pop, L);
+    check("set-integer-self-value", set_integer_self_value, L);
+    check("set-field-self-value", set_field_self_value, L);
+    check("set-integer-self-handler", set_integer_self_handler, L);
     check("set-newindex-handler-operands", set_newindex_handler_operands, L);
     check("set-newindex-table-chain", set_newindex_table_chain, L);
     check("set-existing-key-bypasses-handler", set_existing_key_bypasses_handler, L);

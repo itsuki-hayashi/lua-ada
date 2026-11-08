@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [C API self-valued assignments](2026-11-08-c-api-self-values.md).
+
 Component: [hidden named varargs](2026-11-08-hidden-named-varargs.md).
 Component: [function definition store sites](2026-11-08-function-store-sites.md).
 

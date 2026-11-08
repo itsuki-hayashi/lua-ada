@@ -1052,9 +1052,14 @@ int lua_getfield(lua_State *state, int index, const char *key) {
 }
 
 void lua_setfield(lua_State *state, int index, const char *key) {
+    int target_is_value;
     index = lua_absindex(state, index);
+    target_is_value = index == lua_gettop(state);
     lua_pushstring(state, key);
     lua_insert(state, -2);
+    /* Inserting the key moves an aliased top-of-stack table/value one
+     * position upward. Preserve the original target's actual stack cell. */
+    if (target_is_value) index++;
     lua_settable(state, index);
 }
 
@@ -1065,9 +1070,13 @@ int lua_geti(lua_State *state, int index, lua_Integer key) {
 }
 
 void lua_seti(lua_State *state, int index, lua_Integer key) {
+    int target_is_value;
     index = lua_absindex(state, index);
+    target_is_value = index == lua_gettop(state);
     lua_pushinteger(state, key);
     lua_insert(state, -2);
+    /* The table may itself be the value consumed by this operation. */
+    if (target_is_value) index++;
     lua_settable(state, index);
 }
 

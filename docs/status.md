@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [C API self-value correction](sessions/2026-11-08-c-api-self-values.md)
+preserves the target cell when seti/setfield consume that same table. Thirty
+native/Ada C cases match in both configurations; the combined implementation
+passes 2,232 AUnit cases locally. Reviewed adapted api.lua now reaches its
+line-941 finalization footprint bound; the file remains incomplete.
+
 The [hidden named-vararg checkpoint](sessions/2026-11-08-hidden-named-varargs.md)
 completes unchanged vararg.lua in local default and T-enabled execution,
 matching the native output. Nine focused cases pass all eight C/Ada
