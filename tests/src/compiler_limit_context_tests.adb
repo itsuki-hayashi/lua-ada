@@ -87,6 +87,31 @@ package body Compiler_Limit_Context_Tests is
      " local result=table.pack(f())" & ASCII.LF &
      " assert(result.n==2 and result[1]==nil and resul" &
      "t[2]==nil)" & ASCII.LF &
+     "end" & ASCII.LF &
+     "cases[11]=function()" & ASCII.LF &
+     " local parts={}" & ASCII.LF &
+     " for i=1,201 do parts[i]='local k'..i..' <const>" &
+     " = '..i end" & ASCII.LF &
+     " parts[#parts+1]='return k201'" & ASCII.LF &
+     " local f,e=load(table.concat(parts,'\n'))" & ASCII.LF &
+     " assert(f,e);assert(f()==201)" & ASCII.LF &
+     "end" & ASCII.LF &
+     "cases[12]=function()" & ASCII.LF &
+     " local f,e=load('local '..names('a',200)..';loca" &
+     "l last<const> = 37;return last')" & ASCII.LF &
+     " assert(f,e);assert(f()==37)" & ASCII.LF &
+     "end" & ASCII.LF &
+     "cases[13]=function()" & ASCII.LF &
+     " rejected('local '..names('a',200)..';local last" &
+     "<const> = select(1,37)'," & ASCII.LF &
+     "          'local variables','in main function')" & ASCII.LF &
+     "end" & ASCII.LF &
+     "cases[14]=function()" & ASCII.LF &
+     " local f,e=load('local '..names('a',201)..' =')" & ASCII.LF &
+     " assert(f==nil and type(e)=='string' and e:find(" &
+     "'<eof>',1,true))" & ASCII.LF &
+     " assert(not e:find('too many local variables',1," &
+     "true),e)" & ASCII.LF &
      "end";
    procedure Check (Which : Positive);
    procedure Main_Locals;
@@ -99,6 +124,10 @@ package body Compiler_Limit_Context_Tests is
    procedure Incomplete_Parameters;
    procedure Expired_Scopes;
    procedure Outer_Locals;
+   procedure Many_Folded_Constants;
+   procedure Constant_After_Limit;
+   procedure Dynamic_Constant_Limit;
+   procedure Initializer_Syntax_First;
 
    procedure Check (Which : Positive) is
       State : Session;
@@ -170,6 +199,30 @@ package body Compiler_Limit_Context_Tests is
       Check (10);
    end Outer_Locals;
 
+   --  The native-paired many folded constants require no local registers.
+   procedure Many_Folded_Constants is
+   begin
+      Check (11);
+   end Many_Folded_Constants;
+
+   --  The native-paired a folded constant fits after two-hundred locals.
+   procedure Constant_After_Limit is
+   begin
+      Check (12);
+   end Constant_After_Limit;
+
+   --  The native-paired a dynamic constant still consumes a local register.
+   procedure Dynamic_Constant_Limit is
+   begin
+      Check (13);
+   end Dynamic_Constant_Limit;
+
+   --  Initializer syntax precedes register activation limits.
+   procedure Initializer_Syntax_First is
+   begin
+      Check (14);
+   end Initializer_Syntax_First;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -202,5 +255,17 @@ package body Compiler_Limit_Context_Tests is
       Test_Support.Add
         (Suite, "compiler context: outer locals",
          Outer_Locals'Access);
+      Test_Support.Add
+        (Suite, "compiler context: many folded constants",
+         Many_Folded_Constants'Access);
+      Test_Support.Add
+        (Suite, "compiler context: constant after limit",
+         Constant_After_Limit'Access);
+      Test_Support.Add
+        (Suite, "compiler context: dynamic constant limit",
+         Dynamic_Constant_Limit'Access);
+      Test_Support.Add
+        (Suite, "compiler context: initializer syntax first",
+         Initializer_Syntax_First'Access);
    end Register;
 end Compiler_Limit_Context_Tests;

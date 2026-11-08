@@ -1,5 +1,7 @@
 # Session Records
 
+Correction: [declaration activation](2026-11-08-declaration-activation-correction.md).
+
 Component: [compiler limit context](2026-11-08-compiler-limit-context.md).
 
 Component: [parser stack limits](2026-11-08-parser-stack-limits.md).

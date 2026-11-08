@@ -108,7 +108,7 @@ private package Lua.Syntax_Trees is
    --  Compatible_Global follows the pinned default LUA_COMPAT_GLOBAL=1;
    --  false reserves the keyword for configuration-sensitive C consumers.
    --  Compatible_Limits selects catchable parser-stack overflow and explicit
-   --  local-limit checks at declaration time. False preserves standalone
+   --  local-limit checks after initialization. False preserves standalone
    --  checking and bounded Ada session host-depth accounting.
    --  Both overloads use the same parser. A streaming source requests pieces
    --  through its guarded owner only when lexical lookahead needs more bytes.

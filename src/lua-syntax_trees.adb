@@ -1,8 +1,10 @@
 with Lua.Lexers; use Lua.Lexers;
+with Ada.Containers;
 with Ada.Characters.Handling;
 with Lua.Storage.Buffers;
 
 package body Lua.Syntax_Trees is
+   use type Ada.Containers.Count_Type;
    use type Lua.Syntax.Check_Status;
    use type Lua.Storage.Owner_Access;
 
@@ -107,8 +109,8 @@ package body Lua.Syntax_Trees is
       procedure Remember_End (Id : Node_Id);
       function New_Name
         (Name : Text_Ref; Mode : Attribute := Regular;
-         Kind : Binding_Kind := Local_Name;
-         Pending : Natural := 0) return Symbol_Id;
+         Kind : Binding_Kind := Local_Name) return Symbol_Id;
+      procedure Check_Local_Limit (Pending : Natural);
       function Resolve
         (Name : Text_Ref; Environment : Boolean := False;
          Referenced : Text_Ref := Empty_Text)
@@ -396,42 +398,46 @@ package body Lua.Syntax_Trees is
          Depth := Depth - 1;
       end Leave;
 
-      function New_Name
-        (Name : Text_Ref; Mode : Attribute := Regular;
-         Kind : Binding_Kind := Local_Name;
-         Pending : Natural := 0) return Symbol_Id
-      is
+      procedure Check_Local_Limit (Pending : Natural) is
          Count : Natural := Pending;
       begin
-         if Natural (Unit.Names.Length) >= Limits.Syntax_Nodes then
-            Error ("declaration limit exceeded", Resource => True);
-         end if;
-         if Compatible_Limits and then Kind = Local_Name then
-            --  Lua checks explicit local declarations as names arrive, before
-            --  a later missing end or initializer can replace that failure.
-            --  Only active locals of this function count: outer captures,
-            --  expired lexical scopes and global declarations do not. Pending
-            --  names in this same list are not visible in Active yet. The
-            --  chunk's implicit environment is an upvalue, not a local slot.
+         if Compatible_Limits then
+            --  Check completed declarations, after parsing their initializer
+            --  and before a later block terminator. A malformed initializer
+            --  must retain its earlier grammar failure. This is a safe lower
+            --  bound on register demand: possible compile-time constants are
+            --  deferred to the canonical compiler's authoritative Fold/Bind
+            --  classification instead of duplicating constant evaluation.
             for Symbol of Active loop
                declare
                   Item : constant Binding := Unit.Names (Positive (Symbol));
                begin
                   if Item.Kind = Local_Name and then
                     Item.Owner = Function_Node and then
-                    Symbol /= Unit.Environment
+                    Symbol /= Unit.Environment and then
+                    Item.Mode /= Constant_Name
                   then
                      Count := Count + 1;
-                     exit when Count >= 200;
+                     exit when Count > 200;
                   end if;
                end;
             end loop;
-            if Count >= 200 then
+            if Count > 200 then
                Error ("too many local variables (limit is 200) in " &
                  (if Function_Node = No_Node then "main function"
                   else "function at line " &
                     Line_Text (Fetch (Function_Node).Site.Line)));
             end if;
+         end if;
+      end Check_Local_Limit;
+
+      function New_Name
+        (Name : Text_Ref; Mode : Attribute := Regular;
+         Kind : Binding_Kind := Local_Name) return Symbol_Id
+      is
+      begin
+         if Natural (Unit.Names.Length) >= Limits.Syntax_Nodes then
+            Error ("declaration limit exceeded", Resource => True);
          end if;
          Unit.Names.Append
            (Binding'(Name, Kind, Mode, Function_Node, Here));
@@ -661,6 +667,8 @@ package body Lua.Syntax_Trees is
                exit when not Take (Comma);
             end loop;
          end if;
+         Check_Local_Limit
+           (if Varargs and then Item.Symbol = No_Symbol then 1 else 0);
          Expect (Right_Paren);
          Item.Flag := Varargs;
          Save (Result, Item);
@@ -1000,6 +1008,7 @@ package body Lua.Syntax_Trees is
             Id := New_Name (Read_Name);
             Item.Symbols.Append (Id);
             Active.Append (Id);
+            Check_Local_Limit (0);
             Save (Result, Item);
             Child (Result, Function_Body (Definition));
             return Result;
@@ -1036,8 +1045,7 @@ package body Lua.Syntax_Trees is
                   Unit.Unsupported := Result;
                end if;
                Id := New_Name
-                 (Name, Mode, (if Global then Global_Name else Local_Name),
-                  Pending => Natural (Item.Symbols.Length));
+                 (Name, Mode, (if Global then Global_Name else Local_Name));
                Item.Symbols.Append (Id);
             end;
             exit when not Take (Comma);
@@ -1050,6 +1058,38 @@ package body Lua.Syntax_Trees is
                Save (Result, Item);
             end if;
             Child (Result, Expression_List);
+         end if;
+         if not Global then
+            declare
+               Pending : Natural := Natural (Item.Symbols.Length);
+            begin
+               declare
+                  Actual : constant Nodes.Constant_Reference_Type :=
+                    Unit.Tree.Constant_Reference (Positive (Result));
+               begin
+                  --  Child appended to the owned node, not the earlier Item
+                  --  snapshot. Borrow that actual initializer list without
+                  --  copying its input-sized vectors or retaining a borrow
+                  --  across another node append.
+                  if not Actual.Children.Is_Empty then
+                     declare
+                        Initializers : constant Nodes.Constant_Reference_Type
+                          := Unit.Tree.Constant_Reference
+                            (Positive (Actual.Children (1)));
+                     begin
+                        if Initializers.Children.Length = Item.Symbols.Length
+                          and then Unit.Names
+                            (Positive (Item.Symbols.Last_Element)).Mode =
+                              Constant_Name
+                        then
+                           --  Defer actual foldability to the compiler.
+                           Pending := Pending - 1;
+                        end if;
+                     end;
+                  end if;
+               end;
+               Check_Local_Limit (Pending);
+            end;
          end if;
          for Symbol of Item.Symbols loop
             Active.Append (Symbol);

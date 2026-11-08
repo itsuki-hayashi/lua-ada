@@ -61,4 +61,24 @@ cases[10]=function()
  local result=table.pack(f())
  assert(result.n==2 and result[1]==nil and result[2]==nil)
 end
+cases[11]=function()
+ local parts={}
+ for i=1,201 do parts[i]='local k'..i..' <const> = '..i end
+ parts[#parts+1]='return k201'
+ local f,e=load(table.concat(parts,'\n'))
+ assert(f,e);assert(f()==201)
+end
+cases[12]=function()
+ local f,e=load('local '..names('a',200)..';local last<const> = 37;return last')
+ assert(f,e);assert(f()==37)
+end
+cases[13]=function()
+ rejected('local '..names('a',200)..';local last<const> = select(1,37)',
+          'local variables','in main function')
+end
+cases[14]=function()
+ local f,e=load('local '..names('a',201)..' =')
+ assert(f==nil and type(e)=='string' and e:find('<eof>',1,true))
+ assert(not e:find('too many local variables',1,true),e)
+end
 for i=1,#cases do cases[i]();print('compiler context '..i)end

@@ -75,8 +75,10 @@ not exclude the separate M3 runtime obligations or certify their acceptance.
 M2a diagnostics compare syntax/resource category and reported line, not wording.
 
 Canonical execution enforces its actual local, upvalue and register encoding
-limits. Compatible parsing checks explicit local limits as names arrive,
-preserving their precedence over later incomplete grammar; compiler-limit
+limits. Compatible parsing checks definite local register demand after an
+initializer has parsed, preserving initializer syntax and later block-error
+precedence. Possible compile-time constants retain the canonical compiler's
+authoritative storage classification; compiler-limit
 diagnostics retain the actual defining function's line. See the
 [context checkpoint](sessions/2026-11-08-compiler-limit-context.md).
 Under Lua_Compatible policy, excessive parser nesting is a catchable

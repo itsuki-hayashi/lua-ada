@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [declaration activation correction](sessions/2026-11-08-declaration-activation-correction.md)
+preserves folded-constant acceptance and initializer syntax precedence beyond
+the original errors.lua cases. Both local configurations pass 2,398 AUnit
+cases and the unchanged errors.lua; all eight context-fixture compiler/VM roles
+pass. The prior eager name-time limit check is superseded by this correction.
+
 The [compiler context checkpoint](sessions/2026-11-08-compiler-limit-context.md)
 completes unchanged errors.lua locally in default and retained-T execution.
 Ten focused cases pass within 2,394 AUnit cases per mode; all standalone C
