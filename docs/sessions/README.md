@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [actual table-storage inspection](2026-11-08-table-storage-inspection.md).
+
 Correction: [declaration activation](2026-11-08-declaration-activation-correction.md).
 
 Component: [compiler limit context](2026-11-08-compiler-limit-context.md).

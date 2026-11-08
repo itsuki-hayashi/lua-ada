@@ -4,6 +4,7 @@ with Interfaces.C;
 with Interfaces;
 with Lua.Engine.Foreign;
 with Lua.Engine.Stacks;
+with Lua.Engine.Table_Storage_Probe;
 with Lua.Storage;
 with Lua.Runtime_Configuration;
 with Lua.Conformance_Memory;
@@ -111,6 +112,153 @@ package body Lua.Conformance_Adapter is
       end loop;
       Check (Remembered_Count = Remembered);
    end Verify_Collector_Lists;
+
+   procedure Verify_Table_Storage
+     (State : World; Item : Value;
+      Member_Rows, Live_Entries : out Natural)
+   is
+      Table : Object_Access;
+      Rows, Hash_Rows, Free_Rows, Free_Flags : Natural := 0;
+      Cursor, Visited, Membership : Natural;
+      procedure Check (Condition : Boolean);
+      procedure Reference (Pointer : Object_Access; Kind : Heap_Kind);
+      procedure Value_Reference (Data : Value);
+
+      procedure Check (Condition : Boolean) is
+      begin
+         if not Condition then
+            raise Program_Error with "table storage invariant failed";
+         end if;
+      end Check;
+
+      procedure Reference (Pointer : Object_Access; Kind : Heap_Kind) is
+      begin
+         --  A stale or foreign pointer cannot supply its own registry slot.
+         --  Compare pointer values against actual owned rows first; only a
+         --  matching live allocation may be dereferenced or passed to Hash.
+         Check (Pointer /= null);
+         for Index in 1 .. State.Heap.Last_Index loop
+            if State.Heap (Index) = Pointer then
+               Check (Pointer.Kind = Kind);
+               Check (Pointer.Registry_Slot = Index);
+               return;
+            end if;
+         end loop;
+         Check (False);
+      end Reference;
+
+      procedure Value_Reference (Data : Value) is
+      begin
+         case Data.Kind is
+            when String_Kind => Reference (Data.Reference, String_Object);
+            when Table_Kind => Reference (Data.Reference, Table_Object);
+            when Closure_Kind => Reference (Data.Reference, Closure);
+            when Native_Closure_Kind =>
+               Reference (Data.Reference, Native_Closure);
+            when Thread_Kind => Reference (Data.Reference, Thread_Object);
+            when Userdata_Kind => Reference (Data.Reference, Userdata_Object);
+            when others => null;
+         end case;
+      end Value_Reference;
+   begin
+      Member_Rows := 0;
+      Live_Entries := 0;
+      Check (Item.Kind = Table_Kind);
+      Reference (Item.Reference, Table_Object);
+      Table := Item.Reference;
+      Rows := Natural (Table.Members.Length);
+
+      --  Establish safe keys/values and scalar link extents independently of
+      --  every index. A nil-valued tombstone may still retain a live key and
+      --  stay indexed; a collected nil key must have no collision successor.
+      for Row of Table.Members loop
+         Value_Reference (Row.Key);
+         Value_Reference (Row.Item);
+         Check (Row.Next <= Rows and then Row.Free_Next <= Rows);
+         if Row.Key.Kind = Nil_Kind then
+            Check (Row.Item.Kind = Nil_Kind and then Row.Next = 0);
+         end if;
+         if Row.Item.Kind = Nil_Kind then
+            Check (Row.Free_Listed);
+         else
+            Live_Entries := Live_Entries + 1;
+         end if;
+         if Row.Free_Listed then
+            Free_Flags := Free_Flags + 1;
+         else
+            Check (Row.Free_Next = 0);
+         end if;
+      end loop;
+
+      for Index in 1 .. Table.Array_Index.Last_Index loop
+         Cursor := Table.Array_Index (Index);
+         Check (Cursor <= Rows);
+         if Cursor /= 0 then
+            Check (Equal (Table.Members (Cursor).Key,
+                          (Integer_Kind, Integer_Value (Index))));
+            Check (Table.Members (Cursor).Next = 0);
+         end if;
+      end loop;
+      --  Prove every hash walk finite before invoking ordinary lookup. A
+      --  repeated row in one chain necessarily exceeds Rows; cross-bucket
+      --  aliasing is detected by the independent per-row membership pass.
+      for Head of Table.Hash_Index loop
+         Cursor := Head;
+         Visited := 0;
+         while Cursor /= 0 loop
+            Check (Cursor <= Rows and then Visited < Rows);
+            Check (Table.Members (Cursor).Key.Kind /= Nil_Kind);
+            Check (Hash_Rows < Rows);
+            Hash_Rows := Hash_Rows + 1;
+            Visited := Visited + 1;
+            Cursor := Table.Members (Cursor).Next;
+         end loop;
+      end loop;
+      Check (Table.Hash_Rows = Hash_Rows);
+
+      Cursor := Table.Free_Row;
+      while Cursor /= 0 loop
+         Check (Cursor <= Rows and then Free_Rows < Rows);
+         Check (Table.Members (Cursor).Free_Listed);
+         Free_Rows := Free_Rows + 1;
+         Cursor := Table.Members (Cursor).Free_Next;
+      end loop;
+      Check (Free_Rows = Free_Flags);
+
+      --  No input-sized visited bitmap or copied row vector is necessary.
+      --  Bounded repeated walks prove each retained key has exactly one
+      --  index, nil keys have none, and Find agrees with the actual row.
+      --  The prior phase proved these unchanged chains finite and in bounds.
+      --  Live revived rows may remain on the free list until insertion pops
+      --  them; free/index overlap therefore does not imply corruption.
+      for Index in 1 .. Rows loop
+         Membership := 0;
+         for Row of Table.Array_Index loop
+            if Row = Index then
+               Check (Membership = 0);
+               Membership := 1;
+            end if;
+         end loop;
+         for Head of Table.Hash_Index loop
+            Cursor := Head;
+            while Cursor /= 0 loop
+               if Cursor = Index then
+                  Check (Membership = 0);
+                  Membership := 1;
+               end if;
+               Cursor := Table.Members (Cursor).Next;
+            end loop;
+         end loop;
+         if Table.Members (Index).Key.Kind = Nil_Kind then
+            Check (Membership = 0);
+         else
+            Check (Membership = 1);
+            Check (Table_Storage_Probe.Find
+                     (Table, Table.Members (Index).Key) = Index);
+         end if;
+      end loop;
+      Member_Rows := Rows;
+   end Verify_Table_Storage;
 
    type Integer_Results is array (1 .. 5) of C.long_long
      with Convention => C;
@@ -521,6 +669,15 @@ package body Lua.Conformance_Adapter is
                C.long_long (Context.Stack_Allocated_Bound),
                C.long_long (State.Native_Depth),
                C.long_long (Context.Stack.Length), others => 0];
+         when 38 =>
+            declare
+               Rows, Live : Natural;
+            begin
+               Verify_Table_Storage (State, Argument (1), Rows, Live);
+               Result.Count := 2;
+               Result.Integers :=
+                 [C.long_long (Rows), C.long_long (Live), others => 0];
+            end;
          when others => raise Invalid_Argument;
       end case;
    exception
@@ -572,7 +729,7 @@ package body Lua.Conformance_Adapter is
          --  Public C test drivers are actual light C functions: hidden
          --  captures would make testC's absent-upvalue queries observe two
          --  values and change its C identity and allocation behavior.
-         if Operation in 1 .. 10 | 12 | 13 | 37 then
+         if Operation in 1 .. 10 | 12 | 13 | 37 | 38 then
             Append_Root (State, Captures,
                          (Integer_Kind, Integer_Value (Operation)));
             Append_Root (State, Captures,
@@ -623,6 +780,7 @@ package body Lua.Conformance_Adapter is
       Add ("externstr", 34);
       Add ("checkpanic", 35);
       Add ("stacklevel", 37);
+      Add ("ada_check_table_storage", 38);
       --  The source's regcodes roots these actual status strings before
       --  refusal tests. The driver can then push them without resurrecting
       --  an unrooted weak short string while allocator growth is disabled.

@@ -11,6 +11,8 @@ with Assert_Argument_Tests;
 with Compiler_Limit_Tests;
 with Compiler_Limit_Context_Tests;
 with Lua.Conformance_Adapter_Tests;
+with Lua.Table_Storage_Inspection_Tests;
+with Table_Storage_Public_Tests;
 with Lua.API_Command_Tests;
 with Lua.Foreign_Hook_Tests;
 with Lua.Coroutine_Portal_Tests;
@@ -195,6 +197,8 @@ procedure Test_Runner is
       Lua.Finalizer_Runtime_Tests.Register (Result);
       Lua.Collector_Tests.Register (Result);
       Lua.Conformance_Adapter_Tests.Register (Result);
+      Lua.Table_Storage_Inspection_Tests.Register (Result);
+      Table_Storage_Public_Tests.Register (Result);
       Lua.API_Command_Tests.Register (Result);
       Lua.Foreign_Hook_Tests.Register (Result);
       Lua.Coroutine_Portal_Tests.Register (Result);

@@ -2,6 +2,13 @@
 
 ## Active remaining-suite delivery
 
+The [actual table-storage inspector](sessions/2026-11-08-table-storage-inspection.md)
+and 25 focused cases are implemented; both local modes pass 2,439 AUnit cases.
+Independently review exact locals.lua replacement spans, refreshed checker/
+counterpart bindings and original-anchor coverage before adapting any source.
+Preserve its original deletion/collection and insertion-refusal sweep, then
+require actual whole-file/final-context evidence. No exclusion is installed.
+
 The [compiler context checkpoint](sessions/2026-11-08-compiler-limit-context.md)
 completes unchanged errors.lua in both local configurations, with 2,394 passing
 AUnit cases per mode. Revalidate it at final head in all applicable contexts;

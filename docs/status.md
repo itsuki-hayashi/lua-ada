@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [table-storage inspector](sessions/2026-11-08-table-storage-inspection.md)
+checks actual Ada row/index/free-list safety and reports real row/live counts.
+Both local configurations pass 2,439 AUnit cases, including 25 new corruption,
+weak-lifetime, reuse and refusal cases; the public fixture matches all eight
+producer/VM roles. Exact locals.lua replacement/source approval and full-file
+execution remain pending. The private checker is not a passing C querytab test.
+
 The [declaration activation correction](sessions/2026-11-08-declaration-activation-correction.md)
 preserves folded-constant acceptance and initializer syntax precedence beyond
 the original errors.lua cases. Both local configurations pass 2,398 AUnit
