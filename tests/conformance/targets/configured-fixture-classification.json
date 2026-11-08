@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "kind": "first-party-configured-fixture-classification",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "entries": [
+    {
+      "path": "tests/lua/stack_inspection.lua",
+      "sha256": "e224986f533931ab850c064233529bc7a68e1e3ddfc7c884fe59116d3253ff8f",
+      "selection": "paired-configured-T-only",
+      "rationale": "Every case measures T.stacklevel directly, including reader and protected-depth transitions; the whole fixture requires real T."
+    },
+    {
+      "path": "tests/lua/primitive_not_refusal.lua",
+      "sha256": "7ed504f49adcdfa0ed16333bd3c5983a987d9fadec3e9512372b276e9ec345de",
+      "selection": "paired-configured-T-only",
+      "rationale": "Every scalar NOT operation is executed inside T.alloccount refusal; its prepared values are setup for that campaign."
+    },
+    {
+      "path": "tests/lua/public_api_commands.lua",
+      "sha256": "8c185e0f7f7a81e666a0b0dd19cf5f0546ab64f4b6fb24ca3817799034296595",
+      "selection": "paired-configured-T-only",
+      "rationale": "All22 named operations exercise T.testC or other real T C API commands; no ordinary default branch exists."
+    },
+    {
+      "path": "tests/lua/public_panic_controls.lua",
+      "sha256": "609d3dd75fbe4724492a61365cdb5dcc35c9b6d9b5f600fd9ee921453790c4fb",
+      "selection": "paired-configured-T-only",
+      "rationale": "All14 named operations exercise T.checkpanic and real T provider/child controls; the loadfile helper is retained as a separate ordinary fixture."
+    },
+    {
+      "path": "tests/lua/reader_refusal_phases.lua",
+      "sha256": "23776910686916ba5f65fc47a7f71801e70e2b8cbf0b695db647471317f26095",
+      "selection": "paired-configured-T-only",
+      "rationale": "All four reader phases arm and restore real T.alloccount around their public reader/load assertions."
+    },
+    {
+      "path": "tests/lua/string_refusal_phases.lua",
+      "sha256": "d6beaaba16589cef75152aad71c0d0bddd01aa387cb6a3dc3f94a91ca5a1b6d4",
+      "selection": "paired-configured-T-only",
+      "rationale": "All four string/error phases arm and restore real T.alloccount around their public operation assertions."
+    },
+    {
+      "path": "tests/lua/hook_transition_c.lua",
+      "sha256": "9b3469e108c4f81b7fbe3a5471c1185590e52e0a13e9c86b3af5f2839b1fcc5d",
+      "selection": "paired-configured-T-only",
+      "rationale": "All five transitions install actual C hooks through T.sethook; public hook-event assertions remain executed in the instrumented pair."
+    }
+  ]
+}

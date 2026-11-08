@@ -12,6 +12,7 @@ do
   local ok,a,b=pcall(f,s,p);control()
   assert(ok and a==1 and b==#s)
 end
+print('PASS: string refusal Refused_Find')
 
 -- Refused_Length: A warmed one-integer producer needs no fresh output container.
 do
@@ -20,6 +21,7 @@ do
   control();assert(pcall(f,s));control(0)
   local ok,n=pcall(f,s);control();assert(ok and n==#s)
 end
+print('PASS: string refusal Refused_Length')
 
 -- Refused_Zero: A warmed zero-result producer still returns its protected true status.
 do
@@ -28,6 +30,7 @@ do
   control();assert(pcall(f,s));control(0)
   local ok,extra=pcall(f,s);control();assert(ok and extra==nil)
 end
+print('PASS: string refusal Refused_Zero')
 
 -- Refused_Error: The preexisting protected error owner remains usable with no growth.
 do
@@ -36,5 +39,6 @@ do
   control();assert(not pcall(f,marker,0));control(0)
   local ok,e=pcall(f,marker,0);control();assert(not ok and e==marker)
 end
+print('PASS: string refusal Refused_Error')
 
 print('string refusal phases OK')

@@ -103,6 +103,19 @@ is mandatory in that instrumented campaign with a real T table and all four
 ordered operation markers. `primitive_not_refusal.lua` also requires real T;
 its six actual scalar/operator cases run through the native and Ada allocator
 controls. None of these configured files becomes a default T-absent pass.
+The complete T campaign also requires all 22 public API commands, all 14
+panic/provider cases, all four reader and four string refusal phases, and all
+five actual C-hook transitions.
+Optional per-case filters must be absent, and each refusal phase has its own
+terminal marker after its unchanged assertions and allocator reset. All seven
+T-only files require real T for every operation; no mixed ordinary Lua
+assertions are dropped from default execution. The
+`targets/configured-fixture-classification.json` source hashes and rationales
+bind that classification. Changes require a fresh mixed/default/T source
+review. The complete lexical fixture audit fails closed on new T-bearing
+files and records every ordinary source as well. Generic fixture selection
+derives this classification from the dedicated definitions rather than a
+second list of omitted filenames.
 `check.ps1` records the default pair before `compare.ps1` consumes its receipt;
 `check-instrumented.ps1` records both instrumented pairs. The generic default
 comparison requires the dedicated report and its Ada runner explicitly. Raw

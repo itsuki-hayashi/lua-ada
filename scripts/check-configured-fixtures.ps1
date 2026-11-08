@@ -13,6 +13,8 @@ $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'ConfiguredFixtureEvidence.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1')
+& (Join-Path $PSScriptRoot 'test-configured-fixture-selection.ps1')
 if($Report -eq ''){$Report=Join-Path $root ('reports/core-image/configured-'+[guid]::NewGuid().ToString('N')+'/result.json')}
 $Report=[IO.Path]::GetFullPath($Report)
 if(-not ([IO.Path]::GetRelativePath($root,$Report).Replace('\','/')).StartsWith('reports/',[StringComparison]::Ordinal) -or
@@ -21,10 +23,13 @@ $directory=Split-Path -Parent $Report;[void][IO.Directory]::CreateDirectory($dir
 $revision=(&git -C $root rev-parse HEAD).Trim()
 if($LASTEXITCODE -ne 0){throw 'Configured fixture source revision is unknown'}
 $dirty=@(&git -C $root status --porcelain=v1 --untracked-files=normal).Count -ne 0
+$audit=Get-ConfiguredFixtureAudit -Root $root
 $raw=[ordered]@{schema_version=1;kind='configured-fixture-observations';configuration=$Configuration;
     repository_root=$root;platform=$(if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'});profile=$Profile;library_type=$LibraryType;
     repository_revision=$revision;repository_dirty=$dirty;reference_revision='7579fc9d7ed90240487251dfb69168f8e64e9294';
     runtime_acceptance=$false;coverage_authority=$false;synthetic_fixture=$false;
+    fixture_selection_audit=$audit;
+    fixture_selection_audit_sha256=(Get-ConformanceHash ([Text.Encoding]::UTF8.GetBytes((ConvertTo-Json -InputObject $audit -Depth 12 -Compress))));
     source_bindings=@(Get-ConfiguredFixtureSources $Configuration|ForEach-Object{@{path=$_;sha256=(Get-FileHash (Join-Path $root $_)).Hash.ToLowerInvariant()}});
     runtimes=@();processes=@()}
 $raw.context=$Configuration+'/'+$raw.platform+'/'+$Profile+'/'+$(if($LibraryType -ceq 'relocatable'){'shared'}else{$LibraryType})

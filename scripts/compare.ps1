@@ -10,6 +10,9 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 $originalLocation = Get-Location
 $suffix = if ($IsWindows) { '.exe' } else { '' }
 Import-Module (Join-Path $PSScriptRoot 'ConfiguredFixtureEvidence.psm1')
+$defaultConfigured=@(Get-ConfiguredFixtureDefinitions default|ForEach-Object{[IO.Path]::GetFileName($_.source)})
+$instrumentedConfigured=@(Get-ConfiguredFixtureDefinitions upstream-test|ForEach-Object{[IO.Path]::GetFileName($_.source)})
+$instrumentedOnly=@($instrumentedConfigured|Where-Object{$_ -cnotin $defaultConfigured})
 if(-not $OracleOnly){
     if($ConfiguredWitnessReport -eq '' -or $ConfiguredInterpreter -eq ''){
         throw 'Default differential fixtures require the actual configured fixture pair report and its Ada interpreter'
@@ -88,12 +91,12 @@ try {
         # These are configured witnesses, not default T-absent successes.
         # The default portal pair has already run with measured matching stack
         # limits. The real-T file is mandatory in check-instrumented.ps1.
-        if($script.Name -cin @('stack_inspection.lua','primitive_not_refusal.lua')){
+        if($script.Name -cin $instrumentedOnly){
             Write-Output "CONFIGURED T REQUIRED: $($script.Name) (mandatory instrumented campaign; no default observation)"
             continue
         }
-        if($script.Name -ceq 'coroutine_result_portal.lua' -and -not $OracleOnly){
-            Write-Output 'CONFIGURED PARITY: coroutine_result_portal.lua (verified dedicated native/Ada report)'
+        if($script.Name -cin $defaultConfigured -and -not $OracleOnly){
+            Write-Output "CONFIGURED PARITY: $($script.Name) (verified dedicated native/Ada report)"
             continue
         }
         $prelude=@()

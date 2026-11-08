@@ -18,6 +18,7 @@ do
   assert(t[5]=='line' and t[6]==first+2 and t[7]==nil)
   TT=nil
 end
+print('PASS: C hook transition C_Count_To_Line')
 
 -- C_Same_Line: A direct C count callback does not advance the Lua trace PC.
 do
@@ -33,6 +34,7 @@ do
   assert(t[5]=='line' and t[6]==origin+4 and t[7]==nil)
   TT=nil
 end
+print('PASS: C hook transition C_Same_Line')
 
 -- C_Count_Removes_Line: An old line phase invokes the new count-only callback.
 do
@@ -45,6 +47,7 @@ do
   assert(TT[1]=='line' and TT[2]==origin+2 and TT[3]==nil)
   TT=nil
 end
+print('PASS: C hook transition C_Count_Removes_Line')
 
 -- C_Count_Removes_All: A captured mask cannot invoke a removed hook pointer.
 do
@@ -56,6 +59,7 @@ do
   assert(TT[1]==nil)
   TT=nil
 end
+print('PASS: C hook transition C_Count_Removes_All')
 
 -- C_Line_To_Count: A line callback's new interval starts on later instructions.
 do
@@ -70,5 +74,6 @@ do
   assert(TT[1]=='count' and TT[2]==-1 and TT[3]==nil)
   TT=nil
 end
+print('PASS: C hook transition C_Line_To_Count')
 
 print('C hook transitions OK')

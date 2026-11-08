@@ -2,6 +2,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1')
 
 function Get-ConfiguredFixtureDefinitions {
     param([ValidateSet('default','upstream-test')][string]$Configuration)
@@ -22,6 +23,35 @@ function Get-ConfiguredFixtureDefinitions {
             stdout="CONFIGURED-FIXTURE: real T scalar NOT refusal`n"+
                 ((@('false','nil','zero','empty string','table','function')|ForEach-Object{"PASS: primitive NOT $_"})-join "`n")+
                 "`nPASS: scalar NOT under refusal`n"}
+        $commands=@('Light_Upvalues','Absent_Upvalue','Stack_Reordering','Raw_Table','Metatable_Delegation',
+            'Arithmetic_Commands','C_Function_Identity','Length_Commands','Loaded_Source','Formatting_Commands',
+            'Userdata_Metatable','References','Double_Bytes','Mutable_Upvalues','New_Stack','External_String',
+            'Warning_Fragments','Hook_Command','Stack_Reservation','Traceback_Command','Traceback_Dynamic_Level','Traceback_Suspended_Thread')
+        $definitions+=@{id='public-api-commands';source='tests/lua/public_api_commands.lua';
+            setup="$guard;assert(type(T.testC)=='function' and rawget(_G,'_API_COMMAND_CASE')==nil);print('CONFIGURED-FIXTURE: real T public API commands')";
+            stdout="CONFIGURED-FIXTURE: real T public API commands`n"+
+                (($commands|ForEach-Object{"PASS: API command $_"})-join "`n")+"`nPASS: public API command witnesses`n"}
+        $panic=@('Trivial','Status','Stack','Argument','Memory','Closing','Close_Error','Closing_Status','No_Error',
+            'Count_Restores_Stack','Child_Byte_Limit','Child_Count_Limit','Load_File','Oversized_Userdata')
+        $definitions+=@{id='public-panic-controls';source='tests/lua/public_panic_controls.lua';
+            setup="$guard;assert(type(T.checkpanic)=='function' and rawget(_G,'_PANIC_CONTROL_CASE')==nil);print('CONFIGURED-FIXTURE: real T panic provider controls')";
+            stdout="CONFIGURED-FIXTURE: real T panic provider controls`n"+
+                (($panic|ForEach-Object{"PASS: panic control $_"})-join "`n")+"`nPASS: public panic/provider witnesses`n"}
+        $definitions+=@{id='reader-refusal-phases';source='tests/lua/reader_refusal_phases.lua';
+            setup="$guard;assert(type(T.alloccount)=='function');print('CONFIGURED-FIXTURE: real T reader refusal phases')";
+            stdout="CONFIGURED-FIXTURE: real T reader refusal phases`n"+
+                ((@('Refused_Cold_Reader','Refused_Warm_Reader','Refused_Partial_Source','Refused_Binary_Reader')|
+                    ForEach-Object{"PASS: reader refusal $_"})-join "`n")+"`nreader refusal phases OK`n"}
+        $definitions+=@{id='string-refusal-phases';source='tests/lua/string_refusal_phases.lua';
+            setup="$guard;assert(type(T.alloccount)=='function');print('CONFIGURED-FIXTURE: real T string refusal phases')";
+            stdout="CONFIGURED-FIXTURE: real T string refusal phases`n"+
+                ((@('Refused_Find','Refused_Length','Refused_Zero','Refused_Error')|
+                    ForEach-Object{"PASS: string refusal $_"})-join "`n")+"`nstring refusal phases OK`n"}
+        $definitions+=@{id='c-hook-transitions';source='tests/lua/hook_transition_c.lua';
+            setup="$guard;assert(type(T.sethook)=='function');print('CONFIGURED-FIXTURE: real T C hook transitions')";
+            stdout="CONFIGURED-FIXTURE: real T C hook transitions`n"+
+                ((@('C_Count_To_Line','C_Same_Line','C_Count_Removes_Line','C_Count_Removes_All','C_Line_To_Count')|
+                    ForEach-Object{"PASS: C hook transition $_"})-join "`n")+"`nC hook transitions OK`n"}
     }
     return $definitions
 }
@@ -33,11 +63,51 @@ function Get-ConfiguredFixtureSources {
     return @('scripts/ConfiguredFixtureEvidence.psm1','scripts/check-configured-fixtures.ps1',
         'scripts/ConformanceRunner.psm1','scripts/ManagedTelemetry.psm1',
         'tests/lua/coroutine_result_portal.lua','tests/lua/stack_inspection.lua','tests/lua/primitive_not_refusal.lua',
+        'tests/lua/public_api_commands.lua','tests/lua/public_panic_controls.lua','tests/lua/public_panic_file.lua',
+        'tests/lua/reader_refusal_phases.lua','tests/lua/string_refusal_phases.lua','tests/lua/hook_transition_c.lua',
         ('src/configurations/'+$Configuration+'/lua-runtime_configuration.ads'),
         'references/lua/llimits.h','references/lua/ltests.h','references/lua/luaconf.h',
         'experiments/conformance/reference.gpr','experiments/conformance/c/conformance_cli.c',
         'experiments/conformance/c/observed_ldo.c','tests/src/conformance_runner.adb',
-        'tests/src/lua-conformance_adapter.adb','tests/c/conformance_adapter.c','tests/conformance/suite.json')
+        'tests/src/lua-conformance_adapter.adb','tests/c/conformance_adapter.c','tests/conformance/suite.json',
+        'tests/conformance/targets/configured-fixture-classification.json')
+}
+
+function Get-ConfiguredFixtureAudit {
+    param([Parameter(Mandatory)][string]$Root)
+    $ordinary=@(Get-ConfiguredFixtureDefinitions default|ForEach-Object source)
+    $instrumented=@(Get-ConfiguredFixtureDefinitions upstream-test|ForEach-Object source)
+    $only=@($instrumented|Where-Object{$_ -cnotin $ordinary})
+    $classification=Get-Content (Join-Path $Root 'tests/conformance/targets/configured-fixture-classification.json') -Raw|ConvertFrom-Json -AsHashtable
+    if($classification.schema_version -ne 1 -or $classification.kind -cne 'first-party-configured-fixture-classification' -or
+        $classification.runtime_acceptance -isnot [bool] -or $classification.runtime_acceptance -or
+        $classification.coverage_authority -isnot [bool] -or $classification.coverage_authority -or
+        $classification.entries -isnot [Array] -or $classification.entries.Count -ne $only.Count){
+        throw 'Configured fixture classification is incomplete or claims runtime authority'
+    }
+    foreach($path in $only){
+        $record=@($classification.entries|Where-Object path -CEQ $path)
+        if($record.Count -ne 1 -or $record[0].selection -cne 'paired-configured-T-only' -or
+            [string]::IsNullOrWhiteSpace($record[0].rationale) -or
+            (Get-FileHash (Join-Path $Root $path)).Hash.ToLowerInvariant() -cne $record[0].sha256){
+            throw "Configured T-only classification requires a fresh mixed/default/T source review: $path"
+        }
+    }
+    $entries=@(foreach($file in Get-ChildItem (Join-Path $Root 'tests/lua') -File -Filter '*.lua'|Sort-Object Name){
+        $path='tests/lua/'+$file.Name
+        $tokens=Get-ConformanceTokens -Bytes ([IO.File]::ReadAllBytes($file.FullName))
+        $references=@($tokens|Where-Object{$_.Text -ceq 'T' -and -not $_.IsString})
+        if($references.Count -and $path -cnotin $instrumented){
+            throw "Unclassified T-bearing fixture requires an explicit mixed/default/T campaign audit: $path"
+        }
+        # This is an explicit selection audit, not a Lua scope parser or proof
+        # of compatibility. New T-bearing files fail closed for human review;
+        # mixed ordinary/T files must appear in both configured selections.
+        [ordered]@{path=$path;sha256=(Get-FileHash $file.FullName).Hash.ToLowerInvariant();T_identifiers=$references.Count;
+            selection=$(if($path -cin $ordinary){'paired-configured-default-and-T'}elseif($path -cin $instrumented){'paired-configured-T-only'}else{'generic-default-source-comparison'})}
+    })
+    return [ordered]@{schema_version=1;kind='first-party-fixture-selection-audit';entries=$entries;
+        runtime_acceptance=$false;coverage_authority=$false}
 }
 
 function Assert-ConfiguredFixtureReport {
@@ -61,6 +131,13 @@ function Assert-ConfiguredFixtureReport {
     if($Report.context -cnotin $suite.acceptance_contexts -or
         $Report.context -cne ($Configuration+'/'+$Report.platform+'/'+$Report.profile+'/'+$link)){
         throw 'Configured fixture context tuple differs'
+    }
+    $audit=Get-ConfiguredFixtureAudit -Root $Root
+    $auditBytes=[Text.Encoding]::UTF8.GetBytes((ConvertTo-Json -InputObject $audit -Depth 12 -Compress))
+    $storedAuditBytes=[Text.Encoding]::UTF8.GetBytes((ConvertTo-Json -InputObject $Report.fixture_selection_audit -Depth 12 -Compress))
+    if($Report.fixture_selection_audit_sha256 -cne (Get-ConformanceHash $auditBytes) -or
+        $Report.fixture_selection_audit_sha256 -cne (Get-ConformanceHash $storedAuditBytes)){
+        throw 'Configured fixture selection audit or complete first-party source set differs'
     }
     function Resolve-Observation($Path,$Hash){
         $actual=if($null -ne $ResolveFile){&$ResolveFile $Path $Hash}else{$Path}
@@ -166,4 +243,4 @@ function Assert-ConfiguredFixtureImageReport {
         -Interpreter (Join-Path $Payload $Image.paths.ada_launcher) -ResolveFile $resolve
 }
 
-Export-ModuleMember -Function Get-ConfiguredFixtureDefinitions,Get-ConfiguredFixtureSources,Assert-ConfiguredFixtureReport,Assert-ConfiguredFixtureImageReport
+Export-ModuleMember -Function Get-ConfiguredFixtureDefinitions,Get-ConfiguredFixtureSources,Get-ConfiguredFixtureAudit,Assert-ConfiguredFixtureReport,Assert-ConfiguredFixtureImageReport

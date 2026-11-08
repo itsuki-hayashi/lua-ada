@@ -10,6 +10,7 @@ do
   assert(ok and f==nil and e=='not enough memory')
   assert(assert(load('return 41'))()==41)
 end
+print('PASS: reader refusal Refused_Cold_Reader')
 
 -- Refused_Warm_Reader: Reusing a reader cannot move refusal outside its parser.
 do
@@ -28,6 +29,7 @@ do
   control()
   assert(ok and f==nil and e=='not enough memory')
 end
+print('PASS: reader refusal Refused_Warm_Reader')
 
 -- Refused_Partial_Source: A retained parser prefix is released after refusal.
 do
@@ -42,6 +44,7 @@ do
   control()
   assert(ok and f==nil and e=='not enough memory' and count==2)
 end
+print('PASS: reader refusal Refused_Partial_Source')
 
 -- Refused_Binary_Reader: Binary decoding retains the same protected error policy.
 do
@@ -52,5 +55,6 @@ do
   control()
   assert(ok and f==nil and e=='not enough memory')
 end
+print('PASS: reader refusal Refused_Binary_Reader')
 
 print('reader refusal phases OK')

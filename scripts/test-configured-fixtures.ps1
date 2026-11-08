@@ -32,6 +32,9 @@ Case 'another executable cannot reuse an Ada observation receipt' {param($r)$r.r
 Case 'executable hash drift rejects old observations' {param($r)$r.runtimes[1].executable_sha256='0'*64} 'observed file identity'
 Case 'runtime library drift rejects old observations' {param($r)$r.runtimes[1].library_files[0].sha256='0'*64} 'observed file identity'
 Case 'source changes require new configured observations' {param($r)$r.source_bindings[0].sha256='0'*64} 'source identity'
+Case 'complete first-party fixture audit cannot be relabelled' {param($r)$r.fixture_selection_audit.entries[0].selection='omitted'} 'fixture selection audit'
+Case 'complete first-party fixture audit cannot lose a source' {param($r)$r.fixture_selection_audit.entries=@($r.fixture_selection_audit.entries|Select-Object -Skip 1)} 'fixture selection audit'
+Case 'fixture audit hash cannot be fabricated' {param($r)$r.fixture_selection_audit_sha256='0'*64} 'fixture selection audit'
 Case 'configuration names cannot be relabelled after execution' {param($r)$r.configuration='wrong'} 'kind/configuration'
 Case 'configuration probe must identify an actual Ada implementation' {param($r)
     $p=(Row $r configuration).process;$v=Get-Content $p.stdout_path -Raw|ConvertFrom-Json -AsHashtable
@@ -63,6 +66,25 @@ if($baseline.configuration -ceq 'upstream-test'){
         $p=(Row $r primitive-not-refusal).process
         Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS: primitive NOT nil`n",''))
     } 'complete ordered protocol'
+    foreach($operation in @('public-api-commands','public-panic-controls','reader-refusal-phases','string-refusal-phases','c-hook-transitions')){
+        Case "complete paired T campaign cannot omit $operation" {param($r)
+            $r.processes=@($r.processes|Where-Object operation -CNE $operation)
+        } 'process set is incomplete'
+    }
+    Case 'API command filter cannot narrow the actual command set' {param($r)
+        (Row $r public-api-commands).process.arguments[1]="_API_COMMAND_CASE='Light_Upvalues'"
+    } 'explicit setup'
+    Case 'panic filter cannot narrow the actual provider/child case set' {param($r)
+        (Row $r public-panic-controls).process.arguments[1]="_PANIC_CONTROL_CASE='Trivial'"
+    } 'explicit setup'
+    foreach($pair in @(@('reader-refusal-phases','PASS: reader refusal Refused_Partial_Source'),
+        @('string-refusal-phases','PASS: string refusal Refused_Error'),
+        @('c-hook-transitions','PASS: C hook transition C_Count_Removes_All'))){
+        Case "a final marker cannot replace $($pair[1])" {param($r)
+            $p=(Row $r $pair[0]).process
+            Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace($pair[1]+"`n",''))
+        } 'complete ordered protocol'
+    }
 }
 $origin=$root.Replace('\','/').TrimEnd('/')+'/'
 if(-not $baseline.repository_dirty -and @($baseline.runtimes|Where-Object{
