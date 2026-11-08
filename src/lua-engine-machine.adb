@@ -364,7 +364,8 @@ package body Lua.Engine.Machine is
       function Ordered (A, B : Value) return Boolean is
       begin
          if A.Kind = String_Kind and then B.Kind = String_Kind then
-            return A.Reference.Bytes < B.Reference.Bytes;
+            return Strings.Locale_Less
+              (State, A.Reference.Bytes, B.Reference.Bytes);
          elsif A.Kind in Integer_Kind | Real_Kind and then
            B.Kind in Integer_Kind | Real_Kind
          then
@@ -392,9 +393,22 @@ package body Lua.Engine.Machine is
             when Less => return (Boolean_Kind, Ordered (Left, Right));
             when Greater => return (Boolean_Kind, Ordered (Right, Left));
             when Less_Equal =>
+               --  Native collation can equate different byte strings. Its
+               --  non-strict order is the complement of reverse strict
+               --  order, not strict order plus Lua's raw byte equality.
+               if Left.Kind = String_Kind and then
+                 Right.Kind = String_Kind
+               then
+                  return (Boolean_Kind, not Ordered (Right, Left));
+               end if;
                return (Boolean_Kind, Ordered (Left, Right) or else
                          Engine.Equal (Left, Right));
             when others =>
+               if Left.Kind = String_Kind and then
+                 Right.Kind = String_Kind
+               then
+                  return (Boolean_Kind, not Ordered (Left, Right));
+               end if;
                return (Boolean_Kind, Ordered (Right, Left) or else
                          Engine.Equal (Left, Right));
          end case;

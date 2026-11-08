@@ -249,7 +249,9 @@ package body Lua.Engine.Sorting is
             elsif Left.Kind = String_Kind and then Right.Kind = String_Kind
             then
                Save (Compared, (Boolean_Kind,
-                                Left.Reference.Bytes < Right.Reference.Bytes));
+                                Strings.Locale_Less
+                                  (State, Left.Reference.Bytes,
+                                   Right.Reference.Bytes)));
                Resume (Next);
                return False;
             end if;

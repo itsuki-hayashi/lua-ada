@@ -1,4 +1,11 @@
 package Lua.Engine.Strings is
+   function Locale_Less
+     (State : in out World; Left, Right : Byte_String) return Boolean;
+   --  Compare all NUL-separated spans using the current native collation.
+   --  Callers retain both immutable payload owners throughout this synchronous
+   --  operation. It performs no allocation or callback; input scans consume
+   --  the shared bounded execution budget before entering native collation.
+
    function String_Argument
      (State : in out World; Item : Value; Index : Natural := 0;
       Present : Boolean := True) return String;

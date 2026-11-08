@@ -1,6 +1,9 @@
 with Ada.Characters.Latin_1;
+with Interfaces.C;
+with Lua.Platform_Locales;
 
 package body Lua.Engine.Patterns is
+   use type Interfaces.C.int;
    function Find
      (State : in out World; Subject, Pattern : String;
       Start : Natural := 0; Allow_Anchor : Boolean := True)
@@ -40,21 +43,26 @@ package body Lua.Engine.Patterns is
            (if Code in 'A' .. 'Z' then
               Character'Val (Character'Pos (Code) + 32) else Code);
          Hit : Boolean;
+         function Native
+           (Category : Lua.Platform_Locales.Character_Class) return Boolean
+         is (Lua.Platform_Locales.Matches
+               (Interfaces.C.unsigned_char (Character'Pos (Byte)), Category)
+             /= 0);
       begin
+         --  Pattern grammar and uppercase inversion remain Ada operations.
+         --  Only the recognized byte classes consult libc's current ctype
+         --  category, matching os.setlocale without changing lexer policy.
          case Lower is
-            when 'a' => Hit := Byte in 'a' .. 'z' | 'A' .. 'Z';
-            when 'c' => Hit := Character'Pos (Byte) < 32 or else
-                              Character'Pos (Byte) = 127;
-            when 'd' => Hit := Byte in '0' .. '9';
-            when 'g' => Hit := Byte in '!' .. '~';
-            when 'l' => Hit := Byte in 'a' .. 'z';
-            when 'p' => Hit := Byte in '!' .. '~' and then
-              Byte not in 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9';
-            when 's' => Hit := Byte = ' ' or else
-              Character'Pos (Byte) in 9 .. 13;
-            when 'u' => Hit := Byte in 'A' .. 'Z';
-            when 'w' => Hit := Byte in 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9';
-            when 'x' => Hit := Byte in '0' .. '9' | 'a' .. 'f' | 'A' .. 'F';
+            when 'a' => Hit := Native (Lua.Platform_Locales.Alphabetic);
+            when 'c' => Hit := Native (Lua.Platform_Locales.Control);
+            when 'd' => Hit := Native (Lua.Platform_Locales.Decimal);
+            when 'g' => Hit := Native (Lua.Platform_Locales.Graphic);
+            when 'l' => Hit := Native (Lua.Platform_Locales.Lowercase);
+            when 'p' => Hit := Native (Lua.Platform_Locales.Punctuation);
+            when 's' => Hit := Native (Lua.Platform_Locales.Whitespace);
+            when 'u' => Hit := Native (Lua.Platform_Locales.Uppercase);
+            when 'w' => Hit := Native (Lua.Platform_Locales.Alphanumeric);
+            when 'x' => Hit := Native (Lua.Platform_Locales.Hexadecimal);
             when 'z' => Hit := Byte = Ada.Characters.Latin_1.NUL;
             when others => return Byte = Code;
          end case;

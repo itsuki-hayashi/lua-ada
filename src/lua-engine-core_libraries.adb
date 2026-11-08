@@ -1,5 +1,6 @@
 with Lua.Engine.Mathematics;
 with Lua.Engine.Diagnostics;
+with Lua.Engine.Strings;
 with Ada.Containers;
 with Ada.Unchecked_Conversion;
 with Interfaces;
@@ -266,8 +267,8 @@ package body Lua.Engine.Core_Libraries is
          then
             return Lua.Numbers.Less (Number (Left), Number (Right));
          elsif Left.Kind = String_Kind and then Right.Kind = String_Kind then
-            return To_String (Left.Reference.Bytes) <
-              To_String (Right.Reference.Bytes);
+            return Strings.Locale_Less
+              (State, Left.Reference.Bytes, Right.Reference.Bytes);
          end if;
          Fail (State, "attempt to compare " & Type_Name (Left) & " with " &
                Type_Name (Right));

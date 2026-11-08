@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+Complete the retained external-string T driver reached by the
+[original strings replay](sessions/2026-11-08-native-string-locales.md).
+Keep borrowed external payload lifetimes and explicit deallocation behavior
+real. Locale availability is native process state: final contexts need matching
+native observations; an unavailable optional locale supplies no non-C coverage.
+
 Continue the [original-file observations](sessions/2026-11-08-table-error-arguments.md)
 after the public table diagnostic correction. Original strings needs native
 locale collation; instrumented nextvar/sort still require reviewed treatment

@@ -1,5 +1,7 @@
 # Session Records
 
+Correction: [native string locales](2026-11-08-native-string-locales.md).
+
 Correction: [table errors and missing iteration arguments](2026-11-08-table-error-arguments.md).
 
 Component: [materialized vararg counterparts](2026-11-08-materialized-vararg-counterparts.md).

@@ -1,14 +1,16 @@
 with Lua.Prototypes;
 with Lua.Chunks;
 with Lua.Storage.Buffers;
-with Ada.Characters.Handling;
 with Ada.Containers;
 with Ada.Strings.Fixed;
 with Interfaces;
+with Interfaces.C;
 with Lua.Engine.Patterns;
 with Lua.Engine.Formats;
 with Lua.Engine.Diagnostics;
+with Lua.Platform_Locales;
 with System;
+with System.Storage_Elements;
 
 package body Lua.Engine.Strings is
    package Managed renames Lua.Storage.Buffers;
@@ -19,6 +21,68 @@ package body Lua.Engine.Strings is
    use type Ada.Containers.Count_Type;
    use type Interfaces.Unsigned_64;
    use type System.Address;
+   use type Interfaces.C.int;
+
+   function Locale_Less
+     (State : in out World; Left, Right : Byte_String) return Boolean
+   is
+      use System.Storage_Elements;
+      Zero : aliased constant Character := Character'Val (0);
+      A : constant System.Address :=
+        (if Left.Size = 0 then Zero'Address else Left.Address);
+      B : constant System.Address :=
+        (if Right.Size = 0 then Zero'Address else Right.Address);
+      A_Start, B_Start, A_End, B_End : Natural := 0;
+      Order : Interfaces.C.int;
+
+      procedure Charge (Count : Natural);
+      procedure Charge (Count : Natural) is
+      begin
+         if State.Policy = Bounded then
+            if Count > State.Bounds.Instructions - Natural'Min
+              (State.Steps, State.Bounds.Instructions)
+            then
+               Fail (State, "instruction limit exceeded", Resource => True);
+            end if;
+            State.Steps := State.Steps + Count;
+         end if;
+      end Charge;
+   begin
+      --  Charge the two inputs separately, without overflowing their combined
+      --  length. Native strcoll and our boundary scans borrow only already
+      --  rooted, NUL-terminated bytes; no managed safe point intervenes.
+      Charge (Left.Size);
+      Charge (Right.Size);
+      loop
+         Order := Lua.Platform_Locales.Collate
+           (A + Storage_Offset (A_Start), B + Storage_Offset (B_Start));
+         if Order /= 0 then
+            return Order < 0;
+         end if;
+         --  Equal native prefixes need not have equal byte lengths. Discover
+         --  each terminator independently and continue after embedded NULs;
+         --  a single C-string comparison would discard observable suffixes.
+         A_End := A_Start;
+         while A_End < Left.Size and then
+           Element (Left, A_End + 1) /= Character'Val (0)
+         loop
+            A_End := A_End + 1;
+         end loop;
+         B_End := B_Start;
+         while B_End < Right.Size and then
+           Element (Right, B_End + 1) /= Character'Val (0)
+         loop
+            B_End := B_End + 1;
+         end loop;
+         if B_End = Right.Size then
+            return False;
+         elsif A_End = Left.Size then
+            return True;
+         end if;
+         A_Start := A_End + 1;
+         B_Start := B_End + 1;
+      end loop;
+   end Locale_Less;
 
    function String_Argument
      (State : in out World; Item : Value; Index : Natural := 0;
@@ -294,14 +358,16 @@ package body Lua.Engine.Strings is
                      if Name = "reverse" then
                         Byte := Text (Text'Last - Index + 1);
                      elsif Name = "lower" then
-                        --  Lua's default locale is C, not Unicode/Latin-1.
-                        if Text (Index) in 'A' .. 'Z' then
-                           Byte := Ada.Characters.Handling.To_Lower
-                             (Text (Index));
-                        end if;
-                     elsif Text (Index) in 'a' .. 'z' then
-                        Byte := Ada.Characters.Handling.To_Upper
-                          (Text (Index));
+                        --  ctype is process locale state. Pass an unsigned
+                        --  byte so high-bit characters never become EOF or
+                        --  an invalid negative argument to the native bridge.
+                        Byte := Character'Val (Lua.Platform_Locales.Lower
+                          (Interfaces.C.unsigned_char
+                             (Character'Pos (Text (Index)))));
+                     else
+                        Byte := Character'Val (Lua.Platform_Locales.Upper
+                          (Interfaces.C.unsigned_char
+                             (Character'Pos (Text (Index)))));
                      end if;
                      Changed.Append (Byte);
                   end loop;

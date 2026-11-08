@@ -721,6 +721,83 @@ package body Library_Runtime_Tests is
          "assert(t[m-1]=='a' and t[m]=='b')");
    end Table_Move_Maximum_Destination;
 
+   procedure Locale_Case (Name : String);
+   procedure Locale_Case (Name : String) is
+      Universe : Session;
+      Result : constant Execution_Result := Universe.Execute
+        ("_LOCALE_STRING_CASE='" & Name &
+         "';dofile('tests/lua/locale_strings.lua')");
+      Output : constant String := To_String (Result.Output);
+      Expected : constant String :=
+        "PASS locale strings " & Name & ASCII.LF;
+      Category : constant String :=
+        (if Name = "NonC_Collation" then "collate" else "ctype");
+      Valid : Boolean := Output = Expected;
+   begin
+      Assert (Result.Status = Succeeded, To_String (Result.Error.Message));
+      if Name in "NonC_Collation" | "NonC_Classes_Case" then
+         --  Availability is an actual recorded native observation. Do not
+         --  hide unexpected diagnostics or certify non-C behavior when the
+         --  optional category is unavailable on this host.
+         Valid := Output = "LOCALE unavailable " & Category & ASCII.LF &
+           Expected or else
+           Output = "LOCALE available " & Category & " ptb" & ASCII.LF &
+           Expected or else
+           Output = "LOCALE available " & Category &
+           " pt_BR.iso88591" & ASCII.LF & Expected or else
+           Output = "LOCALE available " & Category &
+           " ISO-8859-1" & ASCII.LF & Expected;
+      end if;
+      Assert (Valid, "unexpected locale observation: " & Output);
+   end Locale_Case;
+
+   procedure C_Collation;
+   procedure C_Collation is
+   begin
+      --  Whole byte strings retain suffix ordering across embedded NULs;
+      --  ordinary comparisons and default sorting use the same semantics.
+      Locale_Case ("C_Collation");
+   end C_Collation;
+
+   procedure C_Classes;
+   procedure C_Classes is
+   begin
+      --  Every byte, inverted classes, %z and unknown escapes preserve the
+      --  C locale policy without importing that policy into source scanning.
+      Locale_Case ("C_Classes");
+   end C_Classes;
+
+   procedure C_Case;
+   procedure C_Case is
+   begin
+      --  C locale case conversion changes ASCII letters only, including
+      --  correct handling of NUL and every unsigned high-bit byte.
+      Locale_Case ("C_Case");
+   end C_Case;
+
+   procedure Non_C_Collation;
+   procedure Non_C_Collation is
+   begin
+      --  Observe native locale availability explicitly. Where installed,
+      --  accented ordering and NUL suffixes must also govern table sorting.
+      Locale_Case ("NonC_Collation");
+   end Non_C_Collation;
+
+   procedure Non_C_Classes_Case;
+   procedure Non_C_Classes_Case is
+   begin
+      --  An available single-byte Portuguese locale classifies and converts
+      --  accented bytes. The fixture restores the original process category.
+      Locale_Case ("NonC_Classes_Case");
+   end Non_C_Classes_Case;
+
+   procedure Unavailable_Locale_Unchanged;
+   procedure Unavailable_Locale_Unchanged is
+   begin
+      --  Refusing an unknown locale leaves the queried category unchanged.
+      Locale_Case ("Unavailable_Unchanged");
+   end Unavailable_Locale_Unchanged;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "load text closure",
@@ -847,5 +924,18 @@ package body Library_Runtime_Tests is
                         Table_Unpack_Explicit_End'Access);
       Test_Support.Add (Suite, "table move maximum destination",
                         Table_Move_Maximum_Destination'Access);
+      Test_Support.Add (Suite, "locale strings: C_Collation",
+                        C_Collation'Access);
+      Test_Support.Add (Suite, "locale strings: C_Classes",
+                        C_Classes'Access);
+      Test_Support.Add (Suite, "locale strings: C_Case",
+                        C_Case'Access);
+      Test_Support.Add (Suite, "locale strings: NonC_Collation availability",
+                        Non_C_Collation'Access);
+      Test_Support.Add
+        (Suite, "locale strings: NonC_Classes_Case availability",
+         Non_C_Classes_Case'Access);
+      Test_Support.Add (Suite, "locale strings: Unavailable_Unchanged",
+                        Unavailable_Locale_Unchanged'Access);
    end Register;
 end Library_Runtime_Tests;

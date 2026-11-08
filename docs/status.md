@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [native locale correction](sessions/2026-11-08-native-string-locales.md)
+connects string ordering, default sorting, recognized pattern classes and case
+conversion to the existing native locale boundary. Both full local AUnit runs
+pass2,570 cases and eight compiler/VM roles agree. Original default strings
+completes with byte-identical native/Ada stdout; instrumented strings reaches
+its missing externKstr driver. Final context and full-target gates remain.
+
 The [table diagnostic correction](sessions/2026-11-08-table-error-arguments.md)
 retains full integer indices in concat errors and argument identity for missing
 pairs/ipairs receivers. Seven focused cases pass within2,556 AUnit cases in
