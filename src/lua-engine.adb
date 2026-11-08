@@ -1239,7 +1239,7 @@ package body Lua.Engine is
       Item.Native_Name := Null_Unbounded_String;
       Item.Native_Id := Print_Function;
       Item.Native_Builtin_Direct := False;
-      Item.Native_Results_Published := False;
+      Item.Return_Window_Published := False;
       Item.Native_Return_First := 0;
       Item.Result_Failure_Class := No_Failure;
       Item.Result_Handler_Called := False;

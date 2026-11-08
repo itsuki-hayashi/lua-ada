@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
     for (which = 1; which <= 25; ++which)
         if (!check("continuation", which,
                    lua_ada_test_continuation_contract(which))) return 1;
-    for (which = 1; which <= 26; ++which) {
+    for (which = 1; which <= 29; ++which) {
         /* A lua_Debug frame token expires with its activation. The Ada-only
          * stale-token rejection is separately tested by AUnit case6; invoking
          * an expired token is outside the native public lifetime contract. */

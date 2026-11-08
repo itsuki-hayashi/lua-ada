@@ -49,6 +49,13 @@ configuration and 2,200 passing AUnit cases per configuration. Correct the
 measured function-statement definition store line in unchanged errors.lua
 while preserving closure end-line events. Full T memerr.lua's cold scalar
 output refusal and all remaining full-target obligations remain open.
+The [close-return window](sessions/2026-11-08-close-return-windows.md)
+checkpoint passes eleven new native-paired cases and 2,216 AUnit cases per
+isolated configuration. Continue the independently confirmed parent coroutine
+result-capacity false/error correction, the thin T traceback command, and
+the unreduced memory-refusal test driver entry observation. Full-source and
+final platform acceptance remain open.
+
 The [native tail return correction](sessions/2026-11-08-native-tail-return-windows.md)
 closes an observing-hook nil regression before integration of the result-window
 delivery. Its three new cases and complete eighteen-case binary campaign pass;

@@ -18,6 +18,96 @@ static struct hook_observation *observation;
 static int closed, close_failed, expected_close_error, close_continued;
 static int hook_generation, count_generation, combined_lines, combined_failed;
 static int view_mode, view_hits, view_failed;
+static struct allocation_counts *close_window_counts;
+static int close_window_mode, close_window_closed, close_window_failed;
+static size_t close_window_growths;
+
+static int change_c_return(lua_State *L) {
+    lua_Debug parent;
+    const char *name;
+    ++close_window_closed;
+    if (!lua_getstack(L, 1, &parent)) { close_window_failed=110; return 0; }
+    name=lua_getlocal(L, &parent, 2);
+    if (name == NULL || lua_tointeger(L, -1) != 11) {
+        close_window_failed=111; return 0;
+    }
+    lua_pop(L, 1);
+    lua_pushinteger(L, 37);
+    if (lua_setlocal(L, &parent, 2) == NULL) close_window_failed=112;
+    if (close_window_mode == 2) {
+        name=lua_getlocal(L, &parent, 4);
+        if (name == NULL || lua_tointeger(L, -1) != 23) {
+            close_window_failed=113; return 0;
+        }
+        lua_pop(L, 1);
+        lua_pushinteger(L, 42);
+        if (lua_setlocal(L, &parent, 4) == NULL) close_window_failed=114;
+    }
+    return 0;
+}
+
+static int c_return_window(lua_State *L) {
+    /* Slot 1 is the real incoming resource; the exact C API operations below
+     * publish the outgoing range in slots 2..4, without compiler assumptions. */
+    lua_toclose(L, 1);
+    lua_pushinteger(L, 11);
+    if (close_window_mode == 2) {
+        lua_pushnil(L);
+        lua_pushinteger(L, 23);
+    }
+    if (close_window_counts != NULL && close_window_mode == 3) {
+        close_window_growths=close_window_counts->growths;
+        close_window_counts->refuse=1;
+    }
+    return close_window_mode == 2 ? 3 : 1;
+}
+
+static void prepare_close_window(lua_State *L) {
+    lua_newtable(L);
+    lua_newtable(L);
+    lua_pushcfunction(L, change_c_return);
+    lua_setfield(L, -2, "__close");
+    lua_setmetatable(L, -2);
+    lua_setglobal(L, "close_return_resource");
+}
+
+static int run_close_window(lua_State *L) {
+    int status;
+    close_window_closed=close_window_failed=0;
+    lua_settop(L, 0);
+    lua_pushcfunction(L, c_return_window);
+    lua_getglobal(L, "close_return_resource");
+    status=lua_pcall(L, 1, LUA_MULTRET, 0);
+    if (close_window_counts != NULL) close_window_counts->refuse=0;
+    if (status != LUA_OK || close_window_closed != 1) return 115;
+    if (close_window_failed) return close_window_failed;
+    if (lua_gettop(L) != (close_window_mode == 2 ? 3 : 1) ||
+        lua_tointeger(L, 1) != 37) return 116;
+    if (close_window_mode == 2 &&
+        (!lua_isnil(L, 2) || lua_tointeger(L, 3) != 42)) return 117;
+    return 0;
+}
+
+static int refused_close_window(void) {
+    struct allocation_counts counts={0};
+    lua_State *L=lua_newstate(counted_allocator, &counts, 0);
+    int i, result=0;
+    if (L == NULL) return 118;
+    close_window_counts=&counts;
+    close_window_mode=1;
+    prepare_close_window(L);
+    for (i=0; i<3 && result==0; ++i) result=run_close_window(L);
+    if (result==0) {
+        close_window_mode=3;
+        result=run_close_window(L);
+        if (counts.growths != close_window_growths) result=119;
+    }
+    counts.refuse=0;
+    lua_close(L);
+    close_window_counts=NULL;
+    if (counts.bytes != 0 || counts.blocks != 0) return 120;
+    return result;
+}
 
 static int fail_in_hook(lua_State *L) {
     lua_pushliteral(L, "nested hook failure");
@@ -569,6 +659,19 @@ int lua_ada_test_hook_contract(int which) {
     memset(&observed, 0, sizeof observed);
     observed.expected = L;
     observation = &observed;
+    if (which >= 27 && which <= 29) {
+        observation = NULL;
+        if (which == 29) {
+            lua_close(L);
+            return refused_close_window();
+        }
+        close_window_counts=NULL;
+        close_window_mode=which-26;
+        prepare_close_window(L);
+        result=run_close_window(L);
+        lua_close(L);
+        return result;
+    }
     if (which >= 25 && which <= 26) {
         result = returned_value_contract(L, which - 16);
         observation = NULL;

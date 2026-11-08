@@ -147,7 +147,8 @@ begin
    Activation.Stack_Live_Top := New_Top;
    Context.Foreign_Top := New_Top;
    Activation.Transfer_First := First;
-   Activation.Native_Results_Published := True;
+   Activation.Transfer_Count := Count;
+   Activation.Return_Window_Published := True;
 
    --  The physical prefix/results now own every semantically live value.
    --  A previous callback's packet or a consumed input/capture must not keep

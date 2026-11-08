@@ -1798,9 +1798,71 @@ package body Lua.Engine.Machine is
       Driver.Unwind_Previous_Prefix :=
         (if Prefix_Floor = Natural'Last then
             State.Current.Closing_Stack_Prefix else Prefix_Floor);
-      Copy_Roots
-        (State, Driver.Unwind_Results,
-         Results);
+      if Reason = Return_Exit and then Owner.Has_Stack_Window and then
+        Owner.Return_Window_Published
+      then
+         declare
+            Count : constant Natural := Owner.Transfer_Count;
+            Prefix : constant Natural := Owner.Protection;
+            Work : constant Ada.Containers.Count_Type :=
+              Owner.Native_Arguments.Length + Owner.Native_Results.Length +
+              Owner.Native_Captures.Length + Owner.Unwind_Results.Length +
+              Owner.Error_Packet.Length + Ada.Containers.Count_Type (Count) +
+              Ada.Containers.Count_Type (Prefix);
+         begin
+            if Count > Natural'Last - Prefix then
+               Fail (State, "stack overflow");
+            elsif State.Policy = Bounded then
+               if Work > Ada.Containers.Count_Type
+                 (State.Bounds.Instructions - Natural'Min
+                    (State.Steps, State.Bounds.Instructions))
+               then
+                  Fail (State, "instruction limit exceeded", True);
+               end if;
+               State.Steps := State.Steps + Natural (Work);
+            end if;
+            --  Outgoing values already belong to actual scalar cells. Keep
+            --  the largest existing packet buffer for reconstruction, not
+            --  another copy of those values. Reserve before the first close
+            --  handler; later readback/cleanup cannot allocate under refusal.
+            if Owner.Unwind_Results.Capacity >
+              Owner.Native_Results.Capacity
+            then
+               Move_Roots
+                 (State, Owner.Native_Results, Owner.Unwind_Results);
+            end if;
+            if Owner.Native_Arguments.Capacity >
+              Owner.Native_Results.Capacity
+            then
+               Move_Roots
+                 (State, Owner.Native_Results, Owner.Native_Arguments);
+            end if;
+            if Owner.Error_Packet.Capacity > Owner.Native_Results.Capacity
+            then
+               Move_Roots
+                 (State, Owner.Native_Results, Owner.Error_Packet);
+            end if;
+            if Driver.Unwind_Results.Capacity >
+              Owner.Native_Results.Capacity
+            then
+               Move_Roots
+                 (State, Owner.Native_Results, Driver.Unwind_Results);
+            end if;
+            Owner.Native_Results.Reserve_Capacity
+              (Ada.Containers.Count_Type (Count + Prefix));
+            Owner.Native_Arguments.Clear;
+            Owner.Native_Results.Clear;
+            Owner.Native_Captures.Clear;
+            Owner.Unwind_Results.Clear;
+            Owner.Error_Packet.Clear;
+            Driver.Unwind_Results.Clear;
+         end;
+      else
+         --  Error/scope exits and the migration packet backend retain their
+         --  existing independent packet lifetime. They do not describe a
+         --  published canonical/native return span that closers may edit.
+         Copy_Roots (State, Driver.Unwind_Results, Results);
+      end if;
       if Owner.Code /= null and then
         Owner.Code.Canonical_Node /= null
       then
@@ -2285,7 +2347,7 @@ package body Lua.Engine.Machine is
       Pin (State, Packet);
       if Activation.Is_Native and then
         Activation.Has_Stack_Window and then
-        not Activation.Native_Results_Published and then
+        not Activation.Return_Window_Published and then
         Activation.Foreign_Handler = System.Null_Address and then
         Length (Activation.Native_Name) > 0 and then
         Element (Activation.Native_Name, 1) /= '@'
@@ -2317,9 +2379,7 @@ package body Lua.Engine.Machine is
          --  weak objects during callback collection. Reserve reconstruction
          --  storage before entering the hook, then drop only the copies.
          Activation.Return_Hook_Done := True;
-         if not (Policy = Resume_Caller and then
-                 Activation.Foreign_Handler /= System.Null_Address)
-         then
+         if not Activation.Return_Window_Published then
             Activation.Transfer_Count := Natural
               ((if Public_Protection then Packet.Length else Result.Length));
          end if;
@@ -3538,6 +3598,12 @@ package body Lua.Engine.Machine is
                Activation.Protection := 0;
                Complete_Packet
                  (Self, Values.Empty_Vector, Activation.Native_Results);
+            elsif Name = "@foreign.entry" then
+               --  The C body and its closers have already returned. Publish
+               --  the internal success prefix in retained storage, just as
+               --  the public protected-call driver does. A fresh Wrap vector
+               --  here would turn a successful warmed return into NOMEM.
+               Finish_Protected_Return;
             else
                Complete (Self, Activation.Native_Results);
             end if;
@@ -3898,7 +3964,44 @@ package body Lua.Engine.Machine is
                case Reason is
                   when Return_Exit =>
                      Set_Closing_Stack_Prefix (State, Previous_Prefix);
-                     Complete (Self, Results);
+                     if Owner.Has_Stack_Window and then
+                       Owner.Return_Window_Published
+                     then
+                        declare
+                           Count : constant Natural := Owner.Transfer_Count;
+                           Prefix : constant Natural := Owner.Protection;
+                        begin
+                           --  Every closer has completed. The original
+                           --  source cells, including their edits, remain
+                           --  rooted until the normal delivery retires this
+                           --  frame. Internal status prefixes are separate
+                           --  from that actual return span and appear once.
+                           if Owner.Native_Results.Capacity <
+                             Ada.Containers.Count_Type (Count + Prefix)
+                           then
+                              raise Program_Error with
+                                "close return packet capacity lost";
+                           end if;
+                           Owner.Native_Results.Clear;
+                           for Index in 1 .. Prefix loop
+                              Append_Root
+                                (State, Owner.Native_Results,
+                                 (Boolean_Kind, True));
+                           end loop;
+                           for Index in 1 .. Count loop
+                              Append_Root
+                                (State, Owner.Native_Results,
+                                 Stacks.Read
+                                   (State.Current, Owner.Stack_Base +
+                                    Owner.Transfer_First + Index - 1));
+                           end loop;
+                           Complete_Packet
+                             (Self, Owner.Native_Results,
+                              Owner.Native_Results);
+                        end;
+                     else
+                        Complete (Self, Results);
+                     end if;
                   when Scope_Exit =>
                      if Owner.Code.Canonical_Node = null then
                         Owner.Scope := Owner.Scope.Parent;
@@ -5345,20 +5448,40 @@ package body Lua.Engine.Machine is
       then
          declare
             Child : constant Context_Access := State.Current;
-            Transfer : constant Control_Transfer := Child.Transfer;
+            Kind : constant Transfer_Kind := Child.Transfer.Kind;
             Parent : constant Context_Access := Child.Resumer;
             Packet : Values.Vector := Owned_Values (State);
          begin
-            Pin (State, Transfer.Results);
             if Parent /= null then
+               if State.Policy = Bounded then
+                  declare
+                     Raw_Count : constant Ada.Containers.Count_Type :=
+                       Child.Transfer.Results.Length;
+                     Published_Count : constant Ada.Containers.Count_Type :=
+                       (if Child.C_Reset_Error then 2 else Raw_Count + 1);
+                     Work : constant Ada.Containers.Count_Type :=
+                       Raw_Count + 3 * Published_Count;
+                  begin
+                     --  Meter the real pin/packet/receiver passes, not the
+                     --  eliminated controlled-record snapshot. Keep the
+                     --  original transfer intact if this quota rejects it.
+                     if Work > Ada.Containers.Count_Type
+                       (State.Bounds.Instructions - Natural'Min
+                          (State.Steps, State.Bounds.Instructions))
+                     then
+                        Fail (State, "instruction limit exceeded", True);
+                     end if;
+                     State.Steps := State.Steps + Natural (Work);
+                  end;
+               end if;
+               Pin (State, Child.Transfer.Results);
                Child.Transfer.Kind := No_Transfer;
                Child.Transfer.Target := 0;
-               Child.Transfer.Results.Clear;
             end if;
             Child.Status :=
-              (if Transfer.Kind = Yielded then Suspended_Context
+              (if Kind = Yielded then Suspended_Context
                else Dead_Context);
-            if Transfer.Kind = Yielded and then Parent /= null then
+            if Kind = Yielded and then Parent /= null then
                --  Lua's resumer consumes the yielded values. Expose an empty
                --  C API window above the retained frames so later public
                --  pushes (or a C takeover of resume) cannot overwrite them.
@@ -5377,12 +5500,15 @@ package body Lua.Engine.Machine is
                Child.Host_Stack_Top := Child.Foreign_Top;
                Child.Detached_Resume_Window := True;
             end if;
-            if Transfer.Kind /= Yielded then
+            if Kind /= Yielded then
                --  Closing is an execution phase, not a permanent dead
                --  thread attribute observed by later boundary queries.
                Child.Phase := Executing;
             end if;
             if Parent = null then
+               --  The root already owns its complete packet. Copying the
+               --  controlled transfer record here would allocate merely to
+               --  report success, even after a permanently refusing C body.
                Self.Done := True;
                return;
             end if;
@@ -5392,18 +5518,22 @@ package body Lua.Engine.Machine is
             State.Current := Parent;
             Parent.Status := Running_Context;
             Packet.Append
-              (Value'(Boolean_Kind, Transfer.Kind /= Lua_Raised));
+              (Value'(Boolean_Kind, Kind /= Lua_Raised));
             if Child.C_Reset_Error then
                Packet.Append (Child.Failure);
                Child.C_Reset_Error := False;
             else
-               for Item of Transfer.Results loop
+               for Item of Child.Transfer.Results loop
                   Packet.Append (Item);
                end loop;
             end if;
             Copy_Roots
               (State, Parent.Stack.Last_Element.Native_Results,
                Packet);
+            --  Preserve the original child packet until the actual receiver
+            --  owns every result. Only scalar transfer metadata is snapshotted
+            --  above; the ordinary root path needs no duplicate value buffer.
+            Child.Transfer.Results.Clear;
          end;
       else
          if not State.State_Close_Phase and then
@@ -5487,6 +5617,7 @@ package body Lua.Engine.Machine is
                      Owner.Canonical_GC_Top := Owner.Canonical_Base + Count;
                      Owner.Transfer_First := Owner.Canonical_Base + 1;
                      Owner.Transfer_Count := Count;
+                     Owner.Return_Window_Published := True;
                   end if;
                end;
                Complete
@@ -6330,6 +6461,7 @@ package body Lua.Engine.Machine is
          Activation.Transfer_First :=
            Context.Foreign_Top - Context.Foreign_Base - Count + 1;
          Activation.Transfer_Count := Count;
+         Activation.Return_Window_Published := True;
       end if;
       if Error_Status /= 0 then
          --  Callback failure has one existing C-stack object. Do not allocate

@@ -67,6 +67,16 @@ succeeds; then real scalar writes and transfer metadata describe that same
 range. Reading a stale pre-call window is not a valid substitute for this
 publication, even if a later hook happens to replace the result.
 
+The same source ownership extends through Return_Exit closing. Publish the
+exact scalar range/count before scheduling closers; retain reconstruction
+capacity without another value snapshot. Close handlers may then edit those
+cells, collect discarded weak values, or suspend in a yieldable context.
+Only successful completion rereads the actual range. A close error follows
+the existing error-unwind path and abandons outgoing values. Generalize the
+existing native publication bit to Return_Window_Published so callback,
+canonical and native-tail returns preserve actual counts across closing,
+return hooks and external-release deferral.
+
 Nine separately named public C regressions cover real scalar edits, hook
 removal/nested calls, protected and unprotected errors, blocked nested yield,
 direct hook yield, weak argument/upvalue release, and allocator reentry into

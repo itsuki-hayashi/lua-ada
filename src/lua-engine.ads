@@ -528,7 +528,9 @@ private package Lua.Engine is
       Native_Name : Unbounded_String;
       Native_Id : Native_Kind := Print_Function;
       Native_Builtin_Direct : Boolean := False;
-      Native_Results_Published : Boolean := False;
+      Return_Window_Published : Boolean := False;
+      --  The scalar source range and Transfer_First/Count are authoritative
+      --  through return closing/hooks, independently of copied result packets.
       Native_Return_First : Natural := 0;
       --  A finishing Ada builtin publishes its real result range once,
       --  before return hooks. Zero means ordinary append placement; a phase

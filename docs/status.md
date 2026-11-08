@@ -48,6 +48,13 @@ Fifteen native-paired cases match four-way compiler/VM campaigns in both
 configurations; each local configuration passes 2,200 AUnit cases. Unchanged
 errors.lua now reaches function-statement store-line attribution. Full
 source/T and immutable final-head acceptance remain open.
+The [close-return checkpoint](sessions/2026-11-08-close-return-windows.md)
+retains edited scalar results through closers, including weak collection,
+yielding and later return hooks. Eleven new cases pass within 2,216 AUnit
+cases per isolated configuration. The native-paired C refusal case completes
+with zero attempted growth after its body freezes allocation. Parent
+coroutine result-portal capacity behavior remains a separate open correction.
+
 The [native tail correction](sessions/2026-11-08-native-tail-return-windows.md)
 publishes results into the retained Lua frame before return-hook inspection.
 Three additional cases pass within 2,205 AUnit cases per isolated configuration;

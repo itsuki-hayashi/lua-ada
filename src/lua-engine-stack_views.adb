@@ -38,7 +38,7 @@ package body Lua.Engine.Stack_Views is
          Reserve_Work (Window.Native_Captures.Length);
          Restore_Packets := Window.Foreign_Handler = System.Null_Address
            and then not Window.Return_Hook_Done and then
-           not Window.Native_Results_Published;
+           not Window.Return_Window_Published;
          if Restore_Packets then
             Reserve_Work (Window.Native_Arguments.Length);
             if Window.Native_Self /= null then
@@ -107,7 +107,7 @@ package body Lua.Engine.Stack_Views is
             Lease.Restore_Arguments :=
               Window.Foreign_Handler = System.Null_Address and then
               not Window.Return_Hook_Done and then
-              not Window.Native_Results_Published;
+              not Window.Return_Window_Published;
             Lease.Restore_Captures := Lease.Restore_Arguments and then
               Window.Native_Self /= null;
             --  Scalar arguments and real closure cells remain roots. Keeping

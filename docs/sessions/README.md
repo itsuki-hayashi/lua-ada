@@ -14,6 +14,8 @@ Component: [label semantic boundaries](2026-11-08-label-semantic-boundaries.md).
 Component: [function definition store sites](2026-11-08-function-store-sites.md).
 
 Component: [base setmetatable arguments](2026-11-08-metatable-argument-phases.md).
+Component: [return windows through closers](2026-11-08-close-return-windows.md).
+
 Correction: [native tail return publication](2026-11-08-native-tail-return-windows.md).
 
 Component: [actual return-hook windows](2026-11-08-return-hook-windows.md).

@@ -30,6 +30,7 @@ with Hook_Registry_Tests;
 with Debug_Temporary_Tests;
 with Native_Return_Window_Tests;
 with Return_Hook_Mutation_Tests;
+with Close_Return_Window_Tests;
 with Metamethod_Name_Tests;
 with Loop_Close_Tests;
 with Error_Closing_Tests;
@@ -145,6 +146,7 @@ procedure Test_Runner is
       Debug_Temporary_Tests.Register (Result);
       Native_Return_Window_Tests.Register (Result);
       Return_Hook_Mutation_Tests.Register (Result);
+      Close_Return_Window_Tests.Register (Result);
       Metamethod_Name_Tests.Register (Result);
       Loop_Close_Tests.Register (Result);
       Error_Closing_Tests.Register (Result);

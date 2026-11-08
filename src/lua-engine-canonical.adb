@@ -1326,6 +1326,8 @@ package body Lua.Engine.Canonical is
             --  before result adjustment/movement to its caller. A packet's
             --  element one alone cannot recover this public stack offset.
             Activation.Transfer_First := Reg_A + 1;
+            Activation.Transfer_Count := Count;
+            Activation.Return_Window_Published := True;
             Freeze_Closing (0);
             Result := (Kind => Return_Results,
                        Arguments => Activation.Unwind_Results, others => <>);

@@ -35,6 +35,31 @@ package body Lua.Foreign_Hook_Tests is
    procedure External_Release_Lua_View;
    procedure C_Return_Value_Mutation;
    procedure C_Return_Weak_Root;
+   procedure C_Close_Return_Mutation;
+   procedure C_Close_Return_Tuple;
+   procedure C_Close_Return_Refusal;
+
+   procedure C_Close_Return_Mutation is
+   begin
+      --  A marked real C slot closes before result movement. The closer
+      --  edits outgoing slot 2, and the protected caller must receive 37.
+      Assert (Contract (27) = 0, "C closer edits actual outgoing result");
+   end C_Close_Return_Mutation;
+
+   procedure C_Close_Return_Tuple is
+   begin
+      --  Keep all three results, including the middle nil, while a closer
+      --  changes the first and last actual scalar source cells.
+      Assert (Contract (28) = 0, "C closer preserves result count and nils");
+   end C_Close_Return_Tuple;
+
+   procedure C_Close_Return_Refusal is
+   begin
+      --  Warm real guards, freeze growth inside the C body, then close/edit
+      --  and return using retained storage. Require zero attempted growth
+      --  after the freeze and exact provider balance after physical close.
+      Assert (Contract (29) = 0, "C close return needs no warmed growth");
+   end C_Close_Return_Refusal;
 
    procedure C_Return_Value_Mutation is
    begin
@@ -276,5 +301,11 @@ package body Lua.Foreign_Hook_Tests is
                         C_Return_Value_Mutation'Access);
       Test_Support.Add (Suite, "C hooks: return replacement drops weak root",
                         C_Return_Weak_Root'Access);
+      Test_Support.Add (Suite, "C close: actual result mutation reaches C",
+                        C_Close_Return_Mutation'Access);
+      Test_Support.Add (Suite, "C close: result tuple retains nils and count",
+                        C_Close_Return_Tuple'Access);
+      Test_Support.Add (Suite, "C close: warmed result mutation under refusal",
+                        C_Close_Return_Refusal'Access);
    end Register;
 end Lua.Foreign_Hook_Tests;
