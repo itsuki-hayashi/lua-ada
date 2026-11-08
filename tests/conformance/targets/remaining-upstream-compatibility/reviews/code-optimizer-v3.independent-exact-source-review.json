@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "kind": "code-optimizer-v3-independent-exact-source-review",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "review_date": "2026-11-08",
+  "decision": "accepted-exact-source-decomposition-and-transform-direction",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_adaptation_authority": false,
+  "inputs": [
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/code-optimizer-v3.policy.author-proposal.json",
+      "sha256": "3b8e94f9ceebd09e3897faf8c202fabd9385d146815ea6906612c4495fbad487"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/code-optimizer-v3.decomposition.author-proposal.json",
+      "sha256": "ea12d2d4c5af37600323841834b4eedfe8a8725a52326398bf35f513bfb5a3d2"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/code-optimizer-v3.transform.author-proposal.json",
+      "sha256": "bb1cfc7fef67a0edfe814598670745e7c717809ffcf5e4f4c4f854fa1cdfeb6c"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.v3-current-feature-review.json",
+      "sha256": "6ab0b934dff237d1069df303c84d17eadbc7d9e6cfbab8634ee7eb5422a5083a"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-optimizer-semantic-retention.independent-review.json",
+      "sha256": "7ee040ac1b56916f4f5d0314ee50f441fca3311ecf26324bf4d8d34ff8b0feea"
+    },
+    {
+      "path": "tests/conformance/coverage/code.jsonl",
+      "sha256": "27231932dffbd450a7fbdabfbf0de2c9edafd4ab0bbaecf3a16457af98e5fd94"
+    },
+    {
+      "path": "references/lua/testes/code.lua",
+      "sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663"
+    }
+  ],
+  "reviewed_candidates": [
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9001",
+      "byte_offset": 800,
+      "byte_length": 143,
+      "anchor_sha256": "26aad09cfda55023d09d73d23353c892cb5e19ba423488629606efc828ddf3fd",
+      "decision": "eligible-source-only-exclusion",
+      "required_semantic_contract_ids": [
+        "compile-original",
+        "numeric-values-types-arity",
+        "callback-sequence",
+        "assignment-sequence"
+      ]
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9002",
+      "byte_offset": 1808,
+      "byte_length": 205,
+      "anchor_sha256": "41b6d2b52bb8f3f0d16dc0cf595c5fd6a4ca1b124b16b1bef028a1dda5f27f6b",
+      "decision": "eligible-source-only-exclusion",
+      "required_semantic_contract_ids": [
+        "compile-original",
+        "retained-checkR",
+        "safe-return-cardinality"
+      ]
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9003",
+      "byte_offset": 2288,
+      "byte_length": 239,
+      "anchor_sha256": "5b3ddc7feef1ddadfa4a18c2526a31ced0495324141bde683ac399700a67e762",
+      "decision": "eligible-source-only-exclusion",
+      "required_semantic_contract_ids": [
+        "compile-original",
+        "retained-checkR"
+      ]
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9004",
+      "byte_offset": 13327,
+      "byte_length": 32,
+      "anchor_sha256": "13c9570d19cf580345c831907370413a0a9b7c0c3d39f7b6660459373cd8e8af",
+      "decision": "eligible-source-only-exclusion",
+      "required_semantic_contract_ids": [
+        "nested-constant-lifetimes"
+      ]
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9005",
+      "byte_offset": 13359,
+      "byte_length": 32,
+      "anchor_sha256": "4b1b8301af5f0f06a693bc66df7fa421860fdf06c9821e447ae6d4af791d8907",
+      "decision": "eligible-source-only-exclusion",
+      "required_semantic_contract_ids": [
+        "nested-constant-lifetimes"
+      ]
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9006",
+      "byte_offset": 13587,
+      "byte_length": 10,
+      "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54",
+      "decision": "eligible-source-only-exclusion",
+      "required_semantic_contract_ids": [
+        "register-load-boundaries"
+      ]
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9007",
+      "byte_offset": 13655,
+      "byte_length": 79,
+      "anchor_sha256": "120c5699b24c0b9102eded9963b92049e2d0f8213c5c43d77a64dc7dd3ecdac9",
+      "decision": "eligible-source-only-exclusion",
+      "required_semantic_contract_ids": [
+        "register-load-boundaries"
+      ]
+    },
+    {
+      "id": "LUA-CODE-REVIEWED-BLOCK-9008",
+      "byte_offset": 14141,
+      "byte_length": 175,
+      "anchor_sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6",
+      "decision": "eligible-source-only-exclusion",
+      "required_semantic_contract_ids": [
+        "constructor-and-vararg-boundaries"
+      ]
+    }
+  ],
+  "decomposition": {
+    "original_records_preserved": 51,
+    "private_children": 8,
+    "retained_runtime_nodes": 9,
+    "original_reference_links": 18,
+    "all_originals_still_pending": true
+  },
+  "reconstruction": {
+    "output_sha256": "676304c019ee3afe8796da7ddfaf8f14cba43c2c49332d96f19b3f4c84211fe0",
+    "byte_length": 14299,
+    "source_emitted": false
+  },
+  "findings": [
+    "Inspected original helper bodies and final constant/register/SETLIST blocks. The eight spans inspect only private constant/opcode/register placement. Emptying only those helper bodies retains argument compilation; checkR remains byte-identical and executes actual values and numeric types.",
+    "The T.listcode wrapper alone is removed around assert(load(source)); physical MOVE inspection is separate. The failing extra-register load and its diagnostic stay required. Constructor compilation, nested returned string and integer-limit dump/reload assertions are untouched.",
+    "Inspected all nine retained semantic nodes and exact source fragments. Their public29 controls and whole native/derived instrumented files remain actual runtime obligations. Neither a lexical reference nor an exclusion receives passing evidence.",
+    "All51 original records stay byte-identical. The18 references require explicit independent decomposition records linking pending retained semantic nodes. Only eight new exact private children may receive excluded resolution.",
+    "This source direction must be installed using separately hash-bound exact policy/decomposition/transform approval envelopes. The existing API18 operation remains18bytes; changing the global policy needs its own coherent transform approval refresh. No stale or automatically rehashed approval is authorized.",
+    "Runtime ownership changed after the dated proposal. This review asserts no passing runtime or final-target acceptance. Fresh whole-file and public named observations remain required on final frozen images."
+  ]
+}
