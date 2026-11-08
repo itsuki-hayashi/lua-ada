@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "kind": "memerr-vararg-private-count-feature-review",
+  "candidate_id": "memerr-materialized-vararg-allocation-count",
+  "author": "Codex /root/runtime_gaps",
+  "reviewer": "Codex /root",
+  "review_date": "2026-11-08",
+  "decision": "accepted-feature-only-with-required-counterparts",
+  "permitted_resolution": "reviewed-t-internal-exclusion",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "synthetic_fixture": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "source": {
+    "path": "references/lua/testes/memerr.lua",
+    "sha256": "02cc2a754e688bdfcbf507e009d899c4d367f27ced45094b68fdf208a6912491",
+    "byte_length": 7512
+  },
+  "configuration": "upstream-test",
+  "proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/memerr-vararg-allocation.author-proposal.json",
+    "sha256": "3beefac566c09658b06819732bf0f4d1db6a6ee8d628e9d78fe76d505bb79f02"
+  },
+  "original_required_anchor": "LUA-MEMERR-ASSERT-CALL-0004",
+  "source_audit": {
+    "file_bindings_checked": 17,
+    "source_spans_checked": 8,
+    "unavailable_historical_reports": [
+      "reports/hook-top/memerr-tail-13123c3a3a284eac8eec3f0debb95cd5/ada-process.json",
+      "reports/hook-top/memerr-tail-13123c3a3a284eac8eec3f0debb95cd5/ada.stdout",
+      "reports/hook-top/memerr-tail-13123c3a3a284eac8eec3f0debb95cd5/ada.stderr",
+      "reports/hook-top/memerr-tail-13123c3a3a284eac8eec3f0debb95cd5/native-process.json",
+      "reports/hook-top/memerr-tail-13123c3a3a284eac8eec3f0debb95cd5/native.stdout",
+      "reports/hook-top/memerr-tail-13123c3a3a284eac8eec3f0debb95cd5/native.stderr"
+    ],
+    "reviewed_implementation_snapshot_revision": "097bb2cf6f8166ebb9e3d811fffaf398e13872bc",
+    "subsequent_change_limit": "Source identities/spans were checked before the scalar-closing delivery. Its later runtime/checker changes require fresh counterpart/exact review; no source adaptation or runtime acceptance transfers."
+  },
+  "candidate": {
+    "path": "references/lua/testes/memerr.lua",
+    "byte_offset": 3544,
+    "byte_length": 19,
+    "line": 133,
+    "end_line": 133,
+    "anchor_sha256": "671d423d19a8f100b52a4f4a1402dcbc11e2aa6eadaa7a1eaa77bf09640add01",
+    "original_bytes": "assert(b.aloc == 3)",
+    "module_observable": true,
+    "module_compatibility_obligation": false,
+    "public_api": false,
+    "mixed_obligation": false
+  },
+  "rationale": "The public selected allocator observes real storage attempts, and its refusal/recovery behavior remains required. The exact positive count3 for one materialized table representation is not a public geometry promise. The pinned native creator allocates its actual table/array/hash storage; Ada owns different real table/index storage. Matching that split would not establish payload, identity, roots or cleanup. Only the19-byte private equality qualifies for a later exact decision.",
+  "retained_requirements": [
+    "Keep the actual pack(...t) function returning t and its exact10/20/30/40/hello invocation; verify type(table), n5, every value/type, absent sixth element and fresh identity on repeated calls.",
+    "Retain actual count/byte refusal sweeps, both collections, deep4 warmup, catchable statuses/messages, increments, reported measurements and recovery; no output normalization or fabricated counters.",
+    "Keep the entire documented optimized named-vararg workload, integral-real index2.0, result32, count0 and original zero-extra-byte sweep unchanged. The owned-tail fix addresses an actual allocation defect rather than excluding this behavior.",
+    "Require actual selected-provider materialization failures, rooted live payloads, atomic retry/recovery, nil/count/mutation boundaries, collector integrity and balanced state closure.",
+    "Preserve every original anchor and required mixed/materialization parent; no default T-absent run certifies the omitted fault campaign."
+  ],
+  "prerequisites_before_adaptation": [
+    "Review and execute source-linked materialized-table semantic/refusal counterparts; existing broad vararg passes alone do not establish this exact workload.",
+    "Author a narrowly bounded observable-private-resource eligibility decision for this exact source/span. Do not relabel it unobservable V1 or borrow the Code-only V3 registry.",
+    "Obtain distinct exact child/anchor decomposition and transformation reviews, including safe composition with the separately reviewed17-byte verifier reset.",
+    "Generate only disposable hashed copies, then require actual original native and approved Ada full memory/file/context evidence, including separately reviewed native Windows temporary-file applicability."
+  ],
+  "retained_optimized_span": {
+    "byte_offset": 3604,
+    "byte_length": 254,
+    "anchor_sha256": "065e3973d7ca76db008fd02bda7d3321d0daeffa35b11a18281ec77b01917976",
+    "must_remain_byte_identical": true
+  },
+  "limitations": [
+    "This feature decision installs no exclusion, source adaptation or passing evidence.",
+    "The author observed whole-file failures and differing positive counts; no observation becomes final acceptance here.",
+    "The separate locals allocation-disabled closing failure remains a mandatory runtime repair."
+  ]
+}

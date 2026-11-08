@@ -1,5 +1,7 @@
 # Session Records
 
+Feature review: [materialized vararg allocation count](2026-11-08-memerr-vararg-feature-review.md).
+
 Source review: [bounded optimizer eligibility](2026-11-08-optimizer-v3-validator-review.md).
 
 Observation: [original main.lua and CLI prompts](2026-11-08-main-cli-native-baseline.md).
