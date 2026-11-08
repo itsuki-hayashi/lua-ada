@@ -15,6 +15,14 @@ pass 2,629 AUnit cases, including four actual constructor-provider refusals
 and healthy retries. Exact upstream source decisions and final acceptance
 remain separate; no Nextvar/Sort adaptation is installed by this checkpoint.
 
+The [typed CLI argument component](sessions/2026-11-08-cli-typed-arguments.md)
+loads the selected closure before resolving the current global arg table and
+preserves actual Lua values through guarded callbacks. Both isolated full
+AUnit suites pass 2,644 cases and both product CLI suites pass 112 controls;
+fresh frozen ordinary/T argument campaigns agree with native contracts.
+These component images do not establish original main.lua, platform transport
+or final immutable full-target acceptance.
+
 The [reviewed Verybig Windows replay](sessions/2026-11-08-verybig-approved-source.md)
 completes the full large-program workload in local native/Ada default/T roles,
 with identical output, single-result 10 and balanced measured ownership.

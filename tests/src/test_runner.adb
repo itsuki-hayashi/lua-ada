@@ -32,6 +32,7 @@ with Integer_Tests;
 with Lexer_Tests;
 with Number_Tests;
 with Session_Tests;
+with Lua.Sessions.CLI_Argument_Tests;
 with Lua.Sessions.CLI_Prompt_Tests;
 with Lifecycle_Tests;
 with Runtime_Control_Tests;
@@ -163,6 +164,7 @@ procedure Test_Runner is
       Lexer_Tests.Register (Result);
       Number_Tests.Register (Result);
       Session_Tests.Register (Result);
+      Lua.Sessions.CLI_Argument_Tests.Register (Result);
       Lua.Sessions.CLI_Prompt_Tests.Register (Result);
       Lifecycle_Tests.Register (Result);
       Runtime_Control_Tests.Register (Result);

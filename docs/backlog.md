@@ -15,6 +15,13 @@ rows/live counts must never replace a physical-rehash termination condition.
 Retain actual provider refusal/retry and measured 529-constructor walk cost;
 neither supplies private C geometry or automatic source-review authority.
 
+Retain the [typed CLI argument component](sessions/2026-11-08-cli-typed-arguments.md)
+and its separate length-result correction during integration. Preserve loaded
+closure/table/value roots, actual C ancestry, one shared budget and callback
+M0/exit behavior. Renew actual immutable images and source bindings before
+claiming original main completion; Windows transport, remaining CLI behavior
+and final review/matrix obligations stay open.
+
 Carry the [reviewed Verybig replay](sessions/2026-11-08-verybig-approved-source.md)
 into final Windows contexts with actual rooted-name/fresh-CWD applicability
 evidence. Preserve the four complete local observations without promoting

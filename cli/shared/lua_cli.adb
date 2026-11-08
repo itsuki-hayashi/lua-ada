@@ -93,7 +93,6 @@ procedure Lua_CLI is
    function Read_Stdin return String;
    procedure Prepare_Stdin;
    function Read_Line (Line : out Unbounded_String) return Boolean;
-   function Arguments_After (Index : Natural) return Argument_Array;
    function Check_Source
      (Source, Name : String) return Lua.Syntax.Check_Result;
    function Incomplete (Result : Lua.Syntax.Check_Result) return Boolean;
@@ -327,16 +326,6 @@ procedure Lua_CLI is
          Append (Line, Character'Val (Byte));
       end loop;
    end Read_Line;
-
-   function Arguments_After (Index : Natural) return Argument_Array is
-      Result : Argument_Array (1 .. Argument_Count - Index);
-   begin
-      for Position in Result'Range loop
-         Result (Position) := To_Unbounded_String
-           (Argument (Index + Position));
-      end loop;
-      return Result;
-   end Arguments_After;
 
    function Check_Source
      (Source, Name : String) return Lua.Syntax.Check_Result is
@@ -779,10 +768,12 @@ begin
                   Source : constant String := Lua.Sources.File_Preamble
                     (if Use_Stdin then Read_Stdin else Read_Source (Path));
                begin
-                  if not Run
-                    (Source, (if Use_Stdin then "=stdin" else "@" & Path),
-                     Arguments_After (Script_Index))
-                  then
+                  Result := Lua.Sessions.CLI.Execute_Selected_Script
+                    (Universe, Source,
+                     (if Use_Stdin then "=stdin" else "@" & Path));
+                  Report (Result);
+                  if Result.Status /= Succeeded then
+                     if not Process_Exit_Requested then Universe.Close; end if;
                      return;
                   end if;
                end;

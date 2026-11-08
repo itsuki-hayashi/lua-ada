@@ -4,6 +4,8 @@ Component: [debug console and actual C calls](2026-11-08-debug-console.md).
 
 Component: [bounded Nextvar storage counterparts](2026-11-08-nextvar-storage-counterparts.md).
 
+Component: [typed CLI script arguments](2026-11-08-cli-typed-arguments.md).
+
 Component: [reviewed Verybig Windows replay](2026-11-08-verybig-approved-source.md).
 
 Component: [native allocator loaded image](2026-11-08-allocator-loaded-image.md).

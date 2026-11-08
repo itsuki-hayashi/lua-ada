@@ -21,6 +21,14 @@ after `--`, where it is a file name. Trailing values become script arguments,
 banner (`Lua 5.5.1  Copyright (C) 1994-2026 Lua.org, PUC-Rio`); `-i` implies
 it. `--version` remains the project banner and is a separate option.
 
+For an explicitly selected script, the host first loads its actual closure,
+then reads the current global `arg` table. Its length handler determines a
+fixed argument count, and raw integer entries supply actual Lua values,
+including nil holes. Changes made by `-e` or initialization therefore affect
+script varargs; changing `arg[0]` does not retarget the selected file. The
+closure retains its initial environment even if argument callbacks replace
+registry globals. See [typed argument ownership](decisions/0042-cli-typed-arguments.md).
+
 Startup order mirrors `pmain`: `arg`, package-path environment, `LUA_INIT_5_5`
 (else `LUA_INIT`; `@file` is `dofile` semantics, otherwise a chunk named
 `=LUA_INIT_5_5`/`=LUA_INIT`), the warning default, then the ordered

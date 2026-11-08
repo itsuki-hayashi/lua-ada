@@ -105,3 +105,6 @@ destination-owned builders and metered borrowed-frame traversal.
 
 ADR 0032 records [panic and test-provider controls](0032-panic-and-test-provider-controls.md),
 real pre-panic closing and shared refusal across independently owned states.
+
+ADR 0042 records [typed CLI arguments](0042-cli-typed-arguments.md), actual
+selected-closure/table roots and sequential guarded primitive callbacks.
