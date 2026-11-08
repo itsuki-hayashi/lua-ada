@@ -46,6 +46,9 @@ Case 'successful completion alone cannot replace the explicit setup marker' {par
 Case 'rehashed stderr cannot become a passing empty-error observation' {param($r)Replace-Capture (Row $r portal).process stderr 'failure'} 'complete ordered protocol|raw capture|process failed'
 Case 'labelled synthetic observations cannot discharge this actual campaign' {param($r)$r.synthetic_fixture=$true} 'observation authority'
 Case 'component observations cannot claim whole runtime acceptance' {param($r)$r.runtime_acceptance=$true} 'observation authority'
+Case 'public optimizer semantics need actual paired source observations in every configuration' {param($r)
+    $r.processes=@($r.processes|Where-Object operation -CNE code-public-semantics)
+} 'process set is incomplete'
 Case 'iterator instruction counts require the actual C graph producer' {param($r)
     $r.processes=@($r.processes|Where-Object operation -CNE produce-debug-iterator-counts)
 } 'process set is incomplete'
@@ -119,6 +122,16 @@ if($baseline.configuration -ceq 'upstream-test'){
     Case 'call metadata completion cannot omit actual cross-context error recovery' {param($r)
         $p=(Row $r call-metadata-windows).process
         Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS call metadata Cross_Context_Error`n",''))
+    } 'complete ordered protocol'
+    Case 'canonical tail lifetime and refusal campaign requires both real T processes' {param($r)
+        $r.processes=@($r.processes|Where-Object operation -CNE canonical-tail-ownership)
+    } 'process set is incomplete'
+    Case 'tail ownership filter cannot omit ordinary or refusing cases' {param($r)
+        (Row $r canonical-tail-ownership).process.arguments[1]="_TAIL_OWNERSHIP_CASE='Tail_Tuple'"
+    } 'explicit setup'
+    Case 'tail ownership output must include actual weak-argument collection' {param($r)
+        $p=(Row $r canonical-tail-ownership).process
+        Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS tail ownership Tail_Weak_Argument`n",''))
     } 'complete ordered protocol'
     foreach($operation in @('public-api-commands','public-panic-controls','reader-refusal-phases','string-refusal-phases','c-hook-transitions')){
         Case "complete paired T campaign cannot omit $operation" {param($r)

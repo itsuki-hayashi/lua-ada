@@ -96,6 +96,11 @@ function Link-Case($Name,[scriptblock]$Action,$Expected=''){
 $context='upstream-test/windows/validation/static'
 $namedCases=@((Get-Content (Join-Path $root $classification) -Raw|ConvertFrom-Json -AsHashtable -Depth 24).entries|
     Where-Object selection -CEQ configured-Ada-internal-counterpart-only)[0].source_linkage.aunit_named_cases.case
+$codeSource='tests/src/code_public_semantic_tests.adb'
+$codeCases=@([regex]::Matches((Get-Content (Join-Path $root $codeSource) -Raw),
+    "(?s)Test_Support\.Add\s*\(Suite,\s*`"([^`"]+)`"\s*,\s*([A-Za-z0-9_]+)'Access")|
+    ForEach-Object{$codeSource+'#'+$_.Groups[2].Value})
+$namedCases+=@($codeCases)
 Link-Case 'only Ada can supply the actual owned-storage inspector role' {
     $definition=@(Get-ConfiguredFixtureDefinitions upstream-test|Where-Object id -CEQ table-storage-private)[0]
     if((@(Get-ConfiguredFixtureRoles $definition) -join '|') -cne 'Ada'){throw 'Wrong private inspector role'}
@@ -103,8 +108,22 @@ Link-Case 'only Ada can supply the actual owned-storage inspector role' {
 Link-Case 'native T cannot be declared an Ada inspector facade' {
     $null=Get-ConfiguredFixtureRoles @{id='table-storage-private';roles=@('ReferenceC')}
 } 'internal counterpart roles differ'
-Link-Case 'all22 named identities satisfy only the source-linkage guard' {
+Link-Case 'all22 storage and29 public code identities satisfy only the source-linkage guard' {
     Assert-ConfiguredFixtureNamedCounterparts -Root $root -Context $context -NamedEvidence @{context=$context;runtime_observed=$true;named_aunit_cases=$namedCases}
+}
+Link-Case 'default public code counterparts require all29 actual named identities too' {
+    $ordinaryContext='default/windows/validation/static'
+    Assert-ConfiguredFixtureNamedCounterparts -Root $root -Context $ordinaryContext -NamedEvidence @{context=$ordinaryContext;runtime_observed=$true;named_aunit_cases=$codeCases}
+}
+Link-Case 'default contexts cannot omit a public numeric/cardinality counterpart' {
+    $ordinaryContext='default/windows/validation/static'
+    Assert-ConfiguredFixtureNamedCounterparts -Root $root -Context $ordinaryContext -NamedEvidence @{context=$ordinaryContext;runtime_observed=$true;named_aunit_cases=@($codeCases|Select-Object -Skip 1)}
+} 'public optimizer lacks an actual required named'
+Link-Case 'ordinary public code remains selected for generic default execution too' {
+    $definition=@(Get-ConfiguredFixtureDefinitions default|Where-Object id -CEQ code-public-semantics)
+    if($definition.Count -ne 1 -or $definition[0].generic_default -isnot [bool] -or -not $definition[0].generic_default){
+        throw 'Public code semantics lost its ordinary default route'
+    }
 }
 Link-Case 'source labels alone cannot replace actual named observations' {
     Assert-ConfiguredFixtureNamedCounterparts -Root $root -Context $context -NamedEvidence @{context=$context;runtime_observed=$false;named_aunit_cases=$namedCases}

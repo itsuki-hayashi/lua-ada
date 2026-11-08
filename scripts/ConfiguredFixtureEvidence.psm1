@@ -65,6 +65,12 @@ function Get-ConfiguredFixtureDefinitions {
             setup="$guard;assert(type(T.testC)=='function' and type(T.alloccount)=='function' and type(T.totalmem)=='function' and rawget(_G,'_CALL_METADATA_CASE')==nil);print('CONFIGURED-FIXTURE: real T call metadata')";
             stdout="CONFIGURED-FIXTURE: real T call metadata`n"+
                 (($metadata|ForEach-Object{"PASS call metadata $_"})-join "`n")+"`n"}
+        $tail=@('Optimized_Vararg_Count','Optimized_Vararg_Bytes','Tail_Tuple','Tail_Chain','Tail_Weak_Argument',
+            'Tail_Hook_Mutation','Tail_Hook_Error','Tail_Yield','Tail_Close_Error','Tail_Refusal_Recovery')
+        $definitions+=@{id='canonical-tail-ownership';source='tests/lua/canonical_tail_ownership.lua';
+            setup="$guard;assert(type(T.testC)=='function' and type(T.alloccount)=='function' and type(T.totalmem)=='function' and rawget(_G,'_TAIL_OWNERSHIP_CASE')==nil);print('CONFIGURED-FIXTURE: real T canonical tail ownership')";
+            stdout="CONFIGURED-FIXTURE: real T canonical tail ownership`n"+
+                (($tail|ForEach-Object{"PASS tail ownership $_"})-join "`n")+"`n"}
     }
     # This fixture deliberately counts instructions. Its own source contract
     # requires one C-compiled graph, consumed unchanged by both interpreters;
@@ -73,6 +79,12 @@ function Get-ConfiguredFixtureDefinitions {
     $definitions+=@{id='debug-iterator-counts';source='tests/lua/debug_iterator_counts.lua';
         execution='native-dumped-chunk';setup="$guard;print('$marker')";
         stdout="$marker`niterator count`t1`t6`niterator count`t2`t13`nOK`n"}
+    # Keep this ordinary source in the generic default glob too. The separate
+    # pair supplies structured source/runtime/cleanup evidence for the private
+    # optimizer exclusions' retained public semantics in every configuration.
+    $definitions+=@{id='code-public-semantics';source='tests/lua/code_public_semantics.lua';generic_default=$true;
+        setup="$guard;print('CONFIGURED-FIXTURE: public optimizer semantics')";
+        stdout="CONFIGURED-FIXTURE: public optimizer semantics`nCode public semantics OK`n"}
     return $definitions
 }
 
@@ -115,6 +127,8 @@ function Get-ConfiguredFixtureSources {
         'tests/lua/debug_iterator_counts.lua',
         'tests/lua/table_storage_public.lua','tests/lua/table_storage_private.lua',
         'tests/lua/code_public_semantics.lua','tests/lua/call_metadata_windows.lua','tests/lua/call_metadata_public.lua',
+        'tests/lua/canonical_tail_ownership.lua','tests/lua/canonical_tail_public.lua',
+        'tests/src/code_public_semantic_tests.adb','tests/src/code_public_semantic_tests.ads',
         'tests/src/lua-table_storage_inspection_tests.ads','tests/src/lua-table_storage_inspection_tests.adb',
         'tests/src/lua-engine-table_storage_probe.ads','tests/src/lua-engine-table_storage_probe.adb',
         ('src/configurations/'+$Configuration+'/lua-runtime_configuration.ads'),
@@ -147,17 +161,22 @@ function Get-ConfiguredFixtureAudit {
             (Get-FileHash (Join-Path $Root $path)).Hash.ToLowerInvariant() -cne $record[0].sha256){
             throw "Configured T-only classification requires a fresh mixed/default/T source review: $path"
         }
-        if($definition.id -ceq 'call-metadata-windows'){
+        $ordinaryPolicy=switch -CaseSensitive ($definition.id){
+            'call-metadata-windows' {@{path='tests/lua/call_metadata_public.lua';names=@('Assert_Protected_Tuple','Table_Equality_Yields')}}
+            'canonical-tail-ownership' {@{path='tests/lua/canonical_tail_public.lua';names=@('Tail_Close_Error','Tail_Hook_Error','Tail_Hook_Mutation','Tail_Weak_Argument','Tail_Yield')}}
+            default {$null}
+        }
+        if($null -ne $ordinaryPolicy){
             # Keep the two T-free public case bodies in ordinary execution,
             # rather than hiding them behind the full provider campaign's
             # unconditional T requirement. Both sides are exact source bytes;
             # a copied case name or successful marker cannot replace a body.
             if(-not $record[0].Contains('retained_default_counterpart')){throw 'Configured mixed fixture lacks its ordinary counterpart'}
             $ordinaryCounterpart=$record[0].retained_default_counterpart
-            if($ordinaryCounterpart.path -cne 'tests/lua/call_metadata_public.lua' -or
+            if($ordinaryCounterpart.path -cne $ordinaryPolicy.path -or
                 $ordinaryCounterpart.runtime_evidence -isnot [Array] -or $ordinaryCounterpart.runtime_evidence.Count -ne 0 -or
-                $ordinaryCounterpart.case_spans -isnot [Array] -or $ordinaryCounterpart.case_spans.Count -ne 2 -or
-                (($ordinaryCounterpart.case_spans.name|Sort-Object) -join '|') -cne 'Assert_Protected_Tuple|Table_Equality_Yields'){
+                $ordinaryCounterpart.case_spans -isnot [Array] -or $ordinaryCounterpart.case_spans.Count -ne $ordinaryPolicy.names.Count -or
+                (($ordinaryCounterpart.case_spans.name|Sort-Object) -join '|') -cne (($ordinaryPolicy.names|Sort-Object)-join '|')){
                 throw 'Configured mixed fixture ordinary correspondence is incomplete or invents evidence'
             }
             $ordinaryPath=Join-Path $Root $ordinaryCounterpart.path
@@ -219,7 +238,7 @@ function Get-ConfiguredFixtureAudit {
         # of compatibility. New T-bearing files fail closed for human review;
         # mixed ordinary/T files must appear in both configured selections.
         [ordered]@{path=$path;sha256=(Get-FileHash $file.FullName).Hash.ToLowerInvariant();T_identifiers=$references.Count;
-            selection=$(if($path -cin $ordinary){'paired-configured-default-and-T'}elseif($path -cin $instrumented){
+            selection=$(if($path -ceq 'tests/lua/code_public_semantics.lua'){'generic-default-plus-paired-configured'}elseif($path -cin $ordinary){'paired-configured-default-and-T'}elseif($path -cin $instrumented){
                 @($classification.entries|Where-Object path -CEQ $path)[0].selection}else{'generic-default-source-comparison'})}
     })
     return [ordered]@{schema_version=1;kind='first-party-fixture-selection-audit';entries=$entries;
@@ -229,10 +248,18 @@ function Get-ConfiguredFixtureAudit {
 function Assert-ConfiguredFixtureNamedCounterparts {
     param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][string]$Context,
         [Parameter(Mandatory)][Collections.IDictionary]$NamedEvidence)
-    if(-not $Context.StartsWith('upstream-test/',[StringComparison]::Ordinal)){return}
     if($NamedEvidence.context -cne $Context -or $NamedEvidence.runtime_observed -isnot [bool] -or -not $NamedEvidence.runtime_observed){
-        throw 'Configured Ada invariant requires actual same-context named AUnit observations'
+        throw 'Configured semantic counterparts require actual same-context named AUnit observations'
     }
+    $codeSource='tests/src/code_public_semantic_tests.adb'
+    $codeNames=@([regex]::Matches((Get-Content (Join-Path $Root $codeSource) -Raw),
+        "(?s)Test_Support\.Add\s*\(Suite,\s*`"([^`"]+)`"\s*,\s*([A-Za-z0-9_]+)'Access")|
+        ForEach-Object{$codeSource+'#'+$_.Groups[2].Value})
+    if($codeNames.Count -ne 29 -or @($codeNames|Sort-Object -Unique).Count -ne 29){throw 'Configured public optimizer source requires its exact29 named registrations'}
+    foreach($case in $codeNames){
+        if($case -cnotin $NamedEvidence.named_aunit_cases){throw 'Configured public optimizer lacks an actual required named AUnit counterpart'}
+    }
+    if(-not $Context.StartsWith('upstream-test/',[StringComparison]::Ordinal)){return}
     # These identities are only linkage until the named-evidence reader has
     # checked fresh source-bound raw AUnit receipts. The final image consumer
     # separately requires independent source review and frozen membership.

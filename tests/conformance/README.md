@@ -153,6 +153,17 @@ hashes and byte equality bind both copies to the full provider fixture, so its
 T requirement cannot hide those default public assertions.
 `code_public_semantics.lua` also remains an ordinary source comparison; its29
 source-linked semantic cases grant no private optimizer exclusion authority.
+Every configured context additionally records an actual paired public-code
+process and requires all29 actual named AUnit counterparts from its bound
+suite report. The generic default comparison still executes this ordinary
+file even after validating that separate receipt.
+
+The full10 `canonical_tail_ownership.lua` cases likewise require paired realT
+with no `_TAIL_OWNERSHIP_CASE` filter. Its five independently ordinary weak-
+argument, hook mutation/error, yield and closing bodies remain byte-identical
+in `canonical_tail_public.lua` and execute in the generic default comparison.
+Both companions' correspondence checks reject stale, changed or omitted
+public bodies; complete T protocols remain mandatory separately.
 
 Eligibility version3 implements only the eight exact pinned `code.lua` private
 structure candidates. It requires truthful observable=true, no public/mixed/

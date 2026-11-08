@@ -210,6 +210,84 @@
         ],
         "runtime_evidence": []
       }
+    },
+    {
+      "path": "tests/lua/canonical_tail_ownership.lua",
+      "sha256": "471d27d4a30690bfea7dd467534df5a2d74f056f18255821fc9049bf60dde679",
+      "selection": "paired-configured-T-only",
+      "rationale": "The full10-case fixture requires actual T allocator/C controls and preserves all original cases. Its five independently ordinary tail/lifetime/hook/yield/closing bodies are also retained byte-identically in the default public companion.",
+      "retained_default_counterpart": {
+        "path": "tests/lua/canonical_tail_public.lua",
+        "sha256": "d95162fe7f7f710b5ad5d447741b33e8a76d7989aa4533953f0e1baa319ebd00",
+        "case_spans": [
+          {
+            "name": "Tail_Weak_Argument",
+            "original": {
+              "byte_offset": 1204,
+              "byte_length": 364,
+              "sha256": "33d226fae76afec63deadcc1c8c41149a4e906f84828a491992ad7e020877e43"
+            },
+            "ordinary": {
+              "byte_offset": 84,
+              "byte_length": 364,
+              "sha256": "33d226fae76afec63deadcc1c8c41149a4e906f84828a491992ad7e020877e43"
+            }
+          },
+          {
+            "name": "Tail_Hook_Mutation",
+            "original": {
+              "byte_offset": 1569,
+              "byte_length": 437,
+              "sha256": "8dce90fa880671346a1fdaf27a2acca9b497d20c35586ed8170d0ecae74892aa"
+            },
+            "ordinary": {
+              "byte_offset": 449,
+              "byte_length": 437,
+              "sha256": "8dce90fa880671346a1fdaf27a2acca9b497d20c35586ed8170d0ecae74892aa"
+            }
+          },
+          {
+            "name": "Tail_Hook_Error",
+            "original": {
+              "byte_offset": 2007,
+              "byte_length": 432,
+              "sha256": "c7ff3f97df6e937eef1be18234d9696ac01f8ee19730b7171c9d6fe680fe5f8a"
+            },
+            "ordinary": {
+              "byte_offset": 887,
+              "byte_length": 432,
+              "sha256": "c7ff3f97df6e937eef1be18234d9696ac01f8ee19730b7171c9d6fe680fe5f8a"
+            }
+          },
+          {
+            "name": "Tail_Yield",
+            "original": {
+              "byte_offset": 2440,
+              "byte_length": 438,
+              "sha256": "e8f5bb9e4bd6a3e17bc53aba57e9379e9fda6e41b35408f0b0a3ec78a0cc7810"
+            },
+            "ordinary": {
+              "byte_offset": 1320,
+              "byte_length": 438,
+              "sha256": "e8f5bb9e4bd6a3e17bc53aba57e9379e9fda6e41b35408f0b0a3ec78a0cc7810"
+            }
+          },
+          {
+            "name": "Tail_Close_Error",
+            "original": {
+              "byte_offset": 2879,
+              "byte_length": 425,
+              "sha256": "57b98d1ad741487fc2d6cb95c178b5b11a75e5526400cf79921842814680d7ea"
+            },
+            "ordinary": {
+              "byte_offset": 1759,
+              "byte_length": 425,
+              "sha256": "57b98d1ad741487fc2d6cb95c178b5b11a75e5526400cf79921842814680d7ea"
+            }
+          }
+        ],
+        "runtime_evidence": []
+      }
     }
   ]
 }

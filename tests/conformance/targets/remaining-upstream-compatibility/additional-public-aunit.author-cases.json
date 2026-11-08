@@ -4654,6 +4654,517 @@
       "case": "tests/src/table_storage_public_tests.adb#Same_Table",
       "required_stdout_line": "OK table storage: same table",
       "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#F_Zero",
+      "registered_label": "code public semantics: f zero",
+      "required_stdout_line": "OK code public semantics: f zero"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#I_Captured_Zero",
+      "registered_label": "code public semantics: i captured zero",
+      "required_stdout_line": "OK code public semantics: i captured zero"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#I_Zero_Floor",
+      "registered_label": "code public semantics: i zero floor",
+      "required_stdout_line": "OK code public semantics: i zero floor"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#K_Reciprocal",
+      "registered_label": "code public semantics: k reciprocal",
+      "required_stdout_line": "OK code public semantics: k reciprocal"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#K_Power",
+      "registered_label": "code public semantics: k power",
+      "required_stdout_line": "OK code public semantics: k power"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#K_Negative_Power",
+      "registered_label": "code public semantics: k negative power",
+      "required_stdout_line": "OK code public semantics: k negative power"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#F_Floor",
+      "registered_label": "code public semantics: f floor",
+      "required_stdout_line": "OK code public semantics: f floor"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#I_Modulo",
+      "registered_label": "code public semantics: i modulo",
+      "required_stdout_line": "OK code public semantics: i modulo"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#F_Division",
+      "registered_label": "code public semantics: f division",
+      "required_stdout_line": "OK code public semantics: f division"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#F_Floor_Modulo",
+      "registered_label": "code public semantics: f floor modulo",
+      "required_stdout_line": "OK code public semantics: f floor modulo"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#I_Bitwise_Mixed",
+      "registered_label": "code public semantics: i bitwise mixed",
+      "required_stdout_line": "OK code public semantics: i bitwise mixed"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#I_Bitwise_Not",
+      "registered_label": "code public semantics: i bitwise not",
+      "required_stdout_line": "OK code public semantics: i bitwise not"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#I_Bitwise_Float",
+      "registered_label": "code public semantics: i bitwise float",
+      "required_stdout_line": "OK code public semantics: i bitwise float"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#I_Shifts",
+      "registered_label": "code public semantics: i shifts",
+      "required_stdout_line": "OK code public semantics: i shifts"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Integer_Borders",
+      "registered_label": "code public semantics: integer borders",
+      "required_stdout_line": "OK code public semantics: integer borders"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Float_Borders",
+      "registered_label": "code public semantics: float borders",
+      "required_stdout_line": "OK code public semantics: float borders"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Maximum_Integer",
+      "registered_label": "code public semantics: maximum integer",
+      "required_stdout_line": "OK code public semantics: maximum integer"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Minimum_Integer",
+      "registered_label": "code public semantics: minimum integer",
+      "required_stdout_line": "OK code public semantics: minimum integer"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Negative_Hex",
+      "registered_label": "code public semantics: negative hex",
+      "required_stdout_line": "OK code public semantics: negative hex"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Nested_Constants",
+      "registered_label": "code public semantics: nested constants",
+      "required_stdout_line": "OK code public semantics: nested constants"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Callback_Sequence",
+      "registered_label": "code public semantics: callback sequence",
+      "required_stdout_line": "OK code public semantics: callback sequence"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Assignment_Sequence",
+      "registered_label": "code public semantics: assignment sequence",
+      "required_stdout_line": "OK code public semantics: assignment sequence"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Constructor_49",
+      "registered_label": "code public semantics: constructor 49",
+      "required_stdout_line": "OK code public semantics: constructor 49"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Constructor_50",
+      "registered_label": "code public semantics: constructor 50",
+      "required_stdout_line": "OK code public semantics: constructor 50"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Constructor_51",
+      "registered_label": "code public semantics: constructor 51",
+      "required_stdout_line": "OK code public semantics: constructor 51"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Return_Zero",
+      "registered_label": "code public semantics: return zero",
+      "required_stdout_line": "OK code public semantics: return zero"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Return_One_Nil",
+      "registered_label": "code public semantics: return one nil",
+      "required_stdout_line": "OK code public semantics: return one nil"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Return_Multiple",
+      "registered_label": "code public semantics: return multiple",
+      "required_stdout_line": "OK code public semantics: return multiple"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/code_public_semantic_tests.adb#Register_Load",
+      "registered_label": "code public semantics: register load",
+      "required_stdout_line": "OK code public semantics: register load"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Pure_Ada_Capacity",
+      "registered_label": "C metadata: pure Ada frame capacity",
+      "required_stdout_line": "OK C metadata: pure Ada frame capacity"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Cached_Capacity",
+      "registered_label": "C metadata: cached reservation reuse",
+      "required_stdout_line": "OK C metadata: cached reservation reuse"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Surface_Preserves_Warm_Cache",
+      "registered_label": "C metadata: first surface preserves depth",
+      "required_stdout_line": "OK C metadata: first surface preserves depth"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Refused_Reservation",
+      "registered_label": "C metadata: transactional refusal",
+      "required_stdout_line": "OK C metadata: transactional refusal"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Physical_Shrink",
+      "registered_label": "C metadata: physical capacity shrink",
+      "required_stdout_line": "OK C metadata: physical capacity shrink"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Physical_Headroom_Privacy",
+      "registered_label": "C backing: no visible capacity publication",
+      "required_stdout_line": "OK C backing: no visible capacity publication"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Headroom_Value_Refusal",
+      "registered_label": "C backing: value array refusal",
+      "required_stdout_line": "OK C backing: value array refusal"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Headroom_Cell_Refusal",
+      "registered_label": "C backing: cell array refusal",
+      "required_stdout_line": "OK C backing: cell array refusal"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Headroom_Close_Refusal",
+      "registered_label": "C backing: close-link array refusal",
+      "required_stdout_line": "OK C backing: close-link array refusal"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Host_Abort_Recovery",
+      "registered_label": "C metadata: abandoned nested guard recovery",
+      "required_stdout_line": "OK C metadata: abandoned nested guard recovery"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Primitive_Strings",
+      "registered_label": "Equality: primitive string equality",
+      "required_stdout_line": "OK Equality: primitive string equality"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Primitive_Numbers",
+      "registered_label": "Equality: integer real NaN equality",
+      "required_stdout_line": "OK Equality: integer real NaN equality"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Primitive_False_Nil",
+      "registered_label": "Equality: false nil equality",
+      "required_stdout_line": "OK Equality: false nil equality"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Same_Object_Equality",
+      "registered_label": "Equality: same object skips handler",
+      "required_stdout_line": "OK Equality: same object skips handler"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Table_Equality_Yields",
+      "registered_label": "Equality: distinct table handler yields",
+      "required_stdout_line": "OK Equality: distinct table handler yields"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Userdata_Equality_Handler",
+      "registered_label": "Equality: distinct userdata handler",
+      "required_stdout_line": "OK Equality: distinct userdata handler"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Equality_Budget_Recovery",
+      "registered_label": "Equality: charged scan and host recovery",
+      "required_stdout_line": "OK Equality: charged scan and host recovery"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Assert_Success_Tuple",
+      "registered_label": "C metadata: refused successful assert tuple",
+      "required_stdout_line": "OK C metadata: refused successful assert tuple"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Assert_Protected_Tuple",
+      "registered_label": "C metadata: protected assert tuple",
+      "required_stdout_line": "OK C metadata: protected assert tuple"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Independent_Checkstack_Refusal",
+      "registered_label": "C metadata: fresh state checkstack refusal",
+      "required_stdout_line": "OK C metadata: fresh state checkstack refusal"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#First_Protected",
+      "registered_label": "C metadata: first protected entry",
+      "required_stdout_line": "OK C metadata: first protected entry"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Nested_Protected",
+      "registered_label": "C metadata: nested protected entries",
+      "required_stdout_line": "OK C metadata: nested protected entries"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Numeric_Error",
+      "registered_label": "C metadata: numeric protected error",
+      "required_stdout_line": "OK C metadata: numeric protected error"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#False_Result",
+      "registered_label": "C metadata: false success result",
+      "required_stdout_line": "OK C metadata: false success result"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Byte_Ceiling",
+      "registered_label": "C metadata: zero spare provider bytes",
+      "required_stdout_line": "OK C metadata: zero spare provider bytes"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Repeated_Entry",
+      "registered_label": "C metadata: repeated refused entries",
+      "required_stdout_line": "OK C metadata: repeated refused entries"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Outstanding_Shrink",
+      "registered_label": "C metadata: shrink under outstanding call",
+      "required_stdout_line": "OK C metadata: shrink under outstanding call"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Error_After_Shrink",
+      "registered_label": "C metadata: error after outstanding shrink",
+      "required_stdout_line": "OK C metadata: error after outstanding shrink"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Cross_Context_Return",
+      "registered_label": "C metadata: cross-context return after shrink",
+      "required_stdout_line": "OK C metadata: cross-context return after shrink"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Cross_Context_Error",
+      "registered_label": "C metadata: cross-context error after shrink",
+      "required_stdout_line": "OK C metadata: cross-context error after shrink"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#ResetCI_Capacity",
+      "registered_label": "C metadata: resetCI physical capacity release",
+      "required_stdout_line": "OK C metadata: resetCI physical capacity release"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#ResetCI_Outstanding",
+      "registered_label": "C metadata: resetCI outstanding guard",
+      "required_stdout_line": "OK C metadata: resetCI outstanding guard"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#ResetCI_Refusal",
+      "registered_label": "C metadata: resetCI actual growth refusal",
+      "required_stdout_line": "OK C metadata: resetCI actual growth refusal"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Optimized_Vararg_Count",
+      "registered_label": "Tail ownership: optimized vararg M0",
+      "required_stdout_line": "OK Tail ownership: optimized vararg M0"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Optimized_Vararg_Bytes",
+      "registered_label": "Tail ownership: optimized vararg byte ceiling",
+      "required_stdout_line": "OK Tail ownership: optimized vararg byte ceiling"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Tuple",
+      "registered_label": "Tail ownership: owned nil tuple",
+      "required_stdout_line": "OK Tail ownership: owned nil tuple"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Chain",
+      "registered_label": "Tail ownership: recursive owned arena",
+      "required_stdout_line": "OK Tail ownership: recursive owned arena"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Weak_Argument",
+      "registered_label": "Tail ownership: retired weak argument",
+      "required_stdout_line": "OK Tail ownership: retired weak argument"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Hook_Mutation",
+      "registered_label": "Tail ownership: actual callee hook mutation",
+      "required_stdout_line": "OK Tail ownership: actual callee hook mutation"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Hook_Error",
+      "registered_label": "Tail ownership: hook error recovery",
+      "required_stdout_line": "OK Tail ownership: hook error recovery"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Yield",
+      "registered_label": "Tail ownership: yielded callee tuple",
+      "required_stdout_line": "OK Tail ownership: yielded callee tuple"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Close_Error",
+      "registered_label": "Tail ownership: outer close error roots",
+      "required_stdout_line": "OK Tail ownership: outer close error roots"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Refusal_Recovery",
+      "registered_label": "Tail ownership: callee publication refusal",
+      "required_stdout_line": "OK Tail ownership: callee publication refusal"
+    },
+    {
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "case": "tests/src/lua-call_metadata_tests.adb#Tail_Budget_Recovery",
+      "registered_label": "Tail ownership: charged work and recovery",
+      "required_stdout_line": "OK Tail ownership: charged work and recovery"
     }
   ]
 }

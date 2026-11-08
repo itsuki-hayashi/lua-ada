@@ -10,9 +10,11 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 $originalLocation = Get-Location
 $suffix = if ($IsWindows) { '.exe' } else { '' }
 Import-Module (Join-Path $PSScriptRoot 'ConfiguredFixtureEvidence.psm1')
-$defaultConfigured=@(Get-ConfiguredFixtureDefinitions default|ForEach-Object{[IO.Path]::GetFileName($_.source)})
+$defaultDefinitions=@(Get-ConfiguredFixtureDefinitions default)
+$defaultConfigured=@($defaultDefinitions|Where-Object{-not $_.Contains('generic_default') -or -not $_.generic_default}|ForEach-Object{[IO.Path]::GetFileName($_.source)})
 $instrumentedConfigured=@(Get-ConfiguredFixtureDefinitions upstream-test|ForEach-Object{[IO.Path]::GetFileName($_.source)})
-$instrumentedOnly=@($instrumentedConfigured|Where-Object{$_ -cnotin $defaultConfigured})
+$allDefaultConfigured=@($defaultDefinitions|ForEach-Object{[IO.Path]::GetFileName($_.source)})
+$instrumentedOnly=@($instrumentedConfigured|Where-Object{$_ -cnotin $allDefaultConfigured})
 if(-not $OracleOnly){
     if($ConfiguredWitnessReport -eq '' -or $ConfiguredInterpreter -eq ''){
         throw 'Default differential fixtures require the actual configured fixture pair report and its Ada interpreter'
