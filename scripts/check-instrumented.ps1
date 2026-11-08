@@ -148,6 +148,13 @@ try {
 
     Invoke-CheckedAlire @('exec', '--', 'gprbuild', '-P',
         'experiments/conformance/oracle.gpr', '-XLUA_CONFORMANCE_CONFIGURATION=upstream-test')
+    # These files need actual selected stack constants and a real T table.
+    # Running their source through the default glob without setup would either
+    # fail before the operation or silently miss the instrumented obligation.
+    & "$PSScriptRoot/check-configured-fixtures.ps1" -Interpreter $runner `
+        -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
+        -Configuration upstream-test -RuntimeDirectory $library `
+        -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib"
     if ($IsWindows) {
         & "$PSScriptRoot/check-windows-buffered-failure.ps1" -Interpreter $runner `
             -Configuration upstream-test -LibraryType $LibraryType `

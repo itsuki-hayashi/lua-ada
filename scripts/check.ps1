@@ -124,8 +124,18 @@ try {
         throw 'CLI must fail for unsupported execution requests'
     }
     Set-Location $projectRoot
+    $configuredRunner=Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"
+    $configuredReport=Join-Path $projectRoot ('reports/configured-fixtures/'+[guid]::NewGuid().ToString('N')+'/report.json')
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
-        (Join-Path $PSScriptRoot 'compare.ps1'), '-Interpreter', $absoluteCli)
+        (Join-Path $PSScriptRoot 'check-configured-fixtures.ps1'),
+        '-Interpreter',$configuredRunner,'-ReferenceInterpreter',
+        (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
+        '-Configuration','default','-RuntimeDirectory',$runtimePath,
+        '-ReferenceLibraryDirectory',(Join-Path $projectRoot 'build/conformance/default/lib'),
+        '-Report',$configuredReport)
+    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+        (Join-Path $PSScriptRoot 'compare.ps1'), '-Interpreter', $absoluteCli,
+        '-ConfiguredWitnessReport',$configuredReport,'-ConfiguredInterpreter',$configuredRunner)
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-conformance-telemetry.ps1'),
         '-Interpreter', (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"),

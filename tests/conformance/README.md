@@ -92,6 +92,18 @@ consumer requires the private C/Ada pair even if no individual global API
 route selects it. Its declared extraspace value describes the header role;
 the buffer witness does not access or certify native T lock storage.
 
+`coroutine_result_portal.lua` is a configured witness: its dedicated native/Ada
+campaign measures both executable handshakes and supplies the matching semantic
+stack limit (1,000,000 default or 68,000 instrumented). `stack_inspection.lua`
+is mandatory in that instrumented campaign with a real T table and all four
+ordered operation markers. Neither file can become a default T-absent pass.
+`check.ps1` records the default pair before `compare.ps1` consumes its receipt;
+`check-instrumented.ps1` records both instrumented pairs. The generic default
+comparison requires the dedicated report and its Ada runner explicitly. Raw
+reports preserve sources, executables, libraries, arguments, configuration
+captures and balanced allocator telemetry. Rejection regressions mutate copies
+of actual observations; they do not execute or certify their fabricated data.
+
 ## Candidate anchors and manual coverage
 
 The 34 `coverage/*.jsonl` partitions currently contain 4,490 pending anchors.

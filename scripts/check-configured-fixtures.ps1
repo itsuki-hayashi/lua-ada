@@ -1,0 +1,63 @@
+param(
+    [Parameter(Mandatory)][string]$Interpreter,
+    [Parameter(Mandatory)][string]$ReferenceInterpreter,
+    [Parameter(Mandatory)][ValidateSet('default','upstream-test')][string]$Configuration,
+    [Parameter(Mandatory)][string]$RuntimeDirectory,
+    [Parameter(Mandatory)][string]$ReferenceLibraryDirectory,
+    [string]$Report=''
+)
+Set-StrictMode -Version Latest
+$ErrorActionPreference='Stop'
+$root=Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot 'ConfiguredFixtureEvidence.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
+if($Report -eq ''){$Report=Join-Path $root ('reports/configured-fixtures/'+[guid]::NewGuid().ToString('N')+'/report.json')}
+$Report=[IO.Path]::GetFullPath($Report)
+if(-not ([IO.Path]::GetRelativePath($root,$Report).Replace('\','/')).StartsWith('reports/',[StringComparison]::Ordinal) -or
+    (Test-Path -LiteralPath $Report)){throw 'Configured fixture report must be a new first-party observation under reports'}
+$directory=Split-Path -Parent $Report;[void][IO.Directory]::CreateDirectory($directory)
+$revision=(&git -C $root rev-parse HEAD).Trim()
+if($LASTEXITCODE -ne 0){throw 'Configured fixture source revision is unknown'}
+$dirty=@(&git -C $root status --porcelain=v1 --untracked-files=normal).Count -ne 0
+$raw=[ordered]@{schema_version=1;kind='configured-fixture-observations';configuration=$Configuration;
+    repository_revision=$revision;repository_dirty=$dirty;reference_revision='7579fc9d7ed90240487251dfb69168f8e64e9294';
+    runtime_acceptance=$false;coverage_authority=$false;synthetic_fixture=$false;
+    source_bindings=@(Get-ConfiguredFixtureSources $Configuration|ForEach-Object{@{path=$_;sha256=(Get-FileHash (Join-Path $root $_)).Hash.ToLowerInvariant()}});
+    runtimes=@();processes=@()}
+$definitions=@(Get-ConfiguredFixtureDefinitions $Configuration)
+try{
+    foreach($role in @('ReferenceC','Ada')){
+        $exe=(Resolve-Path -LiteralPath $(if($role -ceq 'Ada'){$Interpreter}else{$ReferenceInterpreter})).Path
+        $runtime=(Resolve-Path -LiteralPath $(if($role -ceq 'Ada'){$RuntimeDirectory}else{$ReferenceLibraryDirectory})).Path
+        $libraries=@(Get-ChildItem -LiteralPath $runtime -File|Where-Object{$_.Name -cmatch '\.(?:a|dll|dylib|so(?:\.[0-9.]+)?)$'}|
+            ForEach-Object{@{path=$_.FullName;sha256=(Get-FileHash $_.FullName).Hash.ToLowerInvariant()}})
+        $raw.runtimes+=@{role=$role;executable=$exe;executable_sha256=(Get-FileHash $exe).Hash.ToLowerInvariant();library_files=$libraries}
+        $environment=@{PATH=($runtime+[IO.Path]::PathSeparator+$env:PATH);
+            LD_LIBRARY_PATH=($runtime+[IO.Path]::PathSeparator+$env:LD_LIBRARY_PATH);
+            DYLD_LIBRARY_PATH=($runtime+[IO.Path]::PathSeparator+$env:DYLD_LIBRARY_PATH);
+            LUA_ADA_CONFORMANCE_ALLOCATOR='2147483648';MEMLIMIT='2147483648'}
+        # Configuration is measured before either fixture is allowed to run.
+        # Wrong-role or T-absent binaries cannot borrow their neighbour's probe.
+        $p=Invoke-ConformanceProcess -Executable $exe -Arguments @('--conformance-config') -Directory $root `
+            -OutputPrefix (Join-Path $directory ($role+'-configuration')) -TimeoutSeconds 60 -Environment $environment
+        $raw.processes+=@{role=$role;operation='configuration';process=$p}
+        if($p.exit_code -ne 0 -or $p.stderr_bytes -ne 0 -or $p.timed_out -or $p.abnormal_exit_kind){throw 'Configured fixture measured handshake failed'}
+        [void](Test-ConformanceConfiguration -Observed (Get-Content $p.stdout_path -Raw|ConvertFrom-Json -AsHashtable) `
+            -Configuration $Configuration -Target $role -AllocatorLimitBytes 2147483648)
+        foreach($definition in $definitions){
+            $run=[guid]::NewGuid().ToString('N');$prefix=Join-Path $directory ($role+'-'+$definition.id)
+            $environment.LUA_ADA_CONFORMANCE_TELEMETRY=$prefix;$environment.LUA_ADA_CONFORMANCE_RUN_ID=$run
+            $p=Invoke-ConformanceProcess -Executable $exe -Arguments @('-e',$definition.setup,(Join-Path $root $definition.source)) `
+                -Directory $root -OutputPrefix $prefix -TimeoutSeconds 900 -Environment $environment
+            $row=@{role=$role;operation=$definition.id;process=$p;telemetry=@{path=($prefix+'.'+$p.process_id+'.json');run_id=$run;sha256=$null}}
+            $raw.processes+=$row
+            if(Test-Path -LiteralPath $row.telemetry.path){$row.telemetry.sha256=(Get-FileHash $row.telemetry.path).Hash.ToLowerInvariant()}
+            if($p.exit_code -ne 0 -or $p.stderr_bytes -ne 0 -or $p.timed_out -or $p.abnormal_exit_kind){throw "Configured fixture actual execution failed: $role/$($definition.id); see $directory"}
+        }
+    }
+    $observed=Assert-ConfiguredFixtureReport -Root $root -Report $raw -Configuration $Configuration -Interpreter (Resolve-Path $Interpreter).Path
+    Write-Output "PASS: actual configured $Configuration fixture pair ($($observed.operations -join ', ')); runtime acceptance=False"
+}finally{
+    [IO.File]::WriteAllText($Report,(ConvertTo-Json -InputObject $raw -Depth 32).Replace("`r`n","`n")+"`n",[Text.UTF8Encoding]::new($false))
+}
+& (Join-Path $PSScriptRoot 'test-configured-fixtures.ps1') -Report $Report

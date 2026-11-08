@@ -1,17 +1,28 @@
 param(
     [string] $Interpreter = '',
-    [switch] $OracleOnly
+    [switch] $OracleOnly,
+    [string] $ConfiguredWitnessReport = '',
+    [string] $ConfiguredInterpreter = ''
 )
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $originalLocation = Get-Location
 $suffix = if ($IsWindows) { '.exe' } else { '' }
+Import-Module (Join-Path $PSScriptRoot 'ConfiguredFixtureEvidence.psm1')
+if(-not $OracleOnly){
+    if($ConfiguredWitnessReport -eq '' -or $ConfiguredInterpreter -eq ''){
+        throw 'Default differential fixtures require the actual configured fixture pair report and its Ada interpreter'
+    }
+    $configured=Get-Content -LiteralPath $ConfiguredWitnessReport -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+    $null=Assert-ConfiguredFixtureReport -Root $projectRoot -Report $configured -Configuration default -Interpreter $ConfiguredInterpreter
+}
 
 function Invoke-Program {
-    param([string] $Executable, [string] $Script)
+    param([string] $Executable, [string] $Script,[string[]]$PreludeArguments=@())
     $start = [Diagnostics.ProcessStartInfo]::new()
     $start.FileName = $Executable
+    foreach($argument in $PreludeArguments){$start.ArgumentList.Add($argument)}
     $start.ArgumentList.Add($Script)
     $start.WorkingDirectory = $projectRoot
     $start.UseShellExecute = $false
@@ -74,7 +85,24 @@ try {
     if (-not $OracleOnly) { $Interpreter = (Resolve-Path -LiteralPath $Interpreter).Path }
     $mismatches = @()
     foreach ($script in Get-ChildItem tests/lua -Filter *.lua | Sort-Object Name) {
-        $expected = Invoke-Program -Executable $oracle -Script $script.FullName
+        # These are configured witnesses, not default T-absent successes.
+        # The default portal pair has already run with measured matching stack
+        # limits. The real-T file is mandatory in check-instrumented.ps1.
+        if($script.Name -ceq 'stack_inspection.lua'){
+            Write-Output 'CONFIGURED T REQUIRED: stack_inspection.lua (mandatory instrumented campaign; no default observation)'
+            continue
+        }
+        if($script.Name -ceq 'coroutine_result_portal.lua' -and -not $OracleOnly){
+            Write-Output 'CONFIGURED PARITY: coroutine_result_portal.lua (verified dedicated native/Ada report)'
+            continue
+        }
+        $prelude=@()
+        if($script.Name -ceq 'coroutine_result_portal.lua'){
+            # Oracle-only diagnostics still execute the actual default portal
+            # with the pinned stack limit; they never claim Ada parity.
+            $prelude=@('-e',@(Get-ConfiguredFixtureDefinitions default)[0].setup)
+        }
+        $expected = Invoke-Program -Executable $oracle -Script $script.FullName -PreludeArguments $prelude
         if ($expected.Code -ne 0 -or $expected.Err -ne '') {
             throw "Reference fixture failed: $($script.Name): $($expected.Err)"
         }
