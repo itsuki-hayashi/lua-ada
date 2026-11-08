@@ -888,6 +888,20 @@ private package Lua.Engine is
 
    type Random_State is array (0 .. 3) of Interfaces.Unsigned_64;
 
+   type Interrupt_Operation is
+     (Arm_Interrupt, Consume_Interrupt, Restore_Interrupt)
+     with Convention => C;
+   for Interrupt_Operation use
+     (Arm_Interrupt => 0, Consume_Interrupt => 1, Restore_Interrupt => 2);
+   type Interrupt_Controller_Access is access function
+     (Operation : Interrupt_Operation) return Interfaces.C.int
+     with Convention => C;
+   --  Optional private host mechanism, never a signal-handler VM callback.
+   --  Consume runs synchronously at a safe Lua boundary and returns zero,
+   --  one pending interrupt, or a negative host installation/reset failure.
+   --  Ordinary Ada/C hosts leave both controller and target null. The CLI
+   --  owns an explicit disposition lease; generic drivers never arm it.
+
    type World is limited record
       Module_Code : Lua.Platform_Modules.Code_Lease;
       --  This lease finalizes after Memory, including its residual raw frees.
@@ -914,6 +928,11 @@ private package Lua.Engine is
       Current      : Context_Access;
       Main_Context : Context_Access;
       Main_Thread : Object_Access;
+      Interrupt_Controller : Interrupt_Controller_Access;
+      Interrupt_Target : Context_Access;
+      --  Fixed docall context, matching native globalL. A resumed coroutine
+      --  cannot consume its resumer's pending interrupt. No ownership is
+      --  added: the explicit host lease ends before world/context release.
       --  Current borrows a context owned by Contexts; it never owns it twice.
       GC : Collector_State;
       Heap_Free_Next : Table_Indexes.Vector;

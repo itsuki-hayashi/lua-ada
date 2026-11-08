@@ -28,6 +28,9 @@ project Lua_Ada_Cli is
    for Create_Missing_Dirs use "True";
 
    package Compiler is
+      for Switches ("lua_ada_cli_interrupts.c") use
+        ("-std=c11", "-Wall", "-Wextra", "-Werror", "-pedantic") &
+        C_Import_Defines;
       for Default_Switches ("C") use
         ("-std=c99", "-Wall", "-Wextra", "-Werror", "-pedantic",
          "-I" & Project'Project_Dir & "../c_api/include/api") &

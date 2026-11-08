@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [safe CLI interrupt dependency](2026-11-08-cli-interrupts.md).
+
 Component: [actual C-call argument arena reuse](2026-11-08-c-call-argument-arena.md).
 
 Component: [canonical frame storage reduction](2026-11-08-canonical-frame-footprint.md).

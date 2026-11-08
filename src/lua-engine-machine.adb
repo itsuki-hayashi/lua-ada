@@ -1788,6 +1788,135 @@ package body Lua.Engine.Machine is
       Holder.Native_Arguments.Clear;
    end Hook_Event;
 
+   procedure Interrupt_Error
+     (State : in out World; Item : not null Frame_Access;
+      Advance_PC : Boolean);
+   procedure Interrupt_Error
+     (State : in out World; Item : not null Frame_Access;
+      Advance_PC : Boolean)
+   is
+      Context : constant Context_Access := State.Current;
+      Caller : constant Frame_Access :=
+        Inspection.Caller_Frame (State, Context, Item);
+      Line : constant Natural :=
+        (if Caller /= null and then not Caller.Is_Native then
+            Line_At (Caller, Positive'Max (1, Caller.PC - 1))
+         else 0);
+
+      function Source return String;
+      function Source return String is
+      begin
+         if Caller.Code.Canonical_Node /= null then
+            declare
+               Bytes : constant Byte_String :=
+                 Canonical.Source_Bytes (Caller.Code);
+               View : String (1 .. Bytes.Size)
+                 with Import, Address => Bytes.Address;
+            begin
+               --  Borrow the retained immutable prototype name. Chunk-id
+               --  formatting returns at most 59 bytes and never copies the
+               --  complete input-sized source label merely to interrupt it.
+               return Inspection.Short_Source (View);
+            end;
+         else
+            declare
+               Size : constant Natural := Length (Caller.Code.Name);
+            begin
+               --  The packet migration path owns an Unbounded_String name.
+               --  Project just the prefix/tail required by the same bounded
+               --  formatter, without an input-sized To_String temporary.
+               if Size > 60 and then Element (Caller.Code.Name, 1) = '@' then
+                  return Inspection.Short_Source
+                    ("@..." & Slice (Caller.Code.Name, Size - 55, Size));
+               elsif Size > 0 and then
+                 Element (Caller.Code.Name, 1) in '=' | '@'
+               then
+                  return Inspection.Short_Source
+                    (Slice (Caller.Code.Name, 1, Natural'Min (60, Size)));
+               else
+                  return Inspection.Short_Source
+                    (Slice (Caller.Code.Name, 1, Natural'Min (45, Size)));
+               end if;
+            end;
+         end if;
+      end Source;
+   begin
+      --  Native lstop removes the installed hook before raising its error.
+      --  Keep the registry's old Lua callback entry, as lua_sethook(NULL)
+      --  does; only the real current context's active controls are removed.
+      State.Current.Lua_Hook_Installed := False;
+      State.Current.Foreign_Hook := System.Null_Address;
+      State.Current.Foreign_Hook_Mask := 0;
+      State.Current.Hook := Nil_Value;
+      State.Current.Hook_Mask := Null_Unbounded_String;
+      State.Current.Hook_Count := 0;
+      State.Current.Hook_Reported_Count := 0;
+      State.Current.Hook_Remaining := 0;
+      if not Item.Is_Native then
+         State.Current.Failure_At :=
+           (Line => Positive'Max
+              (1, Line_At
+                 (Item, (if Advance_PC then Item.PC
+                         else Positive'Max (1, Item.PC - 1)))),
+            others => 1);
+      end if;
+      --  Traceexec has fetched the interrupted Lua word before calling its
+      --  hook. Match that saved-PC position for error handlers/debug metadata;
+      --  this instruction never executes and cannot later resume after the
+      --  language error abandons it through the ordinary protected recovery.
+      if Advance_PC then Item.PC := Item.PC + 1; end if;
+      --  lstop is a C hook over the interrupted CI; luaL_where(level=1)
+      --  therefore names its immediate public caller. A C caller contributes
+      --  no source, including pcall(real_C_raise_callback) and a root loop.
+      if Caller = null or else Caller.Is_Native or else Line = 0 then
+         Fail (State, "interrupted!");
+      end if;
+      Fail (State, Source & ":" & Ada.Strings.Fixed.Trim
+        (Line'Image, Ada.Strings.Both) & ": interrupted!");
+   end Interrupt_Error;
+
+   procedure Check_Interrupt
+     (State : in out World; Item : not null Frame_Access;
+      At_Return : Boolean := False);
+   procedure Check_Interrupt
+     (State : in out World; Item : not null Frame_Access;
+      At_Return : Boolean := False)
+   is
+      Pending : Interfaces.C.int;
+      Context : constant Context_Access := State.Current;
+   begin
+      if State.Interrupt_Controller = null or else
+        State.Interrupt_Target /= State.Current or else
+        State.Current.Hook_Active or else
+        State.Current.Finalizer_Hook_Suppression /= 0 or else
+        Item.Is_C_Hook_Transport or else Item.Is_C_Collector_Transport
+      then
+         return;
+      end if;
+      if At_Return then
+         if Item.Return_Hook_Done then return; end if;
+         if Item.Is_Native and then
+           (Length (Item.Native_Name) = 0 or else
+            Element (Item.Native_Name, 1) = '@' or else
+            Inspection.Caller_Frame (State, Context, Item) = null)
+         then
+            --  Private continuations and the bottom anonymous CLI transport
+            --  do not add a native hook point outside the protected call.
+            return;
+         end if;
+      end if;
+      Pending := State.Interrupt_Controller (Consume_Interrupt);
+      --  Only a lock-free scalar is consumed. This synchronous safe point
+      --  runs inside the existing Language_Error/Recover protocol. Native
+      --  return hooks poll only after real result publication; library loops
+      --  themselves remain unpolled and preserve second/default behavior.
+      if Pending = 1 then
+         Interrupt_Error (State, Item, Advance_PC => not At_Return);
+      elsif Pending /= 0 then
+         raise Program_Error with "SIGINT default disposition failed";
+      end if;
+   end Check_Interrupt;
+
    function Before_Step (Self : Driver) return Boolean is
       State : World renames Self.Universe.all;
       Item : constant Frame_Access := State.Current.Stack.Last_Element;
@@ -1805,6 +1934,9 @@ package body Lua.Engine.Machine is
    begin
       if Item.Is_C_Collector_Transport then
          return False;
+      end if;
+      if not Item.Is_Native and then Item.PC <= Code_Length (Item) then
+         Check_Interrupt (State, Item);
       end if;
       if not Item.Entry_Hook_Done and then not Item.Is_Native and then
         Item.Code.Canonical_Node /= null and then Item.Code.Vararg and then
@@ -2549,6 +2681,7 @@ package body Lua.Engine.Machine is
             Publish_Native_Return (State, Activation, Result, Result);
          end if;
       end if;
+      Check_Interrupt (State, Activation, At_Return => True);
       if not State.Current.Hook_Active and then
         State.Current.Finalizer_Hook_Suppression = 0 and then
         not Activation.Is_C_Collector_Transport and then
