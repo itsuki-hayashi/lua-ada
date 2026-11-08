@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "native-allocator-loaded-runtime-independent-source-review",
+  "author": "Codex /root",
+  "reviewer": "Codex /root/validation_delivery",
+  "review_date": "2026-11-08",
+  "decision": "accepted-source-loaded-runtime-observation",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "source_commit": "174694b6983142a57b613cce9e820b10528f7aa3",
+  "prior_source_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/heavy-ceiling-native-observer.independent-source-review.json",
+    "sha256": "f53a0a9dabad968229ba67f26abe79a1f33747558ad148ce7607822b850ba515"
+  },
+  "reviewed_delta_sources": [
+    {
+      "path": "experiments/conformance/c/allocator_observer_probe.c",
+      "sha256": "738d04bb6d47871ad2aada630b7e879f2bc9e885a1cce2b8273891aa280242b4"
+    },
+    {
+      "path": "scripts/test-native-allocator-observer.ps1",
+      "sha256": "76c6f3d287a21ba1461ae84d3b32ad8f38e2dcf054e5b598f609369cee6570f3"
+    }
+  ],
+  "findings": [
+    "The actual allocator/data identity assertion precedes module discovery. The reported address is the exported l_memcontrol object used by the real state allocator, avoiding nonportable conversion of a function pointer to a data pointer.",
+    "Windows queries GetModuleHandleExA FROM_ADDRESS with UNCHANGED_REFCOUNT, then GetModuleFileNameA with explicit nonzero/untruncated length checks. This observes the existing mapping without loading or retaining another module.",
+    "POSIX uses dladdr on that same data address. The compiler command requests -fPIC to avoid executable copy relocation, and Linux links -ldl. This source path is reviewed but has no Linux/macOS execution claim from this Windows observation.",
+    "The script accepts exactly one initial runtime identity line followed by all seven original ordered PASS operations, resolves the actual path, requires the selected directory and expected platform library basename, and hashes that mapped file. It stores the OS identity separately from the component protocol and retains runtime/coverage false.",
+    "Existing allocator refusal/growth/free/old-payload/zero-close operations are unchanged. The earlier explicit loaded_runtime_linkage_verified false is now replaced only after the actual OS path/name/hash check succeeds."
+  ],
+  "inspected_component_observation": {
+    "path": "reports/native-allocator-observer/ef84b6e01f9348ba87003199d5cffe40/result.json",
+    "sha256": "9fbabf80803fde1426a3ce0d973bb5277f1b4dd8e21de72791623f08468d8ce1",
+    "platform": "windows",
+    "named_case_count": 7,
+    "compile_exit": 0,
+    "process_exit": 0,
+    "stdout_sha256": "e01ccc5011ec20f4a2c96a8134bd3d8230e3c38a054e02bb2c02ce33f1e7401e",
+    "loaded_runtime": {
+      "identity_source": "OS mapping of actual l_memcontrol data address",
+      "sha256": "90cd6bb9cb2f5cdfe04a79ad2a2a8779f1e2cda590d53aaebb3caf5524fe973c",
+      "path": "C:\\Users\\Itsuki\\workspace\\lua-ada\\build\\conformance\\upstream-test\\lib\\libconformance_lua.dll"
+    },
+    "coverage_authority": false
+  },
+  "remaining_requirements": [
+    "Final context evidence must reconcile this compiler/source/executable/raw protocol and mapped-library identity against its immutable image; merely seeing the report or a true label is insufficient.",
+    "Linux/macOS paths require fresh actual compiler/OS observations; this source review does not assert those runs succeeded.",
+    "This is no API/source-ledger closure, source adaptation approval, final matrix certificate or PR acceptance."
+  ]
+}
