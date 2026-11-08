@@ -710,7 +710,7 @@ try {
         debug_contract = [ordered]@{ matching_output=$true; sources=$debugContractSources;
             reference_library_files=$referenceLibraries };
         builtin_contract = [ordered]@{ matching_output=$true; sources=$builtinContractSources;
-            matched_cases=24;reference_library_files=$referenceLibraries };
+            matched_cases=29;reference_library_files=$referenceLibraries };
         traceback_contract=@{matching_output=$true;sources=$tracebackContractSources;matched_cases=22;reference_library_files=$referenceLibraries};
         external_contract = [ordered]@{ matching_output=$true; sources=$externalContractSources;
             matched_cases=$(if ($Configuration -eq 'upstream-test') { 13 } else { 18 });

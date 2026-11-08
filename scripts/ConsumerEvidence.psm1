@@ -183,7 +183,8 @@ function Test-NamedConsumerEvidence {
                 'direct-protected-results','direct-yield-continuation','direct-callback-yield','scalar-refusal',
                 'captured-refusal-recovery','direct-argument-owner','direct-extra-argument-owner','direct-method-argument-owner',
                 'direct-closure-argument-owner','registry-callback-original-owner','registry-callback-original-roots',
-                'registry-callback-error-guard','registry-callback-original-captures','registry-callback-extra-temporaries')
+                'registry-callback-error-guard','registry-callback-original-captures','registry-callback-extra-temporaries',
+                'reader-direct-host','reader-direct-owner','reader-direct-roots','reader-direct-error','reader-direct-extra-root')
         }elseif($kind -ceq 'traceback'){
             @('no-message','host-message','empty-message','nul-message','negative-level','nested-frames','skip-current',
                 'out-of-stack','stack-prefix','inactive-thread','suspended-thread','independent-destination',

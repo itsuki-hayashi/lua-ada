@@ -456,7 +456,8 @@ foreach($kind in @('builtin','traceback')){
             'direct-protected-results','direct-yield-continuation','direct-callback-yield','scalar-refusal',
             'captured-refusal-recovery','direct-argument-owner','direct-extra-argument-owner','direct-method-argument-owner',
             'direct-closure-argument-owner','registry-callback-original-owner','registry-callback-original-roots',
-            'registry-callback-error-guard','registry-callback-original-captures','registry-callback-extra-temporaries')
+            'registry-callback-error-guard','registry-callback-original-captures','registry-callback-extra-temporaries',
+            'reader-direct-host','reader-direct-owner','reader-direct-roots','reader-direct-error','reader-direct-extra-root')
     }else{
         @('no-message','host-message','empty-message','nul-message','negative-level','nested-frames','skip-current',
             'out-of-stack','stack-prefix','inactive-thread','suspended-thread','independent-destination',
@@ -473,7 +474,10 @@ foreach($kind in @('builtin','traceback')){
         $baseline.consumers+=$record
     }
 }
-Run-Case 'builtin24 and traceback22 retain both complete actual operation protocols' {} '' -Foreign -Format -Additional ($extended+@('builtin','traceback'))
+Run-Case 'builtin29 and traceback22 retain both complete actual operation protocols' {} '' -Foreign -Format -Additional ($extended+@('builtin','traceback'))
+Run-Case 'matching builtin completion and count cannot omit the actual reader owner recovery' {param($r)
+    foreach($name in @('builtin-api','builtin-oracle')){Replace-Capture $r $name stdout ($moreProtocols.builtin.Replace("PASS: builtin-reader-direct-error`n",''))}
+} 'complete ordered protocol' -Foreign -Format -Additional ($extended+@('builtin'))
 Run-Case 'traceback completion cannot replace its native source-thread counterpart' {param($r)
     $r.consumers=@($r.consumers|Where-Object name -CNE traceback-oracle)
 } 'missing/duplicate' -Foreign -Format -Additional ($extended+@('traceback'))
