@@ -100,7 +100,7 @@ function Get-ConfiguredFixtureSources {
     # Source selection and measured executable handshakes are separate facts.
     # Keep both: a freshly copied source hash cannot certify a stale binary.
     return @('scripts/ConfiguredFixtureEvidence.psm1','scripts/check-configured-fixtures.ps1',
-        'scripts/ConformanceRunner.psm1','scripts/ManagedTelemetry.psm1',
+        'scripts/ConformanceRunner.psm1','scripts/ManagedTelemetry.psm1','scripts/ConformanceInventory.psm1',
         'tests/lua/coroutine_result_portal.lua','tests/lua/stack_inspection.lua','tests/lua/primitive_not_refusal.lua',
         'tests/lua/public_api_commands.lua','tests/lua/public_panic_controls.lua','tests/lua/public_panic_file.lua',
         'tests/lua/reader_refusal_phases.lua','tests/lua/string_refusal_phases.lua','tests/lua/hook_transition_c.lua',
