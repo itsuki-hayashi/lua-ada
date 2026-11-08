@@ -19,10 +19,13 @@ foreach($context in $plan.contexts){
         -Arguments @('-NoProfile','-File',(Join-Path $PSScriptRoot 'check-checkpoint.ps1'),'-Context',$context.context,'-PlanOnly')
     Assert ($p.exit_code -eq 0) ([IO.File]::ReadAllText($p.stderr_path))
     $value=Get-Content $p.stdout_path -Raw|ConvertFrom-Json -AsHashtable
-    foreach($required in @('runtime-build','tests-build','cli-build','core-c-sdk-native','aunit','frontend-opcodes','canonical-compiler-runtime',
+    foreach($required in @('runtime-build','tests-build','cli-build','native-oracle-build','core-c-sdk-native','aunit','frontend-opcodes','canonical-compiler-runtime',
         'binary-cli','output-policy','batch-cli-79-plus-2','debug-console-lua','debug-console-c4','readline','allocator-ceiling')){
         Assert ($required -cin $value.steps) "Missing strict checkpoint gate: $required"
     }
+    $order=@($value.steps)
+    Assert ([Array]::IndexOf($order,'native-oracle-build') -lt [Array]::IndexOf($order,'core-c-sdk-native') -and
+        [Array]::IndexOf($order,'native-oracle-build') -lt [Array]::IndexOf($order,'canonical-compiler-runtime')) 'Oracle executable must exist before native-dependent consumers'
     Assert ($value.batch_cli_source_cases -eq 79 -and $value.batch_cli_package_probes -eq 2 -and $value.full_cli_processes -eq 112 -and
         -not $value.runtime_build_requested -and -not $value.runtime_acceptance -and -not $value.coverage_authority) 'Planner invented execution/acceptance or altered CLI scope'
     if($context.configuration -ceq 'upstream-test'){Assert ('real-t-adapter' -cin $value.steps -and 'native-allocator-observer' -cin $value.steps) 'Instrumented context lost actual T gates'}

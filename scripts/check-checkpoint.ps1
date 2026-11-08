@@ -17,7 +17,7 @@ $bin=Join-Path $root "tests/bin/$prefix$type"
 $cli=Join-Path $root "cli/bin/$prefix$type/lua_ada$suffix"
 $oracle=Join-Path $root "build/conformance/$configuration/bin/lua$suffix"
 $oracleLibrary=Join-Path $root "build/conformance/$configuration/lib"
-$steps=@('source-guards','runtime-build','tests-build','cli-build','core-c-sdk-native',
+$steps=@('source-guards','runtime-build','tests-build','cli-build','native-oracle-build','core-c-sdk-native',
     'aunit','syntax-api','configuration','frontend-opcodes','canonical-compiler-runtime',
     'abi','layout','output-policy','batch-cli-79-plus-2','debug-console-lua','readline',
     'readline-signatures','debug-console-c4','binary-cli','lifecycle','allocator-ceiling','launcher-isolation')
@@ -66,6 +66,11 @@ try{
         Invoke-Step ($crate+'-build') @('-n','-C',$crate,'build','--validation','--profiles=lua_ada=validation','--',
             "-XLUA_ADA_LIBRARY_TYPE=$type","-XLUA_ADA_CONFIGURATION=$configuration",'-XLUA_ADA_PREBUILT=true')
     }
+    # The core consumer campaign builds the reference library, but does not
+    # link its standalone CLI. Canonical/binary/console/launcher gates need
+    # this independently built executable in the same selected configuration.
+    Invoke-Step native-oracle-build @('exec','--','gprbuild','-P','experiments/conformance/oracle.gpr',
+        "-XLUA_CONFORMANCE_CONFIGURATION=$configuration")
     # These are the actual selected SAL and compiler support directories for
     # every subsequent child. Nothing points to an ambient sibling profile.
     $selectedPath=& alr exec -- pwsh -NoProfile -Command '$env:PATH'

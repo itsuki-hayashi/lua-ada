@@ -2,11 +2,18 @@ name: Bounded progress checkpoint
 
 on:
   push:
+    branches:
+      - master
+      - codex/m3-remaining-upstream-compatibility
   pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: checkpoint-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   plan:
