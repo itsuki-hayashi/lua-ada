@@ -59,6 +59,25 @@ package body Lua.Engine.Stacks is
       end if;
    end Check_Range;
 
+   function Closing_Predecessor
+     (Activation : not null Frame_Access; Level : Positive) return Natural
+   is
+      Context : constant Context_Access := Activation.Context;
+      Previous : Natural;
+   begin
+      if Context = null or else Level <= Activation.Stack_Base then
+         raise Program_Error with "closing link has no scalar owner";
+      end if;
+      Check_Range (Context, Level, Level);
+      Previous := Context.C_Close_Links.Element (Level).Previous;
+      if Previous >= Level or else
+        (Previous /= 0 and then Previous <= Activation.Stack_Base)
+      then
+         raise Program_Error with "closing links are not strictly descending";
+      end if;
+      return Previous;
+   end Closing_Predecessor;
+
    procedure Reserve
      (State : in out World; Context : not null Context_Access;
       Last : Natural)
@@ -323,6 +342,10 @@ package body Lua.Engine.Stacks is
                Last := Natural'Max (Last, Activation.Stack_Live_Top);
             end if;
          end if;
+         --  A marked local stays live until its handler is selected, even
+         --  when ordinary compiler/debug liveness no longer includes it.
+         --  Trace must preserve this interval before clearing any dead gap.
+         Last := Natural'Max (Last, Activation.C_Closing_Level);
       end Bounds;
 
       procedure Visit (First, Last : Natural) is

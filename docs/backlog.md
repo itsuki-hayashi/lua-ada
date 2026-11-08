@@ -22,6 +22,12 @@ concrete current private18/policy identities. Capture subsequent Machine drift
 again; this dated author packet supplies no automatic renewal, adapted-source
 execution or final acceptance.
 
+Renew the locals source/runtime/checker bindings after the
+[scalar closing repair](sessions/2026-11-08-scalar-closing-links.md), then replay
+the exact reviewed whole source. The mandatory enter(0) callback now lifts real
+refusal; fifteen focused cases and unchanged large error/coroutine witnesses
+pass. This component supplies no source-adaptation authority or whole-file gate.
+
 The [intern-index fault cases](sessions/2026-11-08-intern-index-refusal.md)
 pass actual provider refusal/retry, live-root and dead-header checks in both
 local configurations. Continue independent exact API string-table source

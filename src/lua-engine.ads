@@ -565,8 +565,10 @@ private package Lua.Engine is
       Native_Aux : Natural := 0;
       Native_Operator : Lua.Lexers.Token_Kind := Lua.Lexers.End_Of_Input;
       C_Closing_Level : Natural := 0;
-      --  Intrusive C closing links live with their actual scalar slots.
-      --  This head borrows those indices; it owns no copied value or cell.
+      --  Intrusive closing links live with actual canonical/C scalar slots.
+      --  The historical C name remains private. This head borrows absolute
+      --  indices; marking owns no copied value, lexical cell or extra vector.
+      --  The packet backend retains its separate Closers entries.
       Foreign_Handler : System.Address := System.Null_Address;
       Foreign_Ticket : Interfaces.C.unsigned_long_long := 0;
       Foreign_Continuation : System.Address := System.Null_Address;

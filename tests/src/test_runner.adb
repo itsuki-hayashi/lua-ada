@@ -60,6 +60,7 @@ with String_Constant_Tests;
 with Stripped_Line_Tests;
 with Lua.Execution_Retirement_Tests;
 with Lua.Closing_Prefix_Tests;
+with Lua.Scalar_Closing_Tests;
 with Lua.C_Thread_Reset_Tests;
 with Lua.Constant_Pool_Tests;
 with Runtime_Inspection_Tests;
@@ -187,6 +188,7 @@ procedure Test_Runner is
       Stripped_Line_Tests.Register (Result);
       Lua.Execution_Retirement_Tests.Register (Result);
       Lua.Closing_Prefix_Tests.Register (Result);
+      Lua.Scalar_Closing_Tests.Register (Result);
       Lua.C_Thread_Reset_Tests.Register (Result);
       Lua.Constant_Pool_Tests.Register (Result);
       Runtime_Inspection_Tests.Register (Result);

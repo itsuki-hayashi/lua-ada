@@ -4204,6 +4204,7 @@ package body Lua.Engine.Machine is
             Owner : constant Frame_Access := Activation.Unwind_Owner;
             Reason : Unwind_Reason := Activation.Unwind;
             Closing : Close_Entry;
+            Previous_Closing : Natural := 0;
             Need_Close : Boolean;
          begin
             if Activation.Native_Stage = 1 then
@@ -4237,9 +4238,22 @@ package body Lua.Engine.Machine is
               Owner.C_Closing_Level /= 0
             loop
                if Owner.C_Closing_Level /= 0 then
+                  Previous_Closing := Stacks.Closing_Predecessor
+                    (Owner, Owner.C_Closing_Level);
+                  --  Links always address absolute scalar slots. Canonical
+                  --  scope depths/symbols are relative register numbers;
+                  --  explicit C-slot cleanup instead compares absolute API
+                  --  levels, including a C view borrowing a Lua activation.
                   Closing :=
                     (Cell => null, Stack_Level => Owner.C_Closing_Level,
                      Depth => Owner.C_Closing_Level, others => <>);
+                  if Reason /= C_Slot_Exit and then Owner.Code /= null and
+                    then Owner.Code.Canonical_Node /= null
+                  then
+                     Closing.Depth :=
+                       Closing.Stack_Level - Owner.Stack_Base;
+                     Closing.Symbol := Closing.Depth;
+                  end if;
                else
                   Closing := Owner.Closers.Last_Element;
                end if;
@@ -4256,8 +4270,7 @@ package body Lua.Engine.Machine is
                         Closing.Stack_Level));
                end if;
                if Owner.C_Closing_Level /= 0 then
-                  Owner.C_Closing_Level := State.Current.C_Close_Links
-                    (Closing.Stack_Level).Previous;
+                  Owner.C_Closing_Level := Previous_Closing;
                   State.Current.C_Close_Links.Replace_Element
                     (Closing.Stack_Level, (Previous => 0));
                else
@@ -5479,7 +5492,9 @@ package body Lua.Engine.Machine is
                      (if B <= Natural (Packet.Length) then Packet (B)
                       else Nil_Value));
          when Return_Values =>
-            if Activation.Closers.Is_Empty then
+            if Activation.Closers.Is_Empty and then
+              Activation.C_Closing_Level = 0
+            then
                Complete (Self, Flatten (Activation, Code.Inputs));
             else
                Start_Unwind
@@ -5656,7 +5671,9 @@ package body Lua.Engine.Machine is
                Activation.Native_Arguments.Clear;
                Activation.Native_Captures.Clear;
             when Canonical.Tail_Invoke =>
-               if not Activation.Closers.Is_Empty then
+               if not Activation.Closers.Is_Empty or else
+                 Activation.C_Closing_Level /= 0
+               then
                   --  The compiler never emits TAILCALL while a TBC slot is
                   --  live. Reject an imported contradictory sequence rather
                   --  than retire that slot without invoking its handler.
@@ -5726,7 +5743,9 @@ package body Lua.Engine.Machine is
                             Has_Call_Window => Next.Has_Call_Window);
                end if;
             when Canonical.Return_Results =>
-               if Activation.Closers.Is_Empty then
+               if Activation.Closers.Is_Empty and then
+                 Activation.C_Closing_Level = 0
+               then
                   Complete_Canonical_Return (Self);
                else
                   Start_Unwind (Self, Activation, Return_Exit);

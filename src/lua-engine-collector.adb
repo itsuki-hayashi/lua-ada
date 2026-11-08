@@ -484,6 +484,7 @@ package body Collector is
       end Mark_Value;
       procedure Mark_Activation (Activation : not null Frame_Access);
       procedure Mark_Activation (Activation : not null Frame_Access) is
+         Level : Natural := Activation.C_Closing_Level;
       begin
          Mark_Value (Activation.Callee);
          Mark_Value (Activation.Message_Handler);
@@ -496,6 +497,19 @@ package body Collector is
             if Closing.Frozen then
                Mark_Value (Closing.Frozen_Value);
             end if;
+         end loop;
+         --  Pending canonical/C closers own their actual scalar slots.
+         --  Detached lexical cells can change independently after CLOSE.
+         --  Each predecessor is checked before reading/following it; strict
+         --  descent bounds this allocation-free scan by initialized slots.
+         while Level /= 0 loop
+            declare
+               Previous : constant Natural :=
+                 Lua.Engine.Stacks.Closing_Predecessor (Activation, Level);
+            begin
+               Mark_Value (Lua.Engine.Stacks.Read (Context, Level));
+               Level := Previous;
+            end;
          end loop;
          Mark_Value (Activation.Unwind_Error);
          for Item of Activation.Unwind_Results loop

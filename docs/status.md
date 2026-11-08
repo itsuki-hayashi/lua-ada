@@ -21,6 +21,13 @@ preserves source operations and identifies stale inner/composition edges.
 Independent exact and composition decisions remain pending; no mapping,
 approval, adapted source, runtime evidence or original obligation is renewed.
 
+The [scalar closing checkpoint](sessions/2026-11-08-scalar-closing-links.md)
+marks canonical closing slots without artificial upvalue/list allocations.
+Both local modes pass 2,536 AUnit cases and ordinary C consumers; twelve public
+cases match four T binary roles. Unchanged errors/coroutine files complete
+under the actual 2-GiB ceiling with balanced cleanup. Whole locals source
+bindings must be renewed before current whole-file acceptance.
+
 Three [intern-index fault witnesses](sessions/2026-11-08-intern-index-refusal.md)
 check actual provider-refused replacement, live roots under disabled-growth
 collection and dead-header disposal. The combined local checkout passes 2,510

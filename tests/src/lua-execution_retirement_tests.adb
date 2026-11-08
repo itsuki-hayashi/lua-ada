@@ -3,6 +3,7 @@ with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
 with Lua.Engine.Compiler;
 with Lua.Engine.Machine;
+with Lua.Engine.Stacks;
 with Lua.Storage;
 with Test_Support;
 
@@ -171,21 +172,24 @@ package body Lua.Execution_Retirement_Tests is
       Target : Object_Access;
    begin
       --  Pause after a real TBC declaration, then abandon before RETURN.
-      --  Its frozen close value remains a root after scalar execution storage
-      --  retires, and only physical cleanup relinquishes that final owner.
+      --  Its actual closing prefix remains rooted after execution retires,
+      --  and physical cleanup relinquishes that final owner. Match genuine
+      --  error/reset drivers by publishing their pending prefix beforehand.
       VM.Start (Driver, State, Code);
       for Step in 1 .. 100 loop
          Item := State.Current.Stack.Last_Element;
-         exit when not Item.Is_Native and not Item.Closers.Is_Empty;
+         exit when not Item.Is_Native and Item.C_Closing_Level /= 0;
          Assert (not VM.Is_Complete (Driver), "TBC declaration ran too early");
          VM.Step (Driver);
       end loop;
-      Assert (not Item.Is_Native and not Item.Closers.Is_Empty,
+      Assert (not Item.Is_Native and Item.C_Closing_Level /= 0,
               "TBC declaration did not become a real pending closer");
+      Target := Stacks.Read (State.Current, Item.C_Closing_Level).Reference;
+      VM.Set_Closing_Stack_Prefix
+        (State.all, VM.Pending_Closing_Level (Item));
       VM.Retire_Frame_Execution (State.all, Item);
-      Target := Item.Closers.Last_Element.Frozen_Value.Reference;
       Collect (State.all);
-      Assert (Item.Closers.Last_Element.Frozen and
+      Assert (Item.C_Closing_Level /= 0 and then
               State.Heap.Contains (Target),
               "pending close value was unrooted");
       Stop (State, Driver);

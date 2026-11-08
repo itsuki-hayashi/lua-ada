@@ -1,5 +1,8 @@
 # Architecture Decision Log
 
+ADR 0038 records [scalar closing links](0038-scalar-closing-links.md),
+allocation-free canonical marking and actual slot/capture lifetime.
+
 ADR 0037 records [reusable C call metadata](0037-reusable-c-call-metadata.md),
 frame-capacity reservations and stable owners through actual C guard ACK.
 Focused strict validation is recorded in the component session.

@@ -43,7 +43,7 @@ package body Lua.Closing_Prefix_Tests is
          Assert (not VM.Is_Complete (Driver), "pending scope ran too early");
          VM.Step (Driver);
       end loop;
-      Assert (not Item.Is_Native and then not Item.Closers.Is_Empty,
+      Assert (not Item.Is_Native and then Item.C_Closing_Level /= 0,
               "missing actual canonical closing declaration");
       Behavior (State, Driver, Item);
       VM.Set_Closing_Stack_Prefix (State.all, 0);
@@ -80,11 +80,12 @@ package body Lua.Closing_Prefix_Tests is
       Item : not null Frame_Access)
    is
       pragma Unreferenced (State, Driver);
-      Closing : constant Close_Entry := Item.Closers.Last_Element;
+      Level : constant Natural := Item.C_Closing_Level;
    begin
-      Assert (Closing.Stack_Level = Item.Stack_Base + Closing.Symbol,
+      Assert (Level > Item.Stack_Base and then
+              Level <= Item.Stack_Base + Item.Stack_Window_Length,
               "canonical closing level is not its actual absolute slot");
-      Assert (VM.Pending_Closing_Level (Item) = Closing.Stack_Level,
+      Assert (VM.Pending_Closing_Level (Item) = Level,
               "pending level did not retain the actual closing slot");
    end Exact_Level;
 

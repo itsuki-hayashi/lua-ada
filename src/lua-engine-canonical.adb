@@ -234,9 +234,11 @@ package body Lua.Engine.Canonical is
      (State : in out World; Activation : Frame_Access; From : Natural)
    is
    begin
-      --  C closes open upvalues before invoking __close. Freeze the live
-      --  stack slot now: a handler mutating an already closed upvalue must
-      --  not replace the object passed to a later close handler.
+      --  Detach copies each real open cell back into its departing scalar
+      --  before invoking handlers. A closed upvalue can then change without
+      --  replacing the pending scalar, while debug.setlocal still edits that
+      --  actual slot. Retain snapshot handling for existing packet entries;
+      --  ordinary canonical TBC now links slots without creating such entries.
       for Index in Activation.Closers.First_Index ..
         Activation.Closers.Last_Index
       loop
@@ -975,14 +977,24 @@ package body Lua.Engine.Canonical is
                  "' got a non-closable value");
             end;
          end if;
-         --  Register numbers are used only for canonical lifetime ordering.
-         --  Scope depth in a private frame remains its separate old meaning.
-         Activation.Closers.Append
-           (Close_Entry'(Cell => Capture_Cell (State, Activation, Index),
-                         Stack_Level =>
-                           Absolute_Register (State, Activation, Index),
-                         Symbol => Index + 1, Depth => Index + 1,
-                         others => <>));
+         declare
+            Level : constant Positive :=
+              Absolute_Register (State, Activation, Index);
+         begin
+            --  TBC marks the existing scalar, not a lexical capture. Its
+            --  parallel link was reserved with the real register window;
+            --  neither marking nor an inactive nil/false entry allocates.
+            --  Actual closures still capture cells through Capture_Cell.
+            if Level <= Activation.Stack_Base or else
+              Level <= Activation.C_Closing_Level or else
+              Level > Activation.Stack_Base + Activation.Stack_Window_Length
+            then
+               raise Program_Error with "invalid canonical closing order";
+            end if;
+            Activation.Context.C_Close_Links.Replace_Element
+              (Level, (Previous => Activation.C_Closing_Level));
+            Activation.C_Closing_Level := Level;
+         end;
       end Mark_Closing;
 
       procedure Freeze_Closing (From : Natural) is
