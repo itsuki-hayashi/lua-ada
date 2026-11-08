@@ -49,3 +49,23 @@ reports/core-image/configured-eee171b4f47044de859f626fabe41c77 and
 reports/core-image/configured-2b07de0d8d654396979199bdc910af0c.
 These observations do not establish the original generated child workload,
 matching native refused-shrink execution, whole-file or final matrix acceptance.
+
+The subsequent combined-image sweep compares all79 ordinary first-party Lua
+fixtures against native default execution with exact stdout/stderr equality.
+Every pair matches, and all158 child telemetry records finish with zero live
+bytes/blocks. Real-T and configured fixtures remain separately mandatory; no
+T-absent success is credited. Raw captures are under
+reports/intern-index-faults/ordinary-da9d7ec5c9b84709a5b1866cc8ffe498.
+Both configurations also pass the existing36 four-way canonical compiler/VM
+cases and chunk-codec campaign (16 exact roundtrips,8 stripped crossloads,
+selected subtree and actual C execution of Ada-built chunks). The ten default
+binary CLI file/dump/environment comparisons pass. Reports remain component
+observations; this sweep does not claim a final immutable build revision.
+
+Unchanged errors.lua completes in all four matching default/T C/Ada processes
+under explicitly supplied2GiB limits, with empty stderr and balanced cleanup.
+Ada default/T peaks are1,870,423,599 and144,938,617 bytes; the instrumented run
+records one actual refusal and both shutdown records are complete without an
+accounting fault. Stack-count output remains implementation-dependent, so
+successful execution is not described as byte-identical stdout. Raw captures:
+reports/combined-reader-failure/errors-6520c67f5766488b97e06ee0c23e28a8.

@@ -5,7 +5,9 @@
 Three [intern-index fault witnesses](sessions/2026-11-08-intern-index-refusal.md)
 check actual provider-refused replacement, live roots under disabled-growth
 collection and dead-header disposal. The combined local checkout passes 2,510
-AUnit cases in each mode and both configured fixture campaigns. Original API
+AUnit cases in each mode and both configured fixture campaigns. All79 ordinary
+default fixtures match native bytes, and the existing canonical/chunk/binary
+campaigns pass on the combined images. Original API
 source adaptation, final immutable image replay and whole-target acceptance
 remain pending; these cases supply no passing private C geometry assertion.
 
