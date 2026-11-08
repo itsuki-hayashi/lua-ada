@@ -2,6 +2,28 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 
+function Assert-TargetCompletionSourceReviewFlags {
+    param([Collections.IDictionary]$Artifact,[switch]$AllowSyntheticReview)
+    # Source decisions may authorize only this observation protocol. Labelled
+    # synthetic unit fixtures must never discharge the actual final target's
+    # review gate, even if their binding hashes and claimed reviewers match.
+    if(-not $Artifact.Contains('synthetic_fixture') -or $Artifact.synthetic_fixture -isnot [bool]){
+        throw 'Completion source review requires an explicit boolean synthetic label'
+    }
+    if($Artifact.synthetic_fixture -and -not $AllowSyntheticReview){
+        throw 'Synthetic completion source review cannot authorize the actual target'
+    }
+    foreach($flag in @('runtime_acceptance','coverage_authority')){
+        if(-not $Artifact.Contains($flag) -or $Artifact[$flag] -isnot [bool] -or $Artifact[$flag]){
+            throw 'Completion source review cannot supply runtime or coverage authority'
+        }
+    }
+    if(-not $Artifact.Contains('execution_evidence') -or $Artifact.execution_evidence -isnot [Array] -or
+        $Artifact.execution_evidence.Count -ne 0){
+        throw 'Completion source review cannot supply execution evidence'
+    }
+}
+
 function Get-TargetFileProtocolDefinition {
     param([Parameter(Mandatory)][string] $File)
     # These entry operations and return observations follow all.lua, not the
@@ -37,7 +59,7 @@ function Get-TargetFileProtocolDefinition {
 
 function Read-TargetFileProtocolManifest {
     param([Parameter(Mandatory)][string] $Root, [Parameter(Mandatory)][string] $Path,
-          [switch] $RequireReview)
+          [switch] $RequireReview,[switch]$AllowSyntheticReview)
     $full = if ([IO.Path]::IsPathRooted($Path)) { $Path } else { Join-Path $Root $Path }
     $relative = [IO.Path]::GetRelativePath([IO.Path]::GetFullPath($Root),[IO.Path]::GetFullPath($full)).Replace('\','/')
     $hash = (Get-FileHash -LiteralPath $full).Hash.ToLowerInvariant()
@@ -92,8 +114,10 @@ function Read-TargetFileProtocolManifest {
             [string]::IsNullOrWhiteSpace([string]$review.reviewer) -or $review.author -ceq $review.reviewer) {
             throw 'Target completion protocol requires accepted independent review'
         }
+        Assert-TargetCompletionSourceReviewFlags $manifest -AllowSyntheticReview:$AllowSyntheticReview
         $approvalPath = Resolve-ReviewedFile -Root $Root -Path $review.artifact -Sha256 $review.artifact_sha256
         $approval = Get-Content -LiteralPath $approvalPath -Raw | ConvertFrom-Json -AsHashtable -Depth 48
+        Assert-TargetCompletionSourceReviewFlags $approval -AllowSyntheticReview:$AllowSyntheticReview
         if ($approval.schema_version -ne 1 -or $approval.kind -cne 'target-file-completion-approval' -or
             $approval.decision -cne 'accepted' -or $approval.author -cne $review.author -or
             $approval.reviewer -cne $review.reviewer) { throw 'Completion approval identity differs' }
@@ -113,6 +137,7 @@ function Read-TargetFileProtocolManifest {
         }
         $narrativePath = Resolve-ReviewedFile -Root $Root -Path $approval.review_evidence.path -Sha256 $approval.review_evidence.sha256
         $narrative = Get-Content -LiteralPath $narrativePath -Raw | ConvertFrom-Json -AsHashtable -Depth 48
+        Assert-TargetCompletionSourceReviewFlags $narrative -AllowSyntheticReview:$AllowSyntheticReview
         if ($narrative.reviewer -cne $review.reviewer -or $narrative.decision -cne 'accepted' -or
             $narrative.target -cne $manifest.target) { throw 'Completion independent review narrative differs' }
     }
@@ -195,7 +220,8 @@ function Assert-TargetFileProtocolBinding {
     param([Parameter(Mandatory)][string] $Root,
           [Parameter(Mandatory)][Collections.IDictionary] $Report,
           [Parameter(Mandatory)][string] $WrapperPath,
-          [Collections.IDictionary] $Contract, [switch] $RequireReview)
+          [Collections.IDictionary] $Contract, [switch] $RequireReview,
+          [switch]$AllowSyntheticReview)
     if (-not $Report.operation.StartsWith('file:',[StringComparison]::Ordinal)) { return }
     $file = $Report.operation.Substring(5)
     $definition = Get-TargetFileProtocolDefinition -File $file
@@ -204,7 +230,8 @@ function Assert-TargetFileProtocolBinding {
         throw 'Full-target File report lacks its completion protocol'
     }
     $identity = $Report.file_completion_protocol
-    $reviewed = Read-TargetFileProtocolManifest -Root $Root -Path $identity.manifest_path -RequireReview:$RequireReview
+    $reviewed = Read-TargetFileProtocolManifest -Root $Root -Path $identity.manifest_path -RequireReview:$RequireReview `
+        -AllowSyntheticReview:$AllowSyntheticReview
     if ($reviewed.sha256 -cne $identity.manifest_sha256 -or
         $reviewed.manifest.wrapper.sha256 -cne $identity.wrapper_sha256 -or
         (Get-FileHash -LiteralPath $WrapperPath).Hash.ToLowerInvariant() -cne $identity.wrapper_sha256 -or

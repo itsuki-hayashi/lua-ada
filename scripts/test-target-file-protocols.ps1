@@ -62,11 +62,12 @@ function New-ManifestFixture {
 function Add-SyntheticSourceReview([Collections.IDictionary] $Fixture) {
     $m = $Fixture.manifest
     $narrative = @{schema_version=1;synthetic_fixture=$true;target=$m.target;reviewer='synthetic-independent-reviewer';
-        decision='accepted';runtime_acceptance=$false;coverage_authority=$false}
+        decision='accepted';runtime_acceptance=$false;coverage_authority=$false;execution_evidence=@()}
     $narrativePath = 'tests/conformance/synthetic-source-review.json'
     $narrativeHash = Write-Json (Join-Path $Fixture.root $narrativePath) $narrative
     $approval = @{schema_version=1;kind='target-file-completion-approval';synthetic_fixture=$true;target=$m.target;
         author='synthetic-author';reviewer='synthetic-independent-reviewer';decision='accepted';
+        runtime_acceptance=$false;coverage_authority=$false;execution_evidence=@();
         wrapper_sha256=$m.wrapper.sha256;orchestrator_sha256=$m.orchestrator.sha256;
         review_evidence=@{path=$narrativePath;sha256=$narrativeHash};decisions=@()}
     foreach ($item in $m.files) {
@@ -188,14 +189,43 @@ Case 'self review cannot install source-only completion authority' {
 }
 Case 'synthetic independent source review binds every protocol without executing Lua' {
     $f = New-ManifestFixture; $null = Add-SyntheticSourceReview $f
-    $r = Read-TargetFileProtocolManifest $f.root $relative -RequireReview
+    Reject {Read-TargetFileProtocolManifest $f.root $relative -RequireReview} 'Synthetic completion source review'
+    $r = Read-TargetFileProtocolManifest $f.root $relative -RequireReview -AllowSyntheticReview
     Assert-True (-not $r.manifest.runtime_acceptance -and -not $r.manifest.coverage_authority) 'Source review became runtime acceptance'
+}
+foreach($part in @('manifest','approval','narrative')){
+    Case "an actual-labelled completion cannot borrow a synthetic $part decision" {
+        $f=New-ManifestFixture;$a=Add-SyntheticSourceReview $f
+        $n=Get-Content (Join-Path $f.root $a.approval.review_evidence.path) -Raw|ConvertFrom-Json -AsHashtable
+        $f.manifest.synthetic_fixture=$part -ceq 'manifest'
+        $a.approval.synthetic_fixture=$part -ceq 'approval'
+        $n.synthetic_fixture=$part -ceq 'narrative'
+        $a.approval.review_evidence.sha256=Write-Json (Join-Path $f.root $a.approval.review_evidence.path) $n
+        $f.manifest.review.artifact_sha256=Write-Json (Join-Path $f.root $a.path) $a.approval
+        $null=Write-Json $f.path $f.manifest
+        Reject {Read-TargetFileProtocolManifest $f.root $relative -RequireReview} 'Synthetic completion source review'
+    }
+}
+foreach($mutation in @('missing-label','string-label','runtime','coverage','evidence')){
+    Case "completion source review rejects $mutation authority even in a labelled unit fixture" {
+        $f=New-ManifestFixture;$a=Add-SyntheticSourceReview $f
+        switch($mutation){
+            'missing-label' {[void]$a.approval.Remove('synthetic_fixture')}
+            'string-label' {$a.approval.synthetic_fixture='false'}
+            'runtime' {$a.approval.runtime_acceptance=$true}
+            'coverage' {$a.approval.coverage_authority=$true}
+            'evidence' {$a.approval.execution_evidence=@('fabricated-actual-process')}
+        }
+        $f.manifest.review.artifact_sha256=Write-Json (Join-Path $f.root $a.path) $a.approval
+        $null=Write-Json $f.path $f.manifest
+        Reject {Read-TargetFileProtocolManifest $f.root $relative -RequireReview -AllowSyntheticReview} 'Completion source review'
+    }
 }
 Case 'changed semantic source mapping cannot reuse an earlier source review' {
     $f = New-ManifestFixture; $null = Add-SyntheticSourceReview $f
     $f.manifest.files[0].source_links[0].rationale = 'Changed semantic mapping after source review'
     $null = Write-Json $f.path $f.manifest
-    Reject { Read-TargetFileProtocolManifest $f.root $relative -RequireReview } 'approval decision differs'
+    Reject { Read-TargetFileProtocolManifest $f.root $relative -RequireReview -AllowSyntheticReview } 'approval decision differs'
 }
 Case 'missing duplicate and stale reviewed source decisions each fail' {
     foreach ($change in @('missing','duplicate','stale')) {
@@ -205,7 +235,7 @@ Case 'missing duplicate and stale reviewed source decisions each fail' {
         else { $a.approval.decisions[0].source_sha256 = '0' * 64 }
         $f.manifest.review.artifact_sha256 = Write-Json (Join-Path $f.root $a.path) $a.approval
         $null = Write-Json $f.path $f.manifest
-        Reject { Read-TargetFileProtocolManifest $f.root $relative -RequireReview } 'approval source set|approval decision'
+        Reject { Read-TargetFileProtocolManifest $f.root $relative -RequireReview -AllowSyntheticReview } 'approval source set|approval decision'
     }
 }
 Case 'report cannot claim the wrapper ran when its actual entry arguments differ' {
@@ -238,9 +268,11 @@ Case 'full source binding replays captured returns and requires the execution co
     $report = @{operation='file:attrib.lua';requested_configuration='upstream-test';execution_disposition='unchanged';
         process=$p;file_completion_protocol=$identity;synthetic_fixture=$true}
     $contract = @{file_completion_protocol_sha256=$m.sha256;file_completion_wrapper_sha256=$f.manifest.wrapper.sha256}
-    $result = Assert-TargetFileProtocolBinding -Root $f.root -Report $report -WrapperPath $wrapper -Contract $contract -RequireReview
+    $report.allow_synthetic_review=$true
+    Reject {Assert-TargetFileProtocolBinding -Root $f.root -Report $report -WrapperPath $wrapper -Contract $contract -RequireReview} 'Synthetic completion source review'
+    $result = Assert-TargetFileProtocolBinding -Root $f.root -Report $report -WrapperPath $wrapper -Contract $contract -RequireReview -AllowSyntheticReview
     Assert-True (-not $result.runtime_acceptance) 'Source binding gained runtime acceptance'
-    Reject { Assert-TargetFileProtocolBinding -Root $f.root -Report $report -WrapperPath $wrapper -Contract @{} -RequireReview } 'contract does not bind'
+    Reject { Assert-TargetFileProtocolBinding -Root $f.root -Report $report -WrapperPath $wrapper -Contract @{} -RequireReview -AllowSyntheticReview } 'contract does not bind'
     $identity.executed_sha256 = '0' * 64
     Reject { Assert-TargetFileProtocolBinding -Root $f.root -Report $report -WrapperPath $wrapper } 'selected chunk hash'
     $identity.executed_sha256 = ($f.manifest.files | Where-Object file -CEQ attrib.lua).source.sha256

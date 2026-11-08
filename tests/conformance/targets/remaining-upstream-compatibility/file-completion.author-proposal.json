@@ -5,6 +5,8 @@
   "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
   "runtime_acceptance": false,
   "coverage_authority": false,
+  "synthetic_fixture": false,
+  "execution_evidence": [],
   "wrapper": {
     "path": "tests/conformance/target-file-completion.lua",
     "sha256": "d366c500a8f08baa0f4f9673cbe01dff165b9ad3bec90093221c93af7ea7739c"

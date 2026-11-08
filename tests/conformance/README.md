@@ -102,6 +102,12 @@ operations and the five default release-reentry cases. Instrumented native C
 instead records its exact ownership-only argument and five-case lock omission;
 equal summary counts cannot replace or reorder an operation.
 
+Actual File completion approval requires explicit non-synthetic manifest,
+approval and narrative labels, source-only authority flags and empty execution
+evidence. Binding regressions may opt into labelled synthetic reviews through
+an explicit test-only parameter. The target runner and final matrix never
+select that parameter, and raw report fields cannot enable it.
+
 T target contexts also require a separate private-header buffer executable.
 It includes the actual pinned `ltests.h`, reports its 23-byte scratch and actual
 `luaL_Buffer` layout (56 or 64 bytes on the measured 64-bit hosts), and executes the same 17 ownership,
