@@ -27,8 +27,9 @@ Startup order mirrors `pmain`: `arg`, package-path environment, `LUA_INIT_5_5`
 actions, then the script. `-E` skips the environment variables.
 `LUA_PATH_5_5`/`LUA_PATH` and the `CPATH` pair are applied by the CLI host to
 `package.path`/`package.cpath` before user code, with the first `;;` replaced
-by the default. The library itself still reads no environment; the CLI step
-runs as an internal chunk, so it is not a registry `LUA_NOENV` implementation.
+by the default. The CLI uses the internal host package operation, which sets
+the actual registry `LUA_NOENV` field and configures paths through the shared
+native-module loader. `-E` sets that field to true; ordinary startup clears it.
 `-l` runs `g = require(mod)` through the global `require` as a small internal
 chunk, which is one extra Lua frame during `require` (lua.c uses a C call).
 `-W` delivers `@on` through the actual warning mechanism, independently of
@@ -80,10 +81,12 @@ stderr and failures return a failing process status. Script files now accept
 native Lua 5.5.1 binary chunks for the matching host configuration, including
 the shared BOM/interpreter-line handling. Runtime load/loadfile mode filters
 select text or binary input, and string.dump serializes actual prototypes.
-CLI --check remains text-only. Native modules, readline and signal handling
-remain deferred. Lua-only require is an M2b feature; its library default path is
-`./?.lua;./?/init.lua`, and only the CLI host applies the path environment
-variables described above.
+CLI --check remains text-only. Package loading includes binary Lua modules,
+native searchers and `package.loadlib`; native handles remain owned through
+state cleanup. Host-specific module and loader validation is recorded in
+[status](status.md) and does not establish ecosystem-module acceptance.
+Readline and signal handling remain deferred. The CLI host applies the path
+environment variables described above through the shared package operation.
 
 The dedicated upstream test runner is separate from the product CLI. Its
 explicit test instruction profile does not alter CLI defaults or establish a
