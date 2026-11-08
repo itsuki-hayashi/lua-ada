@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+Counted source metadata and printable NUL behavior have
+[fresh native-paired evidence](sessions/2026-11-08-binary-source-nul.md), with
+2,161 passing AUnit cases per local configuration after integrating the
+selected debug-line writer interval. Continue sort diagnostics, cold refusal
+results, borrowed C views/hooks, traceback callbacks and final storage gates.
+
 Canonical debug metadata has [selected-interval evidence](sessions/2026-11-08-selected-line-baselines.md):
 the measured native T getbaseline assertion is fixed, seven debug behaviors
 match all four compiler/VM paths in each configuration and all 2,157 AUnit

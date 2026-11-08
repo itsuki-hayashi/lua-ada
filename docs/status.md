@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [counted binary-source correction](sessions/2026-11-08-binary-source-nul.md)
+preserves full source metadata while matching native C-prefix display, after
+file-tail selection. Four cases match native/Ada default/T; the combined
+implementation passes 2,161 AUnit cases in each local configuration. Full
+binary/debug and remaining source/platform acceptance remain separate gates.
+
 The [selected debug-line checkpoint](sessions/2026-11-08-selected-line-baselines.md)
 uses the actual native-reader interval (default 128, T 3) for canonical line
 records. Its seven-case debug fixture and all retained string fixtures pass

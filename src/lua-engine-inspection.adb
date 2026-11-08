@@ -31,10 +31,10 @@ package body Lua.Engine.Inspection is
       --  arbitrarily long source label never requires a full newline scan.
       if Source'Length > 0 and then Source (Source'First) in '=' | '@' then
          if Source'Length <= 60 or else Source (Source'First) = '=' then
-            return Source (Source'First + 1 ..
-              Natural'Min (Source'Last, Source'First + 59));
+            return C_Option (Source (Source'First + 1 ..
+              Natural'Min (Source'Last, Source'First + 59)));
          end if;
-         return "..." & Source (Source'Last - 55 .. Source'Last);
+         return C_Option ("..." & Source (Source'Last - 55 .. Source'Last));
       end if;
       if Newline /= 0 then
          Size := Newline - Source'First;
@@ -44,8 +44,13 @@ package body Lua.Engine.Inspection is
          Truncated := True;
       end if;
       Size := Natural'Min (45, Size);
-      return "[string """ & Source (Source'First .. Source'First + Size - 1) &
-        (if Truncated then "..." else "") & """]";
+      --  Binary chunks can contain counted source names with embedded NUL.
+      --  Native short_src is consumed as a C string after chunk-id rendering,
+      --  including file-tail selection; truncating the original name first
+      --  would incorrectly change the displayed tail of a long file source.
+      return C_Option
+        ("[string """ & Source (Source'First .. Source'First + Size - 1) &
+         (if Truncated then "..." else "") & """]");
    end Short_Source;
 
    function Visible_Local_Top

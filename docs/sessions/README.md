@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [binary source display](2026-11-08-binary-source-nul.md).
+
 Component: [owned argument labels](2026-11-08-owned-argument-labels.md).
 
 Component: [selected debug-line baselines](2026-11-08-selected-line-baselines.md).
