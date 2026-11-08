@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [compiler context checkpoint](sessions/2026-11-08-compiler-limit-context.md)
+completes unchanged errors.lua locally in default and retained-T execution.
+Ten focused cases pass within 2,394 AUnit cases per mode; all standalone C
+consumers and eight compiler/VM roles pass. Defining-function context and
+declaration-limit precedence are implemented. Global source and final matrix
+acceptance remain pending.
+
 The [parser stack checkpoint](sessions/2026-11-08-parser-stack-limits.md)
 preserves native runtime-error status/text and bounded Ada host quotas.
 Both local configurations pass 2,384 AUnit cases, all standalone C consumers

@@ -108,6 +108,22 @@ package body Lua.Canonical_Compiler is
          when Allocation_Refused => "not enough memory");
    end Message;
 
+   function Message (Result : Compilation_Result) return String is
+      Line : constant String := Result.Limit_Function_Line'Image;
+   begin
+      --  The rejected graph has already been destroyed. The saved scalar
+      --  identifies its defining function without borrowing freed metadata
+      --  or confusing the failure token's line with the function opener.
+      --  This formatting is bounded by fixed text and a Natural's digits.
+      if Result.Error in Local_Limit | Upvalue_Limit then
+         return Message (Result.Error) & " (limit is " &
+           (if Result.Error = Local_Limit then "200" else "255") &
+           ") in " & (if Result.Limit_Function_Line = 0 then "main function"
+                      else "function at line " & Line (2 .. Line'Last));
+      end if;
+      return Message (Result.Error);
+   end Message;
+
    function Compile
      (Unit : in out Compilation_Unit;
       Memory : not null Lua.Storage.Owner_Access;
@@ -186,11 +202,16 @@ package body Lua.Canonical_Compiler is
               (case Unit.Names (Positive (Id)).Mode is
                  when Regular => 0, when Constant_Name => 1,
                  when Vararg_Name => 2, when Closing_Name => 3);
-            procedure Fail (Error : Error_Kind; Host : Boolean := False);
-            procedure Fail (Error : Error_Kind; Host : Boolean := False) is
+            procedure Fail
+              (Error : Error_Kind; Host : Boolean := False;
+               Function_Line : Natural := 0);
+            procedure Fail
+              (Error : Error_Kind; Host : Boolean := False;
+               Function_Line : Natural := 0) is
             begin
                Result.Error := Error;
                Result.Location := Site;
+               Result.Limit_Function_Line := Function_Line;
                Result.Outcome :=
                  (if Host then Resource_Limit else Compiler_Limit);
                raise Abandon;
@@ -492,7 +513,9 @@ package body Lua.Canonical_Compiler is
               (Fn : in out Function_State; Id : Symbol_Id;
                Register_Id : Natural) is
             begin
-               if Register_Id >= 200 then Fail (Local_Limit); end if;
+               if Register_Id >= 200 then
+                  Fail (Local_Limit, Function_Line => Fn.Code.First_Line);
+               end if;
                Fn.Code.Locals.Append (Local'
                  (Intern_Text (Unit.Names (Positive (Id)).Name),
                   PC (Fn) - 1, 0));
@@ -1246,7 +1269,9 @@ package body Lua.Canonical_Compiler is
                Lifetime : Symbol_Id := No_Symbol)
             is
             begin
-               if Register_Id >= 200 then Fail (Local_Limit); end if;
+               if Register_Id >= 200 then
+                  Fail (Local_Limit, Function_Line => Fn.Code.First_Line);
+               end if;
                Fn.Code.Locals.Append
                  (Local'(Intern (Result.Code, Name), PC (Fn) - 1, 0));
                Fn.Active.Append (Binding_Place'
@@ -1829,7 +1854,10 @@ package body Lua.Canonical_Compiler is
                        (Binding_Place'(Symbol, Value, 0, False));
                   else
                      Index := Natural (Fn.Code.Upvalues.Length);
-                     if Index = 255 then Fail (Upvalue_Limit); end if;
+                     if Index = 255 then
+                        Fail (Upvalue_Limit,
+                              Function_Line => Fn.Code.First_Line);
+                     end if;
                      Fn.Code.Upvalues.Append (Upvalue'
                        (Value.Kind = Stack_Place, Byte (Value.Index),
                         Binding_Kind (Symbol), Intern_Text
@@ -1866,7 +1894,10 @@ package body Lua.Canonical_Compiler is
                   Fn.Code.First_Line := Item.Site.Line;
                   Fn.Code.Last_Line := Item.End_Line;
                   Fn.Last_Line := Item.Site.Line;
-                  if Item.Symbols.Length > 200 then Fail (Local_Limit); end if;
+                  if Item.Symbols.Length > 200 then
+                     Fail (Local_Limit,
+                           Function_Line => Fn.Code.First_Line);
+                  end if;
                   Fn.Code.Parameters := Byte (Item.Symbols.Length);
                   if Item.Flag and then Item.Symbol /= No_Symbol and then
                     Read_Only_Vararg (Item.Children (1), Item.Symbol)

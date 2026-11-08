@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+The [compiler context checkpoint](sessions/2026-11-08-compiler-limit-context.md)
+completes unchanged errors.lua in both local configurations, with 2,394 passing
+AUnit cases per mode. Revalidate it at final head in all applicable contexts;
+local completion does not close its source ledger. Continue the pending C
+metadata/refusal, hook-ordering, table-storage safety and aggregate obligations.
+
 The [parser stack checkpoint](sessions/2026-11-08-parser-stack-limits.md)
 passes sixteen focused cases within 2,384 AUnit cases per configuration.
 Continue unchanged errors.lua at original line768: excessive upvalues must

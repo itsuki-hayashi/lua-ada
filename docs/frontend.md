@@ -75,7 +75,11 @@ not exclude the separate M3 runtime obligations or certify their acceptance.
 M2a diagnostics compare syntax/resource category and reported line, not wording.
 
 Canonical execution enforces its actual local, upvalue and register encoding
-limits. Under Lua_Compatible policy, excessive parser nesting is a catchable
+limits. Compatible parsing checks explicit local limits as names arrive,
+preserving their precedence over later incomplete grammar; compiler-limit
+diagnostics retain the actual defining function's line. See the
+[context checkpoint](sessions/2026-11-08-compiler-limit-context.md).
+Under Lua_Compatible policy, excessive parser nesting is a catchable
 runtime stack failure with the original C-stack error text; public lua_load
 returns LUA_ERRRUN, preserving its distinction from LUA_ERRSYNTAX. Both
 contiguous and streamed input use the same parser. Function bodies charge

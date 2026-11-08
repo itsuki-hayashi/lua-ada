@@ -21,6 +21,9 @@ private package Lua.Canonical_Compiler is
       Outcome : Status := Compiler_Limit;
       Error : Error_Kind := No_Error;
       Location : Lua.Lexers.Source_Location;
+      Limit_Function_Line : Natural := 0;
+      --  Defining function for local/upvalue limits; zero denotes the main
+      --  chunk. Retain this scalar before the rejected prototype is freed.
       Code : Lua.Prototypes.Program;
    end record;
    function Compile
@@ -35,4 +38,6 @@ private package Lua.Canonical_Compiler is
    --  must outlive the result. No engine values or runtime heap are touched.
    --  @exception Program_Error Unit has not passed shared frontend checking.
    function Message (Error : Error_Kind) return String;
+   function Message (Result : Compilation_Result) return String;
+   --  Include actual function context for semantic local/upvalue limits.
 end Lua.Canonical_Compiler;

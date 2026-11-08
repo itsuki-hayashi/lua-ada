@@ -40,13 +40,13 @@ package body Lua.Syntax_Trees is
       Memory : Lua.Storage.Owner_Access := null;
       Compatible_Global : Boolean :=
         Lua.Runtime_Configuration.Compatible_Global;
-      Catchable_Nesting : Boolean := False)
+      Compatible_Limits : Boolean := False)
    is
       Input : Lua.Inputs.Source;
    begin
       Input.Borrow (Source'Address, Source'Length);
       Parse (Unit, Input, Name, Limits, Memory, Compatible_Global,
-             Catchable_Nesting);
+             Compatible_Limits);
    end Parse;
 
    procedure Parse
@@ -55,7 +55,7 @@ package body Lua.Syntax_Trees is
       Memory : Lua.Storage.Owner_Access := null;
       Compatible_Global : Boolean :=
         Lua.Runtime_Configuration.Compatible_Global;
-      Catchable_Nesting : Boolean := False)
+      Compatible_Limits : Boolean := False)
    is
       Selected : constant not null Lua.Storage.Owner_Access :=
         (if Memory /= null then Memory
@@ -107,7 +107,8 @@ package body Lua.Syntax_Trees is
       procedure Remember_End (Id : Node_Id);
       function New_Name
         (Name : Text_Ref; Mode : Attribute := Regular;
-         Kind : Binding_Kind := Local_Name) return Symbol_Id;
+         Kind : Binding_Kind := Local_Name;
+         Pending : Natural := 0) return Symbol_Id;
       function Resolve
         (Name : Text_Ref; Environment : Boolean := False;
          Referenced : Text_Ref := Empty_Text)
@@ -381,7 +382,7 @@ package body Lua.Syntax_Trees is
             --  not escape load/pcall as an embedding host-policy abort.
             --  Explicit checking/session quotas retain their typed resource
             --  failure and are never made catchable by source code.
-            if Catchable_Nesting then
+            if Compatible_Limits then
                Unit.Result.Stack_Overflow := True;
                Error ("C stack overflow", Near_Token => False);
             else
@@ -397,11 +398,40 @@ package body Lua.Syntax_Trees is
 
       function New_Name
         (Name : Text_Ref; Mode : Attribute := Regular;
-         Kind : Binding_Kind := Local_Name) return Symbol_Id
+         Kind : Binding_Kind := Local_Name;
+         Pending : Natural := 0) return Symbol_Id
       is
+         Count : Natural := Pending;
       begin
          if Natural (Unit.Names.Length) >= Limits.Syntax_Nodes then
             Error ("declaration limit exceeded", Resource => True);
+         end if;
+         if Compatible_Limits and then Kind = Local_Name then
+            --  Lua checks explicit local declarations as names arrive, before
+            --  a later missing end or initializer can replace that failure.
+            --  Only active locals of this function count: outer captures,
+            --  expired lexical scopes and global declarations do not. Pending
+            --  names in this same list are not visible in Active yet. The
+            --  chunk's implicit environment is an upvalue, not a local slot.
+            for Symbol of Active loop
+               declare
+                  Item : constant Binding := Unit.Names (Positive (Symbol));
+               begin
+                  if Item.Kind = Local_Name and then
+                    Item.Owner = Function_Node and then
+                    Symbol /= Unit.Environment
+                  then
+                     Count := Count + 1;
+                     exit when Count >= 200;
+                  end if;
+               end;
+            end loop;
+            if Count >= 200 then
+               Error ("too many local variables (limit is 200) in " &
+                 (if Function_Node = No_Node then "main function"
+                  else "function at line " &
+                    Line_Text (Fetch (Function_Node).Site.Line)));
+            end if;
          end if;
          Unit.Names.Append
            (Binding'(Name, Kind, Mode, Function_Node, Here));
@@ -600,7 +630,7 @@ package body Lua.Syntax_Trees is
          --  recursion, without charging the same function boundary twice.
          --  The standalone/bounded checker retains its original host-depth
          --  accounting. Expression recursion has its own independent charge.
-         if not Catchable_Nesting then Enter; end if;
+         if not Compatible_Limits then Enter; end if;
          Function_Node := Result;
          Item.Site := Definition;
          Item.Target := Saved_Function;
@@ -644,7 +674,7 @@ package body Lua.Syntax_Trees is
          Varargs := Saved_Varargs;
          Loop_Depth := Saved_Loops;
          Scope := Saved_Scope;
-         if not Catchable_Nesting then Leave; end if;
+         if not Compatible_Limits then Leave; end if;
          return Result;
       end Function_Body;
 
@@ -1006,7 +1036,8 @@ package body Lua.Syntax_Trees is
                   Unit.Unsupported := Result;
                end if;
                Id := New_Name
-                 (Name, Mode, (if Global then Global_Name else Local_Name));
+                 (Name, Mode, (if Global then Global_Name else Local_Name),
+                  Pending => Natural (Item.Symbols.Length));
                Item.Symbols.Append (Id);
             end;
             exit when not Take (Comma);

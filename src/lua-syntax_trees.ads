@@ -92,14 +92,14 @@ private package Lua.Syntax_Trees is
       Memory : Lua.Storage.Owner_Access := null;
       Compatible_Global : Boolean :=
         Lua.Runtime_Configuration.Compatible_Global;
-      Catchable_Nesting : Boolean := False);
+      Compatible_Limits : Boolean := False);
    procedure Parse
      (Unit : in out Compilation_Unit; Source : in out Lua.Inputs.Source;
       Name : String; Limits : Lua.Syntax.Check_Limits;
       Memory : Lua.Storage.Owner_Access := null;
       Compatible_Global : Boolean :=
         Lua.Runtime_Configuration.Compatible_Global;
-      Catchable_Nesting : Boolean := False);
+      Compatible_Limits : Boolean := False);
    --  Build fully resolved owned syntax or a structured error. No World,
    --  VM register or prototype participates in parsing. An explicit allocator
    --  routes all retained syntax/text storage through its owning universe;
@@ -107,9 +107,9 @@ private package Lua.Syntax_Trees is
    --  A previously bound unit can be reused only with the same owner.
    --  Compatible_Global follows the pinned default LUA_COMPAT_GLOBAL=1;
    --  false reserves the keyword for configuration-sensitive C consumers.
-   --  Catchable_Nesting treats the implementation's parser-depth ceiling as
-   --  a catchable stack error. False preserves configured host-budget
-   --  rejection for standalone checking and bounded Ada sessions.
+   --  Compatible_Limits selects catchable parser-stack overflow and explicit
+   --  local-limit checks at declaration time. False preserves standalone
+   --  checking and bounded Ada session host-depth accounting.
    --  Both overloads use the same parser. A streaming source requests pieces
    --  through its guarded owner only when lexical lookahead needs more bytes.
    function Text (Unit : Compilation_Unit; Item : Text_Ref) return String;

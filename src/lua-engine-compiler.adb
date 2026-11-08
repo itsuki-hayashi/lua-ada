@@ -93,7 +93,7 @@ package body Lua.Engine.Compiler is
              (State.Bounds.Source_Bytes, State.Bounds.Tokens,
               State.Bounds.Syntax_Nodes, State.Bounds.Syntax_Depth),
              Memory => Lua.Storage.Reference (State.Memory),
-             Catchable_Nesting => State.Policy = Lua_Compatible);
+             Compatible_Limits => State.Policy = Lua_Compatible);
       if Unit.Result.Status /= Lua.Syntax.Success then
          State.Current.Failure_At :=
            (Offset => 1, Line => Unit.Result.Error.Line,
@@ -121,7 +121,7 @@ package body Lua.Engine.Compiler is
               Lua.Canonical_Compiler.Resource_Limit =>
                State.Current.Failure_At := Lowered.Location;
                State.Current.Failure_Class := Syntax_Failure;
-               Fail (State, Lua.Canonical_Compiler.Message (Lowered.Error),
+               Fail (State, Lua.Canonical_Compiler.Message (Lowered),
                  Resource => Lowered.Outcome =
                    Lua.Canonical_Compiler.Resource_Limit);
          end case;
@@ -821,7 +821,7 @@ package body Lua.Engine.Compiler is
              (State.Bounds.Source_Bytes, State.Bounds.Tokens,
               State.Bounds.Syntax_Nodes, State.Bounds.Syntax_Depth),
              Memory => Lua.Storage.Reference (State.Memory),
-             Catchable_Nesting => State.Policy = Lua_Compatible);
+             Compatible_Limits => State.Policy = Lua_Compatible);
       if Unit.Result.Status /= Lua.Syntax.Success then
          State.Current.Failure_At :=
            (Offset => 1, Line => Unit.Result.Error.Line,

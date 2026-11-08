@@ -3650,7 +3650,7 @@ package body Lua.Engine.Foreign is
                          Owner.Universe.Bounds.Syntax_Nodes,
                          Owner.Universe.Bounds.Syntax_Depth),
                         Memory.Reference (Owner.Universe.Memory),
-                        Catchable_Nesting =>
+                        Compatible_Limits =>
                           Owner.Universe.Policy = Lua_Compatible);
                      if Unit.Result.Status = Lua.Syntax.Resource_Error then
                         Fail (Owner.Universe.all,
@@ -3685,7 +3685,7 @@ package body Lua.Engine.Foreign is
                               when Lua.Canonical_Compiler.Compiler_Limit =>
                                  Error_Result (Name & ": " &
                                    Lua.Canonical_Compiler.Message
-                                     (Lowered.Error));
+                                     (Lowered));
                                  Output.Integer_Data := 3;
                               when Lua.Canonical_Compiler.Resource_Limit =>
                                  Fail (Owner.Universe.all,
