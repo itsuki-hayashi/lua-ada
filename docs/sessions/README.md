@@ -6,6 +6,8 @@ Source review: [memory-verifier binding refresh](2026-11-08-verifier-binding-ref
 
 Component: [intern-index refusal and collection](2026-11-08-intern-index-refusal.md).
 
+Proposal: [exact locals source equivalent](2026-11-08-locals-exact-source-proposal.md).
+
 Feature review: [private string-table observations](2026-11-08-querystr-feature-review.md).
 
 Correction: [resetCI owning release](2026-11-08-resetci-owning-release.md).

@@ -9,6 +9,13 @@ AUnit cases in each mode and both configured fixture campaigns. Original API
 source adaptation, final immutable image replay and whole-target acceptance
 remain pending; these cases supply no passing private C geometry assertion.
 
+The [exact locals proposal](sessions/2026-11-08-locals-exact-source-proposal.md)
+and bounded source selector preserve the original deletion/collection/refusal
+sweep while proposing actual storage counts and original-key weak lifetime.
+All 38 source-definition/rejection checks pass. Independent exact approval is
+pending; no adapted locals source was emitted or executed and neither original
+anchor is resolved by this proposal.
+
 The [resetCI ownership correction](sessions/2026-11-08-resetci-owning-release.md)
 uses the checked private frame release and retires unused metadata reservations.
 Both local configurations pass 2,507 AUnit cases and all ordinary C consumers;

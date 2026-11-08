@@ -2,6 +2,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceApiComposite.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceVerifierEquivalents.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceLocalsEquivalent.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceTransforms.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1')
@@ -29,6 +30,10 @@ function Get-TargetReviewedSourceReplay {
     }
     if($Specification.kind -ceq 't-verifier-equivalent'){
         return Get-ConformanceVerifierReplay -Root $Root -Specification $Specification -Implementation $Implementation -Configuration $Configuration
+    }
+    if($Specification.id -ceq 'locals-dead-table-storage'){
+        return Get-TargetLocalsTableEquivalentReplay -Root $Root -Specification $Specification `
+            -Implementation $Implementation -Configuration $Configuration
     }
     if($Specification.kind -cne 'target-source-equivalent' -or $Specification.id -cne 'calls-undump-constant-pool' -or
         $Specification.target -cne 'remaining-upstream-compatibility' -or
