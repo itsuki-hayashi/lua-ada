@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [reviewed Verybig Windows replay](2026-11-08-verybig-approved-source.md).
+
 Component: [native allocator loaded image](2026-11-08-allocator-loaded-image.md).
 
 Correction: [Heavy allocator ceilings and observation](2026-11-08-heavy-allocator-observation.md).

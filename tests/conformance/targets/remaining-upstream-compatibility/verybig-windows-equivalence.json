@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "verybig-windows-tempfile",
+  "source": "references/lua/testes/verybig.lua",
+  "source_sha256": "2b6d30c69cbe6974068881108eae297bdedd275b429be8ec614bf5f8ee89707e",
+  "disposition": "native-platform-equivalent",
+  "platform": "windows",
+  "configuration": "default-and-upstream-test",
+  "target": "remaining-upstream-compatibility",
+  "review": {
+    "status": "accepted",
+    "author": "Codex /root/runtime_gaps",
+    "reviewer": "Codex /root/remaining_suite",
+    "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/verybig-windows.equivalence-approval.json",
+    "artifact_sha256": "e7a2a4441584878daca21487cfc3fc78bf0fb15cef26401656063c2797ed42fd"
+  },
+  "replacements": [
+    {
+      "id": "windows-verybig-tempfile-cwd",
+      "start_byte": 3491,
+      "length_bytes": 12,
+      "start_line": 141,
+      "end_line": 141,
+      "source_sha256": "5877a423400935af8288a4a9d58c43ba23153277ed30fdd2f7448ff190911e7a",
+      "original_text": "os.tmpname()",
+      "replacement": "'.'..os.tmpname()",
+      "invariant": "Retain one actual native os.tmpname call and its leaf bytes, translating only the Windows current-drive rooted result into a fresh disposable CWD path. Keep every generated-program, I/O, loader, assertion, removal and return byte unchanged.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-verybig-tempfile.lua#rooted-name",
+        "tests/conformance/platform/windows-verybig-tempfile.lua#fresh-cwd-name",
+        "tests/conformance/platform/windows-verybig-tempfile.lua#write-read",
+        "tests/conformance/platform/windows-verybig-tempfile.lua#text-loadfile",
+        "tests/conformance/platform/windows-verybig-tempfile.lua#dofile",
+        "tests/conformance/platform/windows-verybig-tempfile.lua#binary-load",
+        "tests/conformance/platform/windows-verybig-tempfile.lua#remove"
+      ]
+    }
+  ],
+  "independent_review_status": "accepted-source-only",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "output_sha256": "d973c7a66fd1f4d50ec48c7d2bc49ad2bf8aa3e0df9cadf7033c52f1e3ce00dc",
+  "kind": "native-platform-source-equivalent",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "synthetic_fixture": false,
+  "source_exclusions": [],
+  "authoring_observation": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/verybig-windows-tempfile.source.author-proposal.json",
+    "sha256": "357e594ec9badeec9a31ddd1430899e8c6338226bbe70a6c29d1724142cb0a9a"
+  }
+}

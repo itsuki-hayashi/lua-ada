@@ -2,6 +2,11 @@
 
 ## Active remaining-suite delivery
 
+Carry the [reviewed Verybig replay](sessions/2026-11-08-verybig-approved-source.md)
+into final Windows contexts with actual rooted-name/fresh-CWD applicability
+evidence. Preserve the four complete local observations without promoting
+them to global matrix acceptance; Linux/macOS retain original source.
+
 Integrate the [actual allocator-ceiling observations](sessions/2026-11-08-heavy-allocator-observation.md)
 into immutable context builds and final Heavy reconciliation. Keep actual
 owner/provider/backing counters distinct, require fresh PID/run/hash-bound

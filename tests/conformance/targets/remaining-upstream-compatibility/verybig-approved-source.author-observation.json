@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "kind": "verybig-approved-source-author-observation",
+  "author": "Codex /root",
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "scope": "Actual local component observations, not immutable matrix or native applicability authority",
+  "original_source_unchanged": true,
+  "generated_sha256": "d973c7a66fd1f4d50ec48c7d2bc49ad2bf8aa3e0df9cadf7033c52f1e3ce00dc",
+  "timeout_seconds": 900,
+  "soft_enabled": false,
+  "port_enabled": false,
+  "roles": [
+    {
+      "role": "ada",
+      "configuration": "default",
+      "process_id": 19404,
+      "run_id": "7a37a0dcd34d4be89aca85af2cd2a80b",
+      "observation": {
+        "sha256": "8cc0b026aff3cd9b92965304211d37121b7807f0cf173b9971a7a3d96797cfbb",
+        "path": "C:\\Users\\Itsuki\\workspace\\lua-ada\\reports\\exact-equivalent-review\\verybig-558f995b25f94deaa7c6887ed5e40f9c\\default-ada\\observation.json"
+      },
+      "stdout_sha256": "a61fcf3580a5cd9de6fae4722f686f695e1f29386baa5a5c7efe7fc5bad2481b",
+      "telemetry_sha256": "9a165e17a15c7b3575ab0052c62c11ee6b0fd9db54ea3ed64adabb6cd673722a",
+      "managed_ceiling": 2147483648,
+      "outstanding_bytes": 0,
+      "outstanding_blocks": 0,
+      "images": [
+        {
+          "sha256": "1ecdf1a7e877437f5d9ad4f1a26405f637607f1e8d9d8da27beae4d50c548fe5",
+          "name": "conformance_runner.exe"
+        }
+      ]
+    },
+    {
+      "role": "native",
+      "configuration": "default",
+      "process_id": 91164,
+      "run_id": "8ada894331bc4b55ab1e380144497be1",
+      "observation": {
+        "sha256": "cd8647d60d9740436fb856aff38ac82714e1bd0171a1adcbfe1fef7a91d33502",
+        "path": "C:\\Users\\Itsuki\\workspace\\lua-ada\\reports\\exact-equivalent-review\\verybig-558f995b25f94deaa7c6887ed5e40f9c\\default-native\\observation.json"
+      },
+      "stdout_sha256": "a61fcf3580a5cd9de6fae4722f686f695e1f29386baa5a5c7efe7fc5bad2481b",
+      "telemetry_sha256": "25673d28a4c41aeb9dc427424d9e92827f92d1d19b93e3f5cd21ea9ff5ce7898",
+      "managed_ceiling": 2147483648,
+      "outstanding_bytes": 0,
+      "outstanding_blocks": 0,
+      "images": [
+        {
+          "sha256": "6fd51198bee9770aab18cf42ebaf7ccc133a26d4e3dedb22770c41aba84500b3",
+          "name": "libconformance_lua.dll"
+        },
+        {
+          "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+          "name": "lua.exe"
+        }
+      ]
+    },
+    {
+      "role": "ada",
+      "configuration": "upstream-test",
+      "process_id": 43156,
+      "run_id": "9a081a528f344adf825e18b5e36ac8a7",
+      "observation": {
+        "sha256": "5a81738a3a57d47fc7157ffd94be80c37fac41f8aa8d1d1065487dbab60bffd9",
+        "path": "C:\\Users\\Itsuki\\workspace\\lua-ada\\reports\\exact-equivalent-review\\verybig-558f995b25f94deaa7c6887ed5e40f9c\\upstream-test-ada\\observation.json"
+      },
+      "stdout_sha256": "a61fcf3580a5cd9de6fae4722f686f695e1f29386baa5a5c7efe7fc5bad2481b",
+      "telemetry_sha256": "8543bc79634a2f51d82adb7e302da983ad44ba40da589a9fa1ce693e27738e0b",
+      "managed_ceiling": 2147483648,
+      "outstanding_bytes": 0,
+      "outstanding_blocks": 0,
+      "images": [
+        {
+          "sha256": "e71ee67d58eca4781b870f701e59927d3e1288ccb50a0616cdf09744d7dd6887",
+          "name": "conformance_runner.exe"
+        }
+      ]
+    },
+    {
+      "role": "native",
+      "configuration": "upstream-test",
+      "process_id": 70592,
+      "run_id": "9f551206a3864da59661b04087b65b72",
+      "observation": {
+        "sha256": "2ebffd809609879d92837d61077cb50a1f7be2d7407112cd3d6c6fcea7fbcee9",
+        "path": "C:\\Users\\Itsuki\\workspace\\lua-ada\\reports\\exact-equivalent-review\\verybig-558f995b25f94deaa7c6887ed5e40f9c\\upstream-test-native\\observation.json"
+      },
+      "stdout_sha256": "a61fcf3580a5cd9de6fae4722f686f695e1f29386baa5a5c7efe7fc5bad2481b",
+      "telemetry_sha256": "7c54ad36899cf2906bf91426f365080aeb201cb5f698d58f1bca79995aea0dea",
+      "managed_ceiling": 2147483648,
+      "outstanding_bytes": 0,
+      "outstanding_blocks": 0,
+      "images": [
+        {
+          "sha256": "90cd6bb9cb2f5cdfe04a79ad2a2a8779f1e2cda590d53aaebb3caf5524fe973c",
+          "name": "libconformance_lua.dll"
+        },
+        {
+          "sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
+          "name": "lua.exe"
+        }
+      ]
+    }
+  ]
+}

@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [reviewed Verybig Windows replay](sessions/2026-11-08-verybig-approved-source.md)
+completes the full large-program workload in local native/Ada default/T roles,
+with identical output, single-result 10 and balanced measured ownership.
+Only the exact temporary-path expression changes; final context/native
+applicability reconciliation and complete-target acceptance remain pending.
+
 The [allocator ceiling correction](sessions/2026-11-08-heavy-allocator-observation.md)
 enforces the selected 64 MiB or 2 GiB limit in the conformance launcher and
 reports its actual stored ceiling. Both configurations pass 13 process checks,
