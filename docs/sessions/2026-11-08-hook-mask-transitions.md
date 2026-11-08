@@ -55,7 +55,11 @@ stdout SHA-256 `61d58565c89cd99626c0a10641e6e8a14303a560258ef302fc6b9915e7724897
 
 A disposable copy of the separately reviewed API equivalent retains source
 SHA-256 `c360ae605ad7d2e7935a38ad684a5bb0fd081e59d6d3cc397527864f75cc77d3`.
-Its actual T execution passes the original hook block and advances to generated
+This is a diagnostic replay only: the hook change to Engine.adb stales the
+earlier API941 counterpart's implementation-source binding. The generated
+source has no fresh exact-review or acceptance authority on this runtime until
+independent re-review. Its actual T execution passes the original hook block
+and advances to generated
 line1331, corresponding to original line1306. T.testC on a fresh independent
 state under T.alloccount(0) raises "not enough memory" instead of returning
 false from rawcheckstack. This whole-file run fails. It then reports 35,227
