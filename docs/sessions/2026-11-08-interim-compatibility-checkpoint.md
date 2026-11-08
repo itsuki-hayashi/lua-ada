@@ -22,11 +22,11 @@ remains outside this delivery.
 The following unfinished production work is excluded from this PR. Remote
 backup heads contain skip-CI preservation commits; they are not ready PRs.
 
-| Backup branch | Remote head | Preserved draft |
-|  |  |  |
-| codex/wip-m3-cli-host-main-20261108 | ccc4a83482bc4de3d10a6f4938d6ddd68d657aa2 | 1d6a29ea42fe141cb75b68b915a431ec7f7b0af4 |
+| Backup branch                          | Remote head                              | Preserved draft                          |
+| -------------------------------------- | ---------------------------------------- | ---------------------------------------- |
+| codex/wip-m3-cli-host-main-20261108    | ccc4a83482bc4de3d10a6f4938d6ddd68d657aa2 | 1d6a29ea42fe141cb75b68b915a431ec7f7b0af4 |
 | codex/wip-m3-interrupt-helper-20261108 | 72ca670b680dc58f040f01a79e7ddf9cecc3023d | f45f6422b0833aa97123842f811bc0445f26ef0e |
-| codex/wip-m3-host-receivers-20261108 | db22804a66bea9661d009d678f9eec73308cb002 | decfa4e7c5c6f32ceb7bfdec901013465c1becab |
+| codex/wip-m3-host-receivers-20261108   | db22804a66bea9661d009d678f9eec73308cb002 | decfa4e7c5c6f32ceb7bfdec901013465c1becab |
 
 The CLI backup has a confirmed public call/return-hook mismatch in its temporary
 per-docall transport. Its persistent host-main replacement and thirty named
