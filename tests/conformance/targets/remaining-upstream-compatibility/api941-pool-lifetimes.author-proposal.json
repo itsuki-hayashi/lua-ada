@@ -1,0 +1,502 @@
+{
+  "schema_version": 1,
+  "kind": "api941-pool-source-binding-author-proposal",
+  "id": "api941-pool-lifetimes-d3c2062",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "review_status": "pending-independent-semantic-review",
+  "independent_reviewer": null,
+  "authority_installation": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_snapshot": {
+    "revision": "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+    "previous_revision": "73b69d65942dec817ce82f466786dbaec6b31700",
+    "scope": "committed pool only; pending owner/generation follow-up excluded",
+    "pending_owner_generation_fix_included": false
+  },
+  "prior_pre_pool_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api941-committed-bindings.author-proposal.json",
+    "sha256": "95375d61b16347301dfdb1c7190b15759391c0bacb27a0217b09c3b27072a2f7"
+  },
+  "committed_implementation_bindings": [
+    {
+      "path": "src/lua-engine.ads",
+      "previous_revision": "73b69d65942dec817ce82f466786dbaec6b31700",
+      "previous_sha256": "e0edce8820ca09acd6322b3ce2de24f00e14193023dbd950b23d051c326243bc",
+      "revision": "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+      "sha256": "f1ffa345f1d6a50c097c2c59053364069a49f77918e7f429ec453f4eda28e7c0",
+      "git_blob": "8a55b6cf9a73e9a2731be44da21c516cb297416b",
+      "review_diff": {
+        "command": [
+          "git",
+          "diff",
+          "--no-ext-diff",
+          "--unified=3",
+          "73b69d65942dec817ce82f466786dbaec6b31700",
+          "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+          "--",
+          "src/lua-engine.ads"
+        ],
+        "sha256": "9d0c2b51487157ec407b31aa4f8f95cde3469573fbf38571dabcdfcef8ba18ea"
+      },
+      "independent_semantic_review": "pending"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "previous_revision": "73b69d65942dec817ce82f466786dbaec6b31700",
+      "previous_sha256": "d6abfcb10636b43eb2faf0981f61bc879d33dae1db56e71255efde79d47ea797",
+      "revision": "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+      "sha256": "a82b1e9aa69b39bd54289067827e89e74aa6683adb156a2f3b38addcd4ded9ad",
+      "git_blob": "789fa9cb0679c3b7365f0ab185226c1efcb71107",
+      "review_diff": {
+        "command": [
+          "git",
+          "diff",
+          "--no-ext-diff",
+          "--unified=3",
+          "73b69d65942dec817ce82f466786dbaec6b31700",
+          "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+          "--",
+          "src/lua-engine.adb"
+        ],
+        "sha256": "182e8a49694a565989518928e7cf19191f166b66c232f27283b6ade4b0c58028"
+      },
+      "independent_semantic_review": "pending"
+    },
+    {
+      "path": "src/lua-engine-foreign.ads",
+      "previous_revision": "73b69d65942dec817ce82f466786dbaec6b31700",
+      "previous_sha256": "458334a91be9c8ac65d9c1b3b5b723850d39386c4f5435bcdad51e33bea11c37",
+      "revision": "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+      "sha256": "f5dc6e460d30e000405c41f843a3d1178a10609e2dd1368f7fad516cef852c39",
+      "git_blob": "1172c5a2c634b03c6ef17b3dfacb0f0a74848b64",
+      "review_diff": {
+        "command": [
+          "git",
+          "diff",
+          "--no-ext-diff",
+          "--unified=3",
+          "73b69d65942dec817ce82f466786dbaec6b31700",
+          "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+          "--",
+          "src/lua-engine-foreign.ads"
+        ],
+        "sha256": "0af39c732a75cca72179e662d2a5fd12c8216f473410ede3d2b82d8cf7db99b4"
+      },
+      "independent_semantic_review": "pending"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "previous_revision": "73b69d65942dec817ce82f466786dbaec6b31700",
+      "previous_sha256": "9123aed6ee136ec05d2e8496495ced0587c3b12d16da5f3352ccd545de4bab32",
+      "revision": "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+      "sha256": "4801adb799dfe01fa59791ec56f6806be6e726442d999d4a519e0bb774ffdc0f",
+      "git_blob": "067667b335c60fd03fdd329b1dab25b04ad0d04d",
+      "review_diff": {
+        "command": [
+          "git",
+          "diff",
+          "--no-ext-diff",
+          "--unified=3",
+          "73b69d65942dec817ce82f466786dbaec6b31700",
+          "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+          "--",
+          "src/lua-engine-foreign.adb"
+        ],
+        "sha256": "b62c26b68059894576102b6f72985adb2cb7f727fb11e00378bc6d3848ca946c"
+      },
+      "independent_semantic_review": "pending"
+    },
+    {
+      "path": "src/lua-engine-machine.ads",
+      "previous_revision": "73b69d65942dec817ce82f466786dbaec6b31700",
+      "previous_sha256": "ef16cb18079f722d6326be9af065fba68820da53919de8a2e49a1fa4beecb8c7",
+      "revision": "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+      "sha256": "87b122e678df3b2ada80209bf90c523fb4f5082eac0e8392b280af4237ae8049",
+      "git_blob": "3c4dc04106be2daac805ae6e309b36b8a08bc014",
+      "review_diff": {
+        "command": [
+          "git",
+          "diff",
+          "--no-ext-diff",
+          "--unified=3",
+          "73b69d65942dec817ce82f466786dbaec6b31700",
+          "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+          "--",
+          "src/lua-engine-machine.ads"
+        ],
+        "sha256": "7dc77ad9d1160bc820deb4f06ef6194cf19b72094f25870fc7cff05684de36ba"
+      },
+      "independent_semantic_review": "pending"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "previous_revision": "73b69d65942dec817ce82f466786dbaec6b31700",
+      "previous_sha256": "a11bdbe09713fdf2a9958edcf5d3223dbd84f226a0f7e3cc230be565d5465d90",
+      "revision": "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+      "sha256": "f0c770d98a387b19cf9d3abfade4e3ae52c48cfae85976d48681f98eb320f06f",
+      "git_blob": "58bda00af67962eef27ebbb48aebaba76f65fc8b",
+      "review_diff": {
+        "command": [
+          "git",
+          "diff",
+          "--no-ext-diff",
+          "--unified=3",
+          "73b69d65942dec817ce82f466786dbaec6b31700",
+          "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+          "--",
+          "src/lua-engine-machine.adb"
+        ],
+        "sha256": "4819e1a2cdf6d7fe1ce385270767344da6c7b2f41d5eaf3ac5685c2c27116246"
+      },
+      "independent_semantic_review": "pending"
+    },
+    {
+      "path": "src/lua-engine-canonical.ads",
+      "previous_revision": "73b69d65942dec817ce82f466786dbaec6b31700",
+      "previous_sha256": "4a9fbe58fd3c509d9474c1a21dd180fb5924b954cb972363e73444ff60200bc9",
+      "revision": "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+      "sha256": "8dac74cfbbf410f7a53b31b0f6f14766916968353781b64e697d791975dd49ce",
+      "git_blob": "4e893378f9752ed0d77c6ca167767449527a184e",
+      "review_diff": {
+        "command": [
+          "git",
+          "diff",
+          "--no-ext-diff",
+          "--unified=3",
+          "73b69d65942dec817ce82f466786dbaec6b31700",
+          "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+          "--",
+          "src/lua-engine-canonical.ads"
+        ],
+        "sha256": "b2ce7f3eba0242bff3d57d9ad26956094b67725581868d4880df005cce3d39a2"
+      },
+      "independent_semantic_review": "pending"
+    },
+    {
+      "path": "src/lua-engine-canonical.adb",
+      "previous_revision": "73b69d65942dec817ce82f466786dbaec6b31700",
+      "previous_sha256": "6f4f0a418c64a9d931269578c00efda7902eb0b86ea36585cc4e4a6cb9caabca",
+      "revision": "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+      "sha256": "71963fbe8a1c8ac7ca39064ead7e3818c89adc17d940b9576bd638bb86563539",
+      "git_blob": "b21e20b5bf2d3bc3f5f51936121e8aba0e7b742c",
+      "review_diff": {
+        "command": [
+          "git",
+          "diff",
+          "--no-ext-diff",
+          "--unified=3",
+          "73b69d65942dec817ce82f466786dbaec6b31700",
+          "d3c2062ec74438e3b5cee0da4503d5cbc35f57f6",
+          "--",
+          "src/lua-engine-canonical.adb"
+        ],
+        "sha256": "7b8946a9b2b3c4544800e373dd7756219e3e9aefb2ed46cd1c28eecf6abf2d96"
+      },
+      "independent_semantic_review": "pending"
+    }
+  ],
+  "named_review_regions": [
+    {
+      "path": "src/lua-engine.adb",
+      "name": "Free_Frame",
+      "byte_offset": 3750,
+      "byte_length": 709,
+      "sha256": "7827989a25e3e48d51c25ef71cacc9df76daa27516a24e7c2eb9d9a805a3a35c",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "name": "New_Frame",
+      "byte_offset": 55501,
+      "byte_length": 4149,
+      "sha256": "7f61490755505f0c2da13cd2607afd7da29ea5c53baeaf8a00d6d110b522b026",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "name": "Grow_Call_Pool",
+      "byte_offset": 10647,
+      "byte_length": 1444,
+      "sha256": "c4e50d4f36ce5c0ef8583a92996dbb53b6fea8373c0a8e6dae5e1d1cbc4dbcb8",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "name": "Trim_Call_Pool",
+      "byte_offset": 12092,
+      "byte_length": 1392,
+      "sha256": "d321a2a47a2b4ee42daba62fab09ec0f692eb1fba9dba370873928d7ba13211f",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "name": "Destroy_Call_Pool",
+      "byte_offset": 13485,
+      "byte_length": 697,
+      "sha256": "6299241fe276060f2f9e78aec7dd55f18a090ece53bde5995e8a82801542f589",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "name": "Reserve_Call_Metadata",
+      "byte_offset": 14183,
+      "byte_length": 441,
+      "sha256": "0dfaf39c0b3a1cc72dbadcfe711fe85851f72b74198d5efcd1a7b20dc3e59e98",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "name": "Acquire_Call_Record",
+      "byte_offset": 15367,
+      "byte_length": 1051,
+      "sha256": "5e0e5e5dd8cf79cd00bc0084be70623f571d1c501c7cf1817567adb971c78d9b",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "name": "Release_Call_Record",
+      "byte_offset": 16419,
+      "byte_length": 1043,
+      "sha256": "d17f5204f544284b2671712b32fc0442125947abbef50d88794f9683ab55e0cd",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "name": "Discard_Pending",
+      "byte_offset": 23564,
+      "byte_length": 2471,
+      "sha256": "21680e8fe73997af4ea23f7369059d056dfe81a976c9d2c319edf4129a0c5d4d",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "name": "Discard_Self_Calls",
+      "byte_offset": 26130,
+      "byte_length": 730,
+      "sha256": "07d2b060dc8b23e150270509cebef36a6677255951de10c84548e8ce32469e02",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "name": "Create_Surface",
+      "byte_offset": 28344,
+      "byte_length": 5019,
+      "sha256": "5f0b1647a361b7c12d56e8e5c7307dfe157b53791dce100baa7c89814ec02c9a",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "name": "Release_Context_Control",
+      "byte_offset": 33364,
+      "byte_length": 579,
+      "sha256": "22d9151002c9d9c86d0c56bfaa84b877c4a654ea9eb303c7021e39958bda4979",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "name": "Transfer_Result_Ownership",
+      "byte_offset": 105355,
+      "byte_length": 1515,
+      "sha256": "1fdf244f4521faddcf05f1a56a5768d1d5f92211792ab3d4833045193c4a922c",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "name": "Complete_Packet",
+      "byte_offset": 108408,
+      "byte_length": 8353,
+      "sha256": "a8a74b69e0a7fbf60e5dfc671265717a25e210b63c0ddc584f9ec889231baf55",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "name": "Complete_Canonical_Return",
+      "byte_offset": 117841,
+      "byte_length": 3473,
+      "sha256": "ce29994cd2ab949dd70348d91c0a7ba61e859180bd6591ae70439e04839d6d5c",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "name": "Hook_Event",
+      "byte_offset": 75424,
+      "byte_length": 3529,
+      "sha256": "88595236f7889187afb651c17b3df391d5171200e426cd92ca6c27cecd1873bf",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    },
+    {
+      "path": "src/lua-engine-canonical.adb",
+      "name": "Step",
+      "byte_offset": 33820,
+      "byte_length": 38545,
+      "sha256": "c35a3e6cef0c8fd7fba55b9812ccb3e29bf929d87a69cb1640bcefb7ed846a2d",
+      "scope": "exact named implementation through its matching top-level end; source linkage only"
+    }
+  ],
+  "unchanged_lifecycle_and_verifier_sources": [
+    {
+      "path": "src/lua-engine-collector.adb",
+      "sha256": "17d84811eeb836dcd6afbd5cb0c4271427cceefac9952303822619158e6df687",
+      "unchanged_from_pre_pool": true
+    },
+    {
+      "path": "src/lua-engine-finalizers.adb",
+      "sha256": "cd29399060bc6f9d045f1d247d76a2419e06e62e9a5ca5055b27213c65c62b62",
+      "unchanged_from_pre_pool": true
+    },
+    {
+      "path": "src/lua-storage-vectors.ads",
+      "sha256": "b68454ab6f4e0b30dc69a8fde89ece91674a760c60c672baca7d78b38b06931f",
+      "unchanged_from_pre_pool": true
+    },
+    {
+      "path": "src/lua-storage-vectors.adb",
+      "sha256": "6795bd60f6d3942eecb253fc089dda1b35c25c5c07e1266c26ea5773b36f3f21",
+      "unchanged_from_pre_pool": true
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "sha256": "532ac55f963ff15ea259f30f1493639cb862ab76f6e82ee47ebb1438add04bf3",
+      "unchanged_from_pre_pool": true
+    }
+  ],
+  "required_expansion_of_exact_counterparts": {
+    "status": "pending-independent-review",
+    "old_counterparts_preserved": [
+      "references/lua/manual/manual.of",
+      "src/lua-engine-collector.adb",
+      "src/lua-engine-finalizers.adb",
+      "src/lua-engine.adb",
+      "src/lua-storage-vectors.adb",
+      "src/lua-storage-vectors.ads",
+      "tests/conformance/targets/remaining-upstream-compatibility/api-finalization-lifetimes.author.lua",
+      "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-finalized-userdata-reclamation.independent-feature-review.json",
+      "tests/src/lua-conformance_adapter.adb"
+    ],
+    "additional_source_paths": [
+      "src/lua-engine.ads",
+      "src/lua-engine-foreign.ads",
+      "src/lua-engine-foreign.adb",
+      "src/lua-engine-machine.ads",
+      "src/lua-engine-machine.adb",
+      "src/lua-engine-canonical.ads",
+      "src/lua-engine-canonical.adb"
+    ],
+    "apply_to": "All3 API941 exact operation decisions and their independent current-source narrative, then live equivalent snapshot; no automatic hash-only installation."
+  },
+  "review_questions": [
+    {
+      "id": "selected-owner-capacity-transaction",
+      "regions": [
+        "Free_Frame",
+        "New_Frame",
+        "Reserve_Call_Metadata",
+        "Grow_Call_Pool"
+      ],
+      "question": "Verify actual allocated frame capacity includes active/cached/reset/base owners, selected-owner metadata reserve happens before publication, refusal rolls back both owners and capacity, emergency retry remains legitimate, and physical trim never releases a live guard record."
+    },
+    {
+      "id": "pool-owner-generation-and-ack",
+      "regions": [
+        "Acquire_Call_Record",
+        "Release_Call_Record",
+        "Discard_Pending",
+        "Discard_Self_Calls"
+      ],
+      "question": "Trace each outstanding record through nested/cross-context entry, shrink, guard ACK, host abort and self-close. Verify owner association plus generation distinguishes reused addresses and reset records, no owner can die before genuine ACK, and reset/return never dereferences a retired activation. The separately pending owner/generation fix must be independently reviewed and recaptured before exact approval."
+    },
+    {
+      "id": "surface-and-control-disposal",
+      "regions": [
+        "Create_Surface",
+        "Release_Context_Control",
+        "Destroy_Call_Pool"
+      ],
+      "question": "Verify weak thread rooting before surface reservation, complete transaction rollback, selected owner on all pool/reset allocations, zero outstanding records before control disposal, release of all nodes and no leaked owner/code callback lifetime."
+    },
+    {
+      "id": "scalar-result-authority-before-collection",
+      "regions": [
+        "Step",
+        "Complete_Canonical_Return",
+        "Complete_Packet",
+        "Hook_Event"
+      ],
+      "question": "Verify actual scalar/cell slots root outgoing userdata through closer/return-hook mutation, packet reservation and callbacks; source is retired only after recipient ownership. Duplicate native argument/result/capture roots must disappear before weak/finalizer safe points without losing the only live root."
+    },
+    {
+      "id": "retained-versus-ghost-capacity",
+      "regions": [
+        "Transfer_Result_Ownership",
+        "Complete_Canonical_Return"
+      ],
+      "question": "Verify copying into a retained empty arena preserves both physical owners while clearing logical sources, cold larger results transfer sole ownership, nil arity/status prefixes and bounded-work charges remain exact. Retained capacity may alter private bytes but cannot retain unreachable userdata/weak identities."
+    },
+    {
+      "id": "api941-actual-lifecycle",
+      "regions": [
+        "Complete_Packet",
+        "Release_Context_Control"
+      ],
+      "question": "Independently rerun the unchanged source-linked1000-userdata counterpart on final C/Ada images:1000 unique first-cycle callbacks/live userdata, weak values cleared before callback, weak keys retained for finalization, second-cycle userdata baseline and empty weak identities, no repeated finalizers, selected-owner bytes/blocks0 at shutdown. No metadata footprint waiver can substitute."
+    }
+  ],
+  "public_counterpart_source_links": [
+    {
+      "path": "tests/lua/call_metadata_windows.lua",
+      "sha256": "ee78b2693d124b4567adc9e052e8473c7573e85993d21a3be81f771a0c5b91de"
+    },
+    {
+      "path": "tests/src/lua-call_metadata_tests.adb",
+      "sha256": "2ede9773fde7d5cfa3b75a6670478e00732c4ae850b8c1673bb910ce619c2526"
+    },
+    {
+      "path": "tests/src/lua-call_metadata_tests.ads",
+      "sha256": "e7c7834935a84f2574b33704fb8c999c69b69037275209e3724c11e7937be986"
+    },
+    {
+      "path": "tests/c/foreign_hook_contract.c",
+      "sha256": "3f0909df519cd9334dc7a8a5d2b78cfb9430750ba4a96a658e4efa39a0105a93"
+    },
+    {
+      "path": "tests/src/lua-foreign_hook_tests.adb",
+      "sha256": "741e4c309efccfa75501d90d2c6d05e7509bce80f568d549cd90782ac552a039"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/api-finalization-lifetimes.author.lua",
+      "sha256": "43213950a0f88258a4dc19f893d73329c685ca5ae944026e4645583b38a9c8ac"
+    }
+  ],
+  "counterpart_limits": {
+    "current_committed_metadata_lua_cases": 17,
+    "pending_metadata_microcases": 19,
+    "these_are_source_links_not_passing_evidence": true,
+    "requires_fresh_final_context_reports": true,
+    "prior_component_reports_remain_dated": true
+  },
+  "preserved_api941_source_operation": {
+    "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+    "output_sha256": "2838c5b9183c835b3581f829657d30451c16be1bfca952e5b8638d67e5966897",
+    "source_exclusions": [],
+    "required_pending_parent": "LUA-API-ASSERT-CALL-0195",
+    "exact_replacements_unchanged": true,
+    "adapted_file_emitted": false
+  },
+  "memory_verifier_boundary": {
+    "operation": "The same17-byte T.alloccount reset only after helper pcall and before its original assertion.",
+    "counterpart_adapter_unchanged_by_pool": true,
+    "source_eligibility_review_separate": true,
+    "public_runtime_effect": "The pool changes actual allocation/refusal/result-root behavior, so fresh final-image memerr fault/recovery observations are mandatory even though the seven verifier source identities need no pool-only hash replacement.",
+    "no_earlier_reset_or_source_exclusion": true
+  },
+  "required_next_actions": [
+    "Independently inspect the recorded committed source/regions and ownership questions; source hashes alone do not approve lifetimes.",
+    "Wait for final committed owner/generation fix, then prepare another bounded delta/source snapshot; never silently extend this packet to future bytes.",
+    "Create fresh independent exact decisions including all expanded current implementation/counterpart bindings; preserve old approvals/observations.",
+    "Review composition separately with current API18 policy/component identities and refreshed API941; both original parents stay pending.",
+    "Only after exact authority exists emit disposable source and require fresh whole-file plus final-context observations and envelopes."
+  ]
+}
