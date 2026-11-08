@@ -7097,6 +7097,201 @@
         "default/windows/validation/static-pic"
       ],
       "applicability_rationale": "Native T private allocator-lock mode omits this native case. Complete Ada T remains separately mandatory in the raw foreign-full-api operation protocol; this pending C witness is not a native-T pass."
+    },
+    {
+      "consumer": "foreign-api",
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-25",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-25"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "consumer": "foreign-api",
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-26",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-26"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "consumer": "foreign-api",
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-27",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-27"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "consumer": "foreign-api",
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-28",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-28"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "consumer": "foreign-api",
+      "source": "c_api/tests/foreign_api_contract.c",
+      "case_id": "foreign-hook-29",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: foreign-hook-29"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "consumer": "builtin-api",
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "reader-direct-host",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-reader-direct-host"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "consumer": "builtin-api",
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "reader-direct-owner",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-reader-direct-owner"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "consumer": "builtin-api",
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "reader-direct-roots",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-reader-direct-roots"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "consumer": "builtin-api",
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "reader-direct-error",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-reader-direct-error"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "consumer": "builtin-api",
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "reader-direct-extra-root",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-reader-direct-extra-root"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "consumer": "index-type-api",
+      "source": "c_api/tests/index_type_api_contract.c",
+      "case_id": "set_integer_self_value",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: index-type-set-integer-self-value"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "consumer": "index-type-api",
+      "source": "c_api/tests/index_type_api_contract.c",
+      "case_id": "set_field_self_value",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: index-type-set-field-self-value"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "consumer": "index-type-api",
+      "source": "c_api/tests/index_type_api_contract.c",
+      "case_id": "set_integer_self_handler",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: index-type-set-integer-self-handler"
+      ],
+      "pattern_witness": null,
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
     }
   ],
   "source_measurements": {

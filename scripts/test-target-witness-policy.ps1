@@ -137,7 +137,7 @@ Case 'new value auxiliary and scalar source routes remain proposals with no exec
     $relative=[IO.Path]::GetRelativePath($root,(Join-Path $path 'witness-policy.author-proposal.json')).Replace('\','/')
     $r=Read-TargetWitnessPolicy -Root $root -Path $relative
     $new=@($r.global_api.entries|Where-Object{ $_.Contains('proposed_classification') })
-    Assert-True ($r.consumer.cases.Count -eq 589 -and $r.aunit.entries.Count -eq 466 -and $new.Count -eq 124 -and
+    Assert-True ($r.consumer.cases.Count -eq 602 -and $r.aunit.entries.Count -eq 635 -and $new.Count -eq 126 -and
         @($new|Where-Object{ $_.classification -cne 'pending-semantic-review' -or $_.review_status -cne 'pending' -or
             $_.runtime_acceptance -or $_.execution_evidence.Count }).Count -eq 0 -and -not $r.source_reviewed -and -not $r.runtime_acceptance) 'Source routes invented acceptance'
     foreach($entry in $new){Assert-True ($entry.proposed_context_witnesses.Count -eq 26 -and -not $entry.Contains('context_witnesses')) 'A future route became an actual context observation'}
@@ -149,9 +149,21 @@ Case 'new value auxiliary and scalar source routes remain proposals with no exec
     $foreign=@($r.consumer.cases|Where-Object case_id -CEQ foreign-hook-24)
     Assert-True ($foreign.Count -eq 1 -and $foreign[0].contexts.Count -eq 19 -and
         @($foreign[0].contexts|Where-Object{-not $_.StartsWith('default/',[StringComparison]::Ordinal)}).Count -eq 0) 'Native private-lock omission became an instrumented native C pass'
+    foreach($number in 25..29){
+        $entry=@($r.consumer.cases|Where-Object case_id -CEQ ('foreign-hook-'+$number))
+        Assert-True ($entry.Count -eq 1 -and -not $entry[0].Contains('contexts') -and -not $entry[0].runtime_acceptance -and
+            $entry[0].execution_evidence.Count -eq 0) 'A later actual foreign operation was lost or narrowed to the private-lock omission'
+    }
+    foreach($name in @('reader-direct-host','reader-direct-owner','reader-direct-roots','reader-direct-error','reader-direct-extra-root')){
+        $entry=@($r.consumer.cases|Where-Object{$_.consumer -ceq 'builtin-api' -and $_.case_id -ceq $name})
+        Assert-True ($entry.Count -eq 1 -and $entry[0].exact_witnesses[0] -ceq ('PASS: builtin-'+$name) -and
+            -not $entry[0].runtime_acceptance -and $entry[0].execution_evidence.Count -eq 0) 'Actual reader callback source proposals acquired execution authority or lost their operation'
+    }
     foreach($source in @('tests/src/argument_detail_tests.adb','tests/src/argument_label_tests.adb',
         'tests/src/binary_source_tests.adb','tests/src/lua-line_baseline_tests.adb','tests/src/lua-string_result_tests.adb',
-        'tests/src/sort_argument_tests.adb','tests/src/string_argument_tests.adb')){
+        'tests/src/sort_argument_tests.adb','tests/src/string_argument_tests.adb','tests/src/lua-stack_inspection_tests.adb',
+        'tests/src/lua-coroutine_portal_tests.adb','tests/src/lua-reader_policy_tests.adb','tests/src/lua-diagnostic_text_tests.adb',
+        'tests/src/lua-failure_storage_tests.adb','tests/src/close_return_window_tests.adb','tests/src/reader_portal_tests.adb')){
         $entries=@($r.aunit.entries|Where-Object{$_.case.StartsWith($source+'#',[StringComparison]::Ordinal)})
         Assert-True ($entries.Count -gt 0 -and @($entries|Where-Object{$_.runtime_acceptance -or $_.execution_evidence.Count}).Count -eq 0) 'Registered source candidate gained fabricated observation authority'
     }

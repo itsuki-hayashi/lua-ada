@@ -8,7 +8,7 @@
   "runtime_acceptance": false,
   "coverage_authority": false,
   "source_snapshot": {
-    "revision": "d3ac2b13ec6234a7231ea92cb87271be8e7bda78",
+    "revision": "4b59014a531676d9eb7dcc968690c41a406e094a",
     "repository_dirty": true,
     "kind": "repository-source-snapshot"
   },
@@ -12721,10 +12721,12 @@
       "boundaries": "This invariant covers the actual selected public calls only; complete global C API acceptance remains pending.",
       "retained_route": true,
       "named_c_cases": [
+        "c_api/tests/index_type_api_contract.c#set_field_self_value",
         "tests/c/foreign_continuation_contract.c#foreign-continuation-16",
         "tests/c/foreign_hook_contract.c#foreign-hook-15"
       ],
       "named_aunit_cases": [
+        "tests/src/lua-api_command_tests.adb#Field_Self_Value",
         "tests/src/lua-foreign_continuation_tests.adb#Metamethod_Indexing",
         "tests/src/lua-foreign_hook_tests.adb#C_Suspended_Indexing"
       ],
@@ -12733,7 +12735,350 @@
       "review_status": "pending",
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "execution_evidence": []
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "proposed_invariant": "A table used as both the target and value remains the same rooted identity through the public field write.",
+      "proposed_boundaries": "Named self-value regression supplements every retained field/newindex route; source registration alone grants no runtime acceptance.",
+      "proposed_context_witnesses": [
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/windows/development/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/windows/development/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/windows/validation/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/windows/validation/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/windows/release/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/windows/release/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "upstream-test/windows/validation/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "upstream-test/windows/validation/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/linux/development/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/linux/development/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/linux/validation/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/linux/validation/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/linux/release/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/linux/release/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "upstream-test/linux/validation/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "upstream-test/linux/validation/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/macos/development/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/macos/development/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/macos/validation/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/macos/validation/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/macos/release/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/macos/release/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "upstream-test/macos/validation/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "upstream-test/macos/validation/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "default/windows/validation/static-pic",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/index_type_api_contract.c#set_field_self_value"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+          ],
+          "context": "upstream-test/windows/validation/static-pic",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        }
+      ]
     },
     {
       "id": "CAPI-LUA-H-FUNCTION-LUA_SETI-282",
@@ -12753,6 +13098,8 @@
       "named_c_cases": [
         "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
         "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
+        "c_api/tests/index_type_api_contract.c#set_integer_self_handler",
+        "c_api/tests/index_type_api_contract.c#set_integer_self_value",
         "c_api/tests/index_type_api_contract.c#set_integer_value_and_pop",
         "c_api/tests/index_type_api_contract.c#set_newindex_handler_operands",
         "c_api/tests/index_type_api_contract.c#set_newindex_table_chain",
@@ -12762,7 +13109,10 @@
         "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
         "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
       ],
-      "named_aunit_cases": [],
+      "named_aunit_cases": [
+        "tests/src/lua-api_command_tests.adb#Integer_Self_Handler",
+        "tests/src/lua-api_command_tests.adb#Integer_Self_Value"
+      ],
       "compiled_witnesses": [],
       "applicability_review": null,
       "review_status": "pending",
@@ -12778,7 +13128,10 @@
           "runtime_acceptance": false,
           "context": "default/windows/development/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -12789,7 +13142,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -12798,7 +13153,10 @@
           "runtime_acceptance": false,
           "context": "default/windows/development/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -12809,7 +13167,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -12818,7 +13178,10 @@
           "runtime_acceptance": false,
           "context": "default/windows/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -12829,7 +13192,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -12838,7 +13203,10 @@
           "runtime_acceptance": false,
           "context": "default/windows/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -12849,7 +13217,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -12858,7 +13228,10 @@
           "runtime_acceptance": false,
           "context": "default/windows/release/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -12869,7 +13242,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -12878,7 +13253,10 @@
           "runtime_acceptance": false,
           "context": "default/windows/release/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -12889,7 +13267,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -12898,7 +13278,10 @@
           "runtime_acceptance": false,
           "context": "upstream-test/windows/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -12909,7 +13292,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -12918,7 +13303,10 @@
           "runtime_acceptance": false,
           "context": "upstream-test/windows/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -12929,7 +13317,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -12938,7 +13328,10 @@
           "runtime_acceptance": false,
           "context": "default/linux/development/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -12949,7 +13342,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -12958,7 +13353,10 @@
           "runtime_acceptance": false,
           "context": "default/linux/development/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -12969,7 +13367,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -12978,7 +13378,10 @@
           "runtime_acceptance": false,
           "context": "default/linux/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -12989,7 +13392,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -12998,7 +13403,10 @@
           "runtime_acceptance": false,
           "context": "default/linux/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13009,7 +13417,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -13018,7 +13428,10 @@
           "runtime_acceptance": false,
           "context": "default/linux/release/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13029,7 +13442,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -13038,7 +13453,10 @@
           "runtime_acceptance": false,
           "context": "default/linux/release/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13049,7 +13467,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -13058,7 +13478,10 @@
           "runtime_acceptance": false,
           "context": "upstream-test/linux/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13069,7 +13492,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -13078,7 +13503,10 @@
           "runtime_acceptance": false,
           "context": "upstream-test/linux/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13089,7 +13517,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -13098,7 +13528,10 @@
           "runtime_acceptance": false,
           "context": "default/macos/development/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13109,7 +13542,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -13118,7 +13553,10 @@
           "runtime_acceptance": false,
           "context": "default/macos/development/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13129,7 +13567,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -13138,7 +13578,10 @@
           "runtime_acceptance": false,
           "context": "default/macos/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13149,7 +13592,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -13158,7 +13603,10 @@
           "runtime_acceptance": false,
           "context": "default/macos/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13169,7 +13617,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -13178,7 +13628,10 @@
           "runtime_acceptance": false,
           "context": "default/macos/release/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13189,7 +13642,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -13198,7 +13653,10 @@
           "runtime_acceptance": false,
           "context": "default/macos/release/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13209,7 +13667,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -13218,7 +13678,10 @@
           "runtime_acceptance": false,
           "context": "upstream-test/macos/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13229,7 +13692,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -13238,7 +13703,10 @@
           "runtime_acceptance": false,
           "context": "upstream-test/macos/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13249,7 +13717,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -13258,7 +13728,10 @@
           "runtime_acceptance": false,
           "context": "default/windows/validation/static-pic",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13269,7 +13742,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -13278,7 +13753,10 @@
           "runtime_acceptance": false,
           "context": "upstream-test/windows/validation/static-pic",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+            "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+          ],
           "named_c_cases": [
             "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
             "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
@@ -13289,7 +13767,9 @@
             "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
             "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
             "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+            "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+            "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
           ],
           "required_disposition": "runtime-observed"
         }
@@ -25063,9 +25543,16 @@
         "c_api/tests/debug_api_contract.c#inactive_parameter_names",
         "c_api/tests/debug_api_contract.c#stripped_metadata",
         "c_api/tests/debug_api_contract.c#suspended_capture_local",
-        "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+        "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-29"
       ],
-      "named_aunit_cases": [],
+      "named_aunit_cases": [
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal",
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple"
+      ],
       "compiled_witnesses": [],
       "applicability_review": null,
       "review_status": "pending",
@@ -25081,7 +25568,11 @@
           "runtime_acceptance": false,
           "context": "default/windows/development/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25089,7 +25580,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25098,7 +25592,11 @@
           "runtime_acceptance": false,
           "context": "default/windows/development/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25106,7 +25604,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25115,7 +25616,11 @@
           "runtime_acceptance": false,
           "context": "default/windows/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25123,7 +25628,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25132,7 +25640,11 @@
           "runtime_acceptance": false,
           "context": "default/windows/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25140,7 +25652,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25149,7 +25664,11 @@
           "runtime_acceptance": false,
           "context": "default/windows/release/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25157,7 +25676,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25166,7 +25688,11 @@
           "runtime_acceptance": false,
           "context": "default/windows/release/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25174,7 +25700,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25183,7 +25712,11 @@
           "runtime_acceptance": false,
           "context": "upstream-test/windows/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25191,7 +25724,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25200,7 +25736,11 @@
           "runtime_acceptance": false,
           "context": "upstream-test/windows/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25208,7 +25748,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25217,7 +25760,11 @@
           "runtime_acceptance": false,
           "context": "default/linux/development/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25225,7 +25772,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25234,7 +25784,11 @@
           "runtime_acceptance": false,
           "context": "default/linux/development/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25242,7 +25796,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25251,7 +25808,11 @@
           "runtime_acceptance": false,
           "context": "default/linux/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25259,7 +25820,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25268,7 +25832,11 @@
           "runtime_acceptance": false,
           "context": "default/linux/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25276,7 +25844,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25285,7 +25856,11 @@
           "runtime_acceptance": false,
           "context": "default/linux/release/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25293,7 +25868,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25302,7 +25880,11 @@
           "runtime_acceptance": false,
           "context": "default/linux/release/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25310,7 +25892,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25319,7 +25904,11 @@
           "runtime_acceptance": false,
           "context": "upstream-test/linux/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25327,7 +25916,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25336,7 +25928,11 @@
           "runtime_acceptance": false,
           "context": "upstream-test/linux/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25344,7 +25940,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25353,7 +25952,11 @@
           "runtime_acceptance": false,
           "context": "default/macos/development/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25361,7 +25964,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25370,7 +25976,11 @@
           "runtime_acceptance": false,
           "context": "default/macos/development/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25378,7 +25988,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25387,7 +26000,11 @@
           "runtime_acceptance": false,
           "context": "default/macos/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25395,7 +26012,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25404,7 +26024,11 @@
           "runtime_acceptance": false,
           "context": "default/macos/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25412,7 +26036,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25421,7 +26048,11 @@
           "runtime_acceptance": false,
           "context": "default/macos/release/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25429,7 +26060,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25438,7 +26072,11 @@
           "runtime_acceptance": false,
           "context": "default/macos/release/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25446,7 +26084,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25455,7 +26096,11 @@
           "runtime_acceptance": false,
           "context": "upstream-test/macos/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25463,7 +26108,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25472,7 +26120,11 @@
           "runtime_acceptance": false,
           "context": "upstream-test/macos/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25480,7 +26132,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25489,7 +26144,11 @@
           "runtime_acceptance": false,
           "context": "default/windows/validation/static-pic",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25497,7 +26156,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25506,7 +26168,11 @@
           "runtime_acceptance": false,
           "context": "upstream-test/windows/validation/static-pic",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
@@ -25514,7 +26180,10 @@
             "c_api/tests/debug_api_contract.c#inactive_parameter_names",
             "c_api/tests/debug_api_contract.c#stripped_metadata",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         }
@@ -25540,9 +26209,16 @@
         "c_api/tests/debug_api_contract.c#active_lua_locals",
         "c_api/tests/debug_api_contract.c#caller_temporary_extent",
         "c_api/tests/debug_api_contract.c#suspended_capture_local",
-        "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+        "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-29"
       ],
-      "named_aunit_cases": [],
+      "named_aunit_cases": [
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal",
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple"
+      ],
       "compiled_witnesses": [],
       "applicability_review": null,
       "review_status": "pending",
@@ -25558,13 +26234,20 @@
           "runtime_acceptance": false,
           "context": "default/windows/development/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25573,13 +26256,20 @@
           "runtime_acceptance": false,
           "context": "default/windows/development/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25588,13 +26278,20 @@
           "runtime_acceptance": false,
           "context": "default/windows/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25603,13 +26300,20 @@
           "runtime_acceptance": false,
           "context": "default/windows/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25618,13 +26322,20 @@
           "runtime_acceptance": false,
           "context": "default/windows/release/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25633,13 +26344,20 @@
           "runtime_acceptance": false,
           "context": "default/windows/release/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25648,13 +26366,20 @@
           "runtime_acceptance": false,
           "context": "upstream-test/windows/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25663,13 +26388,20 @@
           "runtime_acceptance": false,
           "context": "upstream-test/windows/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25678,13 +26410,20 @@
           "runtime_acceptance": false,
           "context": "default/linux/development/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25693,13 +26432,20 @@
           "runtime_acceptance": false,
           "context": "default/linux/development/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25708,13 +26454,20 @@
           "runtime_acceptance": false,
           "context": "default/linux/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25723,13 +26476,20 @@
           "runtime_acceptance": false,
           "context": "default/linux/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25738,13 +26498,20 @@
           "runtime_acceptance": false,
           "context": "default/linux/release/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25753,13 +26520,20 @@
           "runtime_acceptance": false,
           "context": "default/linux/release/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25768,13 +26542,20 @@
           "runtime_acceptance": false,
           "context": "upstream-test/linux/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25783,13 +26564,20 @@
           "runtime_acceptance": false,
           "context": "upstream-test/linux/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25798,13 +26586,20 @@
           "runtime_acceptance": false,
           "context": "default/macos/development/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25813,13 +26608,20 @@
           "runtime_acceptance": false,
           "context": "default/macos/development/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25828,13 +26630,20 @@
           "runtime_acceptance": false,
           "context": "default/macos/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25843,13 +26652,20 @@
           "runtime_acceptance": false,
           "context": "default/macos/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25858,13 +26674,20 @@
           "runtime_acceptance": false,
           "context": "default/macos/release/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25873,13 +26696,20 @@
           "runtime_acceptance": false,
           "context": "default/macos/release/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25888,13 +26718,20 @@
           "runtime_acceptance": false,
           "context": "upstream-test/macos/validation/static",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25903,13 +26740,20 @@
           "runtime_acceptance": false,
           "context": "upstream-test/macos/validation/shared",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25918,13 +26762,20 @@
           "runtime_acceptance": false,
           "context": "default/windows/validation/static-pic",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         },
@@ -25933,13 +26784,20 @@
           "runtime_acceptance": false,
           "context": "upstream-test/windows/validation/static-pic",
           "compiled_witnesses": [],
-          "named_aunit_cases": [],
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+            "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+          ],
           "named_c_cases": [
             "c_api/tests/debug_api_contract.c#active_c_locals",
             "c_api/tests/debug_api_contract.c#active_lua_locals",
             "c_api/tests/debug_api_contract.c#caller_temporary_extent",
             "c_api/tests/debug_api_contract.c#suspended_capture_local",
-            "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+            "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-29"
           ],
           "required_disposition": "runtime-observed"
         }
@@ -27391,27 +28249,426 @@
       "boundaries": "This invariant covers the actual selected public calls only; complete global C API acceptance remains pending.",
       "retained_route": true,
       "named_c_cases": [
+        "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-26",
         "tests/c/foreign_hook_contract.c#foreign-hook-1",
+        "tests/c/foreign_hook_contract.c#foreign-hook-14",
         "tests/c/foreign_hook_contract.c#foreign-hook-2",
         "tests/c/foreign_hook_contract.c#foreign-hook-3",
         "tests/c/foreign_hook_contract.c#foreign-hook-4",
-        "tests/c/foreign_hook_contract.c#foreign-hook-5",
-        "tests/c/foreign_hook_contract.c#foreign-hook-14"
+        "tests/c/foreign_hook_contract.c#foreign-hook-5"
       ],
       "named_aunit_cases": [
-        "tests/src/lua-foreign_hook_tests.adb#Reflection",
-        "tests/src/lua-foreign_hook_tests.adb#Line_Events",
+        "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+        "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root",
+        "tests/src/lua-foreign_hook_tests.adb#Combined_Yield_Events",
         "tests/src/lua-foreign_hook_tests.adb#Count_Events",
-        "tests/src/lua-foreign_hook_tests.adb#Remove_Inside_Hook",
         "tests/src/lua-foreign_hook_tests.adb#Independent_States",
-        "tests/src/lua-foreign_hook_tests.adb#Combined_Yield_Events"
+        "tests/src/lua-foreign_hook_tests.adb#Line_Events",
+        "tests/src/lua-foreign_hook_tests.adb#Reflection",
+        "tests/src/lua-foreign_hook_tests.adb#Remove_Inside_Hook"
       ],
       "compiled_witnesses": [],
       "applicability_review": null,
       "review_status": "pending",
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "execution_evidence": []
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "proposed_invariant": "A real return hook edits the actual outgoing C result cell, and replacing its value retires the obsolete weak root.",
+      "proposed_boundaries": "Actual return-event transfer extent, one callback, caller-visible scalar/nil result and weak collection; all retained mask/count/line/yield cases remain required.",
+      "proposed_context_witnesses": [
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/windows/development/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/windows/development/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/windows/validation/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/windows/validation/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/windows/release/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/windows/release/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "upstream-test/windows/validation/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "upstream-test/windows/validation/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/linux/development/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/linux/development/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/linux/validation/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/linux/validation/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/linux/release/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/linux/release/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "upstream-test/linux/validation/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "upstream-test/linux/validation/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/macos/development/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/macos/development/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/macos/validation/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/macos/validation/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/macos/release/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/macos/release/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "upstream-test/macos/validation/static",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "upstream-test/macos/validation/shared",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "default/windows/validation/static-pic",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        },
+        {
+          "named_c_cases": [
+            "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+            "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+          ],
+          "compiled_witnesses": [],
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+            "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+          ],
+          "context": "upstream-test/windows/validation/static-pic",
+          "required_disposition": "runtime-observed",
+          "runtime_acceptance": false
+        }
+      ]
     },
     {
       "id": "CAPI-LUA-H-FUNCTION-LUA_GETHOOK-482",

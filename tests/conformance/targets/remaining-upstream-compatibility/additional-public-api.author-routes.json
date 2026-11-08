@@ -868,7 +868,11 @@
       "proposed_classification": "runtime-behavior",
       "invariant": "Public local inspection addresses the actual active/suspended function frame and its valid caller temporary extent.",
       "boundaries": "Inactive parameter names, Lua/C slots, captured/suspended locals, temporary extent and stripped metadata.",
-      "named_aunit_cases": [],
+      "named_aunit_cases": [
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+      ],
       "id": "CAPI-LUA-H-FUNCTION-LUA_GETLOCAL-472",
       "coverage_authority": false,
       "review_status": "pending",
@@ -881,7 +885,10 @@
         "c_api/tests/debug_api_contract.c#inactive_parameter_names",
         "c_api/tests/debug_api_contract.c#stripped_metadata",
         "c_api/tests/debug_api_contract.c#suspended_capture_local",
-        "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+        "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-29"
       ]
     },
     {
@@ -889,7 +896,11 @@
       "proposed_classification": "runtime-behavior",
       "invariant": "Public local mutation consumes its value and updates the actual selected active or suspended frame.",
       "boundaries": "C/Lua locals, captures and suspended pending temporary slots with exact restored execution results.",
-      "named_aunit_cases": [],
+      "named_aunit_cases": [
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Mutation",
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Tuple",
+        "tests/src/lua-foreign_hook_tests.adb#C_Close_Return_Refusal"
+      ],
       "id": "CAPI-LUA-H-FUNCTION-LUA_SETLOCAL-473",
       "coverage_authority": false,
       "review_status": "pending",
@@ -900,7 +911,10 @@
         "c_api/tests/debug_api_contract.c#active_lua_locals",
         "c_api/tests/debug_api_contract.c#caller_temporary_extent",
         "c_api/tests/debug_api_contract.c#suspended_capture_local",
-        "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+        "c_api/tests/debug_api_contract.c#suspended_pending_temporary",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-27",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-28",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-29"
       ]
     },
     {
@@ -1190,7 +1204,10 @@
       "proposed_classification": "runtime-behavior",
       "invariant": "Ordinary integer assignment consumes its value using the original table index and preserves actual newindex dispatch and barriers.",
       "boundaries": "Exact pop, signed64 and relative indices, newindex operands/table chains, existing/raw bypass, error identity/recovery and nonyieldable/nonindexable cases.",
-      "named_aunit_cases": [],
+      "named_aunit_cases": [
+        "tests/src/lua-api_command_tests.adb#Integer_Self_Value",
+        "tests/src/lua-api_command_tests.adb#Integer_Self_Handler"
+      ],
       "id": "CAPI-LUA-H-FUNCTION-LUA_SETI-282",
       "coverage_authority": false,
       "review_status": "pending",
@@ -1206,7 +1223,9 @@
         "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
         "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
         "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
-        "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+        "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes",
+        "c_api/tests/index_type_api_contract.c#set_integer_self_value",
+        "c_api/tests/index_type_api_contract.c#set_integer_self_handler"
       ]
     },
     {
@@ -2433,6 +2452,42 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETFIELD-281",
+      "name": "lua_setfield",
+      "proposed_classification": "runtime-behavior",
+      "invariant": "A table used as both the target and value remains the same rooted identity through the public field write.",
+      "boundaries": "Named self-value regression supplements every retained field/newindex route; source registration alone grants no runtime acceptance.",
+      "named_c_cases": [
+        "c_api/tests/index_type_api_contract.c#set_field_self_value"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-api_command_tests.adb#Field_Self_Value"
+      ],
+      "review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETHOOK-481",
+      "name": "lua_sethook",
+      "proposed_classification": "runtime-behavior",
+      "invariant": "A real return hook edits the actual outgoing C result cell, and replacing its value retires the obsolete weak root.",
+      "boundaries": "Actual return-event transfer extent, one callback, caller-visible scalar/nil result and weak collection; all retained mask/count/line/yield cases remain required.",
+      "named_c_cases": [
+        "c_api/tests/foreign_api_contract.c#foreign-hook-25",
+        "c_api/tests/foreign_api_contract.c#foreign-hook-26"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-foreign_hook_tests.adb#C_Return_Value_Mutation",
+        "tests/src/lua-foreign_hook_tests.adb#C_Return_Weak_Root"
+      ],
+      "review_status": "pending",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
     }
   ],
   "kind": "additional-target-api-author-routes",

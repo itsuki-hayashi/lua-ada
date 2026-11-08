@@ -76,9 +76,16 @@ decisions. The audit does not classify them as declaration-only or grant pass
 evidence. Its C rows and all 473 global classifications remain pending until
 review and fresh paired observations in the required immutable contexts.
 
+The current successor author catalogue preserves the historical 100 C and
+94 AUnit identities and proposes 602 C and 635 AUnit witnesses against the
+current source. Its additional return/closing, reader, self-value and diagnostic
+cases are named source candidates with empty execution evidence. All 473 global
+classifications remain pending semantic review. Regenerating source hashes or
+compiled declaration proposals does not renew any independent approval.
+
 T target contexts also require a separate private-header buffer executable.
-It includes the actual pinned `ltests.h`, reports its 23-byte scratch and
-64-byte `luaL_Buffer` declarations, and executes the same 17 ownership,
+It includes the actual pinned `ltests.h`, reports its 23-byte scratch and actual
+`luaL_Buffer` layout (56 or 64 bytes on the measured 64-bit hosts), and executes the same 17 ownership,
 growth/refusal and cleanup cases as the ordinary SDK client. The default
 configuration never builds or executes this smaller receiver. The final
 consumer requires the private C/Ada pair even if no individual global API
