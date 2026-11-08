@@ -12,7 +12,8 @@
   "source_exclusions": [],
   "source_snapshot": {
     "repository_revision": "0db6e82182c19bad876e1d40632f490b1e409d71",
-    "repository_dirty": true
+    "repository_dirty": true,
+    "revision": "c71319349f19bcc03a471fac7f913c1f103237ca"
   },
   "feature_review": {
     "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/cli-native-t-exit-no-close.independent-feature-review.json",
@@ -61,7 +62,7 @@
     },
     {
       "path": "scripts/TargetObservationEnvelope.psm1",
-      "sha256": "5be5ff0b525da56cde235a1ceaab73ba6041242b7e6ae5d2a494babffddebcfe"
+      "sha256": "f73c8338b052d54f65428ae64cf07a4b6c3a9d3c9fa3feec02032e9250bff516"
     },
     {
       "path": "scripts/TargetContext.psm1",
@@ -69,11 +70,11 @@
     },
     {
       "path": "scripts/build-target-context.ps1",
-      "sha256": "345911733d8a07db60c26b698fd5e2ea383566e93403f9ba24917bb5ffd22d0c"
+      "sha256": "91c1460c8f0641da91daf4b6872413ab81dcb0f5e4d6295cf7da10c4e504430e"
     },
     {
       "path": "tests/conformance/targets/configured-fixture-classification.json",
-      "sha256": "772183d0bdfc5888e038f35c2de1c7db0a99b493d477bfe7a3a67030d86e15da"
+      "sha256": "490f3437f0de9aff2d2aed8f13defa8c129b23d931a760086126ff166703def9"
     },
     {
       "path": "cli/shared/lua_ada_cli_readline.c",
@@ -105,7 +106,7 @@
     },
     {
       "path": "scripts/check-cli-readline.ps1",
-      "sha256": "1d1d6659d021fc7125ed2ca2f84443813c5c41c6ef5f995c034dca379fac7f49"
+      "sha256": "2e770912883ee046a63e52bcf02e117c639dcec24dd280f035be83793bcdaf8c"
     },
     {
       "path": "scripts/test-cli-readline-portability.ps1",

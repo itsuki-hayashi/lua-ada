@@ -609,7 +609,7 @@
         },
         {
           "path": "scripts/check-cli-readline.ps1",
-          "sha256": "1d1d6659d021fc7125ed2ca2f84443813c5c41c6ef5f995c034dca379fac7f49"
+          "sha256": "2e770912883ee046a63e52bcf02e117c639dcec24dd280f035be83793bcdaf8c"
         },
         {
           "path": "scripts/test-cli-readline-portability.ps1",

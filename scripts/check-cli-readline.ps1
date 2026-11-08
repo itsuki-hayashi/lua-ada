@@ -53,7 +53,11 @@ foreach($role in @('native','ada')){
         if($case.ContainsKey('bytes')){[byte[]]$bytes=$case.bytes}
         else{[byte[]]$bytes=[Text.Encoding]::UTF8.GetBytes($case.input)}
         [IO.File]::WriteAllBytes($inputPath,[byte[]]$bytes)
-        $environment=@{PATH=$image+[IO.Path]::PathSeparator+$env:PATH}
+        # A copied oracle must resolve the shared library beside that exact
+        # image. POSIX dynamic loaders do not search the executable's PATH.
+        $loader=if($IsWindows){'PATH'}elseif($IsMacOS){'DYLD_LIBRARY_PATH'}else{'LD_LIBRARY_PATH'}
+        $environment=@{}
+        $environment[$loader]=$image+[IO.Path]::PathSeparator+[Environment]::GetEnvironmentVariable($loader)
         if($case.ContainsKey('library')){$environment.LUA_READLINELIB=$case.library}
         $arguments=@('-i')
         if($case.ContainsKey('warnings')){$arguments+='-W'}

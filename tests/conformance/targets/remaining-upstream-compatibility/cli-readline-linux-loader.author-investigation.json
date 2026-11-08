@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "kind": "cli-readline-linux-loader-author-investigation",
+  "author": "Codex /root/validation_delivery",
+  "date": "2026-11-08",
+  "decision": "confirmed-harness-loader-selection-defect",
+  "independent_review": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_build_provenance_verified": false,
+  "source_adaptation_authority": false,
+  "source_revision": "635f8125901c399fa6d2e549603ad906343c2791",
+  "run": 42476074118,
+  "observations": [
+    {
+      "configuration": "default",
+      "job": 128717623084,
+      "artifact": 13615213648,
+      "artifact_url": "https://github.com/itsuki-hayashi/lua-ada/actions/runs/42476074118/artifacts/13615213648",
+      "zip_sha256": "1bcdd2ff026ae6b180581aefe3f66ea45c33b21870d4cc62631ef2038d986706",
+      "report_sha256": "9ddc7db2c0794cbb342a6043287922c7c079edec3a15fa6d7ceba42c51559d9f",
+      "native_basic_exit": 127,
+      "native_basic_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_basic_stderr_sha256": "26fa9745c4a50cee5543f012cc85d1cb657137a87fa17d42634e0a1aa6439272",
+      "native_library_sha256": "c6aed286a535b448c421d517dda84d6ae3969da01cf65f0eec5c12057a07dfc0"
+    },
+    {
+      "configuration": "upstream-test",
+      "job": 128717622861,
+      "artifact": 13615756055,
+      "artifact_url": "https://github.com/itsuki-hayashi/lua-ada/actions/runs/42476074118/artifacts/13615756055",
+      "zip_sha256": "9a1292e207892766e2cb650d99f6fc82f61e82ac6438dd6c3d948147f8554ea1",
+      "report_sha256": "9c7d20e8ddeb2a2c905f1c5c714920091ee7f9ec27642d7e0cb59214d7817854",
+      "native_basic_exit": 127,
+      "native_basic_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_basic_stderr_sha256": "0a0def824e2bfc044145d8ccc6b49d9cec6389e859aa7a6148ef25f2b0c52af7",
+      "native_library_sha256": "1046b3c211c9cd4258737ebd9ae0a5cb6977e4912e658a1b7acb8275eb806d78"
+    }
+  ],
+  "original_facts": [
+    "Each first native/basic process exits127 before Lua starts: error while loading shared libraries: libconformance_lua.so: cannot open shared object file.",
+    "The native image actually contains the selected .so and its hash; the process environment only prepends the copied image to PATH, with no LD_LIBRARY_PATH.",
+    "All13 native cases in each configuration exit127 with the same missing-library failure, not a readline semantic result.",
+    "Both Ada/basic processes exit0 with empty stderr and exact stdout SHA256 6c3b4afb322d7baa2b51abcc555abfc341a158625cb4068bc43a167ddce8e210."
+  ],
+  "correction": "Prepend each copied role image to the actual host loader variable: PATH on Windows, DYLD_LIBRARY_PATH on macOS, LD_LIBRARY_PATH on Linux. Preserve inherited tail and all original inputs, argv, expected results and raw failed captures.",
+  "followup": "A fresh Linux default/T CI run must execute the actual native pairs. Source inspection and non-Linux checks cannot establish that result.",
+  "proposed_source": {
+    "path": "scripts/check-cli-readline.ps1",
+    "sha256": "2e770912883ee046a63e52bcf02e117c639dcec24dd280f035be83793bcdaf8c"
+  }
+}
