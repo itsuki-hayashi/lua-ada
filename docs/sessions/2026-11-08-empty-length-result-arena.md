@@ -44,3 +44,14 @@ evidence-only step; their older passing captures remain dated and are not
 silently rehashed. Parent will perform independent source review and frozen
 combined validation. No reference source, upstream assertion, source mapping,
 mode flag, count limit or eligibility rule is modified.
+
+Following fresh relinks, all 26 default and 27 instrumented standalone C
+contracts pass against this micro runtime with empty stderr. No native-module
+argument-driven campaign is included. A new frozen replay satisfies all 166
+argument/lifecycle contracts and balances all 110 measured normal-return
+sidecars. The fresh current packet records new directories
+reports/cli-dynamic-arg/59b124b4074e4f9eaf97139e4805db31 and
+reports/cli-arg-lifecycle/f5779a35a7da4b61add5c49eed137f16, preserving the previous
+current campaign identities as dated records. The current evidence guard also
+checks all 53 retained C records and four empty-M0 positive/absence records;
+936 integrity checks pass. This is actual re-execution, not a hash-only renewal.

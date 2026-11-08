@@ -61,5 +61,29 @@ foreach ($campaign in $packet.campaigns) {
     }
 }
 Check ($caseCount -eq 166 -and $sidecarCount -eq 110) 'Current campaign omitted a case or sidecar'
+$retained = $packet.validation.current_retained_C_records
+Check ((Hash (Join-Path $root $retained.path)) -ceq $retained.sha256) 'Fresh retained C records changed'
+$contracts = Get-Content (Join-Path $root $retained.path) -Raw |
+    ConvertFrom-Json -AsHashtable -Depth 100
+Check ($contracts.Count -eq 53) 'Retained C contract omitted'
+foreach ($contract in $contracts) {
+    Check ($contract.process.exit_code -eq 0 -and $contract.process.stderr_bytes -eq 0 -and
+        -not $contract.process.timed_out -and -not $contract.process.pipe_drain_failed) 'Retained C contract failed'
+    Check ((Hash $contract.process.stdout_path) -ceq $contract.process.stdout_sha256 -and
+        (Hash $contract.process.stderr_path) -ceq $contract.process.stderr_sha256) 'Retained C capture changed'
+}
+$empty = $packet.empty_result_M0
+Check ((Hash (Join-Path $root $empty.fixture)) -ceq $empty.fixture_sha256 -and
+    (Hash (Join-Path $root $empty.records)) -ceq $empty.records_sha256) 'Empty M0 source/record changed'
+$emptyRows = Get-Content (Join-Path $root $empty.records) -Raw |
+    ConvertFrom-Json -AsHashtable -Depth 100
+Check ($emptyRows.Count -eq 4 -and $empty.ordinary_mode_T_credit -eq $false) 'Empty M0 role claim differs'
+foreach ($row in $emptyRows) {
+    Check ($row.telemetry.data.outstanding_bytes -eq 0 -and
+        $row.telemetry.data.outstanding_blocks -eq 0 -and
+        $row.process.exit_code -eq $(if ($row.positive) { 0 } else { 1 })) 'Empty M0 result/cleanup differs'
+    Check ((Hash $row.process.stdout_path) -ceq $row.process.stdout_sha256 -and
+        (Hash $row.process.stderr_path) -ceq $row.process.stderr_sha256) 'Empty M0 raw capture changed'
+}
 Write-Output "PASS: fresh CLI argument component: $caseCount cases, $sidecarCount normal-return sidecars, $checks integrity checks"
 Write-Output 'Dated baseline packets stay unchanged; this grants no original main.lua or full-target authority.'
