@@ -128,6 +128,82 @@ package body Lua.Engine.Diagnostics is
       end if;
    end Global_Name;
 
+   procedure Append_Location
+     (State : in out World; Output : in out Owned_Buffer;
+      Owner : Frame_Access);
+   procedure Append_Location
+     (State : in out World; Output : in out Owned_Buffer;
+      Owner : Frame_Access)
+   is
+      Caller : Frame_Access;
+      function Source return String;
+      function Source return String is
+      begin
+         if Caller.Code.Canonical_Node /= null then
+            declare
+               Bytes : constant Byte_String :=
+                 Canonical.Source_Bytes (Caller.Code);
+               View : String (1 .. Bytes.Size)
+                 with Import, Address => Bytes.Address;
+            begin
+               return Inspection.Short_Source (View);
+            end;
+         end if;
+         return Inspection.Short_Source (To_String (Caller.Code.Name));
+      end Source;
+   begin
+      if Owner /= null then
+         Caller := Inspection.Caller_Frame (State, State.Current, Owner);
+      end if;
+      if Caller /= null and then not Caller.Is_Native then
+         declare
+            PC : constant Natural := Natural'Max (1, Caller.PC - 1);
+            Line : constant Natural :=
+              (if Caller.Code.Canonical_Node /= null then
+                  Canonical.Source_Line (Caller, PC - 1)
+               else Caller.Code.Code (PC).Location.Line);
+         begin
+            --  luaL_where uses only the immediate public caller. Preserve
+            --  the actual immutable function source and current instruction;
+            --  the enclosing host session's chunk name may be unrelated.
+            --  Short_Source bounds this prefix before the owned message grows.
+            if Line > 0 then
+               declare
+                  Prefix : constant String := Source & ":" &
+                    Ada.Strings.Fixed.Trim
+                      (Line'Image, Ada.Strings.Both) & ": ";
+               begin
+                  for Byte of Prefix loop
+                     Work (State);
+                     Output.Append (Byte);
+                  end loop;
+               end;
+            end if;
+         end;
+      end if;
+   end Append_Location;
+
+   procedure Raise_Error (State : in out World; Message : String) is
+      Text : Owned_Buffer;
+      procedure Raise_Message (Bytes : String);
+      procedure Raise_Message (Bytes : String) is
+      begin
+         Fail (State, Bytes);
+      end Raise_Message;
+   begin
+      --  Own all formatting storage on the selected universe. Source lookup
+      --  never invokes Lua or retires the caller; Message stays borrowed from
+      --  its live native phase until Fail publishes the managed diagnostic.
+      Text.Set_Owner (State.Current.Memory);
+      Append_Location
+        (State, Text, Inspection.Logical_Frame (State, State.Current, 0));
+      for Byte of Message loop
+         Work (State);
+         Text.Append (Byte);
+      end loop;
+      Text.Query (Raise_Message'Access);
+   end Raise_Error;
+
    procedure Render_Argument_Error
      (State : in out World; Index : Positive; Detail : String;
       Modules : Value);
@@ -139,14 +215,12 @@ package body Lua.Engine.Diagnostics is
       Owner : constant Frame_Access :=
         Inspection.Logical_Frame (State, Context, 0);
       Origin : Call_Names.Borrowed_Identity;
-      Caller : Frame_Access;
       Position : Natural := Index;
       Extra : Boolean := False;
       Description, Label : Owned_Buffer;
       procedure Put (Text : String);
       procedure Put_Label (Text : String);
       procedure Raise_Error (Text : String);
-      function Source (Item : not null Frame_Access) return String;
 
       procedure Put (Text : String) is
       begin
@@ -163,44 +237,13 @@ package body Lua.Engine.Diagnostics is
       begin
          Fail (State, Text);
       end Raise_Error;
-      function Source (Item : not null Frame_Access) return String is
-      begin
-         if Item.Code.Canonical_Node /= null then
-            declare
-               Bytes : constant Byte_String :=
-                 Canonical.Source_Bytes (Item.Code);
-               View : String (1 .. Bytes.Size)
-                 with Import, Address => Bytes.Address;
-            begin
-               return Inspection.Short_Source (View);
-            end;
-         end if;
-         return Inspection.Short_Source (To_String (Item.Code.Name));
-      end Source;
    begin
       Description.Set_Owner (Context.Memory);
       Label.Set_Owner (Context.Memory);
       if Owner /= null then
          Origin := Inspection.Call_Identity (State, Context, Owner);
-         Caller := Inspection.Caller_Frame (State, Context, Owner);
       end if;
-      if Caller /= null and then not Caller.Is_Native then
-         declare
-            PC : constant Natural := Natural'Max (1, Caller.PC - 1);
-            Line : constant Natural :=
-              (if Caller.Code.Canonical_Node /= null then
-                  Canonical.Source_Line (Caller, PC - 1)
-               else Caller.Code.Code (PC).Location.Line);
-         begin
-            --  Only the immediate Lua caller contributes luaL_where. Render
-            --  this bounded prefix before growing the owned detail; no
-            --  input-sized concatenation or unmanaged source copy is needed.
-            if Line > 0 then
-               Put (Source (Caller) & ":" &
-                 Ada.Strings.Fixed.Trim (Line'Image, Ada.Strings.Both) & ": ");
-            end if;
-         end;
-      end if;
+      Append_Location (State, Description, Owner);
       if Owner = null then
          Put ("bad argument #" & Ada.Strings.Fixed.Trim
            (Index'Image, Ada.Strings.Both) & " (");

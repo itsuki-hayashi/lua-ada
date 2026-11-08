@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+The [IO caller-location cases](sessions/2026-11-08-io-error-locations.md) pass
+both full local AUnit runs and all public binary roles. Preserve immediate C
+caller/stripped-code behavior while continuing original source and CLI gates.
+The reviewed locals T source now fails its later allocator-disabled closing
+recovery block; repair that public behavior without changing its assertions.
+
 The [intern-index fault cases](sessions/2026-11-08-intern-index-refusal.md)
 pass actual provider refusal/retry, live-root and dead-header checks in both
 local configurations. Continue independent exact API string-table source

@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [IO error-location correction](sessions/2026-11-08-io-error-locations.md)
+uses the actual immediate public caller for raising file-open errors. Seven
+focused cases pass within2,528 AUnit cases in each local mode, and all eight
+compiler/VM roles match the public fixture. Full source/CLI/platform and final
+immutable acceptance remain pending.
+
 Three [intern-index fault witnesses](sessions/2026-11-08-intern-index-refusal.md)
 check actual provider-refused replacement, live roots under disabled-growth
 collection and dead-header disposal. The combined local checkout passes 2,510

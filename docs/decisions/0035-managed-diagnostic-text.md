@@ -47,3 +47,9 @@ activation capture until restoration. Host reports materialize their public
 result explicitly. See the [runtime migration record](../sessions/2026-11-08-runtime-failure-storage.md).
 This closes that storage path, while the complete allocation/temporary audit
 and final-head matrix evidence remain open.
+
+Auxiliary IO errors and argument errors share the private immediate-public-
+caller location formatter. It borrows actual function source/line metadata,
+adds no prefix for a C caller or missing stripped line, and builds charged
+text in selected-owned storage. The [IO location record](../sessions/2026-11-08-io-error-locations.md)
+describes the focused boundary and its remaining whole-CLI acceptance limit.

@@ -4,6 +4,12 @@ private package Lua.Engine.Diagnostics is
    --  index/detail before this is raised; no Lua/host failure is published.
    --  Only the existing driver may drive the requested registry lookup.
 
+   procedure Raise_Error (State : in out World; Message : String);
+   --  Raise an auxiliary library error with the immediate public Lua caller's
+   --  source/line, sharing argument-error location rules. A public C caller
+   --  contributes no prefix; hidden scheduler holders are not debug levels.
+   --  The caller retains Message's owner until this nonreturning call exits.
+
    procedure Argument_Error
      (State : in out World; Index : Positive; Detail : String);
    --  Raise an auxiliary argument error for the actual current public CI.

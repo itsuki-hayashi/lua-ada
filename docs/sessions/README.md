@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [actual IO error caller locations](2026-11-08-io-error-locations.md).
+
 Source review: [current target GC mapping](2026-11-08-gc-current-source-review.md).
 
 Source review: [optimizer semantic retention](2026-11-08-optimizer-semantic-review.md).

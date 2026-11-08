@@ -275,7 +275,8 @@ package body Lua.Engine.IO_Libraries is
                   procedure Raise_Open (Text : String);
                   procedure Raise_Open (Text : String) is
                   begin
-                     Fail (State, "cannot open file '" & C_Option (Text) &
+                     Diagnostics.Raise_Error
+                       (State, "cannot open file '" & C_Option (Text) &
                            "' (" & To_String
                              (Error_Packet (2).Reference.Bytes) & ")");
                   end Raise_Open;
