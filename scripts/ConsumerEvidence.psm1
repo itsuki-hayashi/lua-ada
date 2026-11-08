@@ -103,6 +103,15 @@ function Test-NamedConsumerEvidence {
         $expectedArguments=if($instrumented){'--ownership-only'}else{''}
         $expectedCount=if($instrumented){13}else{18}
         $skipped=if($instrumented){5}else{0}
+        $names=@('ordinary-short-identity','short-lookup-refusal','empty-buffer','short-buffer','long-buffer',
+            'embedded-zero','borrowed-buffer','short-key-normalization','long-key-retention','existing-key-update',
+            'weak-value-string','allocation-refusal-recovery','state-close-lifetime')
+        $reentry=@('callback-lua-reentry','callback-nested-collection','callback-interrupted-frame',
+            'callback-closure-lifetime','callback-close-reentry')
+        $expectedLines=@($names|ForEach-Object{'PASS: external-'+$_})
+        $skipLine='SKIP: 5 release reentry cases (instrumented C lock rejects reentry)'
+        if($instrumented){$expectedLines+=$skipLine}else{$expectedLines+=@($reentry|ForEach-Object{'PASS: external-'+$_})}
+        $expected=($expectedLines -join "`n")+"`nPASS: public external string contract`n"
         $external=$Report.external_contract
         if(($external.matched_cases -isnot [int] -and $external.matched_cases -isnot [long]) -or
             ($external.skipped_reentry_cases -isnot [int] -and $external.skipped_reentry_cases -isnot [long]) -or
@@ -116,7 +125,6 @@ function Test-NamedConsumerEvidence {
                 [regex]::Matches($outputs[$name].text,'(?m)^PASS: external-[a-z0-9-]+\r?$').Count -ne $expectedCount){
                 throw 'Named external consumer actual arguments or case set differs'
             }
-            $skipLine='SKIP: 5 release reentry cases (instrumented C lock rejects reentry)'
             if([regex]::Matches($outputs[$name].text,'(?m)^'+[regex]::Escape($skipLine)+'\r?$').Count -ne [int]$instrumented){
                 throw 'Named external consumer actual native-lock omission differs'
             }
@@ -125,6 +133,12 @@ function Test-NamedConsumerEvidence {
                 if([regex]::Matches($outputs[$name].text,'(?m)^PASS: external-'+$caseName+'\r?$').Count -ne [int](-not $instrumented)){
                     throw 'Named external consumer actual release-reentry witnesses differ'
                 }
+            }
+            # Equal counts and a completion marker cannot certify a renamed,
+            # duplicated or reordered ownership/refusal case. Preserve every
+            # physical operation in the exact current driver sequence.
+            if($outputs[$name].text.Replace("`r`n","`n") -cne $expected){
+                throw 'Named external consumer complete ordered ownership protocol differs'
             }
         }
     }
@@ -184,7 +198,8 @@ function Test-NamedConsumerEvidence {
                 'captured-refusal-recovery','direct-argument-owner','direct-extra-argument-owner','direct-method-argument-owner',
                 'direct-closure-argument-owner','registry-callback-original-owner','registry-callback-original-roots',
                 'registry-callback-error-guard','registry-callback-original-captures','registry-callback-extra-temporaries',
-                'reader-direct-host','reader-direct-owner','reader-direct-roots','reader-direct-error','reader-direct-extra-root')
+                'reader-direct-host','reader-direct-owner','reader-direct-roots','reader-direct-error','reader-direct-extra-root',
+                'reader-injected-refusal')
         }elseif($kind -ceq 'traceback'){
             @('no-message','host-message','empty-message','nul-message','negative-level','nested-frames','skip-current',
                 'out-of-stack','stack-prefix','inactive-thread','suspended-thread','independent-destination',

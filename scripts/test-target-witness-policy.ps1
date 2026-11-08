@@ -137,7 +137,7 @@ Case 'new value auxiliary and scalar source routes remain proposals with no exec
     $relative=[IO.Path]::GetRelativePath($root,(Join-Path $path 'witness-policy.author-proposal.json')).Replace('\','/')
     $r=Read-TargetWitnessPolicy -Root $root -Path $relative
     $new=@($r.global_api.entries|Where-Object{ $_.Contains('proposed_classification') })
-    Assert-True ($r.consumer.cases.Count -eq 602 -and $r.aunit.entries.Count -eq 635 -and $new.Count -eq 126 -and
+    Assert-True ($r.consumer.cases.Count -eq 605 -and $r.aunit.entries.Count -eq 733 -and $new.Count -eq 126 -and
         @($new|Where-Object{ $_.classification -cne 'pending-semantic-review' -or $_.review_status -cne 'pending' -or
             $_.runtime_acceptance -or $_.execution_evidence.Count }).Count -eq 0 -and -not $r.source_reviewed -and -not $r.runtime_acceptance) 'Source routes invented acceptance'
     foreach($entry in $new){Assert-True ($entry.proposed_context_witnesses.Count -eq 26 -and -not $entry.Contains('context_witnesses')) 'A future route became an actual context observation'}
@@ -154,10 +154,15 @@ Case 'new value auxiliary and scalar source routes remain proposals with no exec
         Assert-True ($entry.Count -eq 1 -and -not $entry[0].Contains('contexts') -and -not $entry[0].runtime_acceptance -and
             $entry[0].execution_evidence.Count -eq 0) 'A later actual foreign operation was lost or narrowed to the private-lock omission'
     }
-    foreach($name in @('reader-direct-host','reader-direct-owner','reader-direct-roots','reader-direct-error','reader-direct-extra-root')){
+    foreach($name in @('reader-direct-host','reader-direct-owner','reader-direct-roots','reader-direct-error','reader-direct-extra-root','reader-injected-refusal')){
         $entry=@($r.consumer.cases|Where-Object{$_.consumer -ceq 'builtin-api' -and $_.case_id -ceq $name})
         Assert-True ($entry.Count -eq 1 -and $entry[0].exact_witnesses[0] -ceq ('PASS: builtin-'+$name) -and
             -not $entry[0].runtime_acceptance -and $entry[0].execution_evidence.Count -eq 0) 'Actual reader callback source proposals acquired execution authority or lost their operation'
+    }
+    foreach($name in @('buffer','streamed')){
+        $entry=@($r.consumer.cases|Where-Object{$_.consumer -ceq 'load-dump-api' -and $_.case_id -ceq ('test_parser_depth_status_'+$name)})
+        Assert-True ($entry.Count -eq 1 -and $entry[0].exact_witnesses[0] -ceq ('C API PASS: '+$name+' parser depth runtime status') -and
+            -not $entry[0].runtime_acceptance -and $entry[0].execution_evidence.Count -eq 0) 'A parser status source witness was lost or invented runtime authority'
     }
     foreach($source in @('tests/src/argument_detail_tests.adb','tests/src/argument_label_tests.adb',
         'tests/src/binary_source_tests.adb','tests/src/lua-line_baseline_tests.adb','tests/src/lua-string_result_tests.adb',

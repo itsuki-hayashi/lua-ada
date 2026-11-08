@@ -218,9 +218,13 @@ try {
     # The pinned T lock instrumentation itself aborts deallocator API reentry.
     # Keep that observed native limit explicit: ownership/refusal still run in
     # both configurations; ordinary C/Ada reentry is paired in default only.
-    $externalArguments = $(if ($Configuration -eq 'upstream-test') {
-        @('--ownership-only')
-    } else { @() })
+    # Capture the same explicit vector sent to ProcessStartInfo below. A
+    # subexpression around an empty array emits no pipeline object and would
+    # serialize as null, losing the distinction between an observed no-argument
+    # invocation and missing argument evidence in the named consumer report.
+    [string[]]$externalArguments = @(if ($Configuration -eq 'upstream-test') {
+        '--ownership-only'
+    })
     Invoke-Consumer 'external-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/external_string_contract$suffix") 'PASS: public external string contract' $externalArguments
     Invoke-Consumer 'conversion-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/conversion_api_contract$suffix") 'PASS: public numeric conversion contract'
     if($TargetPolicy -ne ''){
@@ -710,7 +714,7 @@ try {
         debug_contract = [ordered]@{ matching_output=$true; sources=$debugContractSources;
             reference_library_files=$referenceLibraries };
         builtin_contract = [ordered]@{ matching_output=$true; sources=$builtinContractSources;
-            matched_cases=29;reference_library_files=$referenceLibraries };
+            matched_cases=30;reference_library_files=$referenceLibraries };
         traceback_contract=@{matching_output=$true;sources=$tracebackContractSources;matched_cases=22;reference_library_files=$referenceLibraries};
         external_contract = [ordered]@{ matching_output=$true; sources=$externalContractSources;
             matched_cases=$(if ($Configuration -eq 'upstream-test') { 13 } else { 18 });

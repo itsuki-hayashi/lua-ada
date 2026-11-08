@@ -254,6 +254,16 @@ Run-Case 'default external string mode retains all five actual release-reentry w
 Run-Case 'default external mode cannot borrow the instrumented ownership-only argument vector' {param($r)
     foreach($name in @('external-api','external-oracle')){@($r.consumers|Where-Object name -CEQ $name)[0].arguments=@('--ownership-only')}
 } 'actual arguments or case set' -Foreign -Format -Additional $extended
+Run-Case 'observed no-argument external invocation cannot be relabelled missing argument evidence' {param($r)
+    foreach($name in @('external-api','external-oracle')){@($r.consumers|Where-Object name -CEQ $name)[0].arguments=$null}
+} 'actual arguments or case set' -Foreign -Format -Additional $extended
+Run-Case 'matching external counts cannot replace the actual short-lookup refusal operation' {param($r)
+    foreach($name in @('external-api','external-oracle')){Replace-Capture $r $name stdout ($externalFull.Replace('PASS: external-short-lookup-refusal','PASS: external-invented-operation'))}
+} 'complete ordered ownership protocol' -Foreign -Format -Additional $extended
+Run-Case 'matching external counts cannot reorder state-close and allocation-refusal operations' {param($r)
+    $reordered=$externalFull.Replace("PASS: external-allocation-refusal-recovery`nPASS: external-state-close-lifetime", "PASS: external-state-close-lifetime`nPASS: external-allocation-refusal-recovery")
+    foreach($name in @('external-api','external-oracle')){Replace-Capture $r $name stdout $reordered}
+} 'complete ordered ownership protocol' -Foreign -Format -Additional $extended
 Run-Case 'a summary count cannot replace a missing default release-reentry witness' {param($r)
     foreach($name in @('external-api','external-oracle')){Replace-Capture $r $name stdout ($externalFull.Replace('PASS: external-callback-close-reentry','PASS: external-invented-case'))}
 } 'actual release-reentry witnesses' -Foreign -Format -Additional $extended
@@ -457,7 +467,8 @@ foreach($kind in @('builtin','traceback')){
             'captured-refusal-recovery','direct-argument-owner','direct-extra-argument-owner','direct-method-argument-owner',
             'direct-closure-argument-owner','registry-callback-original-owner','registry-callback-original-roots',
             'registry-callback-error-guard','registry-callback-original-captures','registry-callback-extra-temporaries',
-            'reader-direct-host','reader-direct-owner','reader-direct-roots','reader-direct-error','reader-direct-extra-root')
+            'reader-direct-host','reader-direct-owner','reader-direct-roots','reader-direct-error','reader-direct-extra-root',
+            'reader-injected-refusal')
     }else{
         @('no-message','host-message','empty-message','nul-message','negative-level','nested-frames','skip-current',
             'out-of-stack','stack-prefix','inactive-thread','suspended-thread','independent-destination',
@@ -474,7 +485,10 @@ foreach($kind in @('builtin','traceback')){
         $baseline.consumers+=$record
     }
 }
-Run-Case 'builtin29 and traceback22 retain both complete actual operation protocols' {} '' -Foreign -Format -Additional ($extended+@('builtin','traceback'))
+Run-Case 'builtin30 and traceback22 retain both complete actual operation protocols' {} '' -Foreign -Format -Additional ($extended+@('builtin','traceback'))
+Run-Case 'builtin completion cannot omit the actual permanent reader-refusal recovery operation' {param($r)
+    foreach($name in @('builtin-api','builtin-oracle')){Replace-Capture $r $name stdout ($moreProtocols.builtin.Replace("PASS: builtin-reader-injected-refusal`n",''))}
+} 'complete ordered protocol' -Foreign -Format -Additional ($extended+@('builtin'))
 Run-Case 'matching builtin completion and count cannot omit the actual reader owner recovery' {param($r)
     foreach($name in @('builtin-api','builtin-oracle')){Replace-Capture $r $name stdout ($moreProtocols.builtin.Replace("PASS: builtin-reader-direct-error`n",''))}
 } 'complete ordered protocol' -Foreign -Format -Additional ($extended+@('builtin'))
