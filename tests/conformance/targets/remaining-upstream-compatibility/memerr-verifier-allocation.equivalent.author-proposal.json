@@ -54,7 +54,7 @@
     },
     {
       "path": "tests/src/lua-conformance_adapter.adb",
-      "sha256": "30bd39e341ea026c43dcb509da4dc51be9ba96b8a27195f7a1c9901a789fe720"
+      "sha256": "9e8f18208cc531020ceaccd8c4010a65a8882805ae810057ea30ac68ffecbcd0"
     },
     {
       "path": "tests/src/lua-conformance_allocator.adb",
@@ -62,7 +62,7 @@
     },
     {
       "path": "tests/c/conformance_adapter.c",
-      "sha256": "0fefa983a21fc5fca9a0d7a77064e9b7eebfabbe859a0f5b3b989e889e9032f8"
+      "sha256": "4141d51fbabd31aae0d7f1c529d2caab381c2a15f980fd7750bfb360f757ceb2"
     },
     {
       "path": "tests/src/lua-sessions-conformance.adb",
