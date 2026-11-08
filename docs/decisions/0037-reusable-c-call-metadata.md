@@ -81,6 +81,14 @@ return still closes its marked arguments before its return hook. Hook events
 build event/line arguments directly in the traced @hook owner's reusable
 buffer, then drop duplicate argument roots after callback publication.
 
+A direct canonical Lua tail moves its actual request into a separate local
+owner before entering Dispatch. The resulting argument borrow outlives caller
+retirement; no borrowed activation field survives it. Actual callee identity
+is returned explicitly, then its already-published scalar slots remain the
+value owner while reusable empty arena capacity returns to that callee.
+Operation pins protect partial construction/error paths; clear work is charged
+before destruction. Native/metamethod/migration tails retain their old paths.
+
 The implementation must retain separate evidence for pure Ada capacity,
 transactional refusal, nested and repeated M=0 entry, numeric errors, actual
 byte ceilings, shrink with outstanding records, self-close, host abort and

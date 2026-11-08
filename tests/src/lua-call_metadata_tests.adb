@@ -13,7 +13,9 @@ with Test_Support;
 package body Lua.Call_Metadata_Tests is
    use type Lua.Storage.Byte_Count;
    use type System.Address;
-   procedure Check (Name : String);
+   procedure Check
+     (Name : String; Tail_Fixture : Boolean := False;
+      Require_Refusal : Boolean := False);
    procedure Prepare (State : in out World);
    procedure Pure_Ada_Capacity;
    procedure Cached_Capacity;
@@ -49,8 +51,21 @@ package body Lua.Call_Metadata_Tests is
    procedure ResetCI_Capacity;
    procedure ResetCI_Outstanding;
    procedure ResetCI_Refusal;
+   procedure Tail_Budget_Recovery;
+   procedure Tail_Refusal_Recovery;
+   procedure Tail_Close_Error;
+   procedure Tail_Yield;
+   procedure Tail_Hook_Error;
+   procedure Tail_Hook_Mutation;
+   procedure Tail_Weak_Argument;
+   procedure Tail_Chain;
+   procedure Tail_Tuple;
+   procedure Optimized_Vararg_Bytes;
+   procedure Optimized_Vararg_Count;
 
-   procedure Check (Name : String) is
+   procedure Check
+     (Name : String; Tail_Fixture : Boolean := False;
+      Require_Refusal : Boolean := False) is
       State : World;
       Success : Boolean;
    begin
@@ -58,13 +73,19 @@ package body Lua.Call_Metadata_Tests is
       Conformance_Allocator.Attach (Lua.Storage.Reference (State.Memory));
       Conformance_Adapter.Install (State);
       Success := Execute
-        (State, "_CALL_METADATA_CASE='" & Name & "';" &
-         "dofile('tests/lua/call_metadata_windows.lua')", "=call-metadata");
+        (State, (if Tail_Fixture then "_TAIL_OWNERSHIP_CASE='" else
+            "_CALL_METADATA_CASE='") & Name & "';dofile('tests/lua/" &
+         (if Tail_Fixture then "canonical_tail_ownership.lua"
+          else "call_metadata_windows.lua") & "')", "=call-metadata");
       --  Verification and physical teardown run after the actual application
       --  refusal has ended; a failed operation must still release all owners.
       Conformance_Allocator.Clear_Count_Limit;
       Conformance_Allocator.Set_Byte_Limit (0);
       Assert (Success, Failure_Image (State.Current));
+      if Require_Refusal then
+         Assert (Lua.Storage.Statistics (State.Memory).Refusals > 0,
+                 "tail refusal fixture did not reject an actual growth");
+      end if;
       Finalize (State);
       Conformance_Allocator.Finish;
       Assert (Lua.Storage.Statistics (State.Memory).Live_Blocks = 0,
@@ -528,6 +549,91 @@ package body Lua.Call_Metadata_Tests is
       Check ("ResetCI_Refusal");
    end ResetCI_Refusal;
 
+   procedure Optimized_Vararg_Count is
+   begin
+      --  Execute only this source-linked public tail ownership behavior.
+      Check ("Optimized_Vararg_Count", Tail_Fixture => True);
+   end Optimized_Vararg_Count;
+
+   procedure Optimized_Vararg_Bytes is
+   begin
+      --  Execute only this source-linked public tail ownership behavior.
+      Check ("Optimized_Vararg_Bytes", Tail_Fixture => True);
+   end Optimized_Vararg_Bytes;
+
+   procedure Tail_Tuple is
+   begin
+      --  Execute only this source-linked public tail ownership behavior.
+      Check ("Tail_Tuple", Tail_Fixture => True);
+   end Tail_Tuple;
+
+   procedure Tail_Chain is
+   begin
+      --  Execute only this source-linked public tail ownership behavior.
+      Check ("Tail_Chain", Tail_Fixture => True);
+   end Tail_Chain;
+
+   procedure Tail_Weak_Argument is
+   begin
+      --  Execute only this source-linked public tail ownership behavior.
+      Check ("Tail_Weak_Argument", Tail_Fixture => True);
+   end Tail_Weak_Argument;
+
+   procedure Tail_Hook_Mutation is
+   begin
+      --  Execute only this source-linked public tail ownership behavior.
+      Check ("Tail_Hook_Mutation", Tail_Fixture => True);
+   end Tail_Hook_Mutation;
+
+   procedure Tail_Hook_Error is
+   begin
+      --  Execute only this source-linked public tail ownership behavior.
+      Check ("Tail_Hook_Error", Tail_Fixture => True);
+   end Tail_Hook_Error;
+
+   procedure Tail_Yield is
+   begin
+      --  Execute only this source-linked public tail ownership behavior.
+      Check ("Tail_Yield", Tail_Fixture => True);
+   end Tail_Yield;
+
+   procedure Tail_Close_Error is
+   begin
+      --  Execute only this source-linked public tail ownership behavior.
+      Check ("Tail_Close_Error", Tail_Fixture => True);
+   end Tail_Close_Error;
+
+   procedure Tail_Refusal_Recovery is
+   begin
+      --  Execute only this source-linked public tail ownership behavior.
+      Check ("Tail_Refusal_Recovery", Tail_Fixture => True,
+             Require_Refusal => True);
+   end Tail_Refusal_Recovery;
+
+   procedure Tail_Budget_Recovery is
+      State : World;
+   begin
+      Initialize (State, (Instructions => 50_000, others => <>));
+      Assert (Execute
+        (State, "function tailagain(n,a,b,c)" &
+         "if n==0 then return a,b,c end;return tailagain(n-1,a,b,c)end",
+         "=tail-budget-setup"), Failure_Image (State.Current));
+      State.Bounds.Instructions := 100;
+      Assert (not Execute
+        (State, "pcall(tailagain,1000,1,2,3);error('caught')",
+         "=tail-budget-stop"), "tail ownership work escaped the host budget");
+      Assert (State.Current.Failure_Class = Host_Abort,
+              "tail ownership quota became a catchable Lua failure");
+      State.Bounds.Instructions := 1_000;
+      Assert (Execute (State, "assert(37==37)", "=tail-budget-recovery"),
+              "tail host abort retained an abandoned argument owner");
+      Finalize (State);
+      Assert (Lua.Storage.Statistics (State.Memory).Live_Blocks = 0,
+              "tail host abort retained selected allocations");
+   exception
+      when others => Finalize (State); raise;
+   end Tail_Budget_Recovery;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "C metadata: pure Ada frame capacity",
@@ -596,5 +702,27 @@ package body Lua.Call_Metadata_Tests is
                         ResetCI_Outstanding'Access);
       Test_Support.Add (Suite, "C metadata: resetCI actual growth refusal",
                         ResetCI_Refusal'Access);
+      Test_Support.Add (Suite, "Tail ownership: optimized vararg M0",
+                        Optimized_Vararg_Count'Access);
+      Test_Support.Add (Suite, "Tail ownership: optimized vararg byte ceiling",
+                        Optimized_Vararg_Bytes'Access);
+      Test_Support.Add (Suite, "Tail ownership: owned nil tuple",
+                        Tail_Tuple'Access);
+      Test_Support.Add (Suite, "Tail ownership: recursive owned arena",
+                        Tail_Chain'Access);
+      Test_Support.Add (Suite, "Tail ownership: retired weak argument",
+                        Tail_Weak_Argument'Access);
+      Test_Support.Add (Suite, "Tail ownership: actual callee hook mutation",
+                        Tail_Hook_Mutation'Access);
+      Test_Support.Add (Suite, "Tail ownership: hook error recovery",
+                        Tail_Hook_Error'Access);
+      Test_Support.Add (Suite, "Tail ownership: yielded callee tuple",
+                        Tail_Yield'Access);
+      Test_Support.Add (Suite, "Tail ownership: outer close error roots",
+                        Tail_Close_Error'Access);
+      Test_Support.Add (Suite, "Tail ownership: callee publication refusal",
+                        Tail_Refusal_Recovery'Access);
+      Test_Support.Add (Suite, "Tail ownership: charged work and recovery",
+                        Tail_Budget_Recovery'Access);
    end Register;
 end Lua.Call_Metadata_Tests;

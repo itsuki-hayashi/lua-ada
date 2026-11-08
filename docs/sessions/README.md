@@ -10,6 +10,8 @@ Component: [intern-index refusal and collection](2026-11-08-intern-index-refusal
 
 Proposal: [exact locals source equivalent](2026-11-08-locals-exact-source-proposal.md).
 
+Component: [canonical tail argument ownership](2026-11-08-canonical-tail-ownership.md).
+
 Feature review: [private string-table observations](2026-11-08-querystr-feature-review.md).
 
 Correction: [resetCI owning release](2026-11-08-resetci-owning-release.md).

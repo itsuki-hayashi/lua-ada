@@ -18,6 +18,13 @@ All 38 source-definition/rejection checks pass. Independent exact approval is
 pending; no adapted locals source was emitted or executed and neither original
 anchor is resolved by this proposal.
 
+The [canonical tail ownership checkpoint](sessions/2026-11-08-canonical-tail-ownership.md)
+preserves the documented optimized-vararg result under real zero-growth and
+byte controls. Both local modes pass 2,518 AUnit cases and ordinary C consumers;
+ten Lua cases match all four T binary roles. Unchanged errors/coroutine files
+complete under 2 GiB; materialized-vararg exact counts and final source/platform
+acceptance remain separately pending.
+
 The [resetCI ownership correction](sessions/2026-11-08-resetci-owning-release.md)
 uses the checked private frame release and retires unused metadata reservations.
 Both local configurations pass 2,507 AUnit cases and all ordinary C consumers;

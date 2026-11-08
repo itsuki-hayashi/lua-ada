@@ -1518,7 +1518,9 @@ package body Lua.Engine.Machine is
       Protected_Call : Natural := 0;
       Call_Name : Unbounded_String := Null_Unbounded_String;
       Name_Kind : Unbounded_String := Null_Unbounded_String;
-      Call_Base : Natural := 0; Has_Call_Window : Boolean := False);
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
+      Independent_Tail_Arguments : Boolean := False;
+      Tail_Callee : access Frame_Access := null);
    procedure Complete
      (Self : Driver; Result : Values.Vector; Independent : Boolean := False);
    procedure Complete_Canonical_Return (Self : Driver);
@@ -1556,7 +1558,7 @@ package body Lua.Engine.Machine is
      (Self : Driver; Item : Value; Level : Natural := 1);
    procedure Push_Frame
      (Self : Driver; Function_Value : Value; Arguments : Values.Vector;
-      Destination, Protection : Natural;
+      Destination, Protection : Natural; Created : out Frame_Access;
       Call_Base : Natural := 0; Has_Call_Window : Boolean := False);
    procedure Deliver
      (Self : Driver; Activation : Frame_Access; Destination : Natural;
@@ -2273,7 +2275,7 @@ package body Lua.Engine.Machine is
 
    procedure Push_Frame
      (Self : Driver; Function_Value : Value; Arguments : Values.Vector;
-      Destination, Protection : Natural;
+      Destination, Protection : Natural; Created : out Frame_Access;
       Call_Base : Natural := 0; Has_Call_Window : Boolean := False)
    is
       State : World renames Self.Universe.all;
@@ -2281,6 +2283,7 @@ package body Lua.Engine.Machine is
       Prototype : constant Prototype_Access :=
         Function_Value.Reference.Code;
    begin
+      Created := null;
       --  A frame owns its fresh lexical scope and register packets.
       --  Publish it before parameter/vararg setup so the central cleanup
       --  path also owns partially initialized activations after failure.
@@ -2314,6 +2317,7 @@ package body Lua.Engine.Machine is
            (State, Item, Function_Value, Arguments,
             Call_Base, Has_Call_Window);
          Canonical.Initialize_Frame (State, Item, Arguments);
+         Created := Item;
          return;
       end if;
       Item.Scope := New_Environment
@@ -2368,6 +2372,7 @@ package body Lua.Engine.Machine is
             Item.Varargs.Clear;
          end;
       end if;
+      Created := Item;
    end Push_Frame;
 
    procedure Publish_Native_Return
@@ -2733,7 +2738,9 @@ package body Lua.Engine.Machine is
       Protected_Call : Natural := 0;
       Call_Name : Unbounded_String := Null_Unbounded_String;
       Name_Kind : Unbounded_String := Null_Unbounded_String;
-      Call_Base : Natural := 0; Has_Call_Window : Boolean := False)
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
+      Independent_Tail_Arguments : Boolean := False;
+      Tail_Callee : access Frame_Access := null)
    is
       State : World renames Self.Universe.all;
       Function_Item : Value := Function_Value;
@@ -2804,6 +2811,7 @@ package body Lua.Engine.Machine is
       procedure Activate (Args : Values.Vector);
       procedure Activate (Args : Values.Vector) is
          Native_Tail_Owner : Frame_Access := null;
+         Created : Frame_Access := null;
       begin
          Pin (State, Function_Item);
          Pin (State, Args);
@@ -2838,7 +2846,7 @@ package body Lua.Engine.Machine is
          end if;
          if Function_Item.Kind = Closure_Kind then
             Push_Frame
-              (Self, Function_Item, Args, Return_To, Protection,
+              (Self, Function_Item, Args, Return_To, Protection, Created,
                Effective_Base, Use_Window);
             State.Current.Stack.Last_Element.Is_Tail_Call := Tail;
          elsif Function_Item.Kind = Foreign_Function_Kind then
@@ -2931,16 +2939,31 @@ package body Lua.Engine.Machine is
             Native_Tail_Owner.Native_Arguments.Clear;
             Native_Tail_Owner.Native_Captures.Clear;
          end if;
+         if Tail_Callee /= null then Tail_Callee.all := Created; end if;
       end Activate;
    begin
+      if Independent_Tail_Arguments then
+         if not Tail or else Tail_Callee = null or else
+           Function_Value.Kind /= Closure_Kind or else
+           Function_Value.Reference.Code.Canonical_Node = null
+         then
+            raise Program_Error with "invalid independent canonical tail";
+         end if;
+         Tail_Callee.all := null;
+      elsif Tail_Callee /= null then
+         raise Program_Error with "unexpected tail callee recipient";
+      end if;
       Pin (State, Function_Value);
       Pin (State, Arguments);
       --  Ordinary non-tail calls borrow their already rooted input until the
       --  new activation publishes its own slots/packet. Copy only when a
       --  receiver chain must mutate arguments, or tail replacement could
-      --  release their original owner. This also keeps error closing usable
+      --  release their original owner. Canonical direct tails may instead
+      --  borrow an independent bridge-owned arena which outlives retirement.
+      --  This also keeps error closing usable
       --  under refusal: a fresh temporary argument copy is unnecessary.
-      if not Tail and then Function_Item.Kind in Closure_Kind |
+      if (not Tail or else Independent_Tail_Arguments) and then
+        Function_Item.Kind in Closure_Kind |
         Native_Closure_Kind | Native_Kind_Value | Foreign_Function_Kind
       then
          Activate (Arguments);
@@ -5639,13 +5662,69 @@ package body Lua.Engine.Machine is
                   --  than retire that slot without invoking its handler.
                   Fail (State, "canonical tail call has pending close values");
                end if;
-               --  Dispatch owns a copy before retiring a tail/metacall
-               --  source, while ordinary calls can borrow it synchronously.
-               Dispatch (Self, Next.Function_Value,
-                         Activation.Native_Arguments,
-                         Next.Destination, Tail => True,
-                         Call_Base => Next.Call_Base,
-                         Has_Call_Window => Next.Has_Call_Window);
+               if Next.Function_Value.Kind = Closure_Kind and then
+                 Next.Function_Value.Reference.Code.Canonical_Node /= null
+               then
+                  declare
+                     Args : Values.Vector := Owned_Values (State);
+                     Callee : aliased Frame_Access := null;
+                     Count : constant Ada.Containers.Count_Type :=
+                       Activation.Native_Arguments.Length;
+                  begin
+                     --  End the source-frame borrow before Dispatch can
+                     --  retire it. The local owned arena, not a reference to
+                     --  an activation field, supplies every later Args view.
+                     if Activation /= State.Current.Stack.Last_Element or else
+                       Activation.Context /= State.Current
+                     then
+                        raise Program_Error with "invalid tail packet owner";
+                     end if;
+                     if State.Policy = Bounded then
+                        if Count > Ada.Containers.Count_Type
+                          (State.Bounds.Instructions - Natural'Min
+                             (State.Steps, State.Bounds.Instructions))
+                        then
+                           Fail (State, "instruction limit exceeded", True);
+                        end if;
+                        State.Steps := State.Steps + Natural (Count);
+                     end if;
+                     Move_Roots (State, Args, Activation.Native_Arguments);
+                     --  Dispatch pins this independent owner before any
+                     --  destructive transition. Partial callee construction
+                     --  and error recovery retain those operation roots.
+                     Dispatch
+                       (Self, Next.Function_Value, Args, Next.Destination,
+                        Tail => True, Call_Base => Next.Call_Base,
+                        Has_Call_Window => Next.Has_Call_Window,
+                        Independent_Tail_Arguments => True,
+                        Tail_Callee => Callee'Access);
+                     --  The created owner is returned explicitly: a hook
+                     --  continuation must never become an assumed recipient.
+                     --  No source-frame pointer is dereferenced after call.
+                     Args.Clear;
+                     if Callee /= null then
+                        if Callee.Context /= State.Current or else
+                          Callee.Lifecycle /= Active or else
+                          not Callee.Native_Arguments.Is_Empty
+                        then
+                           raise Program_Error with "invalid tail recipient";
+                        end if;
+                        if Callee.Native_Arguments.Capacity < Args.Capacity
+                        then
+                           Move_Roots
+                             (State, Callee.Native_Arguments, Args);
+                        end if;
+                     end if;
+                  end;
+               else
+                  --  Native, metamethod and migration tails retain their
+                  --  existing independent-copy and continuation protocols.
+                  Dispatch (Self, Next.Function_Value,
+                            Activation.Native_Arguments,
+                            Next.Destination, Tail => True,
+                            Call_Base => Next.Call_Base,
+                            Has_Call_Window => Next.Has_Call_Window);
+               end if;
             when Canonical.Return_Results =>
                if Activation.Closers.Is_Empty then
                   Complete_Canonical_Return (Self);
