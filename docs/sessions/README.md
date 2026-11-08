@@ -1,5 +1,7 @@
 # Session Records
 
+Source review: [optimizer semantic retention](2026-11-08-optimizer-semantic-review.md).
+
 Source review: [memory-verifier binding refresh](2026-11-08-verifier-binding-refresh.md).
 
 Component: [intern-index refusal and collection](2026-11-08-intern-index-refusal.md).

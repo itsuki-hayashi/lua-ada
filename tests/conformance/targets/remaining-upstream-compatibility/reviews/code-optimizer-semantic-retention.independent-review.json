@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "kind": "code-optimizer-semantic-retention-review",
+  "author": "Codex /root/remaining_suite",
+  "reviewer": "Codex /root",
+  "review_date": "2026-11-08",
+  "decision": "accepted-source-retention-contract-only",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "witness": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/code-public-semantics.author-witness.json",
+    "sha256": "be1a08319ae947eda1bfcbe3279efdbd02e6fa4e7fe2309be05d6431a1e7f5bc"
+  },
+  "eligibility_proposal": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/code-optimizer-eligibility-v3.author-proposal.json",
+    "sha256": "a99032ed66326c17f00d5273bd301e603a3f5284f84c6671f69cd64334274429"
+  },
+  "source": {
+    "path": "references/lua/testes/code.lua",
+    "sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663"
+  },
+  "protected_checkR": {
+    "byte_offset": 2079,
+    "byte_length": 127,
+    "sha256": "324530f639ef49280bcc33a77b56351c3369cdfd13290c63934071985bb880dc"
+  },
+  "witness_sources": [
+    {
+      "path": "tests/lua/code_public_semantics.lua",
+      "sha256": "a5a6f949bced42fcad5ca68451f64019247f778ef3956907ce1a0dab7b55232a"
+    },
+    {
+      "path": "tests/src/code_public_semantic_tests.adb",
+      "sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    {
+      "path": "tests/src/code_public_semantic_tests.ads",
+      "sha256": "0e79dc85150a59a2b2d178f472aceffc21ba4d3ab3236ba29d5f846c2daa88db"
+    }
+  ],
+  "source_audit": {
+    "file_bindings_checked": 11,
+    "original_and_public_spans_verified": 54,
+    "private_candidates_verified": 8,
+    "stale_bindings": [
+      {
+        "path": "tests/src/test_runner.adb",
+        "proposed": "3a68c67bf26775c340eea2502a52d9abee492340890f892db2eb0f61d43de321",
+        "actual": "e3f6046595c746c0b42d8a17ea8c675e1f699c7c279da42b18bb5f2b5d39e20e",
+        "reason": "Additional suite registrations; all29 original registrations separately verified."
+      },
+      {
+        "path": "src/lua-engine-canonical.adb",
+        "proposed": "6f4f0a418c64a9d931269578c00efda7902eb0b86ea36585cc4e4a6cb9caabca",
+        "actual": "71963fbe8a1c8ac7ca39064ead7e3818c89adc17d940b9576bd638bb86563539",
+        "reason": "Runtime implementation drift requires separate current-head execution; this review accepts source retention only."
+      }
+    ]
+  },
+  "retained_contracts": [
+    "Each original checkK/checkI/checkF expression has a source-linked public one-result exact value and numeric-kind witness; borders retain all five integer and five float results.",
+    "Eight original callback arguments are actually delivered, in order, with exact numeric kinds and no return values.",
+    "Fourteen original absent-key writes invoke the real __newindex recorder with exact receiver, key, numeric value/kind and ordering; no raw write or extra key is hidden.",
+    "Nested maker/middle/leaf return actual functions and the complete original constant string, including stripped/unstripped dumps and exact return cardinality.",
+    "Constructors49/50/51 execute real generated source with zero/one/multiple final varargs, exact integer keys, holes, values, kinds and one table result.",
+    "Zero-return, one-nil and four-result functions retain cardinality through actual dump/load; valid and oversized register programs are loaded without invoking the intentionally nil callee.",
+    "Original checkR127bytes and ordinary checkK/checkI/checkF/checkints assertions, all helper call sites and function arguments remain required. Intentionally invalid/infinite opcode-only closures need not be executed."
+  ],
+  "schema_implementation_scope": {
+    "version": 3,
+    "target": "remaining-upstream-compatibility",
+    "permitted_candidates": [
+      {
+        "id": "LUA-CODE-REVIEWED-BLOCK-9001",
+        "byte_offset": 800,
+        "byte_length": 143,
+        "anchor_sha256": "26aad09cfda55023d09d73d23353c892cb5e19ba423488629606efc828ddf3fd"
+      },
+      {
+        "id": "LUA-CODE-REVIEWED-BLOCK-9002",
+        "byte_offset": 1808,
+        "byte_length": 205,
+        "anchor_sha256": "41b6d2b52bb8f3f0d16dc0cf595c5fd6a4ca1b124b16b1bef028a1dda5f27f6b"
+      },
+      {
+        "id": "LUA-CODE-REVIEWED-BLOCK-9003",
+        "byte_offset": 2288,
+        "byte_length": 239,
+        "anchor_sha256": "5b3ddc7feef1ddadfa4a18c2526a31ced0495324141bde683ac399700a67e762"
+      },
+      {
+        "id": "LUA-CODE-REVIEWED-BLOCK-9004",
+        "byte_offset": 13327,
+        "byte_length": 32,
+        "anchor_sha256": "13c9570d19cf580345c831907370413a0a9b7c0c3d39f7b6660459373cd8e8af"
+      },
+      {
+        "id": "LUA-CODE-REVIEWED-BLOCK-9005",
+        "byte_offset": 13359,
+        "byte_length": 32,
+        "anchor_sha256": "4b1b8301af5f0f06a693bc66df7fa421860fdf06c9821e447ae6d4af791d8907"
+      },
+      {
+        "id": "LUA-CODE-REVIEWED-BLOCK-9006",
+        "byte_offset": 13587,
+        "byte_length": 10,
+        "anchor_sha256": "01169ab3aa9b67d6e268a238d869205be891f6403052061cdf5de5d1a9bf9e54"
+      },
+      {
+        "id": "LUA-CODE-REVIEWED-BLOCK-9007",
+        "byte_offset": 13655,
+        "byte_length": 79,
+        "anchor_sha256": "120c5699b24c0b9102eded9963b92049e2d0f8213c5c43d77a64dc7dd3ecdac9"
+      },
+      {
+        "id": "LUA-CODE-REVIEWED-BLOCK-9008",
+        "byte_offset": 14141,
+        "byte_length": 175,
+        "anchor_sha256": "212b31fe72e0800322053802b52608dd3940d8b601b23d3e36350ae17ffe61b6"
+      }
+    ],
+    "constraints": [
+      "Require observable=true and no public, mixed or module compatibility obligation; leave v1/v2 unchanged.",
+      "Preserve all51 original records and require distinct exact reference/decomposition decisions for contained lexical anchors.",
+      "Reject previous passing obligations, changed source/checkR/witness identities, widened spans, fake T, swallowed semantics, self review, execution evidence and non-target use.",
+      "This review authorizes bounded validator implementation and source retention only. Exact policy entries, anchor resolutions and transforms need separate decisions before source generation."
+    ]
+  },
+  "limitations": [
+    "No original source anchor is resolved by this artifact.",
+    "Component observations are not imported as current-head or whole-target passing evidence.",
+    "Fresh actual file/counterpart/named-case observations and final matrix reconciliation remain mandatory."
+  ]
+}

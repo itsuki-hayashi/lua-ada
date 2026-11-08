@@ -16,9 +16,10 @@ sources and final matrix; no source obligation is closed by this component.
 
 The [source-linked optimizer witnesses](sessions/2026-11-08-code-public-semantics.md)
 pass 29 new cases within 2,468 AUnit cases in each local mode and all eight
-compiler/VM roles. Independently review their source bindings and the revised
-private optimization eligibility/exact transform before any code.lua adaptation
-or exclusion installation. Preserve checkR, actual loads/errors and all original
+compiler/VM roles. Their [source retention review](sessions/2026-11-08-optimizer-semantic-review.md)
+permits bounded version3 eligibility implementation; validate that implementation
+and independently review exact decisions before any code.lua adaptation or
+exclusion installation. Preserve checkR, actual loads/errors and all original
 semantic parents; public witness passes supply no private-assertion pass.
 
 The [actual table-storage inspector](sessions/2026-11-08-table-storage-inspection.md)
