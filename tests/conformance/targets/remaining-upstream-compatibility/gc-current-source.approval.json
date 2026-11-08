@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "kind": "equivalent-approval",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "reviewer": "Codex /root",
+  "decision": "accepted",
+  "equivalent": {
+    "id": "gc-ada-remaining-upstream",
+    "source": "references/lua/testes/gc.lua",
+    "source_sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99",
+    "configuration": "default-and-upstream-test",
+    "disposition": "ada-internal-equivalent",
+    "platform": null,
+    "generated_sha256": "059aaafb1068bc4245b23f56b2e10a75a66301b0bf05eede8ce3e7fd8a56b6dd"
+  },
+  "decisions": [
+    {
+      "id": "measure-live-payloads",
+      "decision": "accepted",
+      "author": "Codex /root/validation_delivery",
+      "reviewer": "Codex /root",
+      "start_byte": 11479,
+      "length_bytes": 49,
+      "source_sha256": "4bb49bacb1a6d2575ad3abbb475fd83ff2e7ad65102d29c93d02e7bdf43f700e",
+      "replacement_sha256": "833abcf9a2278f2a5cb3cd892f26de6e8af7cc426bdb718144234527dcd97d9d",
+      "rationale": "Measure actual managed live storage after both original4MiB payloads and the transient weak key exist. Preserve all original weak-key/value workload and subsequent collection; no fabricated C allocation size is substituted.",
+      "review_evidence": {
+        "sha256": "bee6ea56d7bc4f7279a53a91b5eefc886b02ab5b07755c92fa03a0abd56ed70f",
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/gc-current-source.independent-review.json"
+      },
+      "counterparts": [
+        {
+          "sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+          "path": "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads"
+        }
+      ]
+    },
+    {
+      "id": "reclaim-payloads",
+      "decision": "accepted",
+      "author": "Codex /root/validation_delivery",
+      "reviewer": "Codex /root",
+      "start_byte": 11963,
+      "length_bytes": 40,
+      "source_sha256": "c520c19e1c58d291af4e63c84b5083a165dd416be4983767261653ccd569cbc6",
+      "replacement_sha256": "0244ab649f62283a93b423e4250bba43ea0c044bcaaf8f87334b520f94378b15",
+      "rationale": "Require actual release of at least both4MiB payloads relative to their measured live baseline. All original empty traversal, deleted last entry, recreated byte lookup and dead-key safety assertions remain. Retained Ada table capacity is not C residual geometry.",
+      "review_evidence": {
+        "sha256": "bee6ea56d7bc4f7279a53a91b5eefc886b02ab5b07755c92fa03a0abd56ed70f",
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/gc-current-source.independent-review.json"
+      },
+      "counterparts": [
+        {
+          "sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+          "path": "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads"
+        }
+      ]
+    },
+    {
+      "id": "stable-cell-color",
+      "decision": "accepted",
+      "author": "Codex /root/validation_delivery",
+      "reviewer": "Codex /root",
+      "start_byte": 14278,
+      "length_bytes": 31,
+      "source_sha256": "3368876c423554b8967a1fca42de51cf3fc6dc96f2dbe3bc3263b2f14b5aacdf",
+      "replacement_sha256": "8962292d95f5a292ba02ad38b282fe93d1f4a072994b8ec38fe55e7c65206ec6",
+      "rationale": "Current Store_Cell applies the production write barrier before publishing the actual cell value. A black independently owned cell shades its new child gray. Retain the same atomic-cycle weak coroutine collection and final closure value30; change only the private white-versus-gray observation.",
+      "review_evidence": {
+        "sha256": "bee6ea56d7bc4f7279a53a91b5eefc886b02ab5b07755c92fa03a0abd56ed70f",
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/gc-current-source.independent-review.json"
+      },
+      "counterparts": [
+        {
+          "sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+          "path": "tests/src/lua-conformance_adapter_tests.adb#Atomic_Orphan_Cell"
+        }
+      ]
+    },
+    {
+      "id": "measured-emergency-headroom",
+      "decision": "accepted",
+      "author": "Codex /root/validation_delivery",
+      "reviewer": "Codex /root",
+      "start_byte": 16478,
+      "length_bytes": 80,
+      "source_sha256": "342a5139c4c1d3792c706e27094019af1eb85691e390a7fafbca2ad2d3b75559",
+      "replacement_sha256": "acee89ad1dbc5dc0421b883804eadcb693bdaf5958114b874bf24b37e2b9ba4b",
+      "rationale": "The actual adapter measures one real empty-table cost, permits exactly that measured headroom and performs200 real allocations under the production test ceiling. Real refusal and emergency-collection deltas must each reach199. The host ceiling remains independent, and success/exception paths restore test limits and operation start.",
+      "review_evidence": {
+        "sha256": "bee6ea56d7bc4f7279a53a91b5eefc886b02ab5b07755c92fa03a0abd56ed70f",
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/gc-current-source.independent-review.json"
+      },
+      "counterparts": [
+        {
+          "sha256": "9d1a7243752359d0bca7aad04ade74e79484d8564fd4afbfc3f5a962ef4f712e",
+          "path": "tests/src/lua-conformance_adapter_tests.adb#Measured_Emergency_Headroom"
+        }
+      ]
+    }
+  ],
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": []
+}

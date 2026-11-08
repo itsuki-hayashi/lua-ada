@@ -5,11 +5,11 @@
   "source_sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99",
   "configuration": "default-and-upstream-test",
   "review": {
-    "artifact": "tests\\conformance\\targets\\remaining-upstream-compatibility\\gc-ada-equivalence.approval.json",
+    "artifact_sha256": "c928d0d24d8191fdf69af8a6093e288380c02fbdb71fccac1414aa761161828e",
     "status": "accepted",
-    "reviewer": "Codex independent source review /root",
     "author": "Codex /root/validation_delivery",
-    "artifact_sha256": "e79257979e8d7e338bd6a6ae80d7663e3b4f9c2e8f500528bc4734777a8cdbd7"
+    "reviewer": "Codex /root",
+    "artifact": "tests/conformance/targets/remaining-upstream-compatibility/gc-current-source.approval.json"
   },
   "replacements": [
     {

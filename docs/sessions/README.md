@@ -1,5 +1,7 @@
 # Session Records
 
+Source review: [current target GC mapping](2026-11-08-gc-current-source-review.md).
+
 Source review: [optimizer semantic retention](2026-11-08-optimizer-semantic-review.md).
 
 Source review: [memory-verifier binding refresh](2026-11-08-verifier-binding-refresh.md).
