@@ -94,6 +94,27 @@ Case 'path traversal aliases source writes and generated input masquerades fail'
         Save $f; Reject { Replay $f } 'allowed generated artifact|escapes or aliases'
     }
 }
+Case 'only exact disposable native and stdin source evidence paths survive image replay' {
+    $f=New-Fixture;$id='f'*32
+    $paths=@("reports/core-image/$id/file-stdin/stdin-source.lua")
+    foreach($role in @('api','oracle')){foreach($name in @('lib1','lib11','lib2','lib21','lib22')){
+        $paths+="reports/core-image/$id/native-module-$role-fixtures/libs/$name.c"
+    }}
+    foreach($path in $paths){
+        $full=Join-Path $f.directory ('payload/'+$path);[void][IO.Directory]::CreateDirectory((Split-Path -Parent $full))
+        [IO.File]::WriteAllText($full,'synthetic transport bytes only; no compiled fixture or execution',$utf8)
+        $f.image.files+=@{path=$path;bytes=(Get-Item $full).Length;sha256=(Get-FileHash $full).Hash.ToLowerInvariant();
+            unix_mode=$(if($IsWindows){0}else{[int][IO.File]::GetUnixFileMode($full)})}
+    }
+    Save $f;$null=Replay $f
+    foreach($path in @("reports/core-image/$id/native-module-api-fixtures/libs/runtime.c",
+        "reports/core-image/$id/native-module-api-fixtures/libs/lib1.adb",
+        "reports/core-image/$id/file-stdin/runtime.lua",'reports/core-image/not-a-guid/file-stdin/stdin-source.lua',
+        "build/conformance/$id/native-module-api-fixtures/libs/lib1.c")){
+        $changed=New-Fixture;$changed.image.files[0].path=$path;Save $changed
+        Reject {Replay $changed} 'allowed generated artifact'
+    }
+}
 Case 'invalid numeric identities and missing runtime directories fail' {
     $f = New-Fixture; $f.image.files[0].bytes = '24'; Save $f
     Reject { Replay $f } 'file identity'

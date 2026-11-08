@@ -54,12 +54,17 @@ function Resolve-TargetImagePath {
 
 function Test-TargetImageDestination {
     param([Parameter(Mandatory)][string] $Path)
-    # A downloaded artifact may populate only generated binary/library outputs
-    # and retained observations. It must never overwrite first-party/reference
-    # source, manifests, configuration inputs, or toolchain installations.
+    # These two generated observation inputs preserve the exact source bytes
+    # consumed by the native-module and stdin witnesses. They remain under the
+    # unique reports tree: restoring them cannot overwrite implementation,
+    # pinned reference or build-configuration source. The final witness readers
+    # separately validate their source/hash/operation bindings.
+    $sourceEvidence=$Path -cmatch '^reports/core-image/[0-9a-f]{32}/(?:native-module-(?:api|oracle)-fixtures/libs/lib(?:1|11|2|21|22)\.c|file-stdin/stdin-source\.lua)$'
+    # All other source-shaped paths stay forbidden, even under generated
+    # library directories or beside one of those narrowly named evidence files.
     if ($Path -cnotmatch '^(?:lib/|tests/bin/|cli/bin/|build/(?:conformance/|c-api/)|reports/(?:core-image/|target-builds/|target-support/))' -or
-        [IO.Path]::GetExtension($Path) -cin @('.adb','.ads','.c','.h','.lua','.ps1','.psm1','.gpr','.toml','.md')) {
-        throw 'Target image destination is not an allowed generated artifact'
+        (-not $sourceEvidence -and [IO.Path]::GetExtension($Path) -cin @('.adb','.ads','.c','.h','.lua','.ps1','.psm1','.gpr','.toml','.md'))) {
+        throw "Target image destination is not an allowed generated artifact: $Path"
     }
 }
 
