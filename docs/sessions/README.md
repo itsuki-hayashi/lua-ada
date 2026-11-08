@@ -2,6 +2,8 @@
 
 Component: [owned argument labels](2026-11-08-owned-argument-labels.md).
 
+Component: [string arguments and scalar results](2026-11-08-string-arguments-results.md).
+
 Component: [owned argument details](2026-11-08-owned-argument-detail.md).
 
 Component: [public-boundary integration](2026-11-08-public-boundary-integration.md).

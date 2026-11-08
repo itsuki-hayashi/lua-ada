@@ -157,7 +157,7 @@ package body Binary_Runtime_Tests is
    begin
       Check
         ("local ok,e=pcall(string.dump,print);" &
-         "assert(not ok and e:find('unable to dump'))");
+         "assert(not ok and e:find('Lua function expected',1,true))");
    end Native_Dump_Rejected;
 
    procedure Dump_Type_Checked is

@@ -4,6 +4,7 @@ with Interfaces;
 with Interfaces.C;
 with Lua.Big_Naturals;
 with Lua.Engine.Strings;
+with Lua.Engine.Diagnostics;
 with Lua.Platform_Numerics;
 
 package body Lua.Engine.Formats is
@@ -771,11 +772,14 @@ package body Lua.Engine.Formats is
       Cursor : Positive := 1;
       First : Positive;
       Argument : Positive := 1;
+      Format_Value, Converted : Value;
    begin
       Output.Set_Owner (Lua.Storage.Reference (State.Memory));
       if Arguments.Is_Empty then
-         Fail (State, "string expected");
+         Diagnostics.Type_Error
+           (State, 1, "string", Nil_Value, Present => False);
       end if;
+      Format_Value := Arguments (1);
       declare
          procedure Apply_Format (Form : String);
          procedure Apply_Format (Form : String) is
@@ -809,9 +813,9 @@ package body Lua.Engine.Formats is
                   if Argument > Natural (Arguments.Length) then
                      Fail (State, "no value");
                   end if;
+                  Converted := Arguments (Argument);
                   Render_Into
-                    (State, Form (First .. Cursor),
-                     Arguments (Argument), Output);
+                    (State, Form (First .. Cursor), Converted, Output);
                   Cursor := Cursor + 1;
                end if;
                if Length (Output) > State.Bounds.String_Bytes then
@@ -820,7 +824,8 @@ package body Lua.Engine.Formats is
             end loop;
          end Apply_Format;
       begin
-         Strings.Query_Argument (State, Arguments (1), Apply_Format'Access);
+         Strings.Query_Argument
+           (State, Format_Value, Apply_Format'Access, Index => 1);
       end;
       Result.Append (New_String (State, Output));
       return Result;

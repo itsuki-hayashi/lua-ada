@@ -8,6 +8,13 @@ Argument labels and message formatting have
 failure-text store separately, preserving refusal-safe propagation, emergency
 errors and exact cross-context ownership alongside the active hook work.
 
+String diagnostics and warmed scalar outputs have [component evidence](sessions/2026-11-08-string-arguments-results.md):
+47 named regressions within 2,146 passing AUnit cases per configuration,
+selected real T refusal witnesses and default four-way compiler/VM checks.
+Correct the measured native T absolute-line checkpoint interval assertion,
+then continue unchanged errors.lua from table.sort callback argument naming.
+Full memerr.lua and remaining source/T/shared/platform acceptance stay open.
+
 Type-detail construction has [owned-prefix evidence](sessions/2026-11-08-owned-argument-detail.md),
 four native-paired Lua cases and five AUnit regressions within 2,099 passing
 cases per configuration. Continue the wider failure-text/renderer allocation

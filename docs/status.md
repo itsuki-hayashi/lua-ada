@@ -8,6 +8,14 @@ without growing unmanaged formatter intermediates. Four native-paired cases
 and a key-scan quota case pass within 2,104 AUnit cases per local configuration.
 The final context failure-text store remains a separate ownership obligation.
 
+The [string checkpoint](sessions/2026-11-08-string-arguments-results.md) adds
+32 argument diagnostics and fifteen result/status/lifetime/refusal regressions.
+Both local configurations pass 2,146 AUnit cases; selected strict scalar
+refusal cases match actual native T. Default four-way compiler/VM fixtures
+pass, while a native T absolute-line estimate assertion remains explicit and
+assigned to the next compiler checkpoint. Unchanged errors.lua next fails
+table.sort callback argument naming. Full-source/T acceptance stays open.
+
 The [argument detail checkpoint](sessions/2026-11-08-owned-argument-detail.md)
 uses selected-owner text for type-detail construction, meters raw name
 processing and preserves nonstring raw-name temporaries. Four Lua cases match

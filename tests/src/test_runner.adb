@@ -33,6 +33,8 @@ with Argument_Error_Tests;
 with IO_Write_Error_Tests;
 with Collector_Error_Tests;
 with Argument_Registry_Tests;
+with String_Argument_Tests;
+with Lua.String_Result_Tests;
 with Metamethod_Root_Tests;
 with Call_Error_Tests;
 with Comparison_Branch_Tests;
@@ -140,6 +142,8 @@ procedure Test_Runner is
       IO_Write_Error_Tests.Register (Result);
       Collector_Error_Tests.Register (Result);
       Argument_Registry_Tests.Register (Result);
+      String_Argument_Tests.Register (Result);
+      Lua.String_Result_Tests.Register (Result);
       Metamethod_Root_Tests.Register (Result);
       Call_Error_Tests.Register (Result);
       Comparison_Branch_Tests.Register (Result);

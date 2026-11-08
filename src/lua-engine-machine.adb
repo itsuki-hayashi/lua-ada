@@ -3108,12 +3108,39 @@ package body Lua.Engine.Machine is
       Library_Step : Boolean := True;
       procedure Return_Native (Item : Value);
       procedure Invoke (Function_Value : Value; Args : Values.Vector);
+      procedure Finish_Protected_Return;
       procedure Return_Native (Item : Value) is
          Result : Values.Vector := Owned_Values (State);
       begin
          Result.Append (Item);
          Complete (Self, Result);
       end Return_Native;
+      procedure Finish_Protected_Return is
+         Prefix : constant Natural := Activation.Protection;
+         Count : constant Natural :=
+           Natural (Activation.Native_Results.Length);
+      begin
+         if Prefix > 0 then
+            if Prefix > Natural'Last - Count then
+               Fail (State, "stack overflow");
+            end if;
+            --  Keep protection and the original raw packet intact until
+            --  the complete success prefix fits. A refused growth must use
+            --  the existing protected memory-error recovery, not publish a
+            --  partial status or turn that failure into a success value.
+            Activation.Native_Results.Reserve_Capacity
+              (Ada.Containers.Count_Type (Count + Prefix));
+            for Index in 1 .. Prefix loop
+               Activation.Native_Results.Prepend
+                 (Value'(Boolean_Kind, True));
+            end loop;
+            --  This actual publication phase, rather than the first value's
+            --  contents, records that status wrapping has finished. Return
+            --  hooks/yields and a raw false child result cannot add it twice.
+            Activation.Protection := 0;
+         end if;
+         Complete (Self, Activation.Native_Results, Independent => True);
+      end Finish_Protected_Return;
       procedure Invoke (Function_Value : Value; Args : Values.Vector) is
       begin
          --  Publish the resume phase before dispatch: immediate builtins
@@ -3438,8 +3465,7 @@ package body Lua.Engine.Machine is
                       Has_Call_Window => True);
             Activation.Native_Arguments.Clear;
          else
-            Complete (Self, Activation.Native_Results,
-                      Independent => Activation.Protection = 0);
+            Finish_Protected_Return;
          end if;
          return;
       elsif Name = "@hook" then
@@ -4196,8 +4222,7 @@ package body Lua.Engine.Machine is
                       Has_Call_Window => True);
             Activation.Native_Arguments.Clear;
          else
-            Complete (Self, Activation.Native_Results,
-                      Independent => Activation.Protection = 0);
+            Finish_Protected_Return;
          end if;
       elsif Name = "base.tostring" then
          if Activation.Native_Arguments.Is_Empty then
@@ -4573,8 +4598,13 @@ package body Lua.Engine.Machine is
             Complete (Self, Packing.Run
               (State, Name (8 .. Name'Last), Activation.Native_Arguments));
          else
-            Complete (Self, Strings.Run
-              (State, Name (8 .. Name'Last), Activation.Native_Arguments));
+            --  Scalar string results reuse the actual activation's owned
+            --  arena. A fresh function-result vector would allocate even
+            --  for a warmed plain find that only returns two integers.
+            Strings.Run
+              (State, Name (8 .. Name'Last), Activation.Native_Arguments,
+               Activation.Native_Results);
+            Complete (Self, Activation.Native_Results, Independent => True);
          end if;
       elsif Name'Length > 5 and then Name (1 .. 5) = "utf8." then
          if Name = "utf8.codes" then
@@ -5817,7 +5847,29 @@ package body Lua.Engine.Machine is
               not Packet.Is_Empty and then Packet.First_Element.Kind =
                 Boolean_Kind and then not Packet.First_Element.Boolean_Data;
          begin
-            Move_Roots (State, Activation.Native_Results, Packet);
+            if Activation.Native_Results.Capacity < Packet.Length and then
+              Activation.Native_Arguments.Is_Empty and then
+              Activation.Native_Arguments.Capacity >= Packet.Length
+            then
+               --  A waiting native caller has relinquished its input
+               --  request. Reuse that empty arena for its actual returned
+               --  packet before considering a transfer of the producer's
+               --  warmed workspace. No live input or result is copied here.
+               Values.Move (Activation.Native_Results,
+                            Activation.Native_Arguments);
+               Activation.Native_Arguments.Set_Owner (Activation.Memory);
+            end if;
+            if Activation.Native_Results.Capacity >= Packet.Length then
+               --  The real source remains traced throughout publication.
+               --  Copy into existing capacity, then immediately retire its
+               --  old value edges while retaining reusable empty storage.
+               Copy_Roots (State, Activation.Native_Results, Packet);
+               Packet.Clear;
+            else
+               --  Refusing error/foreign paths may have no receiver arena.
+               --  Preserve their existing allocation-free owning transfer.
+               Move_Roots (State, Activation.Native_Results, Packet);
+            end if;
             Activation.Result_Failure_Class := Failure;
             Activation.Result_Handler_Called := Handler_Called;
             if Protected_Error then
