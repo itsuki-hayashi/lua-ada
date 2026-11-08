@@ -2,6 +2,11 @@
 
 ## Active remaining-suite delivery
 
+Reconcile the [local Code observations](sessions/2026-11-08-code-local-execution.md)
+with fresh final immutable contexts. Retain separate original native optimizer
+execution, adapted Ada semantic execution and source-only exclusion accounting.
+Do not give default T-absent returns instrumented credit.
+
 Integrate the [debug-console campaigns](sessions/2026-11-08-debug-console.md)
 into routine/frozen builds and refresh affected source/callable bindings.
 Preserve actual C prefix publication and closing before argument release.

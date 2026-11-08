@@ -1,0 +1,424 @@
+{
+  "schema_version": 1,
+  "kind": "code-local-author-observation",
+  "author": "Codex /root",
+  "date": "2026-11-08",
+  "observed_repository_revision": "c1958c0e78d261c5c83c3ee502987868a810129c",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "final_context_acceptance": false,
+  "notes": [
+    "Local Windows validation/static component images; source-build provenance and final matrix reconciliation remain separate.",
+    "Default original source returns with T absent and supplies no instrumented coverage.",
+    "Instrumented native original source and Ada approved Code8 adaptation have identical stdout; eight private exclusions supply no execution evidence.",
+    "Binary producers compile the identical approved source for paired cross-loading; native original optimizer checks are established only by the separate source run.",
+    "The earlier binary diagnostic deb664d9cb8d4ae2b050106cb1a49027 used mutable environment records; it is not used here."
+  ],
+  "source": {
+    "path": "references/lua/testes/code.lua",
+    "sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663"
+  },
+  "manifest": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/code-private-optimizer-v3.transform.json",
+    "sha256": "713b149e95ed5d82ddb1e0183e13d758ba53ebad2869bc1b3839744879bfbf34"
+  },
+  "binary_report": {
+    "path": "reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/results.json",
+    "sha256": "75aef29161eedb7e2a1715cf74db51b648c876751a238f50e4f16e81981df737"
+  },
+  "observations": [
+    {
+      "operation": "source",
+      "configuration": "default",
+      "role": "native",
+      "observation": {
+        "path": "reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-native/observation.json",
+        "sha256": "355bda63c6b0c6fa89e445377f169bdbd1e94259950dc6eb3d05ecfd8cccbcd2"
+      },
+      "process_id": 23880,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-native/image/lua.exe",
+        "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-native/result.stdout",
+        "sha256": "5bd3d08b3c27f947b9b0be02ee78328c7188f6ed7c95132d35943749a04cf690"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-native/result.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-native/telemetry.23880.json",
+        "sha256": "4d3227be267b66ea4ba69845249e153de4dedf6b28cf844a9ea71549f5e6b93b"
+      }
+    },
+    {
+      "operation": "source",
+      "configuration": "default",
+      "role": "ada",
+      "observation": {
+        "path": "reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-ada/observation.json",
+        "sha256": "47a6678ad5e37f25bf0b345067992c35cfdbf925c4d30b32bf5a52c3109044bf"
+      },
+      "process_id": 14220,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-ada/image/conformance_runner.exe",
+        "sha256": "b0d1c1dd63a7084208ab90782f58fd6cc46c8be7c38c7823c74940cb619ca4e4"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-ada/result.stdout",
+        "sha256": "5bd3d08b3c27f947b9b0be02ee78328c7188f6ed7c95132d35943749a04cf690"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-ada/result.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-ada/telemetry.14220.json",
+        "sha256": "73407322e2bf5a903e21504de1d0563b4f8af22a99623b9d6ad8405b7ba3a032"
+      }
+    },
+    {
+      "operation": "source",
+      "configuration": "upstream-test",
+      "role": "native",
+      "observation": {
+        "path": "reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-native/observation.json",
+        "sha256": "1069be8557027f7da359e0e2ad3c691877016896e66f407b5586448370c9b72d"
+      },
+      "process_id": 26984,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-native/image/lua.exe",
+        "sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-native/result.stdout",
+        "sha256": "e66cefa03b923d43d1024e6d87b4d163447bb9b67048d162891c8dc500ea1259"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-native/result.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-native/telemetry.26984.json",
+        "sha256": "089d0af4336420a3d8d82b503dae437151863716ad59324f62dade6f8a8de5eb"
+      }
+    },
+    {
+      "operation": "source",
+      "configuration": "upstream-test",
+      "role": "ada",
+      "observation": {
+        "path": "reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-ada/observation.json",
+        "sha256": "421bdc42d40cde1db5113e0436d6590aed522c9219643fabc4593f9574fe1adc"
+      },
+      "process_id": 78956,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-ada/image/conformance_runner.exe",
+        "sha256": "45077421eb7e3f664ee619da887ecb9379ad192589602d1266ec41da72828721"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-ada/result.stdout",
+        "sha256": "e66cefa03b923d43d1024e6d87b4d163447bb9b67048d162891c8dc500ea1259"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-ada/result.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-ada/telemetry.78956.json",
+        "sha256": "0ab640b6e81528194a41f1d335b9e4021d9764d966912f7ab10375e433fc2cde"
+      }
+    },
+    {
+      "operation": "dump",
+      "configuration": "default",
+      "producer": "native",
+      "vm": null,
+      "chunk_sha256": "6d142b347f840a1711ac28ac2b2a1a154f8d52e1d3c95c92e92fe22ab7448348",
+      "process_id": 85152,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-native/image/lua.exe",
+        "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/native-dump.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/native-dump.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/native-dump-telemetry.85152.json",
+        "sha256": "11a23453ce88f1b9fe8bc7641f0214e2ff16ef62ffe169d85468638ecec48511"
+      }
+    },
+    {
+      "operation": "execute",
+      "configuration": "default",
+      "producer": "native",
+      "vm": "native",
+      "chunk_sha256": "6d142b347f840a1711ac28ac2b2a1a154f8d52e1d3c95c92e92fe22ab7448348",
+      "process_id": 44140,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-native/image/lua.exe",
+        "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/native-native.stdout",
+        "sha256": "5bd3d08b3c27f947b9b0be02ee78328c7188f6ed7c95132d35943749a04cf690"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/native-native.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/native-native-telemetry.44140.json",
+        "sha256": "278a5036869466d33a8a8ffe87d38ae4717ce3d58cef6ff52e681ea7e679c234"
+      }
+    },
+    {
+      "operation": "execute",
+      "configuration": "default",
+      "producer": "native",
+      "vm": "ada",
+      "chunk_sha256": "6d142b347f840a1711ac28ac2b2a1a154f8d52e1d3c95c92e92fe22ab7448348",
+      "process_id": 90212,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-ada/image/conformance_runner.exe",
+        "sha256": "b0d1c1dd63a7084208ab90782f58fd6cc46c8be7c38c7823c74940cb619ca4e4"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/native-ada.stdout",
+        "sha256": "5bd3d08b3c27f947b9b0be02ee78328c7188f6ed7c95132d35943749a04cf690"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/native-ada.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/native-ada-telemetry.90212.json",
+        "sha256": "29f62b9404d1677cabd0e11d86a179256419c74b4ac9908ec32fb35ea8cb555f"
+      }
+    },
+    {
+      "operation": "dump",
+      "configuration": "default",
+      "producer": "ada",
+      "vm": null,
+      "chunk_sha256": "ca3cf46c973de7f812ae73fedfa74bc6719b6350e622cfed12d674268c2a3df1",
+      "process_id": 63792,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-ada/image/conformance_runner.exe",
+        "sha256": "b0d1c1dd63a7084208ab90782f58fd6cc46c8be7c38c7823c74940cb619ca4e4"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/ada-dump.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/ada-dump.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/ada-dump-telemetry.63792.json",
+        "sha256": "856b1ab52036c3b149d53f490103c3d8ea0d21ac8dc92cb50ab5fab7935647df"
+      }
+    },
+    {
+      "operation": "execute",
+      "configuration": "default",
+      "producer": "ada",
+      "vm": "native",
+      "chunk_sha256": "ca3cf46c973de7f812ae73fedfa74bc6719b6350e622cfed12d674268c2a3df1",
+      "process_id": 36836,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-native/image/lua.exe",
+        "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/ada-native.stdout",
+        "sha256": "5bd3d08b3c27f947b9b0be02ee78328c7188f6ed7c95132d35943749a04cf690"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/ada-native.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/ada-native-telemetry.36836.json",
+        "sha256": "1b62c8910b5d364531d764609c926acfb4ac47e0e7f08e19ee15e26e3829f8be"
+      }
+    },
+    {
+      "operation": "execute",
+      "configuration": "default",
+      "producer": "ada",
+      "vm": "ada",
+      "chunk_sha256": "ca3cf46c973de7f812ae73fedfa74bc6719b6350e622cfed12d674268c2a3df1",
+      "process_id": 69680,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/default-ada/image/conformance_runner.exe",
+        "sha256": "b0d1c1dd63a7084208ab90782f58fd6cc46c8be7c38c7823c74940cb619ca4e4"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/ada-ada.stdout",
+        "sha256": "5bd3d08b3c27f947b9b0be02ee78328c7188f6ed7c95132d35943749a04cf690"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/ada-ada.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/default/ada-ada-telemetry.69680.json",
+        "sha256": "a388e39ceac57aeab50eef0a721c0fbdb99d4802d62bb7608da75729db0dd487"
+      }
+    },
+    {
+      "operation": "dump",
+      "configuration": "upstream-test",
+      "producer": "native",
+      "vm": null,
+      "chunk_sha256": "427a63dab121e1fe9cc3f0049e739ea518f09fd1cdd506800a99cddade652ca2",
+      "process_id": 69540,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-native/image/lua.exe",
+        "sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/native-dump.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/native-dump.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/native-dump-telemetry.69540.json",
+        "sha256": "0eafa7de44483d7e483ca08e9930e7ac56388d093fc996fdb8cca46e450f9674"
+      }
+    },
+    {
+      "operation": "execute",
+      "configuration": "upstream-test",
+      "producer": "native",
+      "vm": "native",
+      "chunk_sha256": "427a63dab121e1fe9cc3f0049e739ea518f09fd1cdd506800a99cddade652ca2",
+      "process_id": 28520,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-native/image/lua.exe",
+        "sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/native-native.stdout",
+        "sha256": "e66cefa03b923d43d1024e6d87b4d163447bb9b67048d162891c8dc500ea1259"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/native-native.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/native-native-telemetry.28520.json",
+        "sha256": "fbff39b6c9d8822771d09b190a7e600a6e652e162e89321b8cc6443d6fbdea47"
+      }
+    },
+    {
+      "operation": "execute",
+      "configuration": "upstream-test",
+      "producer": "native",
+      "vm": "ada",
+      "chunk_sha256": "427a63dab121e1fe9cc3f0049e739ea518f09fd1cdd506800a99cddade652ca2",
+      "process_id": 62100,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-ada/image/conformance_runner.exe",
+        "sha256": "45077421eb7e3f664ee619da887ecb9379ad192589602d1266ec41da72828721"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/native-ada.stdout",
+        "sha256": "e66cefa03b923d43d1024e6d87b4d163447bb9b67048d162891c8dc500ea1259"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/native-ada.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/native-ada-telemetry.62100.json",
+        "sha256": "3cbc28d3df84966f30731f1d3649234b16d682f3a6b448f0c39a181a7020d039"
+      }
+    },
+    {
+      "operation": "dump",
+      "configuration": "upstream-test",
+      "producer": "ada",
+      "vm": null,
+      "chunk_sha256": "ebe2743328b00092467c99d8df5f91216c636c8e3b7c05a5180547be7ca23a2f",
+      "process_id": 77164,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-ada/image/conformance_runner.exe",
+        "sha256": "45077421eb7e3f664ee619da887ecb9379ad192589602d1266ec41da72828721"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/ada-dump.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/ada-dump.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/ada-dump-telemetry.77164.json",
+        "sha256": "787c17bf617366baa6c904dce615232eb8efbd818bdd29d237ec56f3dcc1357c"
+      }
+    },
+    {
+      "operation": "execute",
+      "configuration": "upstream-test",
+      "producer": "ada",
+      "vm": "native",
+      "chunk_sha256": "ebe2743328b00092467c99d8df5f91216c636c8e3b7c05a5180547be7ca23a2f",
+      "process_id": 52368,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-native/image/lua.exe",
+        "sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/ada-native.stdout",
+        "sha256": "e66cefa03b923d43d1024e6d87b4d163447bb9b67048d162891c8dc500ea1259"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/ada-native.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/ada-native-telemetry.52368.json",
+        "sha256": "1cac5378d36f2b311e34f2e38b4ab87a84c987b300328da5387149ec13a90ab0"
+      }
+    },
+    {
+      "operation": "execute",
+      "configuration": "upstream-test",
+      "producer": "ada",
+      "vm": "ada",
+      "chunk_sha256": "ebe2743328b00092467c99d8df5f91216c636c8e3b7c05a5180547be7ca23a2f",
+      "process_id": 41628,
+      "executable": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-43af111d19974dcfb7f2955f9e8ab1fa/upstream-test-ada/image/conformance_runner.exe",
+        "sha256": "45077421eb7e3f664ee619da887ecb9379ad192589602d1266ec41da72828721"
+      },
+      "stdout": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/ada-ada.stdout",
+        "sha256": "e66cefa03b923d43d1024e6d87b4d163447bb9b67048d162891c8dc500ea1259"
+      },
+      "stderr": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/ada-ada.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "telemetry": {
+        "path": "C:/Users/Itsuki/workspace/lua-ada/reports/exact-equivalent-review/code-binary-87e153abcf72492296fec3ee0d158c05/upstream-test/ada-ada-telemetry.41628.json",
+        "sha256": "aaf1df8e70ae0d483da007de2d7edbb41f8d902e108fbea72d745cd0327b486b"
+      }
+    }
+  ]
+}

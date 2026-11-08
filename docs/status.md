@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [retained Code component](sessions/2026-11-08-code-local-execution.md)
+matches native output locally with the approved instrumented adaptation and
+passes all eight paired binary compiler/VM execution roles. Exclusions remain
+source-only. The combined strict local builds pass 2,662 AUnit cases in each
+configuration; final matrix and global acceptance remain pending.
+
 The [debug console](sessions/2026-11-08-debug-console.md) executes commands
 through shared Ada compilation and protected continuations, including actual
 direct C calls and closing slots. Local default/T builds pass 2,629 AUnit
