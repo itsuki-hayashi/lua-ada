@@ -2,6 +2,11 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+Relevant T reader checks now use [actual Ada stack inspection](sessions/2026-11-08-stack-inspection.md).
+All 2,248 AUnit cases pass in both local configurations. Original calls.lua
+completes by default; its T run reaches private constant-pool identity
+inspection at line586, whose treatment and semantic witness remain pending.
+
 The [C API self-value correction](sessions/2026-11-08-c-api-self-values.md)
 preserves the target cell when seti/setfield consume that same table. Thirty
 native/Ada C cases match in both configurations; the combined implementation

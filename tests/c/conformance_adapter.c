@@ -9,11 +9,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
+#include <stdint.h>
 
 struct adapter_result {
     int count;
     int text_length;
-    lua_Integer integers[3];
+    lua_Integer integers[5];
     char text[256];
 };
 extern void lua_ada_test_inspect(void *, int, struct adapter_result *);
@@ -130,6 +131,12 @@ static int inspect(lua_State *L) {
      * publication. A Lua error therefore unwinds only the live C guard. */
     lua_ada_test_inspect(lua_touserdata(L, lua_upvalueindex(2)),
         (int)lua_tointeger(L, lua_upvalueindex(1)), &result);
+    if (lua_tointeger(L, lua_upvalueindex(1)) == 37 && result.count == 4) {
+        /* Match the driver's diagnostic address with this actual C frame;
+         * no Ada frame or private C Lua representation is impersonated. */
+        result.integers[4] = (lua_Integer)(uintptr_t)&i;
+        result.count = 5;
+    }
     if (result.count == -2) abort(); /* Internal invariant, never Lua error. */
     if (result.count < 0) {
         lua_pushlstring(L, result.text, (size_t)result.text_length);

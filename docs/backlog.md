@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+The [actual stack inspector](sessions/2026-11-08-stack-inspection.md) enables
+calls.lua's retained reader invariants. Review its remaining T constant-pool
+identity check with a retained three-function semantic witness. Private arena
+size assertions elsewhere still require feature review; whole-target and
+platform acceptance remain open despite both local 2,248-case AUnit passes.
+
 Public C seti/setfield self assignments have [focused evidence](sessions/2026-11-08-c-api-self-values.md).
 Continue instrumented api.lua from line941 with independent review of the
 private retained-capacity bound and actual finalizer/reclamation witnesses.

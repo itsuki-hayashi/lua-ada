@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [actual stack inspection](2026-11-08-stack-inspection.md).
+
 Component: [C API self-valued assignments](2026-11-08-c-api-self-values.md).
 
 Component: [hidden named varargs](2026-11-08-hidden-named-varargs.md).

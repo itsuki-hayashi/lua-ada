@@ -112,7 +112,7 @@ package body Lua.Conformance_Adapter is
       Check (Remembered_Count = Remembered);
    end Verify_Collector_Lists;
 
-   type Integer_Results is array (1 .. 3) of C.long_long
+   type Integer_Results is array (1 .. 5) of C.long_long
      with Convention => C;
    type Adapter_Result is record
       Count : C.int := 0;
@@ -265,7 +265,7 @@ package body Lua.Conformance_Adapter is
                   Result.Integers :=
                     [C.long_long (Stats.Raw_Bytes),
                      C.long_long (Stats.Live_Blocks),
-                     C.long_long (Stats.Peak_Raw_Bytes)];
+                     C.long_long (Stats.Peak_Raw_Bytes), others => 0];
                   if Shared then
                      declare
                         Measured : constant
@@ -275,7 +275,7 @@ package body Lua.Conformance_Adapter is
                         Result.Integers :=
                           [C.long_long (Measured.Bytes),
                            C.long_long (Measured.Blocks),
-                           C.long_long (Measured.Peak)];
+                           C.long_long (Measured.Peak), others => 0];
                      end;
                   end if;
                elsif Item.Kind = String_Kind then
@@ -502,13 +502,25 @@ package body Lua.Conformance_Adapter is
                Result.Count := 3;
                Result.Integers :=
                  [C.long_long (Refusals), C.long_long (Collections),
-                  C.long_long (Cost)];
+                  C.long_long (Cost), others => 0];
             exception
                when others =>
                   Lua.Storage.Set_Test_Ceiling (State.Memory, 0);
                   State.Operation_Start := Saved_Start;
                   raise;
             end;
+         when 37 =>
+            --  Report the real Ada activation/arena counters. calls.lua
+            --  compares successive reader tops, and all.lua compares native
+            --  nesting before/after the entire campaign. Neither may be
+            --  satisfied with an invented constant. Private reserve sizes
+            --  remain Ada's actual policy, rather than C backing geometry.
+            Result.Count := 4;
+            Result.Integers :=
+              [C.long_long (Context.Foreign_Top),
+               C.long_long (Context.Stack_Allocated_Bound),
+               C.long_long (State.Native_Depth),
+               C.long_long (Context.Stack.Length), others => 0];
          when others => raise Invalid_Argument;
       end case;
    exception
@@ -560,7 +572,7 @@ package body Lua.Conformance_Adapter is
          --  Public C test drivers are actual light C functions: hidden
          --  captures would make testC's absent-upvalue queries observe two
          --  values and change its C identity and allocation behavior.
-         if Operation in 1 .. 10 | 12 | 13 then
+         if Operation in 1 .. 10 | 12 | 13 | 37 then
             Append_Root (State, Captures,
                          (Integer_Kind, Integer_Value (Operation)));
             Append_Root (State, Captures,
@@ -610,6 +622,7 @@ package body Lua.Conformance_Adapter is
       Add ("doonnewstack", 33);
       Add ("externstr", 34);
       Add ("checkpanic", 35);
+      Add ("stacklevel", 37);
       --  The source's regcodes roots these actual status strings before
       --  refusal tests. The driver can then push them without resurrecting
       --  an unrooted weak short string while allocator growth is disabled.
