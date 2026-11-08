@@ -64,6 +64,15 @@ function Resolve-TawArtifact([string]$Origin,[string]$ArtifactRoot,[string]$Path
 function Assert-TawProcess {
     param([Collections.IDictionary]$Process,[string]$Origin,[string]$ArtifactRoot,
         [string]$Executable,[string]$ExecutableHash,[string[]]$Arguments,[string]$Prefix,[switch]$NonzeroExit)
+    # Invoke-ConformanceProcess polls in 50ms slices, then bounds process-exit
+    # and pipe draining separately at 5s each. A false timed_out label cannot
+    # excuse elapsed time outside that explicit transport allowance.
+    $timeout=if($Prefix.Replace('\','/').EndsWith('/producer',[StringComparison]::Ordinal)){600}else{120}
+    Assert-TawInteger $Process.elapsed_milliseconds 'elapsed_milliseconds'
+    Assert-TawInteger $Process.timeout_seconds 'timeout_seconds'
+    if($Process.timeout_seconds -ne $timeout -or $Process.elapsed_milliseconds -gt ([long]$timeout*1000+10050)){
+        throw 'Allocator witness declared timeout or bounded elapsed duration differs'
+    }
     Assert-TawInteger $Process.process_id 'process_id'
     if($Process.process_id -eq 0 -or $ExecutableHash -cnotmatch '^[0-9a-f]{64}$' -or
         ($Process.exit_code -isnot [int] -and $Process.exit_code -isnot [long]) -or
@@ -312,8 +321,11 @@ function Assert-TargetAllocatorWitness {
     $end=$start.AddMilliseconds([long]$parent.elapsed_milliseconds).AddSeconds(2)
     $children=if($Witness.witness_kind -ceq 'ada-ceiling'){@($raw.observations.process)}else{@($raw.compile,$raw.process)}
     foreach($child in $children){
+        Assert-TawInteger $child.elapsed_milliseconds 'child elapsed_milliseconds'
         $childStart=[DateTimeOffset]$child.started_utc
+        $childEnd=$childStart.AddMilliseconds([long]$child.elapsed_milliseconds)
         if($childStart -lt $start.AddSeconds(-2) -or $childStart -gt $end){throw 'Target allocator raw process predates its actual producer invocation'}
+        if($childEnd -gt $end){throw 'Target allocator raw child ends after its actual producer invocation'}
     }
     $result=if($Witness.witness_kind -ceq 'ada-ceiling'){
         Assert-TawCeilingRaw -Raw $raw -Witness $Witness -ArtifactRoot $ArtifactRoot

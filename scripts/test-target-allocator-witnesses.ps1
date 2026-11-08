@@ -16,7 +16,7 @@ function Sample-Process([string]$Name,[string[]]$Arguments,[string]$Output,[stri
     $out=Join-Path $samples ($Name+'.stdout');$err=Join-Path $samples ($Name+'.stderr')
     [IO.File]::WriteAllText($out,$Output,$utf8);[IO.File]::WriteAllText($err,$ErrorText,$utf8)
     return @{executable=(Join-Path $samples 'synthetic-tool.exe');executable_sha256=('a'*64);process_id=1000+$script:sampleIndex;
-        working_directory=$root;arguments=@($Arguments);started_utc=[DateTimeOffset]::UtcNow;elapsed_milliseconds=1;
+        working_directory=$root;arguments=@($Arguments);started_utc=[DateTimeOffset]::UtcNow;elapsed_milliseconds=1;timeout_seconds=120;
         exit_code=$Exit;timed_out=$false;capture_exceeded=$false;pipe_drain_failed=$false;process_tree_kill_error=$null;abnormal_exit_kind=$null;
         stdout_path=$out;stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant();stdout_bytes=$utf8.GetByteCount($Output);
         stderr_path=$err;stderr_sha256=(Get-FileHash $err).Hash.ToLowerInvariant();stderr_bytes=$utf8.GetByteCount($ErrorText)}
@@ -142,7 +142,7 @@ function New-Fixture([string]$Kind){
     $parentOut=Text-Artifact ($base+'/producer.stdout') 'SYNTHETIC parent fixture'
     $parentErr=Artifact ($base+'/producer.stderr') ([byte[]]::new(0))
     $parent=@{executable=(Get-Command pwsh).Source;executable_sha256=(Get-FileHash (Get-Command pwsh).Source).Hash.ToLowerInvariant();
-        process_id=123456;working_directory=$root;arguments=$producerArguments;started_utc=$begin;elapsed_milliseconds=[long]($end-$begin).TotalMilliseconds;
+        process_id=123456;working_directory=$root;arguments=$producerArguments;started_utc=$begin;elapsed_milliseconds=[long]($end-$begin).TotalMilliseconds;timeout_seconds=600;
         exit_code=0;timed_out=$false;capture_exceeded=$false;pipe_drain_failed=$false;process_tree_kill_error=$null;abnormal_exit_kind=$null;
         stdout_path=$parentOut.path;stdout_sha256=$parentOut.sha256;stdout_bytes=$utf8.GetByteCount('SYNTHETIC parent fixture');
         stderr_path=$parentErr.path;stderr_sha256=$parentErr.sha256;stderr_bytes=0}
@@ -220,6 +220,13 @@ Case native-observer 'wrong actual runtime DLL bytes are rejected' {param($f)
     $p=Join-Path $f.root ($f.image.paths.c_runtime+'/libconformance_lua.dll');[IO.File]::AppendAllText($p,'other')
 } 'artifact hash'
 Case ada-ceiling 'raw children must belong to the recorded producer window' {param($f)$f.witness.producer_process.started_utc=[DateTimeOffset]::UtcNow.AddYears(1)} 'predates its actual producer'
+Case ada-ceiling 'raw child completion must remain inside its actual producer window' {param($f)$f.raw.observations[0].process.elapsed_milliseconds=10000;Save-Raw $f} 'child ends after its actual producer'
+Case native-observer 'native operations cannot change their actual120second timeout' {param($f)$f.raw.process.timeout_seconds=600;Save-Raw $f} 'declared timeout'
+Case ada-ceiling 'a false timeout label cannot hide elapsed time beyond transport allowance' {param($f)
+    $f.witness.producer_process.elapsed_milliseconds=131000;$f.raw.observations[0].process.elapsed_milliseconds=130051;Save-Raw $f
+} 'bounded elapsed duration'
+Case ada-ceiling 'parent producer timeout must retain the collector600second limit' {param($f)$f.witness.producer_process.timeout_seconds=120} 'declared timeout'
+Case ada-ceiling 'fractional child elapsed time is rejected before parent-window arithmetic' {param($f)$f.raw.observations[0].process.elapsed_milliseconds=[double]1.5;Save-Raw $f} 'integer differs'
 Case ada-ceiling 'an unlisted raw artifact cannot enter a frozen context' {param($f)$f.image.files=@($f.image.files|Where-Object path -CNE ($f.raw_relative))} 'absent from its exact frozen image'
 Case ada-ceiling 'a successful summary cannot replace all thirteen physical children' {param($f)$f.raw.observations=@($f.raw.observations|Select-Object -SkipLast 1);Save-Raw $f} 'thirteen operations'
 Case ada-ceiling 'relabelled ordinary capacity cannot become the 64MiB request' {param($f)$f.raw.observations[2].environment.LUA_ADA_CONFORMANCE_ALLOCATOR='2147483648';Save-Raw $f} 'selected environment'
