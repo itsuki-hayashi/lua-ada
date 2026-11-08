@@ -8,6 +8,7 @@ with Lua.Chunks;
 with Lua.Engine.Canonical;
 with Lua.Engine.C_Operators;
 with Lua.Engine.Stacks;
+with Lua.Engine.Stack_Views;
 with Lua.Engine.IO_Libraries;
 with Lua.Engine.Garbage_Collection;
 with Lua.Engine.Foreign_Hooks;
@@ -935,7 +936,8 @@ package body Lua.Engine.Foreign is
    function Valid_Index (Context : Context_Access; Index : C.int)
                          return Boolean
    is
-      Activation : constant Frame_Access := Context.Foreign_Activation;
+      Activation : constant Frame_Access :=
+        Stack_Views.Physical_Owner (Context);
       Upvalue : constant C.long_long :=
         C.long_long (Registry_Index) - C.long_long (Index);
    begin
@@ -960,7 +962,8 @@ package body Lua.Engine.Foreign is
          declare
             Upvalue : constant C.long_long :=
               C.long_long (Registry_Index) - C.long_long (Index);
-            Activation : constant Frame_Access := Context.Foreign_Activation;
+            Activation : constant Frame_Access :=
+              Stack_Views.Physical_Owner (Context);
          begin
             if Activation /= null and then Activation.Native_Self /= null
               and then Upvalue in 1 .. C.long_long
@@ -1046,11 +1049,20 @@ package body Lua.Engine.Foreign is
    end Ensure_Base_C_Frame;
 
    procedure Publish_Top (Context : not null Context_Access; Top : Natural) is
+      Window : constant Frame_Access := Stack_Views.Physical_Owner (Context);
    begin
       Context.Foreign_Top := Top;
-      if Context.Foreign_Activation = null then
+      if Window = null then
          Context.Host_Stack_Top := Top;
       else
+         Window.Stack_Live_Top := Top;
+      end if;
+      if Context.Foreign_View /= null and then
+        Context.Foreign_Activation /= null and then
+        Context.Foreign_Activation /= Window
+      then
+         --  The real hook guard retains continuation/error ownership, while
+         --  its visible slots belong to the interrupted Lua/native window.
          Context.Foreign_Activation.Stack_Live_Top := Top;
       end if;
    end Publish_Top;
@@ -1059,6 +1071,7 @@ package body Lua.Engine.Foreign is
      (State : in out World; Context : not null Context_Access; Top : Natural)
    is
       Old : constant Natural := Context.Foreign_Top;
+      Window : constant Frame_Access := Stack_Views.Physical_Owner (Context);
    begin
       --  Reserve through a stable index before publishing a larger top. Both
       --  scalar/cell arrays grow together; their retained initialized length
@@ -1067,9 +1080,9 @@ package body Lua.Engine.Foreign is
          if not VM.Ensure_Stack (State, Context, Top) then
             raise Program_Error with "raising stack check returned false";
          end if;
-         if Context.Foreign_Activation /= null then
+         if Window /= null then
             VM.Resize_Stack_Window
-              (State, Context.Foreign_Activation, Top - Context.Foreign_Base);
+              (State, Window, Top - Context.Foreign_Base);
          else
             Context.Stack_Used := Top;
          end if;
@@ -1109,15 +1122,15 @@ package body Lua.Engine.Foreign is
    procedure Push
      (State : in out World; Context : not null Context_Access; Item : Value) is
       Top : constant Natural := Context.Foreign_Top;
+      Window : constant Frame_Access := Stack_Views.Physical_Owner (Context);
    begin
       if Top + 1 > Context.Stack_Used then
          if not VM.Ensure_Stack (State, Context, Top + 1) then
             raise Program_Error with "raising stack check returned false";
          end if;
-         if Context.Foreign_Activation /= null then
+         if Window /= null then
             VM.Resize_Stack_Window
-              (State, Context.Foreign_Activation,
-               Top + 1 - Context.Foreign_Base);
+              (State, Window, Top + 1 - Context.Foreign_Base);
          else
             Context.Stack_Used := Top + 1;
          end if;
@@ -1683,12 +1696,14 @@ package body Lua.Engine.Foreign is
             --  window. The next resume restores this exact execution view
             --  only after copying its newly supplied arguments into roots.
             Caller.Resume_Foreign_Activation := Caller.Foreign_Activation;
+            Caller.Resume_Foreign_View := Caller.Foreign_View;
             Caller.Resume_Foreign_Base := Caller.Foreign_Base;
             Caller.Resume_Foreign_Top := Caller.Foreign_Top;
             Caller.Resume_Stack_Used := Caller.Stack_Used;
             Caller.Resume_Host_Stack_Top := Caller.Host_Stack_Top;
             Caller.Detached_Resume_Window := Error_Status = 1;
             Caller.Foreign_Activation := null;
+            Caller.Foreign_View := null;
             Caller.Foreign_Base :=
               (if Error_Status = 1 then Caller.Stack_Used
                else Caller.Resume_Return_Base);
@@ -1863,6 +1878,12 @@ package body Lua.Engine.Foreign is
       --  when it is an inactive coroutine. Borrowing it never resets budgets
       --  or resumes Lua execution, and the caller's context is restored below.
       case Input.Operation is
+         when Begin_Hook_View =>
+            VM.Begin_Hook_View
+              (Owner.Universe.all, Context, Input.Callback_Token);
+         when End_Hook_View =>
+            VM.End_Hook_View
+              (Owner.Universe.all, Context, Input.Callback_Token);
          when Create_Formatter | Append_Format_Value | Append_Format_UTF8 |
            Finish_Formatter | Release_Formatter | Charge_Aux_Work =>
             Format_API (Owner.Universe.all, Context, Input.all, Output.all);
@@ -2146,7 +2167,7 @@ package body Lua.Engine.Foreign is
             end;
          when Mark_Close =>
             declare
-               Frame : Frame_Access := Context.Foreign_Activation;
+               Frame : Frame_Access := Stack_Views.Physical_Owner (Context);
                Slot : constant Natural := Position (Context, Input.Index);
                Item : constant Value := Get_Value (Input.Index);
             begin
@@ -2166,7 +2187,7 @@ package body Lua.Engine.Foreign is
                        "variable '(C temporary)' got a non-closable value";
                   end if;
                   Ensure_Base_C_Frame (Owner.Universe.all, Context);
-                  Frame := Context.Foreign_Activation;
+                  Frame := Stack_Views.Physical_Owner (Context);
                   Context.C_Close_Links.Replace_Element
                     (Slot, (Previous => Frame.C_Closing_Level));
                   Frame.C_Closing_Level := Slot;
@@ -2174,7 +2195,8 @@ package body Lua.Engine.Foreign is
             end;
          when Close_Slot =>
             declare
-               Frame : constant Frame_Access := Context.Foreign_Activation;
+               Frame : constant Frame_Access :=
+                 Stack_Views.Physical_Owner (Context);
                Slot : constant Natural := Position (Context, Input.Index);
             begin
                if Frame = null or else not Valid_Index
@@ -2318,11 +2340,13 @@ package body Lua.Engine.Foreign is
                if not Fresh and then Context.Detached_Resume_Window then
                   Context.Foreign_Activation :=
                     Context.Resume_Foreign_Activation;
+                  Context.Foreign_View := Context.Resume_Foreign_View;
                   Context.Foreign_Base := Context.Resume_Foreign_Base;
                   Context.Foreign_Top := Context.Resume_Foreign_Top;
                   Context.Stack_Used := Context.Resume_Stack_Used;
                   Context.Host_Stack_Top := Context.Resume_Host_Stack_Top;
                   Context.Resume_Foreign_Activation := null;
+                  Context.Resume_Foreign_View := null;
                   Context.Detached_Resume_Window := False;
                else
                   Context.Host_Stack_Top := Context.Resume_Return_Top;
@@ -2562,6 +2586,8 @@ package body Lua.Engine.Foreign is
                  C.long_long (Input.Index) + 1);
          when Set_Top =>
             declare
+               Window : constant Frame_Access :=
+                 Stack_Views.Physical_Owner (Context);
                Count : constant Integer_Value :=
                  (if Input.Index >= 0 then Integer_Value
                     (Context.Foreign_Base) + Integer_Value (Input.Index)
@@ -2573,11 +2599,10 @@ package body Lua.Engine.Foreign is
                then
                   raise Foreign_Error with "invalid stack top";
                end if;
-               if Context.Foreign_Activation /= null and then
-                 Context.Foreign_Activation.C_Closing_Level > Natural (Count)
+               if Window /= null and then
+                 Window.C_Closing_Level > Natural (Count)
                then
-                  Prepare_C_Slots
-                    (Context.Foreign_Activation, Natural (Count));
+                  Prepare_C_Slots (Window, Natural (Count));
                else
                   Set_C_Top (Owner.Universe.all, Context, Natural (Count));
                end if;
@@ -2594,14 +2619,16 @@ package body Lua.Engine.Foreign is
                      Available : constant Boolean := VM.Ensure_Stack
                        (Owner.Universe.all, Context, Last,
                         Raise_Error => False);
+                     Window : constant Frame_Access :=
+                       Stack_Views.Physical_Owner (Context);
                   begin
                      if not Available then
                         null;
-                     elsif Context.Foreign_Activation /= null then
+                     elsif Window /= null then
                         VM.Resize_Stack_Window
-                          (Owner.Universe.all, Context.Foreign_Activation,
+                          (Owner.Universe.all, Window,
                            Natural'Max
-                             (Context.Foreign_Activation.Stack_Window_Length,
+                             (Window.Stack_Window_Length,
                               Last - Context.Foreign_Base));
                      else
                         Stacks.Reserve (Owner.Universe.all, Context, Last);
@@ -2632,7 +2659,7 @@ package body Lua.Engine.Foreign is
                then
                   Store_Cell
                     (Owner.Universe.all,
-                     Context.Foreign_Activation.Native_Self.Captures
+                     Stack_Views.Physical_Owner (Context).Native_Self.Captures
                        (Positive (C.long_long (Registry_Index) -
                          C.long_long (Input.Count))),
                      Get_Value (Input.Index));
@@ -2788,7 +2815,8 @@ package body Lua.Engine.Foreign is
                   else
                      Store_Cell
                        (Owner.Universe.all,
-                        Context.Foreign_Activation.Native_Self.Captures
+                        Stack_Views.Physical_Owner
+                          (Context).Native_Self.Captures
                           (Positive (C.long_long (Registry_Index) -
                             C.long_long (Input.Index))), Item);
                   end if;

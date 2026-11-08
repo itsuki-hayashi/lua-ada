@@ -42,6 +42,7 @@ enum lua_ada_operation {
     ADA_STRING_TO_NUMBER = 106,
     ADA_COMPLETE_SELF_CLOSE = 107,
     ADA_PREPARE_PANIC = 108,
+    ADA_BEGIN_HOOK_VIEW = 109, ADA_END_HOOK_VIEW,
     ADA_CREATE_FORMATTER = 120, ADA_APPEND_FORMAT_VALUE,
     ADA_APPEND_FORMAT_UTF8, ADA_FINISH_FORMATTER,
     ADA_RELEASE_FORMATTER, ADA_CHARGE_AUX_WORK,
@@ -171,6 +172,9 @@ int lua_ada_run_protected(lua_State *state,
 void lua_ada_propagate_status(lua_State *state, int status);
 void lua_ada_aux_charge(lua_State *state, size_t amount);
 int lua_ada_invoke_builtin(lua_State *state, int id);
+void lua_ada_hook_view(lua_State *state, int begin);
+/* Enter/leave the interrupted activation's scalar view while retaining the
+ * genuine C callback guard. Error transfers release it on typed guard ACK. */
 /* Identity of the real private finalizer-pump transport, not a callable Lua
  * API. Its lifetime is the loaded library; no Lua allocation is involved. */
 void *lua_ada_collector_drain_address(void);

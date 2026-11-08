@@ -24,6 +24,81 @@ package body Lua.Foreign_Hook_Tests is
    procedure C_Explicit_Close;
    procedure C_Refusal_Reuse;
    procedure C_Suspended_Indexing;
+   procedure Hook_Scalar_Cells;
+   procedure Hook_Nested_Call;
+   procedure Hook_Protected_Error;
+   procedure Hook_Unprotected_Error;
+   procedure Hook_Blocks_Nested_Yield;
+   procedure Hook_Direct_Yield;
+   procedure Hook_Argument_Weak_Root;
+   procedure Hook_Upvalue_Weak_Root;
+   procedure External_Release_Lua_View;
+
+   procedure External_Release_Lua_View is
+   begin
+      --  Release an actual external payload during a Lua allocation loop.
+      --  The callback borrows that real CI, concatenates with Lua handlers,
+      --  mutates an earlier pending operand through debug.setlocal, and sees
+      --  each consumed tail disappear at its actual fold boundary.
+      Assert (Contract (24) = 0, "external release borrows actual Lua CI");
+   end External_Release_Lua_View;
+
+   procedure Hook_Argument_Weak_Root is
+   begin
+      --  Replace type's real C argument with nil, then collect in the call
+      --  hook. No copied packet may retain the former weak table value, and
+      --  the resumed builtin must consume nil from its actual edited slot.
+      Assert (Contract (22) = 0, "C hook removes stale argument roots");
+   end Hook_Argument_Weak_Root;
+
+   procedure Hook_Upvalue_Weak_Root is
+   begin
+      --  Address the interrupted C closure's real upvalue pseudo-index.
+      --  Replacing its sole edge must allow collection before body entry.
+      Assert (Contract (23) = 0, "C hook removes stale captured roots");
+   end Hook_Upvalue_Weak_Root;
+
+   procedure Hook_Scalar_Cells is
+   begin
+      --  Raw C indices and debug locals denote the same interrupted cells.
+      --  Replacing local x through lua_replace changes the caller's result.
+      Assert (Contract (16) = 0, "C hook borrows actual Lua scalar cells");
+   end Hook_Scalar_Cells;
+
+   procedure Hook_Nested_Call is
+   begin
+      --  Remove the hook, call Lua, and inspect its hook origin. The borrow
+      --  must survive nested stack growth and restore the original prefix.
+      Assert (Contract (17) = 0, "C hook retains cells through nested Lua");
+   end Hook_Nested_Call;
+
+   procedure Hook_Protected_Error is
+   begin
+      --  A nested protected C error returns its real object above the same
+      --  prefix, allowing the hook to edit a local and return normally.
+      Assert (Contract (18) = 0, "C hook restores view after nested error");
+   end Hook_Protected_Error;
+
+   procedure Hook_Unprotected_Error is
+   begin
+      --  Raising integer 17 abandons the hook guard, releases its borrowed
+      --  view on typed acknowledgement, and leaves the universe reusable.
+      Assert (Contract (19) = 0, "C hook error releases actual view lease");
+   end Hook_Unprotected_Error;
+
+   procedure Hook_Blocks_Nested_Yield is
+   begin
+      --  Lua called synchronously by a C hook cannot yield across that live
+      --  body. Its protected error cannot corrupt the interrupted locals.
+      Assert (Contract (20) = 0, "C hook nested yield retains C boundary");
+   end Hook_Blocks_Nested_Yield;
+
+   procedure Hook_Direct_Yield is
+   begin
+      --  A direct zero-result hook yield returns normally from C, suspends
+      --  once, then resumes the same instruction with original local cells.
+      Assert (Contract (21) = 0, "C hook yield restores interrupted stack");
+   end Hook_Direct_Yield;
 
    procedure Reflection is
    begin
@@ -163,5 +238,23 @@ package body Lua.Foreign_Hook_Tests is
                         C_Refusal_Reuse'Access);
       Test_Support.Add (Suite, "C indexing: suspended thread retains frames",
                         C_Suspended_Indexing'Access);
+      Test_Support.Add (Suite, "C hooks: actual scalar cells and mutation",
+                        Hook_Scalar_Cells'Access);
+      Test_Support.Add (Suite, "C hooks: nested call restores borrowed cells",
+                        Hook_Nested_Call'Access);
+      Test_Support.Add (Suite, "C hooks: protected error restores view",
+                        Hook_Protected_Error'Access);
+      Test_Support.Add (Suite, "C hooks: unprotected error releases view",
+                        Hook_Unprotected_Error'Access);
+      Test_Support.Add (Suite, "C hooks: nested yield is nonyieldable",
+                        Hook_Blocks_Nested_Yield'Access);
+      Test_Support.Add (Suite, "C hooks: direct yield restores instruction",
+                        Hook_Direct_Yield'Access);
+      Test_Support.Add (Suite, "C hooks: replaced argument loses weak root",
+                        Hook_Argument_Weak_Root'Access);
+      Test_Support.Add (Suite, "C hooks: replaced upvalue loses weak root",
+                        Hook_Upvalue_Weak_Root'Access);
+      Test_Support.Add (Suite, "C release: borrowed Lua cells and concat",
+                        External_Release_Lua_View'Access);
    end Register;
 end Lua.Foreign_Hook_Tests;

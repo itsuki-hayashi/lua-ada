@@ -1,5 +1,8 @@
 # Architecture Decision Log
 
+ADR 0034 records [borrowed C stack views](0034-borrowed-c-stack-views.md),
+real interrupted scalar ownership and independently retained C guards.
+
 Latest: [ADR 0021: External string ownership](0021-external-string-ownership.md), final acceptance pending.
 
 ADR 0007 records explicit native continuation frames, traced library/module

@@ -10,6 +10,8 @@ Component: [string arguments and scalar results](2026-11-08-string-arguments-res
 
 Component: [owned argument details](2026-11-08-owned-argument-detail.md).
 
+Component: [borrowed C stack views](2026-11-08-borrowed-c-stack-views.md).
+
 Component: [public-boundary integration](2026-11-08-public-boundary-integration.md).
 
 Component: [scalar logical negation](2026-11-08-scalar-not-refusal.md).

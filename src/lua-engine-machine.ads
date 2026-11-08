@@ -48,6 +48,18 @@ package Lua.Engine.Machine is
    --  never call this helper and consume no invented Lua slots. A noncurrent
    --  parent may grow its reservation without overwriting a child's ci.top.
 
+   procedure Begin_Hook_View
+     (State : in out World; Context : not null Context_Access;
+      Token : Callback_Identity);
+   procedure End_Hook_View
+     (State : in out World; Context : not null Context_Access;
+      Token : Callback_Identity);
+   --  Called only by the actual C hook transport's guarded entry. The
+   --  private argument window retires before borrowing interrupted cells;
+   --  the real callback guard/serial retains continuation/error ownership.
+   --  End is also performed by typed completion/abandonment if C cannot
+   --  return normally. Neither procedure executes callbacks or another VM.
+
    function Reserve_Native_Results
      (State : in out World; Activation : not null Frame_Access;
       Count : Natural) return Boolean;

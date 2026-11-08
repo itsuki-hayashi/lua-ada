@@ -33,6 +33,13 @@ four native-paired Lua cases and five AUnit regressions within 2,099 passing
 cases per configuration. Continue the wider failure-text/renderer allocation
 audit; this component does not establish that every error temporary is owned.
 
+The [shared C view checkpoint](sessions/2026-11-08-borrowed-c-stack-views.md)
+adds actual interrupted scalar views and typed guard restoration, with nine
+named cases and 2,103 passing AUnit cases per isolated configuration. Continue
+the actual return-hook result window and weak-root lifetime checkpoint, then
+remaining public T commands and unreduced source acceptance. Native T's
+allocator-reentry lock abort remains a recorded counterpart limit.
+
 The [combined public-boundary replay](sessions/2026-11-08-public-boundary-integration.md)
 passes 2,094 AUnit cases per local configuration after preserving the checked
 argument-borrow lifetime. Continue original string/self diagnostics, the

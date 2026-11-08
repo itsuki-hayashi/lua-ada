@@ -1,0 +1,65 @@
+# ADR 0034: Borrowed C stack views
+
+Date: 2026-11-08, Asia/Tokyo. Status: scoped implementation.
+
+## Context
+
+Pinned ldo.c luaD_hook invokes a C hook while borrowing the interrupted
+CallInfo. It saves the prior top, exposes the full Lua reservation, ensures
+LUA_MINSTACK headroom, and restores that reservation after the callback.
+ldebug.c luaG_findlocal observes those same actual cells. A direct line/count
+hook yield returns normally to luaD_hook before the executor suspends.
+
+The Ada scheduler already owns a real C hook transport and a C-only guard.
+Its event/line packet occupied a different scalar window. Removing that
+packet exposed an empty stack to the user hook. Warning and external
+payload-release callbacks also borrowed Canonical_Top, which describes open
+instruction results rather than the current live Lua range. Public raw stack
+access and debug local access consequently disagreed.
+
+## Decision
+
+Keep the actual guard owner separate from the physical scalar owner. The
+existing Foreign_Activation retains callback identity, continuation fields,
+and its real typed error/yield acknowledgement. An optional Foreign_View names
+the actual borrowed stack window. Ordinary C entries clear that override and
+restore it after their own guard returns.
+
+Use one embedded Stack_View_Lease for hooks, warnings, and external releases.
+It records scalar indices and real frame pointers, never a copied stack or a
+second execution state. A custom C hook retires only its consumed transport
+reservation before borrowing interrupted cells. Lua hook views expose the
+original reservation; warning/release views expose the actual live range.
+Writes use the existing scalar/cell arena, collector roots, allocator, and
+execution budget. Nested calls open above the current borrowed top.
+
+Reserve minimum C headroom and charge native packet transitions before the
+transport retires. Clearing copied native argument/capture packets before
+callback collection prevents stale weak roots. On a normal hook return,
+retained capacities reconstruct only execution packets which the interrupted
+Ada native body still needs, using edited scalar/capture cells. Failure
+acknowledgement abandons those packets. Restoration performs no allocation,
+restores only its own lease, and leaves real child error or closing scopes
+to their existing owner and iterative driver.
+
+The C shim only selects enter/leave operations and supplies its actual guard
+token. All nonlocal transfer occurs after Ada dispatch returns. This adds no
+recursive executor calls, reference-interpreter linkage, fake callback
+pointers, or parallel closing implementation.
+
+## Evidence boundary
+
+Nine separately named public C regressions cover real scalar edits, hook
+removal/nested calls, protected and unprotected errors, blocked nested yield,
+direct hook yield, weak argument/upvalue release, and allocator reentry into
+a Lua CI while concatenation handlers inspect and edit pending operands.
+The first eight pass both pinned native configurations. The release-reentry
+case passes native default; native USER_H aborts its private plock assertion
+in ldebug.c before that callback can complete. Its narrower oracle invocation
+uses an explicit --without-release-reentry option and is not evidence that
+the omitted case passed. Both Ada configurations retain the release case.
+
+Strict Ada build/runtime results belong in the component session after
+execution. Exact optimizer temporary counts/content, return-hook result
+mutation, remaining T commands, and full upstream acceptance are separate
+obligations. This decision grants no source exclusion.

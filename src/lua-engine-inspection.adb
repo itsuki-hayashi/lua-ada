@@ -60,7 +60,11 @@ package body Lua.Engine.Inspection is
       Window : Frame_Access := Context.Stack_Window;
       Child : Frame_Access;
       Limit : constant Natural :=
-        (if not Item.Is_Native then Item.Canonical_GC_Top
+        (if not Item.Is_Native then
+            (if Item.Warning_Borrow_Depth /= 0 then Natural'Max
+               (Item.Canonical_GC_Top,
+                Item.Stack_Live_Top - Item.Stack_Base)
+             else Item.Canonical_GC_Top)
          elsif Item.Has_Stack_Window then
             Item.Stack_Live_Top - Item.Stack_Base
          else Natural (Item.Native_Arguments.Length));

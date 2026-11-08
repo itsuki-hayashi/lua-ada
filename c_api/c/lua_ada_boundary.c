@@ -157,6 +157,14 @@ static struct lua_ada_response dispatch(lua_State *state,
     return output;
 }
 
+void lua_ada_hook_view(lua_State *state, int begin) {
+    struct lua_ada_request input = request(begin
+        ? ADA_BEGIN_HOOK_VIEW : ADA_END_HOOK_VIEW);
+    if (state->guard != NULL)
+        input.callback_token = state->guard->callback_token;
+    (void)dispatch(state, input);
+}
+
 int lua_ada_debug_dispatch(lua_State *state,
                            const struct lua_ada_request *input,
                            struct lua_ada_response *output) {

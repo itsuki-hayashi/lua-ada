@@ -142,6 +142,21 @@ private package Lua.Engine is
    type Canonical_Program_Access is access Canonical_Program;
    for Canonical_Program_Access'Storage_Pool use Lua.Storage.Pool;
 
+   type Stack_View_Kind is (Callback_View, Hook_View);
+   type Stack_View_Lease is record
+      Context : Context_Access;
+      Window, Previous_Frame, Previous_View : Frame_Access;
+      Kind : Stack_View_Kind := Callback_View;
+      Previous_Base, Previous_Top : Natural := 0;
+      Window_Length, Live_Top, GC_Top, Stack_Used : Natural := 0;
+      Caller_Base, Caller_Top : Natural := 0;
+      Argument_Count : Natural := 0;
+      Restore_Arguments, Restore_Captures : Boolean := False;
+   end record;
+   --  Embedded, allocation-free ownership of one synchronous C stack view.
+   --  Context=null means inactive. Window remains a real active frame; the
+   --  lease borrows its scalar cells without creating a public call level.
+
    type Object_Color is (White_0, White_1, Gray, Black);
    subtype White_Color is Object_Color range White_0 .. White_1;
    type Object_Age is
@@ -357,9 +372,7 @@ private package Lua.Engine is
             String_Rooted : Boolean := False;
             Release_Queued : Boolean := False;
             Release_Next, Release_Active_Previous : Object_Access;
-            Release_Context : Context_Access;
-            Release_Window, Release_Previous_Frame : Frame_Access;
-            Release_Previous_Base, Release_Previous_Top : Natural := 0;
+            Release_View : Stack_View_Lease;
             --  Bucket membership is weak. The second intrusive list roots
             --  reused strings during one API/compiler operation without an
             --  allocation on a successful short-string lookup.
@@ -570,23 +583,27 @@ private package Lua.Engine is
       --  windows until reset, as recorded by Deferred_Error_Traceback.
       Warning_Phase : Warning_Event_Phase := No_Pending_Warning;
       Warning_Previous : Frame_Access;
-      Warning_Window : Frame_Access;
+      Warning_View : Stack_View_Lease;
       Warning_Borrow_Depth : Natural := 0;
+      Hook_View_Depth : Natural := 0;
+      --  A hook pauses this actual frame's argument/capture packet while C
+      --  operates on its cells; nested warning/release views preserve that.
       Warning_Ticket : Interfaces.C.unsigned_long_long := 0;
       Warning_Message : Byte_String;
       Warning_Root : Value;
       Warning_To_Continue : Boolean := False;
       Warning_Handler : System.Address := System.Null_Address;
       Warning_Data : System.Address := System.Null_Address;
-      Warning_Previous_Base : Natural := 0;
-      Warning_Previous_Top : Natural := 0;
-      Warning_Previous_Frame : Frame_Access;
       Warning_Failed : Boolean := False;
       --  A warning borrows its actual current frame. Embedded event storage
       --  and the linked previous event retain roots across nested C callbacks.
       Foreign_Base : Natural := 0;
       Foreign_Previous_Base : Natural := 0;
       Foreign_Previous_Frame : Frame_Access;
+      Foreign_Previous_View : Frame_Access;
+      Hook_View : Stack_View_Lease;
+      --  The actual C hook guard and its interrupted scalar view have
+      --  distinct lifetimes. A regular C entry saves/restores that view.
       Foreign_Entered : Boolean := False;
       --  A C callback has a base-relative public stack window. The previous
       --  window is explicit frame data so reentrant calls and error unwinding
@@ -754,11 +771,15 @@ private package Lua.Engine is
       Foreign_Control : System.Address := System.Null_Address;
       Foreign_Base : Natural := 0;
       Foreign_Activation : Frame_Access;
+      Foreign_View : Frame_Access;
+      --  Optional physical owner of a borrowed C view. Foreign_Activation
+      --  can still name the genuine callback guard/continuation owner.
       Base_C_Frame : Frame_Access;
       --  Reserved base C activation lazily owns API-level closing slots.
       --  Its real scalar window starts at zero; like Lua's base CallInfo it
       --  has no public debug frame and carries no native-call depth charge.
       Resume_Foreign_Activation : Frame_Access;
+      Resume_Foreign_View : Frame_Access;
       Resume_Foreign_Base : Natural := 0;
       Resume_Foreign_Top : Natural := 0;
       Resume_Stack_Used : Natural := 0;

@@ -17,6 +17,236 @@ struct hook_observation {
 static struct hook_observation *observation;
 static int closed, close_failed, expected_close_error, close_continued;
 static int hook_generation, count_generation, combined_lines, combined_failed;
+static int view_mode, view_hits, view_failed;
+
+static int fail_in_hook(lua_State *L) {
+    lua_pushliteral(L, "nested hook failure");
+    return lua_error(L);
+}
+
+/* Report callback failures through the owning named case rather than aborting
+ * the complete AUnit process. The line identifies the violated public fact. */
+#define VIEW_CHECK(condition) do { if (!(condition)) { \
+    view_failed = __LINE__; return; } } while (0)
+static void stack_view_hook(lua_State *L, lua_Debug *ar) {
+    static const char *const names[] = {"a", "b", "x"};
+    static const lua_Integer values[] = {5, 7, 37};
+    lua_Debug frame;
+    int before, i;
+    if (ar->event != LUA_HOOKLINE || ar->currentline != 3) return;
+    ++view_hits;
+    before = lua_gettop(L);
+    VIEW_CHECK(before >= 3);
+    VIEW_CHECK(lua_getstack(L, 0, &frame));
+    VIEW_CHECK(lua_getinfo(L, "S", &frame));
+    VIEW_CHECK(strcmp(frame.what, "Lua") == 0);
+    for (i = 1; i <= 3; ++i) {
+        const char *name;
+        VIEW_CHECK(lua_isinteger(L, i) &&
+                   lua_tointeger(L, i) == values[i-1]);
+        name = lua_getlocal(L, &frame, i);
+        VIEW_CHECK(name && strcmp(name, names[i-1]) == 0);
+        VIEW_CHECK(lua_tointeger(L, -1) == values[i-1]);
+        lua_pop(L, 1);
+        VIEW_CHECK(lua_gettop(L) == before);
+    }
+    /* Removing the installation cannot remove this active hook's borrowed
+     * cells or its real hook origin during a nested Lua call. */
+    lua_sethook(L, NULL, 0, 0);
+    if (view_mode == 2) {
+        lua_getglobal(L, "hook_nested");
+        lua_pushinteger(L, 40);
+        lua_call(L, 1, 1);
+        VIEW_CHECK(lua_gettop(L) == before + 1 &&
+                   lua_tointeger(L, -1) == 41);
+        lua_pop(L, 1);
+    } else if (view_mode == 3) {
+        lua_pushcfunction(L, fail_in_hook);
+        VIEW_CHECK(lua_pcall(L, 0, 1, 0) == LUA_ERRRUN);
+        VIEW_CHECK(lua_gettop(L) == before + 1);
+        VIEW_CHECK(strcmp(lua_tostring(L, -1), "nested hook failure") == 0);
+        lua_pop(L, 1);
+    } else if (view_mode == 4) {
+        lua_pushinteger(L, 17);
+        lua_error(L);
+        VIEW_CHECK(0);
+    } else if (view_mode == 5) {
+        lua_getglobal(L, "hook_yield");
+        VIEW_CHECK(lua_pcall(L, 0, 0, 0) == LUA_ERRRUN);
+        VIEW_CHECK(strstr(lua_tostring(L, -1), "C-call boundary"));
+        lua_pop(L, 1);
+    } else if (view_mode == 6) {
+        /* A direct hook yield returns zero normally, then suspends only
+         * after the hook returns. No foreign jump may cross an Ada frame. */
+        VIEW_CHECK(lua_yield(L, 0) == 0);
+        return;
+    }
+    VIEW_CHECK(lua_gettop(L) == before);
+    lua_pushinteger(L, 40);
+    lua_replace(L, 3);
+    VIEW_CHECK(lua_gettop(L) == before && lua_tointeger(L, 3) == 40);
+}
+#undef VIEW_CHECK
+
+static int stack_view_contract(lua_State *L, int which) {
+    lua_State *thread;
+    int status, count;
+    luaL_openlibs(L);
+    if (luaL_dostring(L,
+        "function hook_target(a,b)\n local x=37\n return a+x,b\nend\n"
+        "function hook_nested(x)local n=debug.getinfo(1,'n');"
+        "assert(n.namewhat=='hook' and n.name=='?');return x+1 end\n"
+        "function hook_yield()coroutine.yield(9)end") != LUA_OK) return 70;
+    view_mode = which; view_hits = view_failed = 0;
+    thread = which >= 5 ? lua_newthread(L) : L;
+    lua_getglobal(L, "hook_target");
+    if (thread != L) lua_xmove(L, thread, 1);
+    lua_pushinteger(thread, 5);
+    lua_pushinteger(thread, 7);
+    lua_sethook(thread, stack_view_hook, LUA_MASKLINE, 0);
+    if (which >= 5) {
+        status = lua_resume(thread, L, 2, &count);
+        if (which == 6) {
+            if (status != LUA_YIELD || count != 0 || view_hits != 1)
+                return 71;
+            status = lua_resume(thread, L, 0, &count);
+        }
+        if (status != LUA_OK || count != 2) return 72;
+    } else status = lua_pcall(L, 2, 2, 0);
+    if (view_failed) return view_failed;
+    if (view_hits != 1) return 73;
+    if (which == 4) {
+        if (status != LUA_ERRRUN || lua_tointeger(L, -1) != 17) return 74;
+        lua_settop(L, 0);
+        if (luaL_dostring(L, "return 37") != LUA_OK ||
+            lua_tointeger(L, -1) != 37) return 75;
+    } else if (status != LUA_OK ||
+        lua_tointeger(thread, -2) != (which == 6 ? 42 : 45) ||
+        lua_tointeger(thread, -1) != 7) return 76;
+    return 0;
+}
+
+static int captured_result(lua_State *L) {
+    lua_pushvalue(L, lua_upvalueindex(1));
+    return 1;
+}
+
+static void weak_view_hook(lua_State *L, lua_Debug *ar) {
+    int selected;
+    if (ar->event != LUA_HOOKCALL) return;
+    if (!lua_getinfo(L, "f", ar)) { view_failed = 80; return; }
+    if (view_mode == 7) {
+        lua_getglobal(L, "type");
+        selected = lua_rawequal(L, -1, -2);
+        lua_pop(L, 1);
+    } else selected = lua_tocfunction(L, -1) == captured_result;
+    lua_pop(L, 1);
+    if (!selected) return;
+    ++view_hits;
+    lua_sethook(L, NULL, 0, 0);
+    /* Replacing the real argument/upvalue removes its only strong edge.
+     * Collector-visible copied call packets must already have retired. */
+    lua_pushnil(L);
+    lua_replace(L, view_mode == 7 ? 1 : lua_upvalueindex(1));
+    lua_gc(L, LUA_GCCOLLECT);
+    lua_getglobal(L, "weak_hook_value");
+    lua_rawgeti(L, -1, 1);
+    if (!lua_isnil(L, -1)) view_failed = 81;
+    lua_pop(L, 2);
+}
+
+static int weak_view_contract(lua_State *L, int which) {
+    int status;
+    luaL_openlibs(L);
+    if (luaL_dostring(L,
+        "local v={};weak_hook_value=setmetatable({v},{__mode='v'});"
+        "return v") != LUA_OK) return 82;
+    view_mode = which; view_hits = view_failed = 0;
+    if (which == 8) {
+        lua_pushcclosure(L, captured_result, 1);
+    } else {
+        lua_getglobal(L, "type");
+        lua_insert(L, -2);
+    }
+    lua_sethook(L, weak_view_hook, LUA_MASKCALL, 0);
+    status = lua_pcall(L, which == 7 ? 1 : 0, 1, 0);
+    lua_sethook(L, NULL, 0, 0);
+    if (status != LUA_OK || view_hits != 1) return 83;
+    if (view_failed) return view_failed;
+    if (which == 7) {
+        if (!lua_isstring(L, -1) || strcmp(lua_tostring(L, -1), "nil") != 0)
+            return 84;
+    } else if (!lua_isnil(L, -1)) return 85;
+    return 0;
+}
+
+struct release_view { lua_State *state; int released, failed; };
+static void *release_in_lua(void *data, void *block, size_t old,
+                            size_t size) {
+    struct release_view *view = (struct release_view *)data;
+    lua_State *L = view->state;
+    lua_Debug frame;
+    int base = lua_gettop(L), i;
+    if (size != 0 || old != 65 ||
+        !lua_getstack(L, 0, &frame) || !lua_getinfo(L, "S", &frame) ||
+        strcmp(frame.what, "Lua") != 0 || base == 0) view->failed = 90;
+    if (!lua_checkstack(L, 100)) view->failed = 91;
+    if (!view->failed) {
+        lua_pushinteger(L, base);
+        lua_setglobal(L, "borrow_base");
+        for (i = 0; i < 3; ++i) {
+            char id[2] = {(char)('a' + i), 0};
+            lua_newtable(L);
+            lua_pushstring(L, id);
+            lua_setfield(L, -2, "id");
+            lua_getglobal(L, "borrow_mt");
+            lua_setmetatable(L, -2);
+        }
+        lua_concat(L, 3);
+        if (lua_gettop(L) != base + 1 || !lua_isstring(L, -1) ||
+            strcmp(lua_tostring(L, -1), "joined") != 0) view->failed = 92;
+        lua_pop(L, 1);
+        if (lua_gettop(L) != base) view->failed = 93;
+    }
+    ++view->released;
+    free(block);
+    return NULL;
+}
+
+static int release_view_contract(lua_State *L) {
+    struct release_view view = {L, 0, 0};
+    char *payload;
+    int status;
+    luaL_openlibs(L);
+    lua_gc(L, LUA_GCSTOP);
+    payload = (char *)malloc(65);
+    if (payload == NULL) return 94;
+    memset(payload, 'e', 64); payload[64] = 0;
+    lua_pushexternalstring(L, payload, 64, release_in_lua, &view);
+    lua_setglobal(L, "external_pending");
+    status = luaL_dostring(L,
+        "local step=0;local replacement={id='replacement'};local result={};"
+        "borrow_mt={__concat=function(x,y)step=step+1;"
+        "assert(debug.getinfo(2,'f').func==borrow_worker);"
+        "if step==1 then assert(x.id=='b' and y.id=='c');"
+        "local _,v=debug.getlocal(2,borrow_base+1);assert(v.id=='a');"
+        "local _,c=debug.getlocal(2,borrow_base+3);assert(c.id=='c');"
+        "assert(debug.setlocal(2,borrow_base+1,replacement));return result "
+        "else assert(x==replacement and y==result);"
+        "assert(debug.getlocal(2,borrow_base+3)==nil);return 'joined'end end};"
+        "setmetatable(replacement,borrow_mt);setmetatable(result,borrow_mt);"
+        "function borrow_worker()external_pending=nil;"
+        "for i=1,20000 do local t={i,i,i}end end");
+    if (status == LUA_OK) {
+        lua_gc(L, LUA_GCRESTART);
+        status = luaL_dostring(L, "borrow_worker()");
+    }
+    /* Complete physical teardown while callback userdata is still alive.
+     * The caller must not use L after this separately owned case returns. */
+    lua_close(L);
+    if (status != LUA_OK || view.released != 1) return 95;
+    return view.failed;
+}
 
 static void combined_hook(lua_State *L, lua_Debug *ar) {
     if (ar->event == LUA_HOOKCOUNT) count_generation = hook_generation;
@@ -284,6 +514,17 @@ int lua_ada_test_hook_contract(int which) {
     memset(&observed, 0, sizeof observed);
     observed.expected = L;
     observation = &observed;
+    if (which == 24) {
+        observation = NULL;
+        return release_view_contract(L);
+    }
+    if (which >= 16 && which <= 23) {
+        result = which <= 21 ? stack_view_contract(L, which - 15) :
+            weak_view_contract(L, which - 15);
+        observation = NULL;
+        lua_close(L);
+        return result;
+    }
     if (which == 15) {
         result = suspended_index_contract(L);
         observation = NULL;

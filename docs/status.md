@@ -35,6 +35,13 @@ processing and preserves nonstring raw-name temporaries. Four Lua cases match
 native/Ada default/T; each local Ada configuration passes 2,099 AUnit cases.
 The wider failure-rendering/storage audit and remaining full target stay open.
 
+The [borrowed C view checkpoint](sessions/2026-11-08-borrowed-c-stack-views.md)
+passes 2,103 AUnit cases per isolated local configuration, including nine
+actual-cell/guard/weak-root regressions. Eight hook cases match both native
+configurations; allocator reentry matches native default and remains blocked
+by native T private lock instrumentation. Return-hook result mutation and
+full-target acceptance remain open.
+
 The [combined public-boundary check](sessions/2026-11-08-public-boundary-integration.md)
 passes 2,094 AUnit cases in each local configuration after fixing a checked
 I/O argument-borrow interaction. All twenty-six ordinary standalone C

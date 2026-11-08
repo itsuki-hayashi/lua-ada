@@ -60,7 +60,9 @@ static int hook_dispatch(lua_State *L) {
     output = debug_request(L, &input);
     ar.i_ci = (struct CallInfo *)output.pointer;
     lua_settop(L, 0);
+    lua_ada_hook_view(L, 1);
     hook(L, &ar);
+    lua_ada_hook_view(L, 0);
     return 0;
 }
 

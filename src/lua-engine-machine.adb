@@ -32,6 +32,7 @@ with Lua.Engine.Canonical;
 with Lua.Engine.C_Operators;
 with Lua.Engine.Call_Names;
 with Lua.Engine.Stacks;
+with Lua.Engine.Stack_Views;
 with Lua.Engine.Foreign;
 with Lua.Engine.Warnings;
 with Lua.Engine.External_Releases;
@@ -869,7 +870,7 @@ package body Lua.Engine.Machine is
          --  visible activation. A root function is placed after its actual
          --  host prefix, rather than after unused physical/reserved slots.
          Activation.Stack_Base := Context.Foreign_Top + 1;
-      elsif Caller.Is_Native then
+      elsif Caller.Is_Native or else Caller.Warning_Borrow_Depth /= 0 then
          --  A library's explicit callback request models pushing the callee
          --  after its live C arguments/temporaries. Hidden VM helpers instead
          --  run above the current real ci.top, matching Protect's top reset.
@@ -956,7 +957,9 @@ package body Lua.Engine.Machine is
         Natural'Max
           (Context.Closing_Stack_Prefix,
            (if Previous = null then Activation.Saved_Foreign_Top
-            elsif Previous.Is_Native then Previous.Stack_Live_Top else
+            elsif Previous.Is_Native or else
+              Previous.Warning_Borrow_Depth /= 0
+            then Previous.Stack_Live_Top else
               Previous.Stack_Base + Previous.Canonical_Top));
       Activation.Previous_Stack_Window := null;
       Activation.Has_Stack_Window := False;
@@ -965,16 +968,87 @@ package body Lua.Engine.Machine is
       --  this detached interval was owned here. Union GC clears other gaps.
    end Retire_Stack_Window;
 
+   procedure Begin_Hook_View
+     (State : in out World; Context : not null Context_Access;
+      Token : Callback_Identity)
+   is
+      Guard : constant Frame_Access := Context.Foreign_Activation;
+      Window : constant Frame_Access := Context.Hook_Frame;
+      Base : constant Natural := Context.Foreign_Base;
+      Top : constant Natural := Context.Foreign_Top;
+      Width : Natural;
+      Available : Boolean;
+   begin
+      if Context /= State.Current or else Guard = null or else
+        not Guard.Is_C_Hook_Transport or else not Guard.Foreign_Entered or
+        else Guard.Native_Stage /= 1 or else
+        Guard.all'Address /= Token.Activation or else
+        Guard.Foreign_Ticket /= Token.Serial or else
+        Guard.Hook_View.Context /= null or else Window = null or else
+        Context.Stack_Window /= Guard or else
+        Guard.Previous_Stack_Window /= Window
+      then
+         raise Program_Error with "invalid C hook stack-view entry";
+      end if;
+      --  The C trampoline has consumed its event/line scalars. Its metadata
+      --  stays on the activation stack as the genuine guard owner, but no
+      --  private reservation may overlap the interrupted CI's C API writes.
+      Stack_Views.Prepare_Hook (State, Window);
+      Width := Natural'Max
+        (Window.Stack_Window_Length,
+         (if Window.Is_Native then
+             Window.Stack_Live_Top - Window.Stack_Base
+          else Window.Stack_Window_Length));
+      if Width > Natural'Last - Window.Stack_Base - Minimum_C_Stack then
+         Fail (State, "stack overflow");
+      end if;
+      --  Reserve storage while the original C transport still owns a valid
+      --  error slot. After retirement, publishing the borrowed view and its
+      --  minimum C reservation cannot fail half way through a transition.
+      Available := Ensure_Stack
+        (State, Context, Window.Stack_Base + Width + Minimum_C_Stack);
+      if not Available then
+         raise Program_Error with "raising hook reservation returned false";
+      end if;
+      Retire_Stack_Window (Guard);
+      Context.Foreign_Base := Base;
+      Context.Foreign_Top := Top;
+      Stack_Views.Borrow
+        (State, Context, Window, Guard.Hook_View, Hook_View);
+      Resize_Stack_Window (State, Window, Width + Minimum_C_Stack);
+   end Begin_Hook_View;
+
+   procedure End_Hook_View
+     (State : in out World; Context : not null Context_Access;
+      Token : Callback_Identity)
+   is
+      Guard : constant Frame_Access := Context.Foreign_Activation;
+   begin
+      if Guard = null or else not Guard.Is_C_Hook_Transport or else
+        not Guard.Foreign_Entered or else
+        Guard.all'Address /= Token.Activation or else
+        Guard.Foreign_Ticket /= Token.Serial
+      then
+         raise Program_Error with "invalid C hook stack-view completion";
+      end if;
+      Stack_Views.Restore (State, Guard.Hook_View);
+   end End_Hook_View;
+
    procedure Set_Native_Top
      (State : in out World; Activation : not null Frame_Access;
       Count : Natural)
    is
       Context : constant Context_Access := Activation.Context;
+      Window : constant Frame_Access :=
+        (if Context.Foreign_Activation = Activation and then
+            Context.Foreign_View /= null
+         then Context.Foreign_View else Activation);
       Old_Top : constant Natural := Activation.Stack_Live_Top;
       New_Top : Natural;
    begin
-      if not Activation.Is_Native or else Context /= State.Current or else
-        Context.Stack_Window /= Activation
+      if (not Activation.Is_Native and then
+          Context.Foreign_View /= Activation) or else
+        Context /= State.Current or else Context.Stack_Window /= Window
       then
          raise Program_Error with "native top requires its current window";
       end if;
@@ -983,12 +1057,14 @@ package body Lua.Engine.Machine is
       end if;
       New_Top := Activation.Stack_Base + Count;
       Resize_Stack_Window
-        (State, Activation,
-         Natural'Max (Activation.Stack_Window_Length, Count));
+        (State, Window,
+         Natural'Max (Window.Stack_Window_Length, Count));
       --  Preserve both views until all potentially allocating growth has
       --  succeeded. Shrinking the owned packet removes stale argument roots;
       --  clearing actual slots then detaches any cells above the new top.
-      if Activation.Foreign_Handler = System.Null_Address then
+      if Activation.Is_Native and then Window.Hook_View_Depth = 0 and then
+        Activation.Foreign_Handler = System.Null_Address
+      then
          Activation.Native_Arguments.Set_Length
            (Ada.Containers.Count_Type (Count));
       end if;
@@ -1000,6 +1076,7 @@ package body Lua.Engine.Machine is
          end loop;
       end if;
       Activation.Stack_Live_Top := New_Top;
+      Window.Stack_Live_Top := New_Top;
       Context.Foreign_Top := New_Top;
    end Set_Native_Top;
 
@@ -1007,6 +1084,11 @@ package body Lua.Engine.Machine is
      (State : in out World; Activation : not null Frame_Access;
       Item : Value)
    is
+      Context : constant Context_Access := Activation.Context;
+      Window : constant Frame_Access :=
+        (if Context.Foreign_Activation = Activation and then
+            Context.Foreign_View /= null
+         then Context.Foreign_View else Activation);
       Count : constant Natural :=
         Activation.Stack_Live_Top - Activation.Stack_Base;
    begin
@@ -1014,7 +1096,10 @@ package body Lua.Engine.Machine is
       --  value before it becomes part of the actual activation's root range.
       Pin (State, Item);
       Set_Native_Top (State, Activation, Count + 1);
-      if Activation.Foreign_Handler = System.Null_Address then
+      if Activation.Is_Native and then
+        Window.Hook_View_Depth = 0 and then
+        Activation.Foreign_Handler = System.Null_Address
+      then
          Replace_Root
            (State, Activation.Native_Arguments,
             Count + 1, Item);
@@ -1028,13 +1113,18 @@ package body Lua.Engine.Machine is
    is
       Context : constant Context_Access := State.Current;
       Phase : constant Frame_Access := Context.Stack.Last_Element;
+      Window : constant Frame_Access :=
+        (if Context.Foreign_Activation = Owner and then
+            Context.Foreign_View /= null
+         then Context.Foreign_View else Owner);
       Count, Last : Natural;
       Item : Value;
    begin
-      if Context.Stack_Window = Owner then return; end if;
-      if not Owner.Is_Native or else not Phase.Native_Builtin_Direct or else
+      if Context.Stack_Window = Window then return; end if;
+      if (not Owner.Is_Native and then Context.Foreign_View /= Owner) or else
+        not Phase.Native_Builtin_Direct or else
         not Phase.Has_Stack_Window or else Context.Stack_Window /= Phase or
-        else Phase.Previous_Stack_Window /= Owner or else
+        else Phase.Previous_Stack_Window /= Window or else
         Phase.Stack_Base <= Owner.Stack_Base
       then
          raise Program_Error with "invalid builtin diagnostic ownership";
@@ -1053,12 +1143,13 @@ package body Lua.Engine.Machine is
       --  body remains active below its synchronous builtin invocation; its
       --  original function slot, close metadata and guard are never retired.
       Resize_Stack_Window
-        (State, Owner, Natural'Max (Owner.Stack_Window_Length, Count));
+        (State, Window, Natural'Max (Window.Stack_Window_Length, Count));
       for Index in 1 .. Count loop
          Item := Stacks.Read (Context, Phase.Stack_Base + Index);
          Stacks.Write (State, Context, Owner.Stack_Base + Index, Item);
       end loop;
       Owner.Stack_Live_Top := Last;
+      Window.Stack_Live_Top := Last;
       --  The destination begins below the private source, so ascending
       --  writes are safe even if a grown prefix overlaps it. Those moved
       --  rows now belong to Owner; retire only the remaining source tail.
@@ -1082,7 +1173,9 @@ package body Lua.Engine.Machine is
          Retire_Stack_Window (Item);
          Item.Context.Foreign_Activation := Item.Error_Guard_Owner;
          Item.Context.Foreign_Base := Item.Error_Guard_Owner.Stack_Base;
+         Item.Context.Foreign_View := Item.Foreign_Previous_View;
       end if;
+      Stack_Views.Restore (State, Item.Hook_View, Abandon => True);
       Deferred := Item.Deferred_Error_Head;
       while Deferred /= null loop
          Next := Deferred.Deferred_Error_Next;
@@ -1126,6 +1219,7 @@ package body Lua.Engine.Machine is
          State.Current.Foreign_Top := Item.Saved_Foreign_Top;
          State.Current.Foreign_Base := Item.Foreign_Previous_Base;
          State.Current.Foreign_Activation := Item.Foreign_Previous_Frame;
+         State.Current.Foreign_View := Item.Foreign_Previous_View;
          Item.Foreign_Entered := False;
       end if;
       if Item.Is_Native and then Item.Native_Name = "@hook" then
@@ -1150,6 +1244,7 @@ package body Lua.Engine.Machine is
       Retire_Stack_Window (Item);
       if State.Current.Base_C_Frame = Item then
          State.Current.Foreign_Activation := null;
+         State.Current.Foreign_View := null;
          State.Current.Foreign_Base := 0;
       end if;
       Return_Frame (Item);
@@ -1211,9 +1306,11 @@ package body Lua.Engine.Machine is
       end if;
       if Item.Foreign_Entered then
          if Context.Foreign_Activation = Item then
+            Stack_Views.Restore (State, Item.Hook_View, Abandon => True);
             Context.Foreign_Top := Item.Saved_Foreign_Top;
             Context.Foreign_Base := Item.Foreign_Previous_Base;
             Context.Foreign_Activation := Item.Foreign_Previous_Frame;
+            Context.Foreign_View := Item.Foreign_Previous_View;
          end if;
          Item.Foreign_Entered := False;
       end if;
@@ -3181,14 +3278,17 @@ package body Lua.Engine.Machine is
             Activation.Foreign_Previous_Base := State.Current.Foreign_Base;
             Activation.Foreign_Previous_Frame :=
               State.Current.Foreign_Activation;
+            Activation.Foreign_Previous_View := State.Current.Foreign_View;
             Activation.Foreign_Entered := True;
             State.Current.Foreign_Base := Activation.Stack_Base;
             State.Current.Foreign_Top := Activation.Stack_Live_Top;
             State.Current.Foreign_Activation := Activation;
+            State.Current.Foreign_View := null;
             --  Actual scalar slots now own every argument. Keeping a stale
             --  packet would retain C arguments removed/replaced by the host
             --  and invalidate weak observations during callback collection.
             Activation.Native_Arguments.Clear;
+            Activation.Native_Captures.Clear;
             Activation.Native_Stage := 1;
             --  Returning exposes an explicit C request. Invoking its function
             --  pointer here would let longjmp cross these live Ada frames.
@@ -3214,6 +3314,7 @@ package body Lua.Engine.Machine is
                   Context.Foreign_Base := Activation.Foreign_Previous_Base;
                   Context.Foreign_Activation :=
                     Activation.Foreign_Previous_Frame;
+                  Context.Foreign_View := Activation.Foreign_Previous_View;
                   Activation.Foreign_Entered := False;
                   Activation.Native_Stage := 2;
                else
@@ -3301,6 +3402,7 @@ package body Lua.Engine.Machine is
                  (State, Caller, Activation.Native_Index - Caller.Stack_Base);
                Context.Foreign_Top := Activation.Native_Index;
                Context.Foreign_Activation := Caller;
+               Context.Foreign_View := Activation.Foreign_Previous_View;
                for Index in 1 .. Count loop
                   Push_Native_Value
                     (State, Caller,
@@ -5117,11 +5219,13 @@ package body Lua.Engine.Machine is
                --  take over that thread; restore its retained activation
                --  view before supplying arguments or starting cleanup.
                Target.Foreign_Activation := Target.Resume_Foreign_Activation;
+               Target.Foreign_View := Target.Resume_Foreign_View;
                Target.Foreign_Base := Target.Resume_Foreign_Base;
                Target.Foreign_Top := Target.Resume_Foreign_Top;
                Target.Stack_Used := Target.Resume_Stack_Used;
                Target.Host_Stack_Top := Target.Resume_Host_Stack_Top;
                Target.Resume_Foreign_Activation := null;
+               Target.Resume_Foreign_View := null;
                Target.Detached_Resume_Window := False;
             end if;
             if Request.Kind = Close_Requested then
@@ -5167,6 +5271,7 @@ package body Lua.Engine.Machine is
                --  C API window above the retained frames so later public
                --  pushes (or a C takeover of resume) cannot overwrite them.
                Child.Resume_Foreign_Activation := Child.Foreign_Activation;
+               Child.Resume_Foreign_View := Child.Foreign_View;
                Child.Resume_Foreign_Base := Child.Foreign_Base;
                Child.Resume_Foreign_Top := Child.Foreign_Top;
                Child.Resume_Stack_Used := Child.Stack_Used;
@@ -5174,6 +5279,7 @@ package body Lua.Engine.Machine is
                Child.Resume_Return_Base := 0;
                Child.Resume_Return_Top := Child.Host_Stack_Top;
                Child.Foreign_Activation := null;
+               Child.Foreign_View := null;
                Child.Foreign_Base := Child.Stack_Used;
                Child.Foreign_Top := Child.Foreign_Base;
                Child.Host_Stack_Top := Child.Foreign_Top;
@@ -5661,11 +5767,13 @@ package body Lua.Engine.Machine is
       --  locals. Restore the real retained view before deriving close levels.
       if Context.Detached_Resume_Window then
          Context.Foreign_Activation := Context.Resume_Foreign_Activation;
+         Context.Foreign_View := Context.Resume_Foreign_View;
          Context.Foreign_Base := Context.Resume_Foreign_Base;
          Context.Foreign_Top := Context.Resume_Foreign_Top;
          Context.Stack_Used := Context.Resume_Stack_Used;
          Context.Host_Stack_Top := Context.Resume_Host_Stack_Top;
          Context.Resume_Foreign_Activation := null;
+         Context.Resume_Foreign_View := null;
          Context.Detached_Resume_Window := False;
       end if;
       --  Only an unhandled failure that stopped the coroutine is its old
@@ -5705,6 +5813,7 @@ package body Lua.Engine.Machine is
          Retire_Frame_Execution (State, Item);
       end loop;
       Context.Foreign_Activation := null;
+      Context.Foreign_View := null;
       Context.Foreign_Base := 0;
       Context.Hook_Suspended := False;
       Context.Hook_Yield_Pending := False;
@@ -5810,9 +5919,12 @@ package body Lua.Engine.Machine is
          raise Program_Error with "invalid self-close C guard acknowledgment";
       end if;
       if Context.Foreign_Activation = Selected then
+         Stack_Views.Restore
+           (Self.Universe.all, Selected.Hook_View, Abandon => True);
          Context.Foreign_Top := Selected.Saved_Foreign_Top;
          Context.Foreign_Base := Selected.Foreign_Previous_Base;
          Context.Foreign_Activation := Selected.Foreign_Previous_Frame;
+         Context.Foreign_View := Selected.Foreign_Previous_View;
       end if;
       Selected.Foreign_Entered := False;
       Selected.Native_Stage := 6;
@@ -6010,6 +6122,7 @@ package body Lua.Engine.Machine is
       Context.Stack.Delete_Last;
       Retire_Stack_Window (Guard);
       Context.Foreign_Activation := Owner;
+      Context.Foreign_View := Guard.Foreign_Previous_View;
       Context.Foreign_Base := Owner.Stack_Base;
       Context.Foreign_Top := Owner.Stack_Live_Top;
       Release_Frame (State, Guard);
@@ -6110,6 +6223,8 @@ package body Lua.Engine.Machine is
                if Adopted /= Activation then
                   raise Program_Error with "changed deferred C error owner";
                end if;
+               Stack_Views.Restore
+                 (State, Activation.Hook_View, Abandon => True);
                if not Traceback then
                   Retire_Frame_Execution (State, Activation);
                end if;
@@ -6117,6 +6232,8 @@ package body Lua.Engine.Machine is
                Context.Error_Recovery_Pending := True;
             end;
          end if;
+         Stack_Views.Restore
+           (State, Activation.Hook_View, Abandon => True);
          return;
       end if;
       Activation.Native_Results.Clear;
@@ -6135,6 +6252,7 @@ package body Lua.Engine.Machine is
       Context.Foreign_Top := Activation.Saved_Foreign_Top;
       Context.Foreign_Base := Activation.Foreign_Previous_Base;
       Context.Foreign_Activation := Activation.Foreign_Previous_Frame;
+      Context.Foreign_View := Activation.Foreign_Previous_View;
       Activation.Foreign_Entered := False;
       Context.Failure := Nil_Value;
       Root_Barrier (State, Context.Failure);
@@ -6329,11 +6447,13 @@ package body Lua.Engine.Machine is
             Activation.Has_Stack_Window := True;
             Activation.Native_Stage := 2;
             Activation.Pending_Error_Transfer := True;
+            Activation.Foreign_Previous_View := Context.Foreign_View;
             Context.Stack_Window := Activation;
             Context.Stack_Used := Natural'Max (Context.Stack_Used, Base + 1);
             Context.Foreign_Base := Base;
             Context.Foreign_Top := Base + 1;
             Context.Foreign_Activation := Activation;
+            Context.Foreign_View := null;
             Stacks.Write (State, Context, Base + 1, Packet.First_Element);
             Packet.Clear;
             return;
