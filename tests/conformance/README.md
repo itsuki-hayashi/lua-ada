@@ -118,9 +118,11 @@ this dated classification.
 
 Locals counterpart binding version1 keeps its original22 paths and its
 independently reviewed dated76 tuple. Current source drift does not renew that
-authority. Explicit binding schema2 requires exactly29 counterpart paths,
-adding the actual memory checker, both scalar-closing fixtures and the closing
-test sources. It retains the same two exact operations, original anchors and
+authority. Explicit binding schema2 requires exactly39 counterpart paths,
+adding the actual memory checker, allocator controls, declaration interfaces,
+both scalar-closing fixtures and closing test sources. The graph stops at the
+shared compiler, general storage and AUnit baseline; final compiled-image
+evidence still binds that infrastructure. It retains the same two exact operations, original anchors and
 output54481; a pending definition returns only source hashes, never adapted
 bytes or runtime authority. New independent exact review and fresh runtime
 observations remain required before selecting the successor.

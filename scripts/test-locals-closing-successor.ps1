@@ -9,7 +9,12 @@ $legacy=Get-Content (Join-Path $root ($base+'locals-dead-table-storage.equivalen
 $extra=@('tests/src/lua-conformance_memory.adb','tests/lua/scalar_closing_refusal.lua',
     'tests/lua/scalar_closing_mutation.lua',
     'tests/src/lua-scalar_closing_tests.ads','tests/src/lua-scalar_closing_tests.adb',
-    'tests/src/lua-closing_prefix_tests.adb','tests/src/lua-execution_retirement_tests.adb')
+    'tests/src/lua-closing_prefix_tests.adb','tests/src/lua-execution_retirement_tests.adb',
+    'src/lua-engine-stacks.ads','src/lua-engine-canonical.ads','src/lua-engine-machine.ads',
+    'tests/src/lua-conformance_memory.ads','tests/src/lua-closing_prefix_tests.ads',
+    'tests/src/lua-execution_retirement_tests.ads','tests/src/lua-storage-conformance.ads',
+    'tests/src/lua-storage-conformance.adb','tests/src/lua-conformance_allocator.ads',
+    'tests/src/lua-conformance_allocator.adb')
 $paths=@($legacy.counterpart_source_snapshot.bindings.path)+$extra
 $mapping=$legacy|ConvertTo-Json -Depth 64|ConvertFrom-Json -AsHashtable -Depth 64
 $mapping.review=@{status='pending';author='Codex /root';reviewer=$null;artifact=$null;artifact_sha256=$null}
@@ -38,9 +43,9 @@ function Fixture {
 # Positive checks validate pending, exact source definitions only. They neither
 # construct output Lua bytes nor produce an accepted approval. Negative review
 # labels below are mutated inputs, never installed or actual review authority.
-Case 'explicit V2 binds all29 current paths and exactly the same two original operations'{
+Case 'explicit V2 binds all39 current paths and exactly the same two original operations'{
     $r=Definition (Clone)
-    if($r.counterpart_binding_version -ne 2 -or $r.counterpart_count -ne 29 -or $r.source_emission -or
+    if($r.counterpart_binding_version -ne 2 -or $r.counterpart_count -ne 39 -or $r.source_emission -or
         $r.planned_sha256 -cne '54481f4b2c760ef1f8efd747706a3e6eb02553f582e15210aaaab6ec72c448d8' -or
         $r.runtime_acceptance -or $r.coverage_authority){throw 'Pending definition gained source/runtime authority'}
 }
@@ -57,7 +62,7 @@ foreach($version in @('2',1,3)){
         Reject {Definition $m} 'Unsupported locals counterpart binding schema'
     }
 }
-Case 'dropping the V2 tag cannot pass29 paths through the V1 contract'{
+Case 'dropping the V2 tag cannot pass39 paths through the V1 contract'{
     $m=Clone;[void]$m.counterpart_source_snapshot.Remove('binding_schema_version')
     Reject {Definition $m} 'counterpart set'
 }
@@ -85,7 +90,7 @@ foreach($path in @('tests/src/lua-conformance_memory.adb','src/lua-engine-collec
         Reject {Definition (Clone) $directory} 'Review file hash differs'
     }
 }
-Case 'current29 source claims cannot be relabelled a renewed accepted V1 snapshot'{
+Case 'current39 source claims cannot be relabelled a renewed accepted V1 snapshot'{
     $m=Clone;[void]$m.counterpart_source_snapshot.Remove('binding_schema_version')
     $m.counterpart_source_snapshot.bindings=@($m.counterpart_source_snapshot.bindings|Where-Object path -CNotIn $extra)
     foreach($patch in $m.replacements){$patch.counterpart_tests=@($patch.counterpart_tests|Where-Object{$_ -cnotin $extra})}

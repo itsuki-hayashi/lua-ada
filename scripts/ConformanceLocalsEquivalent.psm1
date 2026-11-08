@@ -23,13 +23,22 @@ $script:LocalsClosingCounterparts=@(
     'tests/src/lua-conformance_memory.adb','tests/lua/scalar_closing_refusal.lua',
     'tests/lua/scalar_closing_mutation.lua',
     'tests/src/lua-scalar_closing_tests.ads','tests/src/lua-scalar_closing_tests.adb',
-    'tests/src/lua-closing_prefix_tests.adb','tests/src/lua-execution_retirement_tests.adb')
+    'tests/src/lua-closing_prefix_tests.adb','tests/src/lua-execution_retirement_tests.adb',
+    'src/lua-engine-stacks.ads','src/lua-engine-canonical.ads','src/lua-engine-machine.ads',
+    'tests/src/lua-conformance_memory.ads','tests/src/lua-closing_prefix_tests.ads',
+    'tests/src/lua-execution_retirement_tests.ads','tests/src/lua-storage-conformance.ads',
+    'tests/src/lua-storage-conformance.adb','tests/src/lua-conformance_allocator.ads',
+    'tests/src/lua-conformance_allocator.adb')
 
 function Get-LocalsCounterpartBindingVersion {
     param([Collections.IDictionary]$Snapshot)
     # V1 is the original22-path source contract. Closing metadata changes add
     # a real checker dependency and its fault/root regressions; select that
-    # closed29-path successor explicitly instead of widening old metadata.
+    # closed39-path successor explicitly instead of widening old metadata.
+    # Its boundary includes the actual checker/allocator controls, declaration
+    # interfaces and public/fault/root regressions used by the new close walk.
+    # Shared compiler/storage/AUnit infrastructure is still bound by final
+    # compiled-image evidence; this list is no independent runtime acceptance.
     if(-not $Snapshot.Contains('binding_schema_version')){return 1}
     if(($Snapshot.binding_schema_version -isnot [int] -and $Snapshot.binding_schema_version -isnot [long]) -or
         $Snapshot.binding_schema_version -ne 2){throw 'Unsupported locals counterpart binding schema version'}
