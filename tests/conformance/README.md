@@ -194,23 +194,29 @@ regressions execute no Lua. The current component campaign progresses beyond
 the original verifier but fails during the later allocation sweep; see the
 [session record](../../docs/sessions/2026-11-08-memerr-verifier.md).
 
-The API941 and calls586 source-equivalent manifests are pending exact review.
-They use the existing equivalent approval contract, with the accepted feature
-decision and actual public-counterpart sources required for every patch.
-Original assertions remain required pending obligations. Source inspection
-reconstructs memory only; it supplies no approved execution or passing ledger.
+The API941 and calls586 source-equivalent manifests have separate independent
+exact source approvals. They use the existing equivalent approval contract,
+with the accepted feature decision and actual public-counterpart sources
+required for every patch. Original assertions remain required pending
+obligations. Source review supplies no passing runtime or ledger evidence.
 
 API also needs the already reviewed18-byte private allocation edit. The bounded
-API composite proposal binds both manifests to the same original1601 source
+API composite binds both manifests to the same original1601 source
 hash, validates each accepted inner review separately, rejects overlapping
 spans and applies the original-coordinate union once. It retains exclusion9001
 and required original assertions0125/0195, and requires an additional independent
-composition approval. Its source-only reader rejects default/native selection,
+composition approval, now recorded separately from its inner approvals.
+Its source-only reader rejects default/native selection,
 pending inner approvals, changed replacements, stale policy/counterparts and
 fabricated or labelled synthetic authority. Explicit synthetic unit fixtures
 remain diagnostic. Existing File/Aggregate selectors still reject this new
-composite kind; integration and derived-source writing require the separate
-exact reviews. Ordinary C baselines continue to use original source.
+composite kind pending their explicit integration. The bounded
+`New-ConformanceReviewedSource.ps1` generator recognizes only this composite,
+the decoded-string equivalent and the memory-verifier equivalent. It
+revalidates their independent exact decisions and emits new disposable
+`reports/` artifacts with source-only receipts; it exposes no synthetic or
+unreviewed mode and cannot overwrite prior artifacts. Ordinary C baselines
+continue to use original source. Generation supplies no runtime acceptance.
 
 ## Resolution and evidence contract
 
