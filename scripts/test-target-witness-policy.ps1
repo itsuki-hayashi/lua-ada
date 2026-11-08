@@ -137,7 +137,7 @@ Case 'new value auxiliary and scalar source routes remain proposals with no exec
     $relative=[IO.Path]::GetRelativePath($root,(Join-Path $path 'witness-policy.author-proposal.json')).Replace('\','/')
     $r=Read-TargetWitnessPolicy -Root $root -Path $relative
     $new=@($r.global_api.entries|Where-Object{ $_.Contains('proposed_classification') })
-    Assert-True ($r.consumer.cases.Count -eq 605 -and $r.aunit.entries.Count -eq 733 -and $new.Count -eq 126 -and
+    Assert-True ($r.consumer.cases.Count -eq 605 -and $r.aunit.entries.Count -eq 750 -and $new.Count -eq 126 -and
         @($new|Where-Object{ $_.classification -cne 'pending-semantic-review' -or $_.review_status -cne 'pending' -or
             $_.runtime_acceptance -or $_.execution_evidence.Count }).Count -eq 0 -and -not $r.source_reviewed -and -not $r.runtime_acceptance) 'Source routes invented acceptance'
     foreach($entry in $new){Assert-True ($entry.proposed_context_witnesses.Count -eq 26 -and -not $entry.Contains('context_witnesses')) 'A future route became an actual context observation'}

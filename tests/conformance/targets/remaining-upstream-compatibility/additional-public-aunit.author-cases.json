@@ -5165,6 +5165,125 @@
       "case": "tests/src/lua-call_metadata_tests.adb#Tail_Budget_Recovery",
       "registered_label": "Tail ownership: charged work and recovery",
       "required_stdout_line": "OK Tail ownership: charged work and recovery"
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Uncaptured_Slot",
+      "registered_label": "scalar closing: no artificial capture",
+      "required_stdout_line": "OK scalar closing: no artificial capture",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Liveness_Independent_Root",
+      "registered_label": "scalar closing: independent live root",
+      "required_stdout_line": "OK scalar closing: independent live root",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Invalid_Link_Recovery",
+      "registered_label": "scalar closing: invalid link recovery",
+      "required_stdout_line": "OK scalar closing: invalid link recovery",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Wrong_Frame_Head",
+      "registered_label": "scalar closing: reject another frame head",
+      "required_stdout_line": "OK scalar closing: reject another frame head",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Outside_Context_Head",
+      "registered_label": "scalar closing: reject uninitialized head",
+      "required_stdout_line": "OK scalar closing: reject uninitialized head",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Original_Failure",
+      "registered_label": "scalar closing: Original_Failure",
+      "required_stdout_line": "OK scalar closing: Original_Failure",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Multiple_Failure",
+      "registered_label": "scalar closing: Multiple_Failure",
+      "required_stdout_line": "OK scalar closing: Multiple_Failure",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Closer_Failure",
+      "registered_label": "scalar closing: Closer_Failure",
+      "required_stdout_line": "OK scalar closing: Closer_Failure",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Cold_True",
+      "registered_label": "scalar closing: Cold_True",
+      "required_stdout_line": "OK scalar closing: Cold_True",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Nil_Entry",
+      "registered_label": "scalar closing: Nil_Entry",
+      "required_stdout_line": "OK scalar closing: Nil_Entry",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#False_Entry",
+      "registered_label": "scalar closing: False_Entry",
+      "required_stdout_line": "OK scalar closing: False_Entry",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Closed_Upvalue",
+      "registered_label": "scalar closing: Closed_Upvalue",
+      "required_stdout_line": "OK scalar closing: Closed_Upvalue",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Mutable_Stack",
+      "registered_label": "scalar closing: Mutable_Stack",
+      "required_stdout_line": "OK scalar closing: Mutable_Stack",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Suspended_Roots",
+      "registered_label": "scalar closing: Suspended_Roots",
+      "required_stdout_line": "OK scalar closing: Suspended_Roots",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Captured_Suspended",
+      "registered_label": "scalar closing: Captured_Suspended",
+      "required_stdout_line": "OK scalar closing: Captured_Suspended",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Generic_For_Scope",
+      "registered_label": "scalar closing: Generic_For_Scope",
+      "required_stdout_line": "OK scalar closing: Generic_For_Scope",
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-scalar_closing_tests.adb#Jump_Scope",
+      "registered_label": "scalar closing: Jump_Scope",
+      "required_stdout_line": "OK scalar closing: Jump_Scope",
+      "runtime_acceptance": false,
+      "execution_evidence": []
     }
   ]
 }

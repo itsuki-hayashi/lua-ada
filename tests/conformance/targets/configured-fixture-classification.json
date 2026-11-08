@@ -288,6 +288,99 @@
         ],
         "runtime_evidence": []
       }
+    },
+    {
+      "path": "tests/lua/scalar_closing_refusal.lua",
+      "sha256": "b08301ac199b9ce078e42ed5f6a6412c5f7de958364a4fdc855c54c13de9f0c4",
+      "selection": "paired-configured-T-only",
+      "rationale": "The full12-case fixture requires actual T allocator controls in seven cases and must run unfiltered in the mandatory native/Ada instrumented pair. Its five T-free public upvalue/mutable-local/weak-root/suspension/jump bodies are retained exactly in a separate ordinary default companion.",
+      "retained_default_counterpart": {
+        "path": "tests/lua/scalar_closing_public.lua",
+        "sha256": "14abd6fa8f57f7f7fd9f789a1d6ad4258444be5644f8709a03b71779d1354727",
+        "case_spans": [
+          {
+            "name": "Closed_Upvalue",
+            "original": {
+              "byte_offset": 2235,
+              "byte_length": 409,
+              "sha256": "e3963f7c0212e54a219158f4ab4b83363dd3d3926a72a7d840a54d6c5312f14b"
+            },
+            "ordinary": {
+              "byte_offset": 155,
+              "byte_length": 409,
+              "sha256": "e3963f7c0212e54a219158f4ab4b83363dd3d3926a72a7d840a54d6c5312f14b"
+            }
+          },
+          {
+            "name": "Mutable_Stack",
+            "original": {
+              "byte_offset": 2645,
+              "byte_length": 532,
+              "sha256": "559144466d52aa0478d465e63e3894566a9c586e96027967d9f7f9d0be812597"
+            },
+            "ordinary": {
+              "byte_offset": 565,
+              "byte_length": 532,
+              "sha256": "559144466d52aa0478d465e63e3894566a9c586e96027967d9f7f9d0be812597"
+            }
+          },
+          {
+            "name": "Suspended_Roots",
+            "original": {
+              "byte_offset": 3178,
+              "byte_length": 453,
+              "sha256": "5ee3dd008dff5795ef12200587248b5f860fc4457ec11c21309d7906abc72b93"
+            },
+            "ordinary": {
+              "byte_offset": 1098,
+              "byte_length": 453,
+              "sha256": "5ee3dd008dff5795ef12200587248b5f860fc4457ec11c21309d7906abc72b93"
+            }
+          },
+          {
+            "name": "Captured_Suspended",
+            "original": {
+              "byte_offset": 3632,
+              "byte_length": 369,
+              "sha256": "36a6756ca39d9a8f7e19ae28d4fdcf898048bbf6c3d4194ce963bb983ce42434"
+            },
+            "ordinary": {
+              "byte_offset": 1552,
+              "byte_length": 369,
+              "sha256": "36a6756ca39d9a8f7e19ae28d4fdcf898048bbf6c3d4194ce963bb983ce42434"
+            }
+          },
+          {
+            "name": "Jump_Scope",
+            "original": {
+              "byte_offset": 4521,
+              "byte_length": 338,
+              "sha256": "1ff2b7aecaf608e076c59040931f93a72ca36081662dcfa85bc21fb8193494b5"
+            },
+            "ordinary": {
+              "byte_offset": 1922,
+              "byte_length": 338,
+              "sha256": "1ff2b7aecaf608e076c59040931f93a72ca36081662dcfa85bc21fb8193494b5"
+            }
+          }
+        ],
+        "runtime_evidence": [],
+        "helper_spans": [
+          {
+            "name": "closable",
+            "original": {
+              "byte_offset": 201,
+              "byte_length": 66,
+              "sha256": "eba69d85b27b94dc132de815617ff1198a6e9f9522728e8794ba94f3dc9d64ad"
+            },
+            "ordinary": {
+              "byte_offset": 74,
+              "byte_length": 66,
+              "sha256": "eba69d85b27b94dc132de815617ff1198a6e9f9522728e8794ba94f3dc9d64ad"
+            }
+          }
+        ]
+      }
     }
   ]
 }

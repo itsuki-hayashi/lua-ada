@@ -87,7 +87,7 @@ evidence. Its C rows and all 473 global classifications remain pending until
 review and fresh paired observations in the required immutable contexts.
 
 The successor author inputs preserve the historical 100 C and 94 AUnit
-identities and currently regenerate 605 C and 733 AUnit witnesses. The checked-in
+identities and currently regenerate 605 C and 750 AUnit witnesses. The checked-in
 catalogue records its own dated source snapshot and needs regeneration before
 reviewing new inputs. Additional return/closing, reader, self-value and diagnostic
 cases are named source candidates with empty execution evidence. All 473 global
@@ -107,6 +107,14 @@ approval and narrative labels, source-only authority flags and empty execution
 evidence. Binding regressions may opt into labelled synthetic reviews through
 an explicit test-only parameter. The target runner and final matrix never
 select that parameter, and raw report fields cannot enable it.
+
+The full twelve-case scalar-closing fixture is a mandatory unfiltered T pair.
+Its five T-free public upvalue, mutable-local, weak-root, suspension and jump
+bodies also remain byte-identical in an ordinary default companion. Source
+classification preserves both routes; it supplies no fresh runtime receipt or
+whole locals-source equivalence evidence. The current corpus contains95 Lua
+fixtures, with later uncommitted materialized-vararg controls still outside
+this dated classification.
 
 T target contexts also require a separate private-header buffer executable.
 It includes the actual pinned `ltests.h`, reports its 23-byte scratch and actual

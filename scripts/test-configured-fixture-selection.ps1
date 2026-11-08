@@ -81,6 +81,25 @@ Case 'an ordinary counterpart cannot replace a body with a named marker' {
 Case 'mixed default correspondence cannot omit a public case' {
     Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/call_metadata_windows.lua)[0];$row.retained_default_counterpart.case_spans=@($row.retained_default_counterpart.case_spans|Select-Object -Skip 1)}
 } 'ordinary correspondence is incomplete'
+Case 'scalar closing cannot hide ordinary weak-root and jump semantics behind T controls' {
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/scalar_closing_refusal.lua)[0];[void]$row.Remove('retained_default_counterpart')}
+} 'lacks its ordinary counterpart'
+Case 'scalar closing ordinary companion must retain all five exact public bodies' {
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/scalar_closing_refusal.lua)[0];$row.retained_default_counterpart.case_spans=@($row.retained_default_counterpart.case_spans|Select-Object -Skip 1)}
+} 'ordinary correspondence is incomplete'
+Case 'a rehashed scalar closing companion cannot change an actual collected weak value' {
+    $script:mutatedOrdinaryPath=Join-Path $temporary 'tests/lua/scalar_closing_public.lua'
+    [IO.File]::WriteAllText($script:mutatedOrdinaryPath,[IO.File]::ReadAllText($script:mutatedOrdinaryPath).Replace('weak[1]==nil','weak[1]~=nil'),[Text.UTF8Encoding]::new($false))
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/scalar_closing_refusal.lua)[0];$row.retained_default_counterpart.sha256=(Get-FileHash $script:mutatedOrdinaryPath).Hash.ToLowerInvariant()}
+} 'ordinary correspondence source bytes differ'
+Case 'matching scalar closing case bodies cannot hide a changed metatable helper' {
+    $script:mutatedOrdinaryPath=Join-Path $temporary 'tests/lua/scalar_closing_public.lua'
+    [IO.File]::WriteAllText($script:mutatedOrdinaryPath,[IO.File]::ReadAllText($script:mutatedOrdinaryPath).Replace('__close=fn','__index=fn'),[Text.UTF8Encoding]::new($false))
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/scalar_closing_refusal.lua)[0];$row.retained_default_counterpart.sha256=(Get-FileHash $script:mutatedOrdinaryPath).Hash.ToLowerInvariant()}
+} 'ordinary helper differs'
+Case 'scalar closing helper span lengths require actual integral source coordinates' {
+    Change-Classification {param($v)$row=@($v.entries|Where-Object path -CEQ tests/lua/scalar_closing_refusal.lua)[0];$row.retained_default_counterpart.helper_spans[0].ordinary.byte_length=[string]$row.retained_default_counterpart.helper_spans[0].ordinary.byte_length}
+} 'helper correspondence is outside its source'
 function Link-Case($Name,[scriptblock]$Action,$Expected=''){
     $failure=$null
     try{& $Action}catch{$failure=$_.Exception.Message}

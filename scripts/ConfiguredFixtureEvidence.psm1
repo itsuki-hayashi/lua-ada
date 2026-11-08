@@ -71,6 +71,12 @@ function Get-ConfiguredFixtureDefinitions {
             setup="$guard;assert(type(T.testC)=='function' and type(T.alloccount)=='function' and type(T.totalmem)=='function' and rawget(_G,'_TAIL_OWNERSHIP_CASE')==nil);print('CONFIGURED-FIXTURE: real T canonical tail ownership')";
             stdout="CONFIGURED-FIXTURE: real T canonical tail ownership`n"+
                 (($tail|ForEach-Object{"PASS tail ownership $_"})-join "`n")+"`n"}
+        $closing=@('Original_Failure','Multiple_Failure','Closer_Failure','Cold_True','Nil_Entry','False_Entry',
+            'Closed_Upvalue','Mutable_Stack','Suspended_Roots','Captured_Suspended','Generic_For_Scope','Jump_Scope')
+        $definitions+=@{id='scalar-closing-refusal';source='tests/lua/scalar_closing_refusal.lua';
+            setup="$guard;assert(type(T.alloccount)=='function' and rawget(_G,'_SCALAR_CLOSING_CASE')==nil);print('CONFIGURED-FIXTURE: real T scalar closing')";
+            stdout="CONFIGURED-FIXTURE: real T scalar closing`n"+
+                (($closing|ForEach-Object{"PASS scalar closing $_"})-join "`n")+"`n"}
     }
     # This fixture deliberately counts instructions. Its own source contract
     # requires one C-compiled graph, consumed unchanged by both interpreters;
@@ -128,6 +134,7 @@ function Get-ConfiguredFixtureSources {
         'tests/lua/table_storage_public.lua','tests/lua/table_storage_private.lua',
         'tests/lua/code_public_semantics.lua','tests/lua/call_metadata_windows.lua','tests/lua/call_metadata_public.lua',
         'tests/lua/canonical_tail_ownership.lua','tests/lua/canonical_tail_public.lua',
+        'tests/lua/scalar_closing_refusal.lua','tests/lua/scalar_closing_public.lua',
         'tests/src/code_public_semantic_tests.adb','tests/src/code_public_semantic_tests.ads',
         'tests/src/lua-table_storage_inspection_tests.ads','tests/src/lua-table_storage_inspection_tests.adb',
         'tests/src/lua-engine-table_storage_probe.ads','tests/src/lua-engine-table_storage_probe.adb',
@@ -164,6 +171,7 @@ function Get-ConfiguredFixtureAudit {
         $ordinaryPolicy=switch -CaseSensitive ($definition.id){
             'call-metadata-windows' {@{path='tests/lua/call_metadata_public.lua';names=@('Assert_Protected_Tuple','Table_Equality_Yields')}}
             'canonical-tail-ownership' {@{path='tests/lua/canonical_tail_public.lua';names=@('Tail_Close_Error','Tail_Hook_Error','Tail_Hook_Mutation','Tail_Weak_Argument','Tail_Yield')}}
+            'scalar-closing-refusal' {@{path='tests/lua/scalar_closing_public.lua';names=@('Closed_Upvalue','Mutable_Stack','Suspended_Roots','Captured_Suspended','Jump_Scope')}}
             default {$null}
         }
         if($null -ne $ordinaryPolicy){
@@ -193,12 +201,38 @@ function Get-ConfiguredFixtureAudit {
                     }
                     $bytes=[byte[]]::new($span.byte_length);[Array]::Copy($data,$span.byte_offset,$bytes,0,$bytes.Length)
                     if((Get-ConformanceHash $bytes) -cne $span.sha256 -or
-                        -not ([Text.Encoding]::UTF8.GetString($bytes)).StartsWith("  {'"+$case.name+"',function()",[StringComparison]::Ordinal)){
+                        -not [regex]::IsMatch([Text.Encoding]::UTF8.GetString($bytes),
+                            "\A {1,2}\{'"+[regex]::Escape($case.name)+"',function\(\)")){
                         throw 'Configured mixed fixture ordinary correspondence source bytes differ'
                     }
                     $slices+=,(Get-ConformanceHash $bytes)
                 }
                 if($slices[0] -cne $slices[1]){throw 'Configured mixed fixture ordinary correspondence bodies differ'}
+            }
+            if($definition.id -ceq 'scalar-closing-refusal'){
+                # These public bodies share an actual metatable constructor.
+                # Matching case text alone must not permit a changed helper
+                # to alter their finalizer/closing behavior in the companion.
+                $helperText='local function closable(fn)return setmetatable({},{__close=fn})end'
+                if(-not $ordinaryCounterpart.Contains('helper_spans') -or
+                    $ordinaryCounterpart.helper_spans -isnot [Array] -or $ordinaryCounterpart.helper_spans.Count -ne 1 -or
+                    $ordinaryCounterpart.helper_spans[0].name -cne 'closable'){
+                    throw 'Scalar closing ordinary counterpart lacks its exact shared helper'
+                }
+                foreach($role in @('original','ordinary')){
+                    $span=$ordinaryCounterpart.helper_spans[0][$role]
+                    $data=if($role -ceq 'original'){$originalBytes}else{$ordinaryBytes}
+                    if(($span.byte_offset -isnot [int] -and $span.byte_offset -isnot [long]) -or $span.byte_offset -lt 0 -or
+                        ($span.byte_length -isnot [int] -and $span.byte_length -isnot [long]) -or
+                        $span.byte_length -ne [Text.Encoding]::UTF8.GetByteCount($helperText) -or
+                        $span.byte_offset -gt $data.Length -or $span.byte_length -gt $data.Length-$span.byte_offset){
+                        throw 'Scalar closing ordinary helper correspondence is outside its source'
+                    }
+                    $slice=[byte[]]::new($span.byte_length);[Array]::Copy($data,$span.byte_offset,$slice,0,$slice.Length)
+                    if((Get-ConformanceHash $slice) -cne $span.sha256 -or [Text.Encoding]::UTF8.GetString($slice) -cne $helperText){
+                        throw 'Scalar closing ordinary helper differs from its actual source'
+                    }
+                }
             }
         }
         if($roles.Count -eq 1){

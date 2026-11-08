@@ -144,6 +144,16 @@ if($baseline.configuration -ceq 'upstream-test'){
     Case 'panic filter cannot narrow the actual provider/child case set' {param($r)
         (Row $r public-panic-controls).process.arguments[1]="_PANIC_CONTROL_CASE='Trivial'"
     } 'explicit setup'
+    Case 'scalar closing filter cannot omit actual allocator failures and retained public cases' {param($r)
+        (Row $r scalar-closing-refusal).process.arguments[1]="_SCALAR_CLOSING_CASE='Cold_True'"
+    } 'explicit setup'
+    Case 'scalar closing completion cannot omit the actual original error and closer recovery' {param($r)
+        $p=(Row $r scalar-closing-refusal).process
+        Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS scalar closing Original_Failure`n",''))
+    } 'complete ordered protocol'
+    Case 'the full instrumented campaign cannot omit scalar closing observations' {param($r)
+        $r.processes=@($r.processes|Where-Object operation -CNE scalar-closing-refusal)
+    } 'process set is incomplete'
     foreach($pair in @(@('reader-refusal-phases','PASS: reader refusal Refused_Partial_Source'),
         @('string-refusal-phases','PASS: string refusal Refused_Error'),
         @('c-hook-transitions','PASS: C hook transition C_Count_Removes_All'))){
