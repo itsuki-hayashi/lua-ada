@@ -41,8 +41,9 @@ backup also preserves 433 verified raw report blobs. Local worktrees are kept.
 The independently useful C-call arena change 30c6185 is included as 6d52343.
 Its author's 2,679-case combined-draft runs include excluded interrupt tests
 and must not be reported as the checkpoint's AUnit count. The clean cut has
-2,665 Windows AUnit cases before CI (2,660 on Unix, which omits five Windows
-platform cases), plus three appended public C cases (33 builtin cases). Root
+2,665 Windows AUnit cases before CI. The first CI observations report 2,660 on
+Linux and 2,663 on macOS, reflecting platform-specific registrations. The cut
+also adds three public C cases (33 builtin cases). Root
 independently read the lending/return paths and regressions; current-head
 checkpoint CI must validate the integrated cut.
 
@@ -55,6 +56,13 @@ checks, 2,660 AUnit cases and the frontend/opcode campaign, then failed because
 the new checkpoint script had not built the separate native oracle executable.
 That failed run is retained as failed evidence; a fresh run must validate the
 corrected dependency and all remaining gates before merge.
+The first macOS T campaign also exposed a default C frontend oracle paired with
+the T-enabled Ada parser. The corrected frontend project uses matching native
+configuration/layouts and retains all 4,000 generated grammar cases, including
+the T-invalid local-global originals, plus all unchanged upstream files. Both
+Windows campaigns pass locally. Its private C scanner now holds the expected
+native lock while calling the reader/collector; the T lock assertions remain
+enabled. The separate default ABI oracle remains unchanged.
 The full-target workflow remains manually available and its validators reject
 incomplete receipts, stale approvals and missing global reconciliation. All
 remaining work is retained in the owning backlog and M3 contract.

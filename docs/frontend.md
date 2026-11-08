@@ -3,6 +3,14 @@
 The [M2a contract](milestones/m2a.md) targets pinned default Lua 5.5.1.
 Current validation is recorded in the [session](sessions/2026-11-06-m2a-frontend.md).
 
+The interim checkpoint also runs `check-frontend.ps1 -Configuration upstream-test`
+against a T-enabled Ada probe and a separately built static C frontend oracle.
+Both oracle translation units use the selected private layout definitions.
+All generated grammar cases remain present: the local named `global` is an
+expected syntax error when pinned ltests.h disables LUA_COMPAT_GLOBAL. This
+matching-configuration campaign preserves the default M2a/ABI oracle scope and
+does not certify whole-suite execution.
+
 ## Checking and execution
 
 Lua.Syntax.Check accepts source bytes, an owned diagnostic source label, and

@@ -83,7 +83,7 @@ try{
     Invoke-Check aunit check-aunit-evidence.ps1 @('-Executable',"$bin/test_runner$suffix",'-Configuration',$configuration,'-Profile','validation','-LibraryType',$type)
     Invoke-Step syntax-api @('exec','--',"$bin/syntax_consumer$suffix")
     Invoke-Check configuration check-runtime-configuration.ps1 @('-Probe',"$bin/lua-configuration_probe$suffix",'-Configuration',$configuration,'-RuntimeDirectory',$runtime)
-    Invoke-Check frontend-opcodes check-frontend.ps1 @('-Probe',"$bin/lexer_probe$suffix",'-OpcodeProbe',"$bin/lua-opcode_probe$suffix")
+    Invoke-Check frontend-opcodes check-frontend.ps1 @('-Probe',"$bin/lexer_probe$suffix",'-OpcodeProbe',"$bin/lua-opcode_probe$suffix",'-Configuration',$configuration)
     Invoke-Check canonical-compiler-runtime check-canonical-compiler.ps1 @('-Probe',"$bin/lua-canonical_compiler_probe$suffix",'-RuntimeProbe',"$bin/lua-canonical_runtime_probe$suffix",
         '-ReferenceInterpreter',$oracle,'-Configuration',$configuration,'-RuntimeDirectory',$runtime)
     Invoke-Check abi check-abi.ps1
