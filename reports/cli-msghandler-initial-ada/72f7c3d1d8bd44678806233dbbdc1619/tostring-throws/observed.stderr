@@ -1,0 +1,9 @@
+C:\Users\Itsuki\.codex\worktrees\remaining-debug\lua-ada\reports\cli-msghandler-initial-ada\72f7c3d1d8bd44678806233dbbdc1619\image\lua_ada.exe: MM_THROW
+stack traceback:
+	[C]: in global 'error'
+	controls.lua:38: in function <controls.lua:37>
+	[C]: in ?
+	[C]: in global 'error'
+	controls.lua:37: in function <controls.lua:36>
+	controls.lua:141: in main chunk
+	[C]: in ?

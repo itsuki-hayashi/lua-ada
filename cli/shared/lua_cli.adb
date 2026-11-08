@@ -81,7 +81,8 @@ procedure Lua_CLI is
    procedure Banner;
    procedure Bad_Option (Option : String);
    procedure Report
-     (Result : Execution_Result; Fail_Process : Boolean := True);
+     (Result : Execution_Result; Fail_Process : Boolean := True;
+      Native_Message : Boolean := False);
    function Read_Source (Path : String) return String;
    function Read_Stdin return String;
    procedure Prepare_Stdin;
@@ -171,7 +172,8 @@ procedure Lua_CLI is
    end Bad_Option;
 
    procedure Report
-     (Result : Execution_Result; Fail_Process : Boolean := True) is
+     (Result : Execution_Result; Fail_Process : Boolean := True;
+      Native_Message : Boolean := False) is
    begin
       --  Output before a failed statement is observable Lua behavior.
       --  Preserve it before sending the structured diagnostic to stderr.
@@ -198,7 +200,15 @@ procedure Lua_CLI is
                then Source (Source'First + 1 .. Source'Last)
                else Source) & ":";
          begin
-            if Message'Length >= Prefix'Length and then
+            if Native_Message then
+               --  docall has already transformed the original error while
+               --  its frames were intact. report only publishes that string;
+               --  it must not add a second source location or call tostring.
+               Ada.Text_IO.Put_Line
+                 (Ada.Text_IO.Standard_Error,
+                  (if Fail_Process then Command_Name & ": " else "") &
+                  Message);
+            elsif Message'Length >= Prefix'Length and then
               Message (Message'First .. Message'First + Prefix'Length - 1) =
                 Prefix
             then
@@ -474,8 +484,9 @@ begin
             begin
                --  One batch chunk: report it, and on failure release the
                --  state unless a typed exit already decided its disposal.
-               Result := Universe.Execute (Source, Name, Arguments);
-               Report (Result);
+               Result := Lua.Sessions.CLI.Execute
+                 (Universe, Source, Name, Arguments);
+               Report (Result, Native_Message => True);
                if Result.Status /= Succeeded then
                   if not Process_Exit_Requested then
                      Universe.Close;
@@ -562,7 +573,8 @@ begin
             procedure Evaluate (Source : String) is
                Print_Failed : Boolean;
                Shown : constant Execution_Result :=
-                 Universe.Execute_Display (Source, "=stdin", Print_Failed);
+                 Lua.Sessions.CLI.Execute_Display
+                   (Universe, Source, "=stdin", Print_Failed);
             begin
                if Print_Failed and then Shown.Status = Runtime_Error then
                   --  l_print's pcall wrapper message (lua.c l_message).
@@ -571,7 +583,8 @@ begin
                      "error calling 'print' (" &
                      To_String (Shown.Error.Message) & ")");
                else
-                  Report (Shown, Fail_Process => False);
+                  Report
+                    (Shown, Fail_Process => False, Native_Message => True);
                end if;
             end Evaluate;
 
@@ -765,7 +778,7 @@ begin
                   Result := Lua.Sessions.CLI.Execute_Selected_Script
                     (Universe, Source,
                      (if Use_Stdin then "=stdin" else "@" & Path));
-                  Report (Result);
+                  Report (Result, Native_Message => True);
                   if Result.Status /= Succeeded then
                      if not Process_Exit_Requested then Universe.Close; end if;
                      return;

@@ -1,0 +1,116 @@
+[
+  {
+    "sidecar": {
+      "schema_version": 1,
+      "run_id": "1a322feadb454e9f86cfa9ffb523a47e",
+      "process_id": 73940,
+      "allocator_limit_bytes": 2147483648,
+      "configuration": "default",
+      "managed_refusals": 0,
+      "outstanding_bytes": 0,
+      "outstanding_blocks": 0
+    },
+    "process": {
+      "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler\\346457279dd348848b95b0c6dd38c977\\default\\image\\lua.exe",
+      "process_id": 73940,
+      "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+      "arguments": [
+        "-E",
+        "-i",
+        "-e",
+        "global *;_PROMPT='';_PROMPT2='';print=function() error(setmetatable({},{__tostring=function() io.write('BAD_META');return 'BAD_MESSAGE' end}),0) end"
+      ],
+      "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-print\\793a163077b3400e8048ccd3e123ef90\\default",
+      "started_utc": "2026-11-08T11:30:56.6474605Z",
+      "elapsed_milliseconds": 96,
+      "timeout_seconds": 900,
+      "exit_code": 0,
+      "abnormal_exit_kind": null,
+      "timed_out": false,
+      "capture_limit_bytes": 67108864,
+      "capture_exceeded": false,
+      "pipe_drain_failed": false,
+      "output_drain_failed": false,
+      "input_write_failed": false,
+      "early_input_close_requested": false,
+      "process_tree_kill_error": null,
+      "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-print\\793a163077b3400e8048ccd3e123ef90\\default\\observed.stdout",
+      "stdout_bytes": 55,
+      "stdout_sha256": "439e91097fb6d6365900bc93b7b5bbddd534e04720a51af9b1890127317502c5",
+      "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-print\\793a163077b3400e8048ccd3e123ef90\\default\\observed.stderr",
+      "stderr_bytes": 32,
+      "stderr_sha256": "83d5e287bb03a898eab47bddc314ad8a834a0780878b7553c6a736de9a152cd2",
+      "standard_input": {
+        "source_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-print\\793a163077b3400e8048ccd3e123ef90\\default\\input",
+        "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-print\\793a163077b3400e8048ccd3e123ef90\\default\\observed.stdin",
+        "bytes": 9,
+        "sha256": "0805bfdc02e872ed322a4a4e440ae985f3a4335f4dd59f3d373dfaf2a68a4a3c",
+        "byte_limit": 67108864,
+        "write_completed": true,
+        "eof_sent": true,
+        "close_requested": true
+      }
+    },
+    "run_id": "1a322feadb454e9f86cfa9ffb523a47e",
+    "setup": "global *;_PROMPT='';_PROMPT2='';print=function() error(setmetatable({},{__tostring=function() io.write('BAD_META');return 'BAD_MESSAGE' end}),0) end",
+    "configuration": "default"
+  },
+  {
+    "sidecar": {
+      "schema_version": 1,
+      "run_id": "ad556c8607cb4d8fbbf16ebb1ecaa26c",
+      "process_id": 35856,
+      "allocator_limit_bytes": 2147483648,
+      "configuration": "upstream-test",
+      "expected_finalizer_warnings": 0,
+      "managed_refusals": 0,
+      "backing_refusals": 0,
+      "outstanding_bytes": 0,
+      "outstanding_blocks": 0
+    },
+    "process": {
+      "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler\\346457279dd348848b95b0c6dd38c977\\upstream-test\\image\\lua.exe",
+      "process_id": 35856,
+      "executable_sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
+      "arguments": [
+        "-E",
+        "-i",
+        "-e",
+        "global *;_PROMPT='';_PROMPT2='';print=function() error(setmetatable({},{__tostring=function() io.write('BAD_META');return 'BAD_MESSAGE' end}),0) end"
+      ],
+      "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-print\\793a163077b3400e8048ccd3e123ef90\\upstream-test",
+      "started_utc": "2026-11-08T11:30:56.7928464Z",
+      "elapsed_milliseconds": 68,
+      "timeout_seconds": 900,
+      "exit_code": 0,
+      "abnormal_exit_kind": null,
+      "timed_out": false,
+      "capture_limit_bytes": 67108864,
+      "capture_exceeded": false,
+      "pipe_drain_failed": false,
+      "output_drain_failed": false,
+      "input_write_failed": false,
+      "early_input_close_requested": false,
+      "process_tree_kill_error": null,
+      "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-print\\793a163077b3400e8048ccd3e123ef90\\upstream-test\\observed.stdout",
+      "stdout_bytes": 55,
+      "stdout_sha256": "439e91097fb6d6365900bc93b7b5bbddd534e04720a51af9b1890127317502c5",
+      "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-print\\793a163077b3400e8048ccd3e123ef90\\upstream-test\\observed.stderr",
+      "stderr_bytes": 32,
+      "stderr_sha256": "83d5e287bb03a898eab47bddc314ad8a834a0780878b7553c6a736de9a152cd2",
+      "standard_input": {
+        "source_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-print\\793a163077b3400e8048ccd3e123ef90\\upstream-test\\input",
+        "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-print\\793a163077b3400e8048ccd3e123ef90\\upstream-test\\observed.stdin",
+        "bytes": 9,
+        "sha256": "0805bfdc02e872ed322a4a4e440ae985f3a4335f4dd59f3d373dfaf2a68a4a3c",
+        "byte_limit": 67108864,
+        "write_completed": true,
+        "eof_sent": true,
+        "close_requested": true
+      }
+    },
+    "run_id": "ad556c8607cb4d8fbbf16ebb1ecaa26c",
+    "setup": "global *;_PROMPT='';_PROMPT2='';print=function() error(setmetatable({},{__tostring=function() io.write('BAD_META');return 'BAD_MESSAGE' end}),0) end",
+    "configuration": "upstream-test"
+  }
+]

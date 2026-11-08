@@ -1,0 +1,9 @@
+C:\Users\Itsuki\.codex\worktrees\remaining-debug\lua-ada\reports\cli-msghandler\346457279dd348848b95b0c6dd38c977\upstream-test\image\lua.exe: attempt to yield from outside a coroutine
+stack traceback:
+	[C]: in field 'yield'
+	controls.lua:111: in function <controls.lua:111>
+	[C]: in ?
+	[C]: in global 'error'
+	controls.lua:111: in function <controls.lua:110>
+	controls.lua:141: in main chunk
+	[C]: in ?

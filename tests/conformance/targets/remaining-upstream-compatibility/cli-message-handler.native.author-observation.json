@@ -1,0 +1,3744 @@
+{
+  "schema_version": 1,
+  "kind": "cli-message-handler-native-author-observation",
+  "author": "Codex /root/remaining_suite",
+  "date": "2026-11-08",
+  "source_head": "63eaf9df3a08af990fb4cae02f27f286b661a2a4",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "platform": "windows-x86_64",
+  "images": [
+    {
+      "configuration": "default",
+      "source": "C:/Users/Itsuki/workspace/lua-ada/build/conformance/default/bin/lua.exe",
+      "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/image/lua.exe",
+      "sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd"
+    },
+    {
+      "configuration": "default",
+      "source": "C:/Users/Itsuki/workspace/lua-ada/build/conformance/default/lib/libconformance_lua.dll",
+      "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/image/libconformance_lua.dll",
+      "sha256": "6fd51198bee9770aab18cf42ebaf7ccc133a26d4e3dedb22770c41aba84500b3"
+    },
+    {
+      "configuration": "upstream-test",
+      "source": "C:/Users/Itsuki/workspace/lua-ada/build/conformance/upstream-test/bin/lua.exe",
+      "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/image/lua.exe",
+      "sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725"
+    },
+    {
+      "configuration": "upstream-test",
+      "source": "C:/Users/Itsuki/workspace/lua-ada/build/conformance/upstream-test/lib/libconformance_lua.dll",
+      "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/image/libconformance_lua.dll",
+      "sha256": "90cd6bb9cb2f5cdfe04a79ad2a2a8779f1e2cda590d53aaebb3caf5524fe973c"
+    }
+  ],
+  "source_counterparts": [
+    {
+      "path": "references/lua/lua.c",
+      "sha256": "17ce8e73dd3586b84076ceaad9d638887723a1c60945c6ee086d723a6e61453f"
+    },
+    {
+      "path": "references/lua/lauxlib.c",
+      "sha256": "12479bc0ada905452185278dc681d72eb865e1fc247a0143227c210bc3f9dd78"
+    },
+    {
+      "path": "references/lua/lapi.c",
+      "sha256": "d744084bfec5049f6eaa509f4f353886a8c4fa8c8ef875d9f5bd3783caa46e09"
+    },
+    {
+      "path": "references/lua/ldo.c",
+      "sha256": "6dd1265ccbc686073580a49de19e7fb5af80133d5decee104fc012dbfaaab3b8"
+    },
+    {
+      "path": "tests/lua/cli_message_handler_controls.lua",
+      "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+    }
+  ],
+  "process_count": 89,
+  "actual_balanced_nonexit_sidecars": 81,
+  "groups": [
+    {
+      "raw_index": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/index.json",
+      "raw_index_sha256": "bd4baa7c747e7982b2a0d760a78e7250d8f0541d314415aed675b1668b35612f",
+      "records": [
+        {
+          "case": "string",
+          "configuration": "default",
+          "process_id": 67144,
+          "run_id": "26fbeab8f4d24f519b9e0e62bd2bed59",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 45,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/string/case.lua",
+            "sha256": "f3463fe259646d81d3ddb2f944c224f92524f8f753d0653a2ef7ceb25988e08c"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/string/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/string/observed.stderr",
+            "sha256": "b2e99ced2bf8bc3610d2cd048880b8bebed6975a48ccb4ccd46fec7a7a138490",
+            "bytes": 293
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "26fbeab8f4d24f519b9e0e62bd2bed59",
+            "process_id": 67144,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "table",
+          "configuration": "default",
+          "process_id": 37776,
+          "run_id": "7bf984894a6c4de88042586710c0bc8f",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 10,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/table/case.lua",
+            "sha256": "aa45406b5a7610a6e7f9efe12408b6d2b45c8ae01e0d009c7afd047820c24d0d"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/table/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/table/observed.stderr",
+            "sha256": "0596268e38260068c8d207cb8c8d49409a760a6e56e2fe1649c2d44451bef1a1",
+            "bytes": 252
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "7bf984894a6c4de88042586710c0bc8f",
+            "process_id": 37776,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "table-name",
+          "configuration": "default",
+          "process_id": 39656,
+          "run_id": "8b5c19e7d79e4626834144aed193caf3",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/table-name/case.lua",
+            "sha256": "73af155fb89f4a724ddf135a6e16c655c47f685268d2b58b65005bc35f296339"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/table-name/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/table-name/observed.stderr",
+            "sha256": "0596268e38260068c8d207cb8c8d49409a760a6e56e2fe1649c2d44451bef1a1",
+            "bytes": 252
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "8b5c19e7d79e4626834144aed193caf3",
+            "process_id": 39656,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-string",
+          "configuration": "default",
+          "process_id": 50424,
+          "run_id": "6d65b39aa5964d3e936e39d3f511221d",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-string/case.lua",
+            "sha256": "b233c586d35e2e9d01c60b9830a4657401cf81af582f44c225d3aec35f386a2d"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-string/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-string/observed.stderr",
+            "sha256": "acba77736a31c97479b3ff8062242e07f08f0dab81a3f083a37bf8bf1e5b5602",
+            "bytes": 147
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "6d65b39aa5964d3e936e39d3f511221d",
+            "process_id": 50424,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-number",
+          "configuration": "default",
+          "process_id": 15204,
+          "run_id": "67f86531f52a4e11a2137a4406999003",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 32,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-number/case.lua",
+            "sha256": "7047c071e8018b8ca64611a51aae5ce58b8bdd45d2c758491ca6c8e79cb18073"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-number/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-number/observed.stderr",
+            "sha256": "0596268e38260068c8d207cb8c8d49409a760a6e56e2fe1649c2d44451bef1a1",
+            "bytes": 252
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "67f86531f52a4e11a2137a4406999003",
+            "process_id": 15204,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-nil",
+          "configuration": "default",
+          "process_id": 70136,
+          "run_id": "b0b85e1a091f4248a7ff6788335106b3",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 10,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-nil/case.lua",
+            "sha256": "30c87a94befb4ba5785d2b12002b84d243ef83d4f75f028fafff86f31530edb6"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-nil/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-nil/observed.stderr",
+            "sha256": "0596268e38260068c8d207cb8c8d49409a760a6e56e2fe1649c2d44451bef1a1",
+            "bytes": 252
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "b0b85e1a091f4248a7ff6788335106b3",
+            "process_id": 70136,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-throws",
+          "configuration": "default",
+          "process_id": 44424,
+          "run_id": "d0bf0a0ce8f5443788d9fd175b4710f3",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 32,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-throws/case.lua",
+            "sha256": "858c1e310580f84fe31e91e10a2ee01130311354127fca2148df155f79b8fd90"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-throws/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-throws/observed.stderr",
+            "sha256": "d0df75f95b68b1d801e34853a94d941fe60af64eb9ce90fd45843bf1a1361605",
+            "bytes": 305
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "d0bf0a0ce8f5443788d9fd175b4710f3",
+            "process_id": 44424,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-nul",
+          "configuration": "default",
+          "process_id": 85908,
+          "run_id": "5d9bb35fcdb84b86922901ef1bb8d98c",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 10,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-nul/case.lua",
+            "sha256": "176c4959673611173fd8965900c1e701948ba9f6b20810ebba2c3d884ff8e77c"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-nul/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/tostring-nul/observed.stderr",
+            "sha256": "aaf66f05d15e1628cdc756849e284121df214f0b7dea714a8d2ee8a46d118000",
+            "bytes": 140
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "5d9bb35fcdb84b86922901ef1bb8d98c",
+            "process_id": 85908,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "numeric",
+          "configuration": "default",
+          "process_id": 85864,
+          "run_id": "afa8e6613fad4d87a9a98e751b1213e6",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/numeric/case.lua",
+            "sha256": "761f506345ba4407f78f3138b6d5450dc158fe9762bb5a287db4b2526ef4fdf1"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/numeric/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/numeric/observed.stderr",
+            "sha256": "b450bd2839fd0c7f6c16286cc4e4532e9738182afc20364dfa6e8273a30a4cf3",
+            "bytes": 223
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "afa8e6613fad4d87a9a98e751b1213e6",
+            "process_id": 85864,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "numeric-meta",
+          "configuration": "default",
+          "process_id": 56600,
+          "run_id": "e37dd021af224fed87a82c761220a1c6",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 13,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/numeric-meta/case.lua",
+            "sha256": "74f9cc503277da3329fca46280427fd46b92d21c0de217ea95721133d4dcb9c7"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/numeric-meta/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/numeric-meta/observed.stderr",
+            "sha256": "b450bd2839fd0c7f6c16286cc4e4532e9738182afc20364dfa6e8273a30a4cf3",
+            "bytes": 223
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "e37dd021af224fed87a82c761220a1c6",
+            "process_id": 56600,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "callable-meta",
+          "configuration": "default",
+          "process_id": 60232,
+          "run_id": "79a351583e7d4d6ca6255623ba86208f",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 10,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/callable-meta/case.lua",
+            "sha256": "52e57cde710dedd97750cc97071eb23a0b7cf6d0edccb9c97f2b7628adcc5e7a"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/callable-meta/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/callable-meta/observed.stderr",
+            "sha256": "7f1f9380b1a950b2e3c0cca09fde8543d450c72f9e70a015089bad544558af78",
+            "bytes": 149
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "79a351583e7d4d6ca6255623ba86208f",
+            "process_id": 60232,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "raw-meta",
+          "configuration": "default",
+          "process_id": 58776,
+          "run_id": "585644faee274304a6b6bb8a031ab4ce",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 10,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/raw-meta/case.lua",
+            "sha256": "4189b5deecd676dee433b4e86ef417b97546eab245c17fbefaf1ad0c8008e8b8"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/raw-meta/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/raw-meta/observed.stderr",
+            "sha256": "0596268e38260068c8d207cb8c8d49409a760a6e56e2fe1649c2d44451bef1a1",
+            "bytes": 252
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "585644faee274304a6b6bb8a031ab4ce",
+            "process_id": 58776,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "mutate-parent",
+          "configuration": "default",
+          "process_id": 55248,
+          "run_id": "ea06e65015d24f84824db64619929903",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/mutate-parent/case.lua",
+            "sha256": "22e053626180658d61445df8a38b2eafeb7aaa871b592410b13a8e921c68f2e5"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/mutate-parent/observed.stdout",
+            "sha256": "2b16bf72b2860720fd4b3e7691cd698d3f4dc65c093a157bc96a6de9edbee820",
+            "bytes": 50
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/mutate-parent/observed.stderr",
+            "sha256": "6aee06854906d08bda2f9d692d1138ad6099585368d3de8a0552170f63d872be",
+            "bytes": 253
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "ea06e65015d24f84824db64619929903",
+            "process_id": 55248,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "compile-before-args",
+          "configuration": "default",
+          "process_id": 22956,
+          "run_id": "137a8285567a485ba2bc6b65859d11cc",
+          "arguments": [
+            "-E",
+            "-e",
+            "global *\nlocal e=setmetatable({},{__tostring=function() io.stdout:write(\"TOSTRING\\n\"); return \"ARG_MM\" end}); arg=nil; setmetatable(_G,{__index=function(t,k) if k==\"arg\" then io.stdout:write(\"ARG_LOOKUP\\n\"); error(e,0) end end}); io.stdout:write(\"READY\\n\")",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 11,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/compile-before-args/case.lua",
+            "sha256": "7a62bc28a57aec252a1caad8b68eddfff26cb1cde5becfd498a402828bd03962"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/compile-before-args/observed.stdout",
+            "sha256": "5f14c516e0c7a2be0aa613a98a475138fe4e5824bd7715e51ae46652059c709b",
+            "bytes": 7
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/compile-before-args/observed.stderr",
+            "sha256": "2cd4fab24ff3b029df45026dbcce0a3ee9b219b07577f6422f34da425c6ceccd",
+            "bytes": 174
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "137a8285567a485ba2bc6b65859d11cc",
+            "process_id": 22956,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "arg-lookup-before-handler",
+          "configuration": "default",
+          "process_id": 60072,
+          "run_id": "109d814a429f4e7a80c47c4a929b45bd",
+          "arguments": [
+            "-E",
+            "-e",
+            "global *\nlocal e=setmetatable({},{__tostring=function() io.stdout:write(\"TOSTRING\\n\"); return \"ARG_MM\" end}); arg=nil; setmetatable(_G,{__index=function(t,k) if k==\"arg\" then io.stdout:write(\"ARG_LOOKUP\\n\"); error(e,0) end end}); io.stdout:write(\"READY\\n\")",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 10,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/arg-lookup-before-handler/case.lua",
+            "sha256": "158dc02c35ff1b716a74a3ab44dbbd72ffbe58b3be66fb513bc7d9d51eb95e34"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/arg-lookup-before-handler/observed.stdout",
+            "sha256": "e298af3de533d60beb502403d3a72bb89b8bca2916939b571bc203d6d48d3dae",
+            "bytes": 19
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/arg-lookup-before-handler/observed.stderr",
+            "sha256": "e2f6e1f89d9f9516a5033587f1297b784f3e365a903d27e24b02927bd4fbaeb6",
+            "bytes": 166
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "109d814a429f4e7a80c47c4a929b45bd",
+            "process_id": 60072,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "arg-length-before-handler",
+          "configuration": "default",
+          "process_id": 36228,
+          "run_id": "f01317bcdc3b4c7c9dfb8d199099d6b7",
+          "arguments": [
+            "-E",
+            "-e",
+            "global *\nlocal e=setmetatable({},{__tostring=function() io.stdout:write(\"TOSTRING\\n\"); return \"ARG_MM\" end}); arg=setmetatable({},{__len=function() io.stdout:write(\"ARG_LENGTH\\n\"); error(e,0) end}); io.stdout:write(\"READY\\n\")",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/arg-length-before-handler/case.lua",
+            "sha256": "158dc02c35ff1b716a74a3ab44dbbd72ffbe58b3be66fb513bc7d9d51eb95e34"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/arg-length-before-handler/observed.stdout",
+            "sha256": "9a8c0c8ab7803f2ca0e0f466816a60427deee1ca2eab355b0ff58c028f3c2c45",
+            "bytes": 19
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/arg-length-before-handler/observed.stderr",
+            "sha256": "e2f6e1f89d9f9516a5033587f1297b784f3e365a903d27e24b02927bd4fbaeb6",
+            "bytes": 166
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "f01317bcdc3b4c7c9dfb8d199099d6b7",
+            "process_id": 36228,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "exit-close",
+          "configuration": "default",
+          "process_id": 55240,
+          "run_id": "ffbcc35a1e9f4684affcd505ca0bef98",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 37,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/exit-close/case.lua",
+            "sha256": "0c906c72fb45c8ed44eb8469e7b9eac70f618759280d088397ea96d0542caf04"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/exit-close/observed.stdout",
+            "sha256": "d76f58b5564da57b1bc1fa30f19340789b519cbd558163cd2e26dd77d3ff087e",
+            "bytes": 14
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/exit-close/observed.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "telemetry": null,
+          "cleanup_evidence": "not measured: typed exit bypasses launcher finish",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "exit-no-close",
+          "configuration": "default",
+          "process_id": 34960,
+          "run_id": "d57cf3cfd8674f538175cf2a5652c729",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 37,
+          "timeout_seconds": 5,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/exit-no-close/case.lua",
+            "sha256": "fd292983cdfd31d95533fd0c57fcf66aa816648c01c7d5fb9403bb6995065b77"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/exit-no-close/observed.stdout",
+            "sha256": "d76f58b5564da57b1bc1fa30f19340789b519cbd558163cd2e26dd77d3ff087e",
+            "bytes": 14
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/exit-no-close/observed.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "telemetry": null,
+          "cleanup_evidence": "not measured: typed exit bypasses launcher finish",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "frames",
+          "configuration": "default",
+          "process_id": 38688,
+          "run_id": "1c47d72dfa424772aac7cc65b3b9b337",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 11,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/frames/case.lua",
+            "sha256": "f15727f074c58cf5559b6fbb480c55958da730d09a99490e9b611b4e59798e47"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/frames/observed.stdout",
+            "sha256": "510401bcb76a9bec95f922ba81d3ea6df7b8b96948eb2a5f46222ebc66725285",
+            "bytes": 479
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/default/frames/observed.stderr",
+            "sha256": "663ef5ac000d50e5e6b9fb3a8cce978a856c4c00f8c0b58b0b19a7819a4ebc04",
+            "bytes": 151
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "1c47d72dfa424772aac7cc65b3b9b337",
+            "process_id": 38688,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "string",
+          "configuration": "upstream-test",
+          "process_id": 84388,
+          "run_id": "aa5b7a2154254a158d385e4f5e2c368e",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 32,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/string/case.lua",
+            "sha256": "f3463fe259646d81d3ddb2f944c224f92524f8f753d0653a2ef7ceb25988e08c"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/string/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/string/observed.stderr",
+            "sha256": "b11bd03f52d2a227be0d1322cbd5896af8d09b82a7735ba887fb151348317456",
+            "bytes": 299
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "aa5b7a2154254a158d385e4f5e2c368e",
+            "process_id": 84388,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "table",
+          "configuration": "upstream-test",
+          "process_id": 61112,
+          "run_id": "912b804ca7b945ec87ec89beca74e027",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 6,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/table/case.lua",
+            "sha256": "aa45406b5a7610a6e7f9efe12408b6d2b45c8ae01e0d009c7afd047820c24d0d"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/table/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/table/observed.stderr",
+            "sha256": "6a09b2b26159b8a027dc6ad5f54da6eb77ee6ee898d6f3ddf4bb27652f9175e3",
+            "bytes": 258
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "912b804ca7b945ec87ec89beca74e027",
+            "process_id": 61112,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "table-name",
+          "configuration": "upstream-test",
+          "process_id": 40072,
+          "run_id": "446c2a6ab74a48a6b1e58999344afb31",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 6,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/table-name/case.lua",
+            "sha256": "73af155fb89f4a724ddf135a6e16c655c47f685268d2b58b65005bc35f296339"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/table-name/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/table-name/observed.stderr",
+            "sha256": "6a09b2b26159b8a027dc6ad5f54da6eb77ee6ee898d6f3ddf4bb27652f9175e3",
+            "bytes": 258
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "446c2a6ab74a48a6b1e58999344afb31",
+            "process_id": 40072,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-string",
+          "configuration": "upstream-test",
+          "process_id": 26496,
+          "run_id": "b208a5d155c44715b418e819baefd403",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 6,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-string/case.lua",
+            "sha256": "b233c586d35e2e9d01c60b9830a4657401cf81af582f44c225d3aec35f386a2d"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-string/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-string/observed.stderr",
+            "sha256": "8222ffe676f36298d4edc916cddbf7770dfd57d84304b93c50e8055e5fadbdbb",
+            "bytes": 153
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "b208a5d155c44715b418e819baefd403",
+            "process_id": 26496,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-number",
+          "configuration": "upstream-test",
+          "process_id": 47660,
+          "run_id": "31a3cf9124c143adad18daba80b03ece",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 7,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-number/case.lua",
+            "sha256": "7047c071e8018b8ca64611a51aae5ce58b8bdd45d2c758491ca6c8e79cb18073"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-number/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-number/observed.stderr",
+            "sha256": "6a09b2b26159b8a027dc6ad5f54da6eb77ee6ee898d6f3ddf4bb27652f9175e3",
+            "bytes": 258
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "31a3cf9124c143adad18daba80b03ece",
+            "process_id": 47660,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-nil",
+          "configuration": "upstream-test",
+          "process_id": 92044,
+          "run_id": "92288d6bd07a4cc9858de08ce50f34e1",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 6,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-nil/case.lua",
+            "sha256": "30c87a94befb4ba5785d2b12002b84d243ef83d4f75f028fafff86f31530edb6"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-nil/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-nil/observed.stderr",
+            "sha256": "6a09b2b26159b8a027dc6ad5f54da6eb77ee6ee898d6f3ddf4bb27652f9175e3",
+            "bytes": 258
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "92288d6bd07a4cc9858de08ce50f34e1",
+            "process_id": 92044,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-throws",
+          "configuration": "upstream-test",
+          "process_id": 26600,
+          "run_id": "5ca910eec0984a468bb90dd033969fba",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 6,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-throws/case.lua",
+            "sha256": "858c1e310580f84fe31e91e10a2ee01130311354127fca2148df155f79b8fd90"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-throws/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-throws/observed.stderr",
+            "sha256": "29ef9b1f280e5376a4db1c6b1f0f3f0d4d03d633f3e4b61f554eb6280fe2a8fe",
+            "bytes": 311
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "5ca910eec0984a468bb90dd033969fba",
+            "process_id": 26600,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-nul",
+          "configuration": "upstream-test",
+          "process_id": 93104,
+          "run_id": "7d68d4ed9f4744c0bc2d7e204d7e2013",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 6,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-nul/case.lua",
+            "sha256": "176c4959673611173fd8965900c1e701948ba9f6b20810ebba2c3d884ff8e77c"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-nul/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/tostring-nul/observed.stderr",
+            "sha256": "9430623b84b994fbec1b40884e9d76abd1003aa52c8d48a6a6a500628fceff5d",
+            "bytes": 146
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "7d68d4ed9f4744c0bc2d7e204d7e2013",
+            "process_id": 93104,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "numeric",
+          "configuration": "upstream-test",
+          "process_id": 54128,
+          "run_id": "f3e2a47159c0432b9c87c9c79a8fd8e6",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 6,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/numeric/case.lua",
+            "sha256": "761f506345ba4407f78f3138b6d5450dc158fe9762bb5a287db4b2526ef4fdf1"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/numeric/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/numeric/observed.stderr",
+            "sha256": "ece2963947f71337a35038cc28be0deb5769ecbe6e3c872fcea8170d3f8dda6d",
+            "bytes": 229
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "f3e2a47159c0432b9c87c9c79a8fd8e6",
+            "process_id": 54128,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "numeric-meta",
+          "configuration": "upstream-test",
+          "process_id": 44736,
+          "run_id": "266f99400dae4833be4639ff95c6f52b",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 6,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/numeric-meta/case.lua",
+            "sha256": "74f9cc503277da3329fca46280427fd46b92d21c0de217ea95721133d4dcb9c7"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/numeric-meta/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/numeric-meta/observed.stderr",
+            "sha256": "ece2963947f71337a35038cc28be0deb5769ecbe6e3c872fcea8170d3f8dda6d",
+            "bytes": 229
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "266f99400dae4833be4639ff95c6f52b",
+            "process_id": 44736,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "callable-meta",
+          "configuration": "upstream-test",
+          "process_id": 79360,
+          "run_id": "4450e2c6d66640ec9319a8d95615ab03",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 6,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/callable-meta/case.lua",
+            "sha256": "52e57cde710dedd97750cc97071eb23a0b7cf6d0edccb9c97f2b7628adcc5e7a"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/callable-meta/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/callable-meta/observed.stderr",
+            "sha256": "00898b63361135af7a31afd83a026fffb6add1f86019339533c3f4f8300699cf",
+            "bytes": 155
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "4450e2c6d66640ec9319a8d95615ab03",
+            "process_id": 79360,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "raw-meta",
+          "configuration": "upstream-test",
+          "process_id": 81284,
+          "run_id": "9ffd5706073e482f9da692603e8ea42c",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 6,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/raw-meta/case.lua",
+            "sha256": "4189b5deecd676dee433b4e86ef417b97546eab245c17fbefaf1ad0c8008e8b8"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/raw-meta/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/raw-meta/observed.stderr",
+            "sha256": "6a09b2b26159b8a027dc6ad5f54da6eb77ee6ee898d6f3ddf4bb27652f9175e3",
+            "bytes": 258
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "9ffd5706073e482f9da692603e8ea42c",
+            "process_id": 81284,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "mutate-parent",
+          "configuration": "upstream-test",
+          "process_id": 71288,
+          "run_id": "d895d9820e1a4b7ea6600c0696828688",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 6,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/mutate-parent/case.lua",
+            "sha256": "22e053626180658d61445df8a38b2eafeb7aaa871b592410b13a8e921c68f2e5"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/mutate-parent/observed.stdout",
+            "sha256": "2b16bf72b2860720fd4b3e7691cd698d3f4dc65c093a157bc96a6de9edbee820",
+            "bytes": 50
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/mutate-parent/observed.stderr",
+            "sha256": "a198978a90a0bc1c4dce81bc0e8b7a41280409e0f0cbd558fb0c713b672e34aa",
+            "bytes": 259
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "d895d9820e1a4b7ea6600c0696828688",
+            "process_id": 71288,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "compile-before-args",
+          "configuration": "upstream-test",
+          "process_id": 92824,
+          "run_id": "16db73388a054b9c85f3ea173504ce8f",
+          "arguments": [
+            "-E",
+            "-e",
+            "global *\nlocal e=setmetatable({},{__tostring=function() io.stdout:write(\"TOSTRING\\n\"); return \"ARG_MM\" end}); arg=nil; setmetatable(_G,{__index=function(t,k) if k==\"arg\" then io.stdout:write(\"ARG_LOOKUP\\n\"); error(e,0) end end}); io.stdout:write(\"READY\\n\")",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/compile-before-args/case.lua",
+            "sha256": "7a62bc28a57aec252a1caad8b68eddfff26cb1cde5becfd498a402828bd03962"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/compile-before-args/observed.stdout",
+            "sha256": "5f14c516e0c7a2be0aa613a98a475138fe4e5824bd7715e51ae46652059c709b",
+            "bytes": 7
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/compile-before-args/observed.stderr",
+            "sha256": "e5ccd4aba1557354ac2ba8b8db67aa51fe97679084aec192093ccff6450e9896",
+            "bytes": 180
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "16db73388a054b9c85f3ea173504ce8f",
+            "process_id": 92824,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "arg-lookup-before-handler",
+          "configuration": "upstream-test",
+          "process_id": 33548,
+          "run_id": "dce87f6057e241069d7b019ce3fa0f58",
+          "arguments": [
+            "-E",
+            "-e",
+            "global *\nlocal e=setmetatable({},{__tostring=function() io.stdout:write(\"TOSTRING\\n\"); return \"ARG_MM\" end}); arg=nil; setmetatable(_G,{__index=function(t,k) if k==\"arg\" then io.stdout:write(\"ARG_LOOKUP\\n\"); error(e,0) end end}); io.stdout:write(\"READY\\n\")",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 6,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/arg-lookup-before-handler/case.lua",
+            "sha256": "158dc02c35ff1b716a74a3ab44dbbd72ffbe58b3be66fb513bc7d9d51eb95e34"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/arg-lookup-before-handler/observed.stdout",
+            "sha256": "e298af3de533d60beb502403d3a72bb89b8bca2916939b571bc203d6d48d3dae",
+            "bytes": 19
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/arg-lookup-before-handler/observed.stderr",
+            "sha256": "9af8ea7c47bc192aee7e7622d3b33e516ba413cb40438f12fb3dea6add72964d",
+            "bytes": 172
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "dce87f6057e241069d7b019ce3fa0f58",
+            "process_id": 33548,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "arg-length-before-handler",
+          "configuration": "upstream-test",
+          "process_id": 40120,
+          "run_id": "91ddc6a2d9d64c46812578073323e305",
+          "arguments": [
+            "-E",
+            "-e",
+            "global *\nlocal e=setmetatable({},{__tostring=function() io.stdout:write(\"TOSTRING\\n\"); return \"ARG_MM\" end}); arg=setmetatable({},{__len=function() io.stdout:write(\"ARG_LENGTH\\n\"); error(e,0) end}); io.stdout:write(\"READY\\n\")",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/arg-length-before-handler/case.lua",
+            "sha256": "158dc02c35ff1b716a74a3ab44dbbd72ffbe58b3be66fb513bc7d9d51eb95e34"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/arg-length-before-handler/observed.stdout",
+            "sha256": "9a8c0c8ab7803f2ca0e0f466816a60427deee1ca2eab355b0ff58c028f3c2c45",
+            "bytes": 19
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/arg-length-before-handler/observed.stderr",
+            "sha256": "9af8ea7c47bc192aee7e7622d3b33e516ba413cb40438f12fb3dea6add72964d",
+            "bytes": 172
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "91ddc6a2d9d64c46812578073323e305",
+            "process_id": 40120,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "exit-close",
+          "configuration": "upstream-test",
+          "process_id": 4868,
+          "run_id": "9fc98ce4257b434c9c6dc563f6371cbd",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 37,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 6,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/exit-close/case.lua",
+            "sha256": "0c906c72fb45c8ed44eb8469e7b9eac70f618759280d088397ea96d0542caf04"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/exit-close/observed.stdout",
+            "sha256": "d76f58b5564da57b1bc1fa30f19340789b519cbd558163cd2e26dd77d3ff087e",
+            "bytes": 14
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/exit-close/observed.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "telemetry": null,
+          "cleanup_evidence": "not measured: typed exit bypasses launcher finish",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "exit-no-close",
+          "configuration": "upstream-test",
+          "process_id": 60172,
+          "run_id": "29e9fc944730401298cc85c9455d796b",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 37,
+          "timeout_seconds": 5,
+          "elapsed_milliseconds": 401,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/exit-no-close/case.lua",
+            "sha256": "fd292983cdfd31d95533fd0c57fcf66aa816648c01c7d5fb9403bb6995065b77"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/exit-no-close/observed.stdout",
+            "sha256": "d76f58b5564da57b1bc1fa30f19340789b519cbd558163cd2e26dd77d3ff087e",
+            "bytes": 14
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/exit-no-close/observed.stderr",
+            "sha256": "3502938af48118d9164dd36c60d9d761721edc05c8ac9f3dfecc68ae347a7bff",
+            "bytes": 122
+          },
+          "telemetry": null,
+          "cleanup_evidence": "not measured: typed exit bypasses launcher finish",
+          "native_oracle_cleanup_failed": true,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "memory",
+          "configuration": "upstream-test",
+          "process_id": 74356,
+          "run_id": "45f496a3af9d415894072e1472b51cb8",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 10,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/memory/case.lua",
+            "sha256": "efc0cc23de78b10e963647693638ddebcd5d2ff5ba86b32728fc7796179a22ca"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/memory/observed.stdout",
+            "sha256": "26762c1f19342d34235aeba5944be23a074007678dff925a6a1a7207c61fa3c2",
+            "bytes": 7
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/memory/observed.stderr",
+            "sha256": "d300465ea9deba9a3341f50aa866705d0c85cce8f76d6e39363df4adb7f4246c",
+            "bytes": 161
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "45f496a3af9d415894072e1472b51cb8",
+            "process_id": 74356,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 8,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "memory-in-numeric-handler",
+          "configuration": "upstream-test",
+          "process_id": 84472,
+          "run_id": "97e8310d6e304d719001c0fbcf7f798f",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 16,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/memory-in-numeric-handler/case.lua",
+            "sha256": "053e7a90ae643b8e8b5212b458a85776d2725a13f09501816e750254d2cb16e1"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/memory-in-numeric-handler/observed.stdout",
+            "sha256": "26762c1f19342d34235aeba5944be23a074007678dff925a6a1a7207c61fa3c2",
+            "bytes": 7
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/memory-in-numeric-handler/observed.stderr",
+            "sha256": "d300465ea9deba9a3341f50aa866705d0c85cce8f76d6e39363df4adb7f4246c",
+            "bytes": 161
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "97e8310d6e304d719001c0fbcf7f798f",
+            "process_id": 84472,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 8,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "frames",
+          "configuration": "upstream-test",
+          "process_id": 89720,
+          "run_id": "1cdfa10337484b4e80e5770f078a75c8",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 6,
+          "source": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/frames/case.lua",
+            "sha256": "f15727f074c58cf5559b6fbb480c55958da730d09a99490e9b611b4e59798e47"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/frames/observed.stdout",
+            "sha256": "510401bcb76a9bec95f922ba81d3ea6df7b8b96948eb2a5f46222ebc66725285",
+            "bytes": 479
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler/346457279dd348848b95b0c6dd38c977/upstream-test/frames/observed.stderr",
+            "sha256": "ca8f02d7bac3e9ffd4961596bc5c1b629b38aa09588b5bbec1a0157a5fb37f87",
+            "bytes": 157
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "1cdfa10337484b4e80e5770f078a75c8",
+            "process_id": 89720,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        }
+      ]
+    },
+    {
+      "raw_index": "reports/cli-msghandler-handler-refusal/fb10d07d6cfb4802b37d2935febc390c/index.json",
+      "raw_index_sha256": "e77819b188b90c62bc9a8f1c1889cd6b4671e36bb614670154769ab9f2db9e29",
+      "records": [
+        {
+          "case": "entered-handler-memory",
+          "configuration": "upstream-test",
+          "process_id": 51668,
+          "run_id": "f6323759cab540b0add5431e67fa2369",
+          "arguments": [
+            "-E",
+            "case.lua"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 21,
+          "source": {
+            "path": "reports/cli-msghandler-handler-refusal/fb10d07d6cfb4802b37d2935febc390c/case.lua",
+            "sha256": "e352e363be55f165b62045a48c8755721b6c39c5b5602cf2ac4a0d98ec3cf5bd"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-handler-refusal/fb10d07d6cfb4802b37d2935febc390c/observed.stdout",
+            "sha256": "fbee0bcbc5addc11962ef481b10af11a5b315a1b8bdfd113bacbbd69af4f7280",
+            "bytes": 15
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-handler-refusal/fb10d07d6cfb4802b37d2935febc390c/observed.stderr",
+            "sha256": "d300465ea9deba9a3341f50aa866705d0c85cce8f76d6e39363df4adb7f4246c",
+            "bytes": 161
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "f6323759cab540b0add5431e67fa2369",
+            "process_id": 51668,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 8,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        }
+      ]
+    },
+    {
+      "raw_index": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/index.json",
+      "raw_index_sha256": "cd9259e95dd7e4997a383e9e1c0598372b40e0c3da0c435c7a1706ec625124a0",
+      "records": [
+        {
+          "case": "string",
+          "configuration": "default",
+          "process_id": 44424,
+          "run_id": "f79065c2b86a471db4d365be33a7d8a6",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "string"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 51,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/string/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/string/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/string/observed.stderr",
+            "sha256": "6bd46e848aa9b03fdf1acb479abfad42aba033a3edfda6fb87db8e7e1797c708",
+            "bytes": 356
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "f79065c2b86a471db4d365be33a7d8a6",
+            "process_id": 44424,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "table",
+          "configuration": "default",
+          "process_id": 26196,
+          "run_id": "2079326d8a7d48a585da95763265f440",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "table"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 10,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/table/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/table/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/table/observed.stderr",
+            "sha256": "e3a44ab2162dbef9a5911420a4401cc0d554da19ff0dd59970f6aec420d8425a",
+            "bytes": 307
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "2079326d8a7d48a585da95763265f440",
+            "process_id": 26196,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "table-name",
+          "configuration": "default",
+          "process_id": 88524,
+          "run_id": "07589f92eb90432aa9838db5ba888d7d",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "table-name"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/table-name/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/table-name/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/table-name/observed.stderr",
+            "sha256": "cd4a30d4c139b0208259687cb7d3abf686b38f19eccf361fb29cfaefee8d68a6",
+            "bytes": 307
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "07589f92eb90432aa9838db5ba888d7d",
+            "process_id": 88524,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-string",
+          "configuration": "default",
+          "process_id": 29244,
+          "run_id": "577dc3b068e2472a905962d84cad2867",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "tostring-string"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-string/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-string/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-string/observed.stderr",
+            "sha256": "acba77736a31c97479b3ff8062242e07f08f0dab81a3f083a37bf8bf1e5b5602",
+            "bytes": 147
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "577dc3b068e2472a905962d84cad2867",
+            "process_id": 29244,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-number",
+          "configuration": "default",
+          "process_id": 56092,
+          "run_id": "6e011d796af543f69b45e1c880c385bc",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "tostring-number"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-number/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-number/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-number/observed.stderr",
+            "sha256": "10d2669f1328cac93e21dcf4859799c58191a3677946beba78791368cf518b1a",
+            "bytes": 307
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "6e011d796af543f69b45e1c880c385bc",
+            "process_id": 56092,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-nil",
+          "configuration": "default",
+          "process_id": 32620,
+          "run_id": "14e472c4e34147e9a1d8db3c4238205e",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "tostring-nil"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-nil/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-nil/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-nil/observed.stderr",
+            "sha256": "3de2a9704cd842d44a754439106067701ff5a880e7a186080a112cc0ec239f88",
+            "bytes": 307
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "14e472c4e34147e9a1d8db3c4238205e",
+            "process_id": 32620,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-throws",
+          "configuration": "default",
+          "process_id": 84844,
+          "run_id": "275bb4452c7f46bf8796e411a1baac86",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "tostring-throws"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-throws/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-throws/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-throws/observed.stderr",
+            "sha256": "70b2c569baed21a01ffaf6a11f168289d25710f58d5a813d855c0287806d1025",
+            "bytes": 370
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "275bb4452c7f46bf8796e411a1baac86",
+            "process_id": 84844,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-nul",
+          "configuration": "default",
+          "process_id": 60684,
+          "run_id": "c90d2f4a27c849b8a5c79b62d06cd61d",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "tostring-nul"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-nul/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-nul/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/tostring-nul/observed.stderr",
+            "sha256": "aaf66f05d15e1628cdc756849e284121df214f0b7dea714a8d2ee8a46d118000",
+            "bytes": 140
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "c90d2f4a27c849b8a5c79b62d06cd61d",
+            "process_id": 60684,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "numeric",
+          "configuration": "default",
+          "process_id": 23756,
+          "run_id": "fd7cd39c26a84be78f14368d726d59b1",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "numeric"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/numeric/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/numeric/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/numeric/observed.stderr",
+            "sha256": "2021de862693b42bbb86573573218669b881c9453c3d7a831a382178e46a2851",
+            "bytes": 278
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "fd7cd39c26a84be78f14368d726d59b1",
+            "process_id": 23756,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "numeric-meta",
+          "configuration": "default",
+          "process_id": 33072,
+          "run_id": "c9ea069b785f41da972a03db2789fc99",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "numeric-meta"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/numeric-meta/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/numeric-meta/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/numeric-meta/observed.stderr",
+            "sha256": "40014b619d5a7deee8d20584e4712f7003bbb904bf120cb13dfc28ac34a435b8",
+            "bytes": 278
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "c9ea069b785f41da972a03db2789fc99",
+            "process_id": 33072,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "callable-meta",
+          "configuration": "default",
+          "process_id": 28912,
+          "run_id": "174b952caef84490a4bfe858671c712a",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "callable-meta"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/callable-meta/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/callable-meta/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/callable-meta/observed.stderr",
+            "sha256": "7f1f9380b1a950b2e3c0cca09fde8543d450c72f9e70a015089bad544558af78",
+            "bytes": 149
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "174b952caef84490a4bfe858671c712a",
+            "process_id": 28912,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "raw-meta",
+          "configuration": "default",
+          "process_id": 25392,
+          "run_id": "62d464a3655842249d5c7f3fd21daf1f",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "raw-meta"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/raw-meta/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/raw-meta/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/raw-meta/observed.stderr",
+            "sha256": "6a00a5f7ca2f4dd6e427cac79e9b28f1de1810ff1b07f5fa818b68e96854b2a3",
+            "bytes": 307
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "62d464a3655842249d5c7f3fd21daf1f",
+            "process_id": 25392,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "mutate-parent",
+          "configuration": "default",
+          "process_id": 6028,
+          "run_id": "a6577fb1b1cc4976a333febd01261feb",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "mutate-parent"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/mutate-parent/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/mutate-parent/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/mutate-parent/observed.stderr",
+            "sha256": "53527de796c8cf71493d54315d575632c847311a353cd5230657e3228ac44317",
+            "bytes": 308
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "a6577fb1b1cc4976a333febd01261feb",
+            "process_id": 6028,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "frames",
+          "configuration": "default",
+          "process_id": 47768,
+          "run_id": "b4379970ff954f4e99d6af4b7fad6d0d",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "frames"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/frames/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/frames/observed.stdout",
+            "sha256": "3bcc0be65e8e1556d3efe3776b43d3bbc60cb84ae263d0cc2fcb49be092474cc",
+            "bytes": 16
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/frames/observed.stderr",
+            "sha256": "663ef5ac000d50e5e6b9fb3a8cce978a856c4c00f8c0b58b0b19a7819a4ebc04",
+            "bytes": 151
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "b4379970ff954f4e99d6af4b7fad6d0d",
+            "process_id": 47768,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "weak-error",
+          "configuration": "default",
+          "process_id": 82564,
+          "run_id": "225cb928e680494381e500a0b0defb85",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "weak-error"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/weak-error/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/weak-error/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/weak-error/observed.stderr",
+            "sha256": "a85298b0911fc81d0c3361eb1a2d31d74be9801688c4e3d19bff9ae478465864",
+            "bytes": 150
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "225cb928e680494381e500a0b0defb85",
+            "process_id": 82564,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "handler-yield",
+          "configuration": "default",
+          "process_id": 65320,
+          "run_id": "64695fe4113f4a9b8d6bb0fadd437400",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "handler-yield"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/handler-yield/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/handler-yield/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/handler-yield/observed.stderr",
+            "sha256": "a06ecc5cbc9c32ee153e074cbdd22449727aefe96a5c559670253a5c57f2454a",
+            "bytes": 406
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "64695fe4113f4a9b8d6bb0fadd437400",
+            "process_id": 65320,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "closer-error",
+          "configuration": "default",
+          "process_id": 15292,
+          "run_id": "758414e9b03047c9b2b202df9118d911",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "closer-error"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/closer-error/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/closer-error/observed.stdout",
+            "sha256": "902cbd2137217d9c78ac66046354b3d609b21f2faaea1c19970c7c6201e8a000",
+            "bytes": 22
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/closer-error/observed.stderr",
+            "sha256": "bcb36f10d1b94c589bbc9af8804bbaa5a5295e1e6d4a7e39e07e9fb24ba27520",
+            "bytes": 151
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "758414e9b03047c9b2b202df9118d911",
+            "process_id": 15292,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "exit-close",
+          "configuration": "default",
+          "process_id": 17788,
+          "run_id": "0eaca40375854b74afe61c139851de05",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "exit-close"
+          ],
+          "exit_code": 37,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/exit-close/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/exit-close/observed.stdout",
+            "sha256": "d76f58b5564da57b1bc1fa30f19340789b519cbd558163cd2e26dd77d3ff087e",
+            "bytes": 14
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/exit-close/observed.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "telemetry": null,
+          "cleanup_evidence": "not measured: typed exit bypasses launcher finish",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "exit-no-close",
+          "configuration": "default",
+          "process_id": 68580,
+          "run_id": "96c3b4b925c845a4940fa486831518eb",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "exit-no-close"
+          ],
+          "exit_code": 37,
+          "timeout_seconds": 5,
+          "elapsed_milliseconds": 7,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/exit-no-close/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/exit-no-close/observed.stdout",
+            "sha256": "d76f58b5564da57b1bc1fa30f19340789b519cbd558163cd2e26dd77d3ff087e",
+            "bytes": 14
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/default/exit-no-close/observed.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "telemetry": null,
+          "cleanup_evidence": "not measured: typed exit bypasses launcher finish",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "string",
+          "configuration": "upstream-test",
+          "process_id": 87732,
+          "run_id": "8bc93239d6134f0dacbbc06de80ce939",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "string"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/string/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/string/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/string/observed.stderr",
+            "sha256": "58814cd7c286696d978ba4312f7cb0bd28ce4283b40c3ad49f99eff80f9a0bf6",
+            "bytes": 362
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "8bc93239d6134f0dacbbc06de80ce939",
+            "process_id": 87732,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "table",
+          "configuration": "upstream-test",
+          "process_id": 46456,
+          "run_id": "175d8b24b56b4d75add71e337f65fc05",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "table"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/table/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/table/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/table/observed.stderr",
+            "sha256": "00f740e55a7981920549c1d8435813f957693356352d862ea888e06496191e5a",
+            "bytes": 313
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "175d8b24b56b4d75add71e337f65fc05",
+            "process_id": 46456,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "table-name",
+          "configuration": "upstream-test",
+          "process_id": 58996,
+          "run_id": "fc972ce639c94c24b36d5338d29d5859",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "table-name"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/table-name/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/table-name/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/table-name/observed.stderr",
+            "sha256": "2e86e27c1532b648e38d1daec636c8321d1a8022683d5141c1674dd3cc3509c2",
+            "bytes": 313
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "fc972ce639c94c24b36d5338d29d5859",
+            "process_id": 58996,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-string",
+          "configuration": "upstream-test",
+          "process_id": 71432,
+          "run_id": "bdb53254a3684f1689692c78dfdb479e",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "tostring-string"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-string/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-string/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-string/observed.stderr",
+            "sha256": "8222ffe676f36298d4edc916cddbf7770dfd57d84304b93c50e8055e5fadbdbb",
+            "bytes": 153
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "bdb53254a3684f1689692c78dfdb479e",
+            "process_id": 71432,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-number",
+          "configuration": "upstream-test",
+          "process_id": 75904,
+          "run_id": "a896089c55a54cd68aef10ab529ca1a4",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "tostring-number"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-number/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-number/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-number/observed.stderr",
+            "sha256": "66ddddca2b79097b1c23a3320792be1b32e60af3c7af32730b1d85d234cd8752",
+            "bytes": 313
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "a896089c55a54cd68aef10ab529ca1a4",
+            "process_id": 75904,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-nil",
+          "configuration": "upstream-test",
+          "process_id": 12060,
+          "run_id": "1b08a11b6b4b479d8286b2bc2259d416",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "tostring-nil"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-nil/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-nil/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-nil/observed.stderr",
+            "sha256": "a7a2f812f2af7a3ceb1d34040d5a2d5288a26d0b3b5abf2a03e93af227998b7f",
+            "bytes": 313
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "1b08a11b6b4b479d8286b2bc2259d416",
+            "process_id": 12060,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-throws",
+          "configuration": "upstream-test",
+          "process_id": 67148,
+          "run_id": "7ba5a169ee4f4bc7934878974162b77b",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "tostring-throws"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-throws/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-throws/observed.stdout",
+            "sha256": "30a9fc851bc7f4dc8b15de3b7b3fd0e15d599f0d30a86cff1b35192080c80614",
+            "bytes": 10
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-throws/observed.stderr",
+            "sha256": "be901389b166821da6aa8c1b73247de025a72a1abed9c17cf3caeb693a4e92a1",
+            "bytes": 376
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "7ba5a169ee4f4bc7934878974162b77b",
+            "process_id": 67148,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "tostring-nul",
+          "configuration": "upstream-test",
+          "process_id": 54644,
+          "run_id": "7d211549857a43f194c56cc1f2217e54",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "tostring-nul"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-nul/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-nul/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/tostring-nul/observed.stderr",
+            "sha256": "9430623b84b994fbec1b40884e9d76abd1003aa52c8d48a6a6a500628fceff5d",
+            "bytes": 146
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "7d211549857a43f194c56cc1f2217e54",
+            "process_id": 54644,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "numeric",
+          "configuration": "upstream-test",
+          "process_id": 65816,
+          "run_id": "60f354a24aec40d7af73d181a3407c8b",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "numeric"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/numeric/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/numeric/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/numeric/observed.stderr",
+            "sha256": "c0dc681d6feb31da5c9069d9ae4817a6a392ec1249017b19adeee2b10bc3bd37",
+            "bytes": 284
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "60f354a24aec40d7af73d181a3407c8b",
+            "process_id": 65816,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "numeric-meta",
+          "configuration": "upstream-test",
+          "process_id": 40452,
+          "run_id": "ec450fadb5394fb6b8dd5476d1ff67c5",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "numeric-meta"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/numeric-meta/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/numeric-meta/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/numeric-meta/observed.stderr",
+            "sha256": "b7710700ebff6a2237ba94b92a481467ede673f3889aaddbab7207816e9f8f9c",
+            "bytes": 284
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "ec450fadb5394fb6b8dd5476d1ff67c5",
+            "process_id": 40452,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "callable-meta",
+          "configuration": "upstream-test",
+          "process_id": 61284,
+          "run_id": "3fbf045fa0314b9b887d6fec0e595d11",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "callable-meta"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/callable-meta/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/callable-meta/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/callable-meta/observed.stderr",
+            "sha256": "00898b63361135af7a31afd83a026fffb6add1f86019339533c3f4f8300699cf",
+            "bytes": 155
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "3fbf045fa0314b9b887d6fec0e595d11",
+            "process_id": 61284,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "raw-meta",
+          "configuration": "upstream-test",
+          "process_id": 11716,
+          "run_id": "754e1e852e3b4b0fab70cbddbd66ab7e",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "raw-meta"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/raw-meta/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/raw-meta/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/raw-meta/observed.stderr",
+            "sha256": "82531a8fc16865ebb75507d0ac5c7507714f87dae59dc1064ba82a829b09c49a",
+            "bytes": 313
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "754e1e852e3b4b0fab70cbddbd66ab7e",
+            "process_id": 11716,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "mutate-parent",
+          "configuration": "upstream-test",
+          "process_id": 70176,
+          "run_id": "e0b05f3729f8499f97958ee6c838d772",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "mutate-parent"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/mutate-parent/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/mutate-parent/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/mutate-parent/observed.stderr",
+            "sha256": "bef17d7ceaee5ec3e419d31d0701f0076df85092bd6b3cc94ccb2b5bd7bb1e12",
+            "bytes": 314
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "e0b05f3729f8499f97958ee6c838d772",
+            "process_id": 70176,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "frames",
+          "configuration": "upstream-test",
+          "process_id": 51436,
+          "run_id": "e6a0f7f6445c41078ec5cf165e93c74a",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "frames"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/frames/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/frames/observed.stdout",
+            "sha256": "3bcc0be65e8e1556d3efe3776b43d3bbc60cb84ae263d0cc2fcb49be092474cc",
+            "bytes": 16
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/frames/observed.stderr",
+            "sha256": "ca8f02d7bac3e9ffd4961596bc5c1b629b38aa09588b5bbec1a0157a5fb37f87",
+            "bytes": 157
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "e6a0f7f6445c41078ec5cf165e93c74a",
+            "process_id": 51436,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "weak-error",
+          "configuration": "upstream-test",
+          "process_id": 31892,
+          "run_id": "907301a8c070446e8e848a60af4c8283",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "weak-error"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/weak-error/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/weak-error/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/weak-error/observed.stderr",
+            "sha256": "c2901ec65aa8d830223fd408f63defd5754d7eeafd21d0359f058945dab4e911",
+            "bytes": 156
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "907301a8c070446e8e848a60af4c8283",
+            "process_id": 31892,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "handler-yield",
+          "configuration": "upstream-test",
+          "process_id": 62540,
+          "run_id": "28f975d66c794553b0971bb16098311a",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "handler-yield"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/handler-yield/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/handler-yield/observed.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/handler-yield/observed.stderr",
+            "sha256": "0e5c9bbf9f8be8d16a72921cf62613dab4dbd32e992ea90af382c942240a9870",
+            "bytes": 412
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "28f975d66c794553b0971bb16098311a",
+            "process_id": 62540,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "closer-error",
+          "configuration": "upstream-test",
+          "process_id": 64776,
+          "run_id": "0800a3e978e74a2ebe479d371f773e10",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "closer-error"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/closer-error/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/closer-error/observed.stdout",
+            "sha256": "902cbd2137217d9c78ac66046354b3d609b21f2faaea1c19970c7c6201e8a000",
+            "bytes": 22
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/closer-error/observed.stderr",
+            "sha256": "2e170176e5bc4d61324de97fa1fff65a85c7c60d234ffc0c9f15b4568d4d6bab",
+            "bytes": 157
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "0800a3e978e74a2ebe479d371f773e10",
+            "process_id": 64776,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "exit-close",
+          "configuration": "upstream-test",
+          "process_id": 63448,
+          "run_id": "97bf43cfa32b4e79b225311c44b0980c",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "exit-close"
+          ],
+          "exit_code": 37,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/exit-close/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/exit-close/observed.stdout",
+            "sha256": "d76f58b5564da57b1bc1fa30f19340789b519cbd558163cd2e26dd77d3ff087e",
+            "bytes": 14
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/exit-close/observed.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "telemetry": null,
+          "cleanup_evidence": "not measured: typed exit bypasses launcher finish",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "exit-no-close",
+          "configuration": "upstream-test",
+          "process_id": 2980,
+          "run_id": "e8381f9891bc4efbb07b3136a3b86594",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "exit-no-close"
+          ],
+          "exit_code": 37,
+          "timeout_seconds": 5,
+          "elapsed_milliseconds": 389,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/exit-no-close/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/exit-no-close/observed.stdout",
+            "sha256": "d76f58b5564da57b1bc1fa30f19340789b519cbd558163cd2e26dd77d3ff087e",
+            "bytes": 14
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/exit-no-close/observed.stderr",
+            "sha256": "3502938af48118d9164dd36c60d9d761721edc05c8ac9f3dfecc68ae347a7bff",
+            "bytes": 122
+          },
+          "telemetry": null,
+          "cleanup_evidence": "not measured: typed exit bypasses launcher finish",
+          "native_oracle_cleanup_failed": true,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "memory",
+          "configuration": "upstream-test",
+          "process_id": 68416,
+          "run_id": "868e3cb0150a45179ab372bccc84dcdc",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "memory"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 8,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/memory/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/memory/observed.stdout",
+            "sha256": "26762c1f19342d34235aeba5944be23a074007678dff925a6a1a7207c61fa3c2",
+            "bytes": 7
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/memory/observed.stderr",
+            "sha256": "d300465ea9deba9a3341f50aa866705d0c85cce8f76d6e39363df4adb7f4246c",
+            "bytes": 161
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "868e3cb0150a45179ab372bccc84dcdc",
+            "process_id": 68416,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 8,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "entered-handler-memory",
+          "configuration": "upstream-test",
+          "process_id": 34896,
+          "run_id": "3ec86f82e1c04d64880de116f1f51bfb",
+          "arguments": [
+            "-E",
+            "controls.lua",
+            "entered-handler-memory"
+          ],
+          "exit_code": 1,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 9,
+          "source": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/entered-handler-memory/controls.lua",
+            "sha256": "4b154e90becd7f7acf773783080484698af762be918525aa9a244f696173ef36"
+          },
+          "stdout": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/entered-handler-memory/observed.stdout",
+            "sha256": "fbee0bcbc5addc11962ef481b10af11a5b315a1b8bdfd113bacbbd69af4f7280",
+            "bytes": 15
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-fixture/8b34d39c9ec64e5eb48c34f0a88f1dc6/upstream-test/entered-handler-memory/observed.stderr",
+            "sha256": "d300465ea9deba9a3341f50aa866705d0c85cce8f76d6e39363df4adb7f4246c",
+            "bytes": 161
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "3ec86f82e1c04d64880de116f1f51bfb",
+            "process_id": 34896,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 8,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        }
+      ]
+    },
+    {
+      "raw_index": "reports/cli-msghandler-print/793a163077b3400e8048ccd3e123ef90/index.json",
+      "raw_index_sha256": "8886bf711c4cf3f54795285313b121ec7be2c2f5c975581ef11d39204e9f05e2",
+      "records": [
+        {
+          "case": "print-table-repl",
+          "configuration": "default",
+          "process_id": 73940,
+          "run_id": "1a322feadb454e9f86cfa9ffb523a47e",
+          "arguments": [
+            "-E",
+            "-i",
+            "-e",
+            "global *;_PROMPT='';_PROMPT2='';print=function() error(setmetatable({},{__tostring=function() io.write('BAD_META');return 'BAD_MESSAGE' end}),0) end"
+          ],
+          "exit_code": 0,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 96,
+          "source": null,
+          "stdout": {
+            "path": "reports/cli-msghandler-print/793a163077b3400e8048ccd3e123ef90/default/observed.stdout",
+            "sha256": "439e91097fb6d6365900bc93b7b5bbddd534e04720a51af9b1890127317502c5",
+            "bytes": 55
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-print/793a163077b3400e8048ccd3e123ef90/default/observed.stderr",
+            "sha256": "83d5e287bb03a898eab47bddc314ad8a834a0780878b7553c6a736de9a152cd2",
+            "bytes": 32
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "1a322feadb454e9f86cfa9ffb523a47e",
+            "process_id": 73940,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "print-table-repl",
+          "configuration": "upstream-test",
+          "process_id": 35856,
+          "run_id": "ad556c8607cb4d8fbbf16ebb1ecaa26c",
+          "arguments": [
+            "-E",
+            "-i",
+            "-e",
+            "global *;_PROMPT='';_PROMPT2='';print=function() error(setmetatable({},{__tostring=function() io.write('BAD_META');return 'BAD_MESSAGE' end}),0) end"
+          ],
+          "exit_code": 0,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 68,
+          "source": null,
+          "stdout": {
+            "path": "reports/cli-msghandler-print/793a163077b3400e8048ccd3e123ef90/upstream-test/observed.stdout",
+            "sha256": "439e91097fb6d6365900bc93b7b5bbddd534e04720a51af9b1890127317502c5",
+            "bytes": 55
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-print/793a163077b3400e8048ccd3e123ef90/upstream-test/observed.stderr",
+            "sha256": "83d5e287bb03a898eab47bddc314ad8a834a0780878b7553c6a736de9a152cd2",
+            "bytes": 32
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "ad556c8607cb4d8fbbf16ebb1ecaa26c",
+            "process_id": 35856,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        }
+      ]
+    },
+    {
+      "raw_index": "reports/cli-msghandler-hooks/91a4c87d4c5441f8a5b84693e72e769d/index.json",
+      "raw_index_sha256": "db780fc208a137bda46f4b23034325f7a0d3e9c40ab7a4afb2ae6e7ce82ddd11",
+      "records": [
+        {
+          "case": "persistent-main-hook-events",
+          "configuration": "default",
+          "process_id": 50276,
+          "run_id": "4b785d059ebf42bebc67a0838593c79d",
+          "arguments": [
+            "-E",
+            "-e",
+            "global *;debug.sethook(function(event) local i=debug.getinfo(2,'S');if i.what=='C' then io.stdout:write(event,':C\\n') end end,'cr')",
+            "-e",
+            "local x=1",
+            "-e",
+            "local y=2"
+          ],
+          "exit_code": 0,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 67,
+          "source": null,
+          "stdout": {
+            "path": "reports/cli-msghandler-hooks/91a4c87d4c5441f8a5b84693e72e769d/default/observed.stdout",
+            "sha256": "08a76fa98bd210606970d5b43883cdea8e199e87c72355bf9d5a51437ab3947a",
+            "bytes": 20
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-hooks/91a4c87d4c5441f8a5b84693e72e769d/default/observed.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "4b785d059ebf42bebc67a0838593c79d",
+            "process_id": 50276,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "persistent-main-hook-events",
+          "configuration": "upstream-test",
+          "process_id": 21668,
+          "run_id": "50da0fccc25e4f559a623ab2d281cb14",
+          "arguments": [
+            "-E",
+            "-e",
+            "global *;debug.sethook(function(event) local i=debug.getinfo(2,'S');if i.what=='C' then io.stdout:write(event,':C\\n') end end,'cr')",
+            "-e",
+            "local x=1",
+            "-e",
+            "local y=2"
+          ],
+          "exit_code": 0,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 58,
+          "source": null,
+          "stdout": {
+            "path": "reports/cli-msghandler-hooks/91a4c87d4c5441f8a5b84693e72e769d/upstream-test/observed.stdout",
+            "sha256": "08a76fa98bd210606970d5b43883cdea8e199e87c72355bf9d5a51437ab3947a",
+            "bytes": 20
+          },
+          "stderr": {
+            "path": "reports/cli-msghandler-hooks/91a4c87d4c5441f8a5b84693e72e769d/upstream-test/observed.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "50da0fccc25e4f559a623ab2d281cb14",
+            "process_id": 21668,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        }
+      ]
+    },
+    {
+      "raw_index": "reports/cli-main-prefix/9dc6874d714a487fa0ba655e6beed3d6/index.json",
+      "raw_index_sha256": "dc07d597715819b7cf47dd028a7b175b496395ae0f16081aa551788924df1a68",
+      "records": [
+        {
+          "case": "persistent-main-prefix-plain",
+          "configuration": "default",
+          "process_id": 82888,
+          "run_id": "e76befa1183f4a61be1fd3c8e8d9dead",
+          "arguments": [
+            "-i",
+            "-e",
+            "probe('snippet')",
+            "case.lua",
+            "extra"
+          ],
+          "exit_code": 0,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 87,
+          "source": null,
+          "stdout": {
+            "path": "reports/cli-main-prefix/9dc6874d714a487fa0ba655e6beed3d6/default/plain/observed.stdout",
+            "sha256": "fed5dd3d06b0f4132cde7c9e674cac9f4f2206ce6fffbc4851dc3ece63f4f3db",
+            "bytes": 550
+          },
+          "stderr": {
+            "path": "reports/cli-main-prefix/9dc6874d714a487fa0ba655e6beed3d6/default/plain/observed.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "e76befa1183f4a61be1fd3c8e8d9dead",
+            "process_id": 82888,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "persistent-main-prefix-mutated",
+          "configuration": "default",
+          "process_id": 59140,
+          "run_id": "9ea728da687448469e28a4d961272e00",
+          "arguments": [
+            "-i",
+            "-e",
+            "probe('snippet')",
+            "case.lua",
+            "extra"
+          ],
+          "exit_code": 0,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 60,
+          "source": null,
+          "stdout": {
+            "path": "reports/cli-main-prefix/9dc6874d714a487fa0ba655e6beed3d6/default/mutated/observed.stdout",
+            "sha256": "bea0d86343ead7d449be681a6e0a66fa5decb1b679f8e904193cc07926239b92",
+            "bytes": 462
+          },
+          "stderr": {
+            "path": "reports/cli-main-prefix/9dc6874d714a487fa0ba655e6beed3d6/default/mutated/observed.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "9ea728da687448469e28a4d961272e00",
+            "process_id": 59140,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "default",
+            "managed_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "persistent-main-prefix-plain",
+          "configuration": "upstream-test",
+          "process_id": 61104,
+          "run_id": "ec2bfceeb73e4b409826420cab3f4f81",
+          "arguments": [
+            "-i",
+            "-e",
+            "probe('snippet')",
+            "case.lua",
+            "extra"
+          ],
+          "exit_code": 0,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 64,
+          "source": null,
+          "stdout": {
+            "path": "reports/cli-main-prefix/9dc6874d714a487fa0ba655e6beed3d6/upstream-test/plain/observed.stdout",
+            "sha256": "fed5dd3d06b0f4132cde7c9e674cac9f4f2206ce6fffbc4851dc3ece63f4f3db",
+            "bytes": 550
+          },
+          "stderr": {
+            "path": "reports/cli-main-prefix/9dc6874d714a487fa0ba655e6beed3d6/upstream-test/plain/observed.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "ec2bfceeb73e4b409826420cab3f4f81",
+            "process_id": 61104,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        },
+        {
+          "case": "persistent-main-prefix-mutated",
+          "configuration": "upstream-test",
+          "process_id": 81248,
+          "run_id": "e56b985c6a0942b5aab752dbb057300d",
+          "arguments": [
+            "-i",
+            "-e",
+            "probe('snippet')",
+            "case.lua",
+            "extra"
+          ],
+          "exit_code": 0,
+          "timeout_seconds": 900,
+          "elapsed_milliseconds": 53,
+          "source": null,
+          "stdout": {
+            "path": "reports/cli-main-prefix/9dc6874d714a487fa0ba655e6beed3d6/upstream-test/mutated/observed.stdout",
+            "sha256": "bea0d86343ead7d449be681a6e0a66fa5decb1b679f8e904193cc07926239b92",
+            "bytes": 462
+          },
+          "stderr": {
+            "path": "reports/cli-main-prefix/9dc6874d714a487fa0ba655e6beed3d6/upstream-test/mutated/observed.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "telemetry": {
+            "schema_version": 1,
+            "run_id": "e56b985c6a0942b5aab752dbb057300d",
+            "process_id": 81248,
+            "allocator_limit_bytes": 2147483648,
+            "configuration": "upstream-test",
+            "expected_finalizer_warnings": 0,
+            "managed_refusals": 0,
+            "backing_refusals": 0,
+            "outstanding_bytes": 0,
+            "outstanding_blocks": 0
+          },
+          "cleanup_evidence": "actual zero outstanding selected bytes and blocks",
+          "native_oracle_cleanup_failed": false,
+          "runtime_acceptance": false
+        }
+      ]
+    }
+  ],
+  "facts": [
+    "String/number original errors convert before metamethod lookup.",
+    "Only an actual string returned by raw/callable __tostring bypasses traceback.",
+    "Primitive fallback ignores __name and uses actual arg1 after callback debug.setlocal mutation.",
+    "Handler callback observes one anonymous C parent, original C argument and non-yieldability.",
+    "Compilation and argument lookup/length precede handler installation.",
+    "Handler-entered permanent refusal reports canonical memory failure without traceback.",
+    "Nonstring REPL print error reports error calling print with (null), without __tostring."
+  ],
+  "limits": [
+    "Native observations only: no Ada execution, runtime acceptance, source adaptation, exclusion or whole-main completion.",
+    "Native T os.exit(false) retains actual atexit allocator assertion; no cleanup pass. Both exit forms have no finish sidecar, so exit cleanup is unmeasured.",
+    "Cold numeric error under refusal does not certify exact handler-entry timing.",
+    "All primary ordinary cases use900seconds/2GiB; no-close exit uses an explicitly secondary5second watchdog.",
+    "No terminal, Unix or signal behavior is measured here."
+  ],
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false
+}

@@ -1,0 +1,53 @@
+{
+  "kind": "native-cli-entered-handler-refusal-author-observation",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "configuration": "upstream-test",
+  "source": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-handler-refusal\\fb10d07d6cfb4802b37d2935febc390c\\case.lua",
+  "source_sha256": "e352e363be55f165b62045a48c8755721b6c39c5b5602cf2ac4a0d98ec3cf5bd",
+  "image": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler\\346457279dd348848b95b0c6dd38c977\\upstream-test\\image",
+  "run_id": "f6323759cab540b0add5431e67fa2369",
+  "process": {
+    "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler\\346457279dd348848b95b0c6dd38c977\\upstream-test\\image\\lua.exe",
+    "process_id": 51668,
+    "executable_sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
+    "arguments": [
+      "-E",
+      "case.lua"
+    ],
+    "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-handler-refusal\\fb10d07d6cfb4802b37d2935febc390c",
+    "started_utc": "2026-11-08T11:19:43.4252429Z",
+    "elapsed_milliseconds": 21,
+    "timeout_seconds": 900,
+    "exit_code": 1,
+    "abnormal_exit_kind": null,
+    "timed_out": false,
+    "capture_limit_bytes": 67108864,
+    "capture_exceeded": false,
+    "pipe_drain_failed": false,
+    "output_drain_failed": false,
+    "input_write_failed": false,
+    "early_input_close_requested": false,
+    "process_tree_kill_error": null,
+    "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-handler-refusal\\fb10d07d6cfb4802b37d2935febc390c\\observed.stdout",
+    "stdout_bytes": 15,
+    "stdout_sha256": "fbee0bcbc5addc11962ef481b10af11a5b315a1b8bdfd113bacbbd69af4f7280",
+    "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-handler-refusal\\fb10d07d6cfb4802b37d2935febc390c\\observed.stderr",
+    "stderr_bytes": 161,
+    "stderr_sha256": "d300465ea9deba9a3341f50aa866705d0c85cce8f76d6e39363df4adb7f4246c"
+  },
+  "telemetry_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-handler-refusal\\fb10d07d6cfb4802b37d2935febc390c\\observed.allocator.51668.json",
+  "telemetry": {
+    "schema_version": 1,
+    "run_id": "f6323759cab540b0add5431e67fa2369",
+    "process_id": 51668,
+    "allocator_limit_bytes": 2147483648,
+    "configuration": "upstream-test",
+    "expected_finalizer_warnings": 0,
+    "managed_refusals": 8,
+    "backing_refusals": 0,
+    "outstanding_bytes": 0,
+    "outstanding_blocks": 0
+  },
+  "runtime_acceptance": false,
+  "coverage_authority": false
+}

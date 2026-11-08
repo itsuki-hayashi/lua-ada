@@ -1,0 +1,2 @@
+global *
+error({},0)

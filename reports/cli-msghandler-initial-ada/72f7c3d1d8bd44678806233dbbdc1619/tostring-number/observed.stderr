@@ -1,0 +1,6 @@
+C:\Users\Itsuki\.codex\worktrees\remaining-debug\lua-ada\reports\cli-msghandler-initial-ada\72f7c3d1d8bd44678806233dbbdc1619\image\lua_ada.exe: (error object is a table value)
+stack traceback:
+	[C]: in global 'error'
+	controls.lua:27: in function <controls.lua:26>
+	controls.lua:141: in main chunk
+	[C]: in ?

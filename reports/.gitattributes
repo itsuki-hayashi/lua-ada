@@ -1,0 +1,4 @@
+# Unready-backup artifacts preserve exact hashed bytes, including raw CRLF,
+# intentional blank output lines, and the initial failed dependency patch.
+# This backup-only file and its captures are not part of the production cut.
+* -text -diff

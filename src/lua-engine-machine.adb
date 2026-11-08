@@ -1551,7 +1551,9 @@ package body Lua.Engine.Machine is
       Depth : Natural := 0; PC : Natural := 0;
       Live : Registers.Vector := Registers.Empty_Vector;
       Prefix_Floor : Natural := Natural'Last);
-   procedure Native_Step (Self : Driver);
+   procedure Native_Step (Self : in out Driver);
+   procedure Host_Work
+     (State : in out World; Count : Ada.Containers.Count_Type);
    procedure Hook_Event
      (Self : Driver; Event : String; Line : Natural := 0;
       Target : Frame_Access := null);
@@ -3567,7 +3569,21 @@ package body Lua.Engine.Machine is
       end case;
    end Advance_Finalizers;
 
-   procedure Native_Step (Self : Driver) is
+   procedure Host_Work
+     (State : in out World; Count : Ada.Containers.Count_Type) is
+   begin
+      if State.Policy = Bounded then
+         if Count > Ada.Containers.Count_Type
+           (State.Bounds.Instructions - Natural'Min
+              (State.Steps, State.Bounds.Instructions))
+         then
+            Fail (State, "instruction limit exceeded", Resource => True);
+         end if;
+         State.Steps := State.Steps + Natural (Count);
+      end if;
+   end Host_Work;
+
+   procedure Native_Step (Self : in out Driver) is
       State : World renames Self.Universe.all;
       Activation : constant Frame_Access :=
         State.Current.Stack.Last_Element;
@@ -3991,6 +4007,97 @@ package body Lua.Engine.Machine is
          State.Current.Failure_Handled := True;
          Lua.Diagnostic_Text.Clear (State.Current.Failure_Text);
          Recover (Self);
+         return;
+      elsif Name = "cli.main" then
+         --  This is a real native continuation with the same implemented C
+         --  trampoline as every catalogued Ada builtin. Its host scope lives
+         --  outside Step: requesting work returns to that scope without a Lua
+         --  yield, another executor, a fabricated caller or a return event.
+         if Self.Host_State = Starting_Host and then
+           Self.Host_Main = Activation
+         then
+            if not Activation.Has_Stack_Window then
+               raise Program_Error with "CLI main has no actual window";
+            end if;
+            Activation.Native_Results.Reserve_Capacity (1);
+            Activation.Native_Captures.Reserve_Capacity (Minimum_C_Stack + 1);
+            --  The actual scalar prefix now owns the parameters. Do not keep
+            --  a shadow argument root after a callback edits the real cells.
+            Activation.Native_Arguments.Clear;
+            Activation.Native_Stage := 1;
+            Self.Host_Main := Activation;
+            Self.Host_State := Waiting_Host;
+            Self.Host_Waiting := True;
+         elsif Self.Host_Main /= Activation or else
+           Self.Host_State in No_Host | Starting_Host | Waiting_Host
+         then
+            --  A Lua/C caller can retain the genuine function identity, but
+            --  cannot reenter a host's live scope or revive an expired borrow.
+            --  Reject before reading any host controller or foreign address.
+            Fail (State, "CLI main activation is unavailable");
+         elsif Self.Host_State = Calling_Host_Child then
+            if Activation.Native_Results.Is_Empty or else
+              Activation.Native_Results.First_Element.Kind /= Boolean_Kind
+            then
+               raise Program_Error with "missing protected CLI child packet";
+            end if;
+            declare
+               Raw_Count : constant Natural :=
+                 Natural (Activation.Native_Results.Length) - 1;
+               Success : constant Boolean :=
+                 Truth (Activation.Native_Results.First_Element);
+               Count : constant Natural :=
+                 (if not Success then 1
+                  elsif Self.Host_Wanted < 0 then Raw_Count
+                  else Natural (Self.Host_Wanted));
+            begin
+               --  Child results have one private protection cell. Only real
+               --  results enter the host's C window, after removal of its
+               --  handler/function/argument tail. The result packet remains
+               --  rooted until the actual destination has been published.
+               Host_Work
+                 (State, Ada.Containers.Count_Type
+                    (Activation.Stack_Live_Top - Activation.Stack_Base) +
+                  Ada.Containers.Count_Type (Count));
+               Set_Native_Top (State, Activation, Self.Host_Prefix);
+               for Index in 1 .. Count loop
+                  Left :=
+                    (if Index <= Raw_Count then
+                        Activation.Native_Results.Element (Index + 1)
+                     else Nil_Value);
+                  Push_Native_Value (State, Activation, Left);
+               end loop;
+               Activation.Native_Arguments.Clear;
+            end;
+            Self.Host_State := Waiting_Host;
+            Self.Host_Waiting := True;
+         else
+            --  Only explicit host completion retires this activation. Reuse
+            --  real retained result capacity before appending its one true
+            --  pmain result; a failed normal main return supplies no values.
+            Activation.Native_Results.Clear;
+            --  pmain pushes its status at the current real top. A script can
+            --  leave results there, whereas REPL loadline has removed the
+            --  original argc/argv prefix. This is actual output placement,
+            --  not a fixed argument-count or inspection-only offset.
+            Activation.Native_Return_First :=
+              Activation.Stack_Live_Top - Activation.Stack_Base + 1;
+            if Self.Host_State = Returning_Host_Success then
+               if Activation.Native_Results.Capacity = 0 and then
+                 Activation.Native_Arguments.Capacity > 0
+               then
+                  Move_Roots
+                    (State, Activation.Native_Results,
+                     Activation.Native_Arguments);
+               end if;
+               Append_Root
+                 (State, Activation.Native_Results, (Boolean_Kind, True));
+            end if;
+            Activation.Result_Failure_Class := No_Failure;
+            Activation.Result_Handler_Called := False;
+            Complete_Packet
+              (Self, Activation.Native_Results, Activation.Native_Results);
+         end if;
          return;
       elsif Name = "base.primitive" then
          if Activation.Native_Id = Assert_Function and then
@@ -6413,6 +6520,11 @@ package body Lua.Engine.Machine is
       Self.Entry_Depth := Retained_Depth;
       Self.Done := False;
       Self.Failed := False;
+      Self.Host_Main := null;
+      Self.Host_State := No_Host;
+      Self.Host_Waiting := False;
+      Self.Host_Prefix := 0;
+      Self.Host_Wanted := -1;
    end Prepare;
 
    procedure Start_Borrowed
@@ -6467,6 +6579,148 @@ package body Lua.Engine.Machine is
       Start_Borrowed
         (Self, World_View (State), null, Function_Value, Arguments);
    end Start;
+
+   procedure Start_Host_Main
+     (Self : in out Driver; State : not null World_Access;
+      Arguments : Values.Vector)
+   is
+      Holder : Frame_Access;
+   begin
+      --  The outer guard is the ordinary protection of the real main call.
+      --  Errors outside a child docall abandon main without a return hook;
+      --  each child supplies its own nearer handler boundary when required.
+      Start_Foreign
+        (Self, State, (Native_Kind_Value, CLI_Main_Function), Arguments);
+      Begin_Operation (State.all);
+      Holder := State.Current.Stack.Last_Element;
+      Holder.Native_Arguments.Delete_First;
+      Holder.Native_Stage := 1;
+      --  Bind the actual native callee before any call hook can execute.
+      --  Otherwise a hook could reenter the same first-class builtin while
+      --  the initial owner was still unbound. This is the ordinary frame
+      --  dispatch operation, not an executor step or an invoked callback.
+      Dispatch
+        (Self, (Native_Kind_Value, CLI_Main_Function),
+         Holder.Native_Arguments, 0);
+      Holder.Native_Arguments.Clear;
+      Self.Host_Main := State.Current.Stack.Last_Element;
+      Self.Host_State := Starting_Host;
+      End_Operation (State.all);
+   exception
+      when others =>
+         End_Operation (State.all);
+         if Self.Universe /= null then
+            Self.Failed := True;
+            Abandon (Self);
+         end if;
+         raise;
+   end Start_Host_Main;
+
+   function Host_Work_Requested (Self : Driver) return Boolean is
+      Item : Frame_Access;
+   begin
+      if Self.Universe = null or else Self.Done or else Self.Failed or else
+        not Self.Host_Waiting or else Self.Host_State /= Waiting_Host or else
+        Self.Host_Main = null or else
+        Self.Universe.Current /= Self.Root_Context or else
+        Self.Root_Context.Stack.Is_Empty
+      then
+         return False;
+      end if;
+      --  At a work request the real host must be the actual top activation.
+      --  Read that trusted stack member before inspecting the borrowed token;
+      --  this constant-work check neither follows an expired pointer nor scans
+      --  an input-sized call graph on every scheduler-pump iteration.
+      Item := Self.Root_Context.Stack.Last_Element;
+      return Item = Self.Host_Main and then not Item.Logically_Unwound and
+        then Item.Is_Native and then Item.Native_Id = CLI_Main_Function and
+        then Item.Native_Name = "cli.main" and then Item.Native_Stage = 1;
+   end Host_Work_Requested;
+
+   function Host_Universe (Self : Driver) return not null World_View;
+   function Host_Universe (Self : Driver) return not null World_View is
+   begin
+      if not Host_Work_Requested (Self) then
+         raise Program_Error with "CLI main is not waiting for host work";
+      end if;
+      return Self.Universe;
+   end Host_Universe;
+
+   procedure Begin_Host_Call
+     (Self : in out Driver; Callee : Value; Arguments : Values.Vector;
+      Message_Handler : Value := Nil_Value; Wanted_Results : Integer := -1)
+   is
+      State : World renames Host_Universe (Self).all;
+      Owner : Frame_Access;
+      Holder : Frame_Access;
+      Call_Base : Natural;
+   begin
+      if Wanted_Results < -1 then
+         raise Program_Error with "invalid CLI host result count";
+      end if;
+      Owner := Self.Host_Main;
+      Begin_Operation (State);
+      Pin (State, Callee);
+      Pin (State, Arguments);
+      Pin (State, Message_Handler);
+      Host_Work (State, 2 * Arguments.Length + 2);
+      Owner.Native_Captures.Clear;
+      Append_Root (State, Owner.Native_Captures, Callee);
+      for Argument of Arguments loop
+         Append_Root (State, Owner.Native_Captures, Argument);
+      end loop;
+      Self.Host_Prefix := Owner.Stack_Live_Top - Owner.Stack_Base;
+      Self.Host_Wanted := Wanted_Results;
+      if Message_Handler.Kind /= Nil_Kind then
+         Push_Native_Value (State, Owner, Message_Handler);
+      end if;
+      Call_Base := Owner.Stack_Live_Top + 1;
+      for Item of Owner.Native_Captures loop
+         Push_Native_Value (State, Owner, Item);
+      end loop;
+      --  The actual C prefix owns all these values before any hook/callback.
+      --  A duplicate argument vector would retain values after debug.setlocal
+      --  replaces the corresponding live caller cells.
+      Owner.Native_Arguments.Clear;
+      Self.Host_Waiting := False;
+      Self.Host_State := Calling_Host_Child;
+      --  The existing protected native holder dispatches and completes this
+      --  child. It is an actual owner of pending args/results and protection,
+      --  not an added public C caller. The same driver resumes native main.
+      Schedule (Self, "@foreign.entry", Owner.Native_Captures, 0);
+      Holder := State.Current.Stack.Last_Element;
+      Holder.Native_Index := Call_Base;
+      Holder.Native_Aux := 1;
+      Holder.Error_Packet.Reserve_Capacity (2);
+      Holder.Protection := 1;
+      Holder.Message_Handler := Message_Handler;
+      Root_Barrier (State, Holder.Message_Handler);
+      Owner.Native_Captures.Clear;
+      End_Operation (State);
+   exception
+      when others => End_Operation (State); raise;
+   end Begin_Host_Call;
+
+   procedure Take_Host_Results
+     (Self : Driver; Packet : in out Values.Vector;
+      Failure : out Failure_Kind; Handler_Called : out Boolean)
+   is
+      State : World renames Host_Universe (Self).all;
+   begin
+      Failure := Self.Host_Main.Result_Failure_Class;
+      Handler_Called := Self.Host_Main.Result_Handler_Called;
+      Move_Roots (State, Packet, Self.Host_Main.Native_Results);
+   end Take_Host_Results;
+
+   procedure Complete_Host_Main (Self : in out Driver; Success : Boolean) is
+   begin
+      if not Host_Work_Requested (Self) then
+         raise Program_Error with "CLI main is not waiting for completion";
+      end if;
+      Self.Host_Waiting := False;
+      Self.Host_State :=
+        (if Success then Returning_Host_Success else Returning_Host_Failure);
+   end Complete_Host_Main;
 
    procedure Start_Foreign
      (Self : in out Driver; State : in out World;
@@ -7498,6 +7752,11 @@ package body Lua.Engine.Machine is
       Self.Entry_Depth := 0;
       Self.Done := False;
       Self.Failed := False;
+      Self.Host_Main := null;
+      Self.Host_State := No_Host;
+      Self.Host_Waiting := False;
+      Self.Host_Prefix := 0;
+      Self.Host_Wanted := -1;
    end Finish;
 
    procedure Cancel (Self : in out Driver) is

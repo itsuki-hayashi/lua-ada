@@ -1,0 +1,13 @@
+Lua 5.5.1  Copyright (C) 1994-2026 Lua.org, PUC-Rio
+init:C 1=number/integer/6 2=userdata/same-argv 3=function 4=function
+snippet:C 1=boolean 2=table 3=function 4=function
+arg-global:C 1=boolean 2=table 3=function 4=string
+arg-length:C 1=boolean 2=table 3=function 4=table
+script:C 1=boolean 2=table 3=function 4=function 5=string
+prompt-global:C 1=string
+prompt-string:C 1=table
+repl:C 1=function
+2
+prompt-global:C 1=string
+prompt-string:C 1=table
+

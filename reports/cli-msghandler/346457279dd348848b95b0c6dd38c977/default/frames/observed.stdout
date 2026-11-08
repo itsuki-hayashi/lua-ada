@@ -1,0 +1,19 @@
+PARENT C anonymous
+ARG (C temporary) same
+YIELDABLE no
+FRAME 1 Lua  - case.lua 12
+FRAME 2 C  - [C] -1
+FRAME 3 C global error [C] -1
+FRAME 4 Lua upvalue inner case.lua 19
+FRAME 5 Lua local outer case.lua 20
+FRAME 6 main  - case.lua 21
+FRAME 7 C  - [C] -1
+IN_CALLBACK
+stack traceback:
+	case.lua:16: in function <case.lua:3>
+	[C]: in ?
+	[C]: in global 'error'
+	case.lua:19: in upvalue 'inner'
+	case.lua:20: in local 'outer'
+	case.lua:21: in main chunk
+	[C]: in ?

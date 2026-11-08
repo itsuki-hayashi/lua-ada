@@ -1,0 +1,6 @@
+C:\Users\Itsuki\.codex\worktrees\remaining-debug\lua-ada\reports\cli-msghandler\346457279dd348848b95b0c6dd38c977\upstream-test\image\lua.exe: 37
+stack traceback:
+	[C]: in global 'error'
+	controls.lua:49: in function <controls.lua:45>
+	controls.lua:141: in main chunk
+	[C]: in ?

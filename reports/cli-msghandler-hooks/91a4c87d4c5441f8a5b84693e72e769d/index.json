@@ -1,0 +1,102 @@
+[
+  {
+    "configuration": "default",
+    "telemetry": {
+      "schema_version": 1,
+      "run_id": "4b785d059ebf42bebc67a0838593c79d",
+      "process_id": 50276,
+      "allocator_limit_bytes": 2147483648,
+      "configuration": "default",
+      "managed_refusals": 0,
+      "outstanding_bytes": 0,
+      "outstanding_blocks": 0
+    },
+    "run_id": "4b785d059ebf42bebc67a0838593c79d",
+    "setup": "global *;debug.sethook(function(event) local i=debug.getinfo(2,'S');if i.what=='C' then io.stdout:write(event,':C\\n') end end,'cr')",
+    "process": {
+      "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler\\346457279dd348848b95b0c6dd38c977\\default\\image\\lua.exe",
+      "process_id": 50276,
+      "executable_sha256": "098b0348da5eb4ab581d0579d503662d383827e66ffb15d35f248a138b55d7fd",
+      "arguments": [
+        "-E",
+        "-e",
+        "global *;debug.sethook(function(event) local i=debug.getinfo(2,'S');if i.what=='C' then io.stdout:write(event,':C\\n') end end,'cr')",
+        "-e",
+        "local x=1",
+        "-e",
+        "local y=2"
+      ],
+      "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-hooks\\91a4c87d4c5441f8a5b84693e72e769d\\default",
+      "started_utc": "2026-11-08T11:39:38.5928332Z",
+      "elapsed_milliseconds": 67,
+      "timeout_seconds": 900,
+      "exit_code": 0,
+      "abnormal_exit_kind": null,
+      "timed_out": false,
+      "capture_limit_bytes": 67108864,
+      "capture_exceeded": false,
+      "pipe_drain_failed": false,
+      "output_drain_failed": false,
+      "input_write_failed": false,
+      "early_input_close_requested": false,
+      "process_tree_kill_error": null,
+      "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-hooks\\91a4c87d4c5441f8a5b84693e72e769d\\default\\observed.stdout",
+      "stdout_bytes": 20,
+      "stdout_sha256": "08a76fa98bd210606970d5b43883cdea8e199e87c72355bf9d5a51437ab3947a",
+      "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-hooks\\91a4c87d4c5441f8a5b84693e72e769d\\default\\observed.stderr",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "configuration": "upstream-test",
+    "telemetry": {
+      "schema_version": 1,
+      "run_id": "50da0fccc25e4f559a623ab2d281cb14",
+      "process_id": 21668,
+      "allocator_limit_bytes": 2147483648,
+      "configuration": "upstream-test",
+      "expected_finalizer_warnings": 0,
+      "managed_refusals": 0,
+      "backing_refusals": 0,
+      "outstanding_bytes": 0,
+      "outstanding_blocks": 0
+    },
+    "run_id": "50da0fccc25e4f559a623ab2d281cb14",
+    "setup": "global *;debug.sethook(function(event) local i=debug.getinfo(2,'S');if i.what=='C' then io.stdout:write(event,':C\\n') end end,'cr')",
+    "process": {
+      "executable": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler\\346457279dd348848b95b0c6dd38c977\\upstream-test\\image\\lua.exe",
+      "process_id": 21668,
+      "executable_sha256": "5f6df96a1c5883fb9e3f9d058c3b4fce012cb52a15bc5050c0de503daf406725",
+      "arguments": [
+        "-E",
+        "-e",
+        "global *;debug.sethook(function(event) local i=debug.getinfo(2,'S');if i.what=='C' then io.stdout:write(event,':C\\n') end end,'cr')",
+        "-e",
+        "local x=1",
+        "-e",
+        "local y=2"
+      ],
+      "working_directory": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-hooks\\91a4c87d4c5441f8a5b84693e72e769d\\upstream-test",
+      "started_utc": "2026-11-08T11:39:38.7077868Z",
+      "elapsed_milliseconds": 58,
+      "timeout_seconds": 900,
+      "exit_code": 0,
+      "abnormal_exit_kind": null,
+      "timed_out": false,
+      "capture_limit_bytes": 67108864,
+      "capture_exceeded": false,
+      "pipe_drain_failed": false,
+      "output_drain_failed": false,
+      "input_write_failed": false,
+      "early_input_close_requested": false,
+      "process_tree_kill_error": null,
+      "stdout_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-hooks\\91a4c87d4c5441f8a5b84693e72e769d\\upstream-test\\observed.stdout",
+      "stdout_bytes": 20,
+      "stdout_sha256": "08a76fa98bd210606970d5b43883cdea8e199e87c72355bf9d5a51437ab3947a",
+      "stderr_path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-debug\\lua-ada\\reports\\cli-msghandler-hooks\\91a4c87d4c5441f8a5b84693e72e769d\\upstream-test\\observed.stderr",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+]

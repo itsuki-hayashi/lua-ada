@@ -1,0 +1,529 @@
+diff --git a/cli/shared/lua-sessions-cli.adb b/cli/shared/lua-sessions-cli.adb
+index 940934c..5c445dc 100644
+--- a/cli/shared/lua-sessions-cli.adb
++++ b/cli/shared/lua-sessions-cli.adb
+@@ -18,7 +18,285 @@ package body Lua.Sessions.CLI is
+    use type Ada.Containers.Count_Type;
+    use type Integer_Value;
+    use type Interfaces.C.int;
++<<<<<<< Updated upstream
+    use type System.Address;
++=======
++
++   type Handler_Action is
++     (Convert_Original, Call_Metamethod, Format_Fallback, Add_Traceback,
++      Return_One);
++   for Handler_Action use
++     (Convert_Original => 0, Call_Metamethod => 1, Format_Fallback => 2,
++      Add_Traceback => 3, Return_One => 4);
++   for Handler_Action'Size use Interfaces.C.int'Size;
++   pragma Convention (C, Handler_Action);
++
++   function Select_Handler_Action
++     (Previous, Result, Value_Type : Interfaces.C.int) return Handler_Action
++     with Export, Convention => C,
++          External_Name => "lua_ada_cli_handler_action";
++   function Select_Handler_Action
++     (Previous, Result, Value_Type : Interfaces.C.int) return Handler_Action
++   is
++   begin
++      --  This allocation-free selector is the whole CLI conversion policy.
++      --  The C transport returns from here before any fallible public call.
++      --  lua.c:msghandler returns a genuine string __tostring result directly;
++      --  unlike luaL_tolstring, a number/nil result selects primitive fallback
++      --  and a successful string result does not acquire another traceback.
++      case Previous is
++         when -1 => return Convert_Original;
++         when 0 =>
++            return (if Result /= 0 then Add_Traceback else Call_Metamethod);
++         when 1 =>
++            return (if Result /= 0 and then Value_Type = 4 then Return_One
++                    else Format_Fallback);
++         when 2 => return Add_Traceback;
++         when others => return Return_One;
++      end case;
++   end Select_Handler_Action;
++
++   Fallback_Format : aliased constant Interfaces.C.char_array :=
++     Interfaces.C.To_C ("(error object is a %s value)");
++   function Handler_Format return System.Address
++     with Export, Convention => C,
++          External_Name => "lua_ada_cli_handler_format";
++   function Handler_Format return System.Address is
++     (Fallback_Format'Address);
++
++   function Message_Handler (Pointer : System.Address) return Interfaces.C.int
++     with Import, Convention => C,
++          External_Name => "lua_ada_cli_message_handler";
++   function Protected_Call (Pointer : System.Address) return Interfaces.C.int
++     with Import, Convention => C,
++          External_Name => "lua_ada_cli_protected_call";
++
++   procedure Pump (State : in out World; Driver : in out Machine.Driver);
++   procedure Pump (State : in out World; Driver : in out Machine.Driver) is
++   begin
++      --  All CLI host drives use the production borrowed C/warning/release
++      --  pump. No Lua callback runs recursively inside an Ada execution step.
++      while not Machine.Is_Complete (Driver) or else
++        External_Releases.Pending (State)
++      loop
++         if Machine.Needs_Foreign_Call (Driver) or else
++           Warnings.Pending (State) or else External_Releases.Pending (State)
++         then
++            Foreign.Invoke_Borrowed (State, Driver);
++         else
++            Machine.Step (Driver);
++         end if;
++      end loop;
++      if State.Exit_Phase /= Exit_Complete and then
++        Machine.Outcome (Driver) /= Completed
++      then
++         raise Language_Error;
++      end if;
++   end Pump;
++
++   procedure Docall (Self : in out Session);
++   procedure Docall (Self : in out Session) is
++      State : World renames Self.State.all;
++      Status : Integer_Value;
++   begin
++      --  Current.Arguments is the traced [callee,args...] packet prepared by
++      --  compilation/pushargs. Publish the noncollectable actual C handler
++      --  before Start pins/copies the packet; no local vector is a ghost root.
++      State.Current.Arguments.Prepend
++        ((Foreign_Function_Kind, Message_Handler'Address));
++      declare
++         Driver : Machine.Driver;
++      begin
++         --  The interrupt lease belongs here, after compilation and argument
++         --  lookup/length/copy. Its controlled scope must end before an outer
++         --  typed os.exit(close=true) can physically dispose of the universe.
++         Machine.Start
++           (Driver, Self.State,
++            (Foreign_Function_Kind, Protected_Call'Address),
++            State.Current.Arguments);
++         State.Current.Arguments.Clear;
++         Pump (State, Driver);
++         if State.Exit_Phase /= Exit_Complete then
++            Machine.Take_Results (Driver, State.Current.Arguments);
++         end if;
++         Machine.Finish (Driver);
++      exception
++         when others => Machine.Cancel (Driver); raise;
++      end;
++      if State.Exit_Phase = Exit_Complete then return; end if;
++      if State.Current.Arguments.Is_Empty or else
++        State.Current.Arguments.First_Element.Kind /= Integer_Kind
++      then
++         raise Program_Error with "invalid CLI protected-call packet";
++      end if;
++      Status := State.Current.Arguments.First_Element.Integer_Data;
++      State.Current.Arguments.Delete_First;
++      if Status /= 0 then
++         --  The protected primitive already ran the handler above the intact
++         --  failed stack. Publish its real final object/class without another
++         --  conversion, source prefix, pcall wrapper or posthoc traceback.
++         if State.Current.Arguments.Is_Empty then
++            raise Program_Error with "missing CLI protected error object";
++         end if;
++         State.Current.Failure := State.Current.Arguments.First_Element;
++         Root_Barrier (State, State.Current.Failure);
++         State.Current.Has_Failure_Value := True;
++         State.Current.Failure_Class :=
++           (if Status = 4 then Memory_Failure
++            elsif Status = 5 then Handling_Failure else Language_Failure);
++         State.Current.Failure_Handled := True;
++         Lua.Diagnostic_Text.Clear (State.Current.Failure_Text);
++         raise Language_Error;
++      end if;
++   end Docall;
++
++   function Reported_Failure
++     (Self : Session; Name : String) return Execution_Result;
++   function Reported_Failure
++     (Self : Session; Name : String) return Execution_Result
++   is
++      Result : Execution_Result := Failure (Self, Name);
++   begin
++      --  report, unlike msghandler, never invokes __tostring. In particular
++      --  syntax and pushargs errors occur before docall installs the handler.
++      --  Keep their actual engine object intact while publishing C display.
++      if Self.State /= null and then
++        Self.State.Current.Failure_Class = Language_Failure and then
++        Self.State.Current.Has_Failure_Value and then
++        Self.State.Current.Failure.Kind not in
++          String_Kind | Integer_Kind | Real_Kind
++      then
++         Result.Error.Message := To_Unbounded_String
++           ("(error message not a string)");
++      else
++         Result.Error.Message := To_Unbounded_String
++           (C_Option (To_String (Result.Error.Message)));
++      end if;
++      return Result;
++   end Reported_Failure;
++
++   function Execute_Chunk
++     (Self : in out Session; Source, Name : String;
++      Arguments : Argument_Array; Display : Boolean;
++      Display_Failed : out Boolean) return Execution_Result;
++   function Execute_Chunk
++     (Self : in out Session; Source, Name : String;
++      Arguments : Argument_Array; Display : Boolean;
++      Display_Failed : out Boolean) return Execution_Result
++   is
++      Result : Execution_Result;
++
++      procedure Recover;
++      procedure Recover is
++         State : World renames Self.State.all;
++      begin
++         End_Operation (State);
++         State.Entry_Code := null;
++         Machine.Clear_Frames (State);
++         State.Current.Arguments.Clear;
++         State.Current.Status := Suspended_Context;
++      end Recover;
++   begin
++      Display_Failed := False;
++      if Self.State = null then return Failure (Self, Name); end if;
++      declare
++         State : World renames Self.State.all;
++         Code : Prototype_Access;
++         Callee : Value;
++      begin
++         State.Current.Arguments.Clear;
++         State.Current.Status := Running_Context;
++         State.Current.Failure := Nil_Value;
++         State.Current.Has_Failure_Value := False;
++         State.Current.Failure_Class := No_Failure;
++         State.Current.Failure_Handled := False;
++         State.Current.Protected_Failure_Class := No_Failure;
++         State.Current.Protected_Handler_Called := False;
++         State.Current.Failure_At := (others => 1);
++         Lua.Diagnostic_Text.Clear (State.Current.Failure_Text);
++         State.Output := Null_Unbounded_String;
++         State.Output_Used := 0;
++         State.Steps := 0;
++         --  Root string arguments before the compiler's first possible GC.
++         for Argument of Arguments loop
++            Append_Root
++              (State, State.Current.Arguments,
++               New_String (State, To_String (Argument)));
++         end loop;
++         if State.GC_Running then Collect (State); end if;
++         if Source'Length > State.Bounds.Source_Bytes then
++            Fail (State, "source byte limit exceeded", Resource => True);
++         end if;
++         Begin_Operation (State);
++         Code := Compiler.Compile (State, Source, Name);
++         State.Entry_Code := Code;
++         Callee := New_Closure (State, Code, null);
++         State.Current.Arguments.Prepend (Callee);
++         Root_Barrier (State, Callee);
++         End_Operation (State);
++         --  Loading is finished before this sole protected execution entry.
++         Docall (Self);
++         State.Entry_Code := null;
++         if State.Exit_Phase /= Exit_Complete then
++            if Display and then not State.Current.Arguments.Is_Empty then
++               --  Native l_print runs after docall removed its handler and
++               --  signal lease. A print error receives only l_print framing.
++               Display_Failed := True;
++               Machine.Run_Display (State);
++               Display_Failed := False;
++            end if;
++            State.Current.Arguments.Clear;
++            if State.GC_Running then Collect (State); end if;
++            State.Current.Status := Suspended_Context;
++         end if;
++         Result.Output := State.Output;
++      end;
++      if Self.State.Exit_Phase = Exit_Complete then
++         Apply_Exit (Self, Result);
++      end if;
++      return Result;
++   exception
++      when Language_Error => Recover; return Reported_Failure (Self, Name);
++      when Lua.Storage.Allocation_Error =>
++         Record_Memory_Error (Self.State.all);
++         Recover;
++         return Reported_Failure (Self, Name);
++      when Storage_Error =>
++         Recover;
++         Self.State.Current.Failure_Class := Host_Abort;
++         Result.Status := Resource_Error;
++         Result.Error.Source := To_Unbounded_String (Name);
++         Result.Error.Message := To_Unbounded_String
++           ("host storage exhausted");
++         return Result;
++      when Error : Constraint_Error | Program_Error =>
++         if Lua.Storage.Refusal_Pending (Self.State.Memory) then
++            Record_Memory_Error (Self.State.all);
++         else
++            Set_Failure_Text
++              (Self.State.all, Self.State.Current, "internal Ada check: " &
++               Ada.Exceptions.Exception_Message (Error));
++         end if;
++         Recover;
++         return Reported_Failure (Self, Name);
++   end Execute_Chunk;
++
++   function Execute
++     (Self : in out Session; Source, Name : String;
++      Arguments : Argument_Array := No_Arguments) return Execution_Result
++   is
++      Unused_Display_Failed : Boolean;
++   begin
++      return Execute_Chunk
++        (Self, Source, Name, Arguments, False, Unused_Display_Failed);
++   end Execute;
++
++   function Execute_Display
++     (Self : in out Session; Source : String;
++      Name : String; Display_Failed : out Boolean) return Execution_Result is
++     (Execute_Chunk
++        (Self, Source, Name, No_Arguments, True, Display_Failed));
++>>>>>>> Stashed changes
+ 
+    function Primary (Pointer : System.Address) return Interfaces.C.int
+      with Import, Convention => C,
+@@ -400,7 +678,6 @@ package body Lua.Sessions.CLI is
+       procedure Execute_Body;
+       procedure Execute_Body is
+          State : World renames Self.State.all;
+-         Arguments : Values.Vector := Owned_Values (State);
+          Code : Prototype_Access;
+          Callee, Table, Length_Value : Value;
+          Count : Natural;
+@@ -482,7 +759,6 @@ package body Lua.Sessions.CLI is
+          --  transactional reservation. These are two selected-owner arenas,
+          --  not another context root or an uncharged input-sized C array.
+          State.Current.Arguments.Reserve_Capacity (Minimum_C_Stack + 3);
+-         Arguments.Reserve_Capacity (Minimum_C_Stack);
+          Begin_Operation (State);
+          Code := Compiler.Compile (State, Source, Name);
+          State.Entry_Code := Code;
+@@ -532,44 +808,35 @@ package body Lua.Sessions.CLI is
+               (State, State.Current.Arguments,
+                Get (Table, (Integer_Kind, Integer_Value (Index))));
+          end loop;
+-         Arguments.Reserve_Capacity (Ada.Containers.Count_Type (Count));
+-         for Index in 1 .. Count loop
+-            Arguments.Append (State.Current.Arguments.Element (Index + 3));
+-         end loop;
+          Callee := State.Current.Arguments.First_Element;
+-         declare
+-            Driver : Machine.Driver;
+-         begin
+-            --  Keep the full prefix AND all copied values in Current.Arguments
+-            --  until Start has pinned and published the real call. Its new
+-            --  temporary-root epoch may allocate; neither a local Callee nor
+-            --  this local argument arena is an independent collector root.
+-            Machine.Start (Driver, Self.State, Callee, Arguments);
+-            State.Current.Arguments.Clear;
+-            Pump (Driver);
+-            Machine.Finish (Driver);
+-         exception
+-            when others => Machine.Cancel (Driver); raise;
+-         end;
++         --  The reserved arena already owns every raw argument, including
++         --  nil holes. Drop the lookup-only table/length prefix and retain the
++         --  real closure plus values for Docall. These in-place edits cannot
++         --  allocate; Callee never crosses a safe point as a local-only root.
++         for Index in 1 .. 3 loop
++            State.Current.Arguments.Delete_First;
++         end loop;
++         State.Current.Arguments.Prepend (Callee);
++         Docall (Self);
++         State.Current.Arguments.Clear;
+          State.Current.Status := Suspended_Context;
+       end Execute_Body;
+    begin
+       if Self.State = null then return Failure (Self, Name); end if;
+       Execute_Body;
+-      --  Execute_Body's local owned arena has finalized while the owner is
+-      --  still alive. Only now may a close=true typed exit physically free
+-      --  the world and its allocator; no local buffer can outlive that owner.
++      --  Docall's driver/signal scope has ended while the owner is alive.
++      --  Only now may close=true physically free the world and its allocator.
+       Result.Output := Self.State.Output;
+       if Self.State.Exit_Phase = Exit_Complete then
+          Apply_Exit (Self, Result);
+       end if;
+       return Result;
+    exception
+-      when Language_Error => Recover; return Failure (Self, Name);
++      when Language_Error => Recover; return Reported_Failure (Self, Name);
+       when Lua.Storage.Allocation_Error =>
+          Record_Memory_Error (Self.State.all);
+          Recover;
+-         return Failure (Self, Name);
++         return Reported_Failure (Self, Name);
+       when Storage_Error =>
+          Recover;
+          Self.State.Current.Failure_Class := Host_Abort;
+@@ -587,6 +854,6 @@ package body Lua.Sessions.CLI is
+                Ada.Exceptions.Exception_Message (Error));
+          end if;
+          Recover;
+-         return Failure (Self, Name);
++         return Reported_Failure (Self, Name);
+    end Execute_Selected_Script;
+ end Lua.Sessions.CLI;
+diff --git a/cli/shared/lua-sessions-cli.ads b/cli/shared/lua-sessions-cli.ads
+index dab57cf..505943e 100644
+--- a/cli/shared/lua-sessions-cli.ads
++++ b/cli/shared/lua-sessions-cli.ads
+@@ -1,4 +1,19 @@
+ package Lua.Sessions.CLI is
++   function Execute
++     (Self : in out Session; Source, Name : String;
++      Arguments : Argument_Array := No_Arguments) return Execution_Result;
++   --  CLI docall policy: compile before installing the actual error handler,
++   --  then execute behind one real protected C caller. The handler sees the
++   --  intact failed frames and original error value. No engine value escapes.
++   --  Generic Session.Execute retains its ordinary embedding policy.
++
++   function Execute_Display
++     (Self : in out Session; Source : String;
++      Name : String; Display_Failed : out Boolean) return Execution_Result;
++   --  Apply CLI docall policy to the compiled REPL chunk, then invoke current
++   --  print in its separate ordinary display phase. Neither compilation nor
++   --  print failure is transformed by the chunk's message handler.
++
+    function Write_Prompt
+      (Self : in out Session; First_Line : Boolean) return Execution_Result;
+    --  CLI-only operation: resolve _PROMPT/_PROMPT2 through the actual global
+diff --git a/cli/shared/lua_ada_cli_message.c b/cli/shared/lua_ada_cli_message.c
+new file mode 100644
+index 0000000..8c992c8
+--- /dev/null
++++ b/cli/shared/lua_ada_cli_message.c
+@@ -0,0 +1,54 @@
++/* CLI-only primitive transport. Ada selects each next operation and owns the
++ * error-object, fallback, display and exit policies. A fallible public API
++ * call begins only after the Ada selector has returned: no C error transfer
++ * can cross a live Ada policy frame. The whole loop is one genuine anonymous
++ * C activation, whose first argument remains the actual inspectable error. */
++#include "lua.h"
++#include "lauxlib.h"
++
++extern int lua_ada_cli_handler_action(int previous, int result, int type);
++extern const char *lua_ada_cli_handler_format(void);
++
++int lua_ada_cli_message_handler(lua_State *L) {
++    int action = -1;
++    int result = 0;
++    int type = LUA_TNONE;
++    const char *message = NULL;
++    for (;;) {
++        action = lua_ada_cli_handler_action(action, result, type);
++        switch (action) {
++            case 0:
++                message = lua_tostring(L, 1);
++                result = (message != NULL);
++                break;
++            case 1:
++                result = luaL_callmeta(L, 1, "__tostring");
++                type = lua_type(L, -1);
++                break;
++            case 2:
++                message = lua_pushfstring(L, lua_ada_cli_handler_format(),
++                                         luaL_typename(L, 1));
++                break;
++            case 3:
++                luaL_traceback(L, L, message, 1);
++                break;
++            case 4:
++                return 1;
++            default:
++                return 0; /* The closed Ada action type cannot select this. */
++        }
++    }
++}
++
++/* Ada prepares [handler, function, arguments...] after loading/pushargs. This
++ * is only the public protected-call primitive and its scalar result envelope;
++ * policy, status interpretation, result retention and signal scope are Ada.
++ * Keeping this real C caller also preserves the native CLI's bottom ancestry.
++ */
++int lua_ada_cli_protected_call(lua_State *L) {
++    int status = lua_pcall(L, lua_gettop(L) - 2, LUA_MULTRET, 1);
++    lua_remove(L, 1);
++    lua_pushinteger(L, status);
++    lua_insert(L, 1);
++    return lua_gettop(L);
++}
+diff --git a/cli/shared/lua_cli.adb b/cli/shared/lua_cli.adb
+index 51d2e21..7bd6263 100644
+--- a/cli/shared/lua_cli.adb
++++ b/cli/shared/lua_cli.adb
+@@ -171,7 +171,8 @@ procedure Lua_CLI is
+    end Bad_Option;
+ 
+    procedure Report
+-     (Result : Execution_Result; Fail_Process : Boolean := True) is
++     (Result : Execution_Result; Fail_Process : Boolean := True;
++      Native_Message : Boolean := False) is
+    begin
+       --  Output before a failed statement is observable Lua behavior.
+       --  Preserve it before sending the structured diagnostic to stderr.
+@@ -198,7 +199,15 @@ procedure Lua_CLI is
+                then Source (Source'First + 1 .. Source'Last)
+                else Source) & ":";
+          begin
+-            if Message'Length >= Prefix'Length and then
++            if Native_Message then
++               --  docall has already transformed the original error while
++               --  its frames were intact. report only publishes that string;
++               --  it must not add a second source location or call tostring.
++               Ada.Text_IO.Put_Line
++                 (Ada.Text_IO.Standard_Error,
++                  (if Fail_Process then Command_Name & ": " else "") &
++                  Message);
++            elsif Message'Length >= Prefix'Length and then
+               Message (Message'First .. Message'First + Prefix'Length - 1) =
+                 Prefix
+             then
+@@ -474,8 +483,9 @@ begin
+             begin
+                --  One batch chunk: report it, and on failure release the
+                --  state unless a typed exit already decided its disposal.
+-               Result := Universe.Execute (Source, Name, Arguments);
+-               Report (Result);
++               Result := Lua.Sessions.CLI.Execute
++                 (Universe, Source, Name, Arguments);
++               Report (Result, Native_Message => True);
+                if Result.Status /= Succeeded then
+                   if not Process_Exit_Requested then
+                      Universe.Close;
+@@ -562,7 +572,8 @@ begin
+             procedure Evaluate (Source : String) is
+                Print_Failed : Boolean;
+                Shown : constant Execution_Result :=
+-                 Universe.Execute_Display (Source, "=stdin", Print_Failed);
++                 Lua.Sessions.CLI.Execute_Display
++                   (Universe, Source, "=stdin", Print_Failed);
+             begin
+                if Print_Failed and then Shown.Status = Runtime_Error then
+                   --  l_print's pcall wrapper message (lua.c l_message).
+@@ -571,7 +582,8 @@ begin
+                      "error calling 'print' (" &
+                      To_String (Shown.Error.Message) & ")");
+                else
+-                  Report (Shown, Fail_Process => False);
++                  Report
++                    (Shown, Fail_Process => False, Native_Message => True);
+                end if;
+             end Evaluate;
+ 
+@@ -765,7 +777,7 @@ begin
+                   Result := Lua.Sessions.CLI.Execute_Selected_Script
+                     (Universe, Source,
+                      (if Use_Stdin then "=stdin" else "@" & Path));
+-                  Report (Result);
++                  Report (Result, Native_Message => True);
+                   if Result.Status /= Succeeded then
+                      if not Process_Exit_Requested then Universe.Close; end if;
+                      return;

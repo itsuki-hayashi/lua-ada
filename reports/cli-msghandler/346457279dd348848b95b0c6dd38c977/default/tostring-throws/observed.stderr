@@ -1,0 +1,8 @@
+C:\Users\Itsuki\.codex\worktrees\remaining-debug\lua-ada\reports\cli-msghandler\346457279dd348848b95b0c6dd38c977\default\image\lua.exe: MM_THROW
+stack traceback:
+	[C]: in global 'error'
+	case.lua:2: in function <case.lua:2>
+	[C]: in ?
+	[C]: in global 'error'
+	case.lua:2: in main chunk
+	[C]: in ?

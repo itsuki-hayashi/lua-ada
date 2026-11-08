@@ -112,6 +112,41 @@ package Lua.Engine.Machine is
    --  @param Self An idle driver, or one released by Finish.
    --  @param State Owning universe, retained by its host during this borrow.
 
+   procedure Start_Host_Main
+     (Self : in out Driver; State : not null World_Access;
+      Arguments : Values.Vector);
+   --  Enter one actual native CLI-main activation behind root protection.
+   --  Pump until Host_Work_Requested before performing idle host policy.
+   --  Its implemented builtin identity is callable but rejects reentry and
+   --  calls outside this explicit live owner; no borrowed host pointer exists.
+
+   function Host_Work_Requested (Self : Driver) return Boolean;
+   --  A typed suspension of the native host continuation, not a Lua yield or
+   --  completed drive. The same driver/context/frame remain owned until the
+   --  next host call or explicit Complete_Host_Main/Cancel.
+
+   procedure Begin_Host_Call
+     (Self : in out Driver; Callee : Value; Arguments : Values.Vector;
+      Message_Handler : Value := Nil_Value; Wanted_Results : Integer := -1);
+   --  Schedule a protected child above the retained actual host activation.
+   --  Call only at a host-work request; arguments become owned frame roots
+   --  before returning. No callback or executor runs synchronously here.
+   --  Publish the real handler/function/argument window above the existing
+   --  host prefix. Minus one keeps all results; a nonnegative count adjusts
+   --  them before returning host work, as the public protected call does.
+
+   procedure Take_Host_Results
+     (Self : Driver; Packet : in out Values.Vector;
+      Failure : out Failure_Kind; Handler_Called : out Boolean);
+   --  Move the completed child's protected status/results into a traced
+   --  destination at the next host-work request. Preserve failure class and
+   --  actual handler invocation; no fresh status packet is manufactured.
+
+   procedure Complete_Host_Main (Self : in out Driver; Success : Boolean);
+   --  Resume the real native main continuation to return one true result or
+   --  no result, matching pmain's successful/failed normal return. Pump to
+   --  Is_Complete, then Finish. Cancellation abandons it without return hooks.
+
    procedure Step (Self : in out Driver);
    --  Perform one scheduler transfer or one Lua/native/hook execution step.
    --  Return to the caller before any future foreign callback is invoked.
@@ -327,11 +362,22 @@ package Lua.Engine.Machine is
 
 private
    type World_View is access all World;
+   type Host_Phase is
+     (No_Host, Starting_Host, Waiting_Host, Calling_Host_Child,
+      Returning_Host_Success, Returning_Host_Failure);
    type Driver is limited record
       Universe : World_View;
       Root_Context : Context_Access;
       Entry_Depth : Natural := 0;
       Done : Boolean := False;
       Failed : Boolean := False;
+      Host_Main : Frame_Access;
+      Host_State : Host_Phase := No_Host;
+      Host_Waiting : Boolean := False;
+      Host_Prefix : Natural := 0;
+      Host_Wanted : Integer := -1;
+      --  A borrowed pointer to the actual stack-owned native activation.
+      --  Only Waiting_Host permits host access; membership is checked before
+      --  dereference. Finish/Cancel remove the borrow before its owner ends.
    end record;
 end Lua.Engine.Machine;
