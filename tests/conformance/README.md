@@ -177,8 +177,25 @@ case contracts in `CliFixtureCases.psm1`; default comparison delegates the setup
 chunk only after validating a fresh host CLI pair receipt. The instrumented
 build runs the full CLI campaign too. Context images freeze the selected CLI,
 all generated setup/input captures and a sixth mandatory build witness.
-That base image schema still needs the allocator and console witness extensions
-before it can represent the complete target. The four C console modes are
+The allocator-aware collector adds a seventh base witness in every context:
+the actual thirteen-process Ada ceiling campaign, including the protected
+80 MiB request under the measured 64 MiB ceiling, recovery, and the same
+request succeeding under 2 GiB. Every instrumented context also needs an
+eighth witness: the strict seven-case native allocator observer, with its
+actual OS-mapped shared runtime path and hash. Native oracle linkage remains
+shared when the Ada context is static or static-pic.
+
+`run-target-allocator-witnesses.ps1` invokes these existing producers and records
+their parent and child process identities, exact operations, PID/run-bound
+sidecars, source/configuration bindings, runtime files and compiler identity.
+`build-target-context.ps1` collects these reports before freezing the image;
+the final reader requires all their raw artifacts in that same image. The Ada
+ceiling report binds its selected launcher, measured configuration and runtime
+artifacts; it does not claim an OS module-mapping observation for Ada. Source
+and synthetic validator checks do not supply execution or acceptance evidence.
+The seven/eight base witnesses still leave dedicated console Lua/C, typed CLI
+argument and readline report reconciliation pending. The final receiver
+explicitly rejects a context until those receivers exist. The four C console modes are
 separate actual invocations; the ordinary 605 C source candidates cannot borrow
 their evidence or count them as no-argument consumer operations.
 
@@ -188,7 +205,7 @@ false. Its private `atexit(checkfinalmem)` assertion cannot replace the clean
 native-default no-close, Ada T no-close or native T close-true counterparts.
 Only the independently reviewed original-source direction permits collecting
 this diagnostic; final image reconciliation requires an additional independent
-review of all fourteen current protocol sources. The pending author packet
+review of all twenty-three current protocol sources. The pending author packet
 grants none. Other hosts require fresh diagnostic applicability review. Raw
 failed input writes remain failed pipe observations, with separate write,
 close and output-drain fields; the closed prompt-before-input terminal cases

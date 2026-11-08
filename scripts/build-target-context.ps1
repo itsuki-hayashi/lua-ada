@@ -77,7 +77,10 @@ $buildLog=@{schema_version=1;kind='target-context-build-log';context=$Context;re
     process=$build;source_bindings=@(foreach($file in @('scripts/build-target-context.ps1',('scripts/'+$scriptName),
         'scripts/check-core-image.ps1','scripts/check-aunit-evidence.ps1','scripts/TargetWitnessPolicy.psm1',
         'scripts/AUnitLaunch.psm1','scripts/run-aunit-in-context.ps1','scripts/ForeignContractEvidence.psm1',
-        'scripts/ConfiguredFixtureEvidence.psm1','scripts/check-configured-fixtures.ps1','scripts/compare.ps1')){
+        'scripts/ConfiguredFixtureEvidence.psm1','scripts/check-configured-fixtures.ps1','scripts/compare.ps1',
+        'scripts/TargetAllocatorWitnesses.psm1','scripts/run-target-allocator-witnesses.ps1',
+        'scripts/ConformanceAllocatorEvidence.psm1','scripts/test-conformance-allocator-ceiling.ps1',
+        'scripts/test-native-allocator-observer.ps1','experiments/conformance/c/allocator_observer_probe.c')){
         @{path=$file;sha256=(Get-FileHash -LiteralPath (Join-Path $root $file)).Hash.ToLowerInvariant()}
     });runtime_acceptance=$false;coverage_authority=$false}
 [IO.File]::WriteAllText($buildLogPath,(ConvertTo-Json -InputObject $buildLog -Depth 48).Replace("`r`n","`n")+"`n",[Text.UTF8Encoding]::new($false))
@@ -113,6 +116,14 @@ foreach ($directory in @((Split-Path -Parent $compiler),$runtime.Directory) | So
         [IO.File]::Copy($file.FullName,(Join-Path $support $file.Name))
     }
 }
+$allocatorOutputs=@(& (Join-Path $PSScriptRoot 'run-target-allocator-witnesses.ps1') -Context $Context `
+    -Compiler $compiler -RuntimeSupportDirectory $support)
+foreach($item in $allocatorOutputs){if($item -is [string]){Write-Output $item}}
+$allocatorResults=@($allocatorOutputs|Where-Object{$_ -is [Collections.IDictionary] -and $_.Contains('witnesses')})
+if($allocatorResults.Count -ne 1){throw 'Target allocator collector did not return its actual report index'}
+$allocator=$allocatorResults[0]
+$receipt['allocator_witnesses']=@($allocator.witnesses)
+[IO.File]::WriteAllText($receiptPath,(ConvertTo-Json -InputObject $receipt -Depth 64).Replace("`r`n","`n")+"`n",[Text.UTF8Encoding]::new($false))
 $directories = @((Split-Path -Parent $paths.ada_launcher).Replace('\','/'),
     (Split-Path -Parent $paths.ada_cli).Replace('\','/'),
     (Split-Path -Parent $paths.c_oracle).Replace('\','/'),$paths.ada_runtime,$paths.c_runtime,
@@ -129,7 +140,8 @@ foreach($raw in $cliRaw){
     $directories+=,$relative
 }
 $imageDirectory = Join-Path $root ('reports/target-images/' + $selected.id)
-$toolchain = @{compiler_sha256=(Get-FileHash -LiteralPath $compiler).Hash.ToLowerInvariant()}
+$toolchain = @{compiler_sha256=(Get-FileHash -LiteralPath $compiler).Hash.ToLowerInvariant();
+    pwsh_sha256=(Get-FileHash -LiteralPath (Get-Command pwsh -ErrorAction Stop).Source).Hash.ToLowerInvariant()}
 foreach($frontendName in @('cc1','cc1plus')){
     $frontendOutput=& $compiler ('-print-prog-name='+$frontendName)
     if($LASTEXITCODE -ne 0){throw 'Cannot identify selected C/C++ frontend'}
@@ -148,6 +160,6 @@ if ($IsWindows) {
     $toolchain.nm_sha256 = (Get-FileHash -LiteralPath $nm).Hash.ToLowerInvariant()
 }
 $image = New-TargetContextImage -Root $root -Context $Context -OutputDirectory $imageDirectory -Paths $paths `
-    -Directories $directories -WitnessReports @($receiptPath,$receipt.consumer.path,$receipt.aunit.path,$buildLogPath,$receipt.configured_fixtures.path,$receipt.host_cli.path) `
+    -Directories $directories -WitnessReports (@($receiptPath,$receipt.consumer.path,$receipt.aunit.path,$buildLogPath,$receipt.configured_fixtures.path,$receipt.host_cli.path)+@($allocator.witnesses.path)) `
     -Toolchain $toolchain
 Write-Output "FROZEN: $Context image=$imageDirectory sha256=$($image.sha256); target acceptance=False"

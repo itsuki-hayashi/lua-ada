@@ -5,6 +5,7 @@ Import-Module (Join-Path $PSScriptRoot 'TargetContext.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
 Import-Module (Join-Path $PSScriptRoot 'FileConsumerIO.psm1')
 Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtureEvidence.psm1')
+Import-Module (Join-Path $PSScriptRoot 'TargetAllocatorWitnesses.psm1')
 
 function Get-TargetObservationClaims {
     param([Parameter(Mandatory)][Collections.IDictionary] $Report,
@@ -104,8 +105,10 @@ function Test-TargetImageBuildWitnesses {
           [Parameter(Mandatory)][Collections.IDictionary] $WitnessPolicy)
     $identity=Assert-TargetContextImage -ImageDirectory $ImageDirectory -Context $Context -Revision $Revision -RequireActual
     $image=$identity.manifest
-    if(@($image.build_witnesses).Count -lt 6){throw 'Final context image lacks actual source-bound build witness reports'}
+    $allocatorKinds=@(if($Context.StartsWith('upstream-test/',[StringComparison]::Ordinal)){@('ada-ceiling','native-observer')}else{@('ada-ceiling')})
+    if(@($image.build_witnesses).Count -ne (6+$allocatorKinds.Count)){throw 'Final context image lacks actual source-bound build witness reports (exact seven/eight required)'}
     $payload=Join-Path $ImageDirectory 'payload';$receipt=$null;$consumerPath=$null;$unitPath=$null;$buildLog=$null;$configuredPath=$null;$cliPath=$null;$seen=@{}
+    $allocators=@{}
     foreach($witness in $image.build_witnesses){
         $path=Resolve-TargetImagePath -Root $payload -Relative $witness.path
         $file=@($image.files|Where-Object path -CEQ $witness.path)
@@ -133,6 +136,13 @@ function Test-TargetImageBuildWitnesses {
                 if((Get-FileHash -LiteralPath $capture).Hash.ToLowerInvariant() -cne $process["${stream}_sha256"] -or
                     (Get-Item -LiteralPath $capture).Length -ne $process["${stream}_bytes"]){throw 'Context build log capture bytes differ'}
             }
+        }elseif($value.Contains('kind') -and $value.kind -ceq 'target-context-allocator-witness'){
+            if($value.witness_kind -cnotin $allocatorKinds -or $allocators.ContainsKey($value.witness_kind)){
+                throw 'Duplicate or wrong-role target allocator build witness'
+            }
+            $null=Assert-TargetAllocatorWitness -Root $Root -Witness $value -ArtifactRoot $payload -Context $Context `
+                -Revision $Revision -Image $image
+            $allocators[$value.witness_kind]=$witness
         }elseif($value.Contains('kind') -and $value.kind -ceq 'configured-fixture-observations'){
             if($null -ne $configuredPath){throw 'Duplicate configured fixture build report'}
             $configuredPath=$path
@@ -151,6 +161,13 @@ function Test-TargetImageBuildWitnesses {
         $receipt.context -cne $Context -or $receipt.revision -cne $Revision -or
         $receipt.witness_policy.path -cne $WitnessPolicy.identity.path -or
         $receipt.witness_policy.sha256 -cne $WitnessPolicy.identity.sha256){throw 'Context image build receipt is missing or identifies another source policy'}
+    if($allocators.Count -ne $allocatorKinds.Count -or -not $receipt.Contains('allocator_witnesses') -or
+        @($receipt.allocator_witnesses).Count -ne $allocatorKinds.Count){throw 'Context image lacks mandatory actual allocator report receipts'}
+    foreach($kind in $allocatorKinds){
+        if(@($receipt.allocator_witnesses|Where-Object sha256 -CEQ $allocators[$kind].sha256).Count -ne 1){
+            throw 'Context allocator witness differs from its source-bound build receipt'
+        }
+    }
     Import-Module (Join-Path $PSScriptRoot 'ConfiguredFixtureEvidence.psm1')
     $configured=Get-Content -LiteralPath $configuredPath -Raw|ConvertFrom-Json -AsHashtable -Depth 48
     if($receipt.configured_fixtures.sha256 -cne (Get-FileHash -LiteralPath $configuredPath).Hash.ToLowerInvariant()){
@@ -183,6 +200,11 @@ function Test-TargetImageBuildWitnesses {
             native_fixture_directory=$consumer.native_module_contract[$implementation+'_fixture_directory']}
         $null=Assert-NativeLuaFixtureEvidence -Root $Root -ArtifactRoot $payload -ImagePayload $payload -Image $image -Report $nativeReport -ConsumerHost
     }
+    # Seven/eight allocator-aware base rows do not close the new host process
+    # campaigns. All older checks above remain active. Keep final acceptance
+    # refused until dedicated consumers reconcile actual console Lua/C,
+    # typed-argument and readline receipts with exact image membership.
+    throw 'Final context still requires actual console Lua/C, typed CLI argument and readline report reconciliation'
     return @{image=$identity;named_evidence=$named;consumer_report=$consumer;build_witnesses_verified=$true;
         runtime_acceptance=$false;coverage_authority=$false}
 }
