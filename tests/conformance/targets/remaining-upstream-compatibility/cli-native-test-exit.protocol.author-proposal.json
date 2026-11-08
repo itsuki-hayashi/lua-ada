@@ -11,7 +11,7 @@
   "execution_evidence": [],
   "source_exclusions": [],
   "source_snapshot": {
-    "repository_revision": "0b95cc880ce35367ecdd8a5cbdbaa2b9b150d749",
+    "repository_revision": "3303b8f48cb1c51d4b23f8b682c8234eac65d2c6",
     "repository_dirty": true
   },
   "feature_review": {
@@ -25,7 +25,7 @@
     },
     {
       "path": "scripts/CliFixtureEvidence.psm1",
-      "sha256": "a560f2bde26002e15db3a467015cc585fdda18adf05cc913dbd0bd8c0b2693c8"
+      "sha256": "5a7eb52b404b1b9b1b2408949cc8d87047b07970bc42237fe30424980dd86934"
     },
     {
       "path": "scripts/ConformanceRunner.psm1",
@@ -41,7 +41,7 @@
     },
     {
       "path": "scripts/ConfiguredFixtureEvidence.psm1",
-      "sha256": "fcd32bc93b944b2559cfc662eff97b9903b9f3864b665c29fffcdd0c2a661a3b"
+      "sha256": "2e64cdb6465a8599c1304cb41c18467cb461185130f73827179fa46640df2aec"
     },
     {
       "path": "scripts/compare.ps1",
@@ -49,11 +49,11 @@
     },
     {
       "path": "scripts/check.ps1",
-      "sha256": "b99d82db89097cbc163645c3a6cec0e62464e501942ede12d25b32f963b30df2"
+      "sha256": "ae1f448606108da789067d8d5e1f8a15bcb0b84ffd650dfb749ce370734f9ff7"
     },
     {
       "path": "scripts/check-instrumented.ps1",
-      "sha256": "b7bd0d5e32d4b4da0936ef28b1623cb64be160c8f6f600173854aef5a978c484"
+      "sha256": "12f82a3b8509412462191edf016502d5365dfc11aa9e6f26df0fbb9f0b4b3833"
     },
     {
       "path": "scripts/TargetWitnessPolicy.psm1",
@@ -73,19 +73,56 @@
     },
     {
       "path": "tests/conformance/targets/configured-fixture-classification.json",
-      "sha256": "ba14fbf45c63c160d3c8009f96bafd02cbf480c7ae7f058b263f2dd29a067dfa"
+      "sha256": "772183d0bdfc5888e038f35c2de1c7db0a99b493d477bfe7a3a67030d86e15da"
+    },
+    {
+      "path": "cli/shared/lua_ada_cli_readline.c",
+      "sha256": "f30a269bfe1abf8a58bfd48cb761724114ea1040d68f999daabaeae6d2072aa1"
+    },
+    {
+      "path": "cli/shared/lua_ada_cli_prompt.c",
+      "sha256": "810db61e5b4c4e6dd478050428a46fd736ae1d47c5ac315734ad523f5ca6e26e"
+    },
+    {
+      "path": "cli/shared/lua-sessions-cli.adb",
+      "sha256": "b29b337b2762511aed1a3e9a2986350f895b33f7ea989f3f7be298f5eaf69c45"
+    },
+    {
+      "path": "cli/shared/lua-sessions-cli.ads",
+      "sha256": "4430feb9456b29ac279907f1b6efcda036b397fe58bd9c8b858ceb8626a45c91"
+    },
+    {
+      "path": "cli/shared/lua_cli.adb",
+      "sha256": "9ce48c447874496af313dbb8a702d1cd89d9e41fa57fa78aa9d2c5d9d9b25eb6"
+    },
+    {
+      "path": "cli/lua_ada_cli.gpr",
+      "sha256": "372a68f9466eab9da3e84be9102e57bf5fbbaee71eb064927fe3b57608bd751f"
+    },
+    {
+      "path": "tests/lua_ada_tests.gpr",
+      "sha256": "2d919063699469859d4ea10d619290ac81214d457ec7052d83bc6c327abdb6ce"
+    },
+    {
+      "path": "scripts/check-cli-readline.ps1",
+      "sha256": "1d1d6659d021fc7125ed2ca2f84443813c5c41c6ef5f995c034dca379fac7f49"
+    },
+    {
+      "path": "scripts/test-cli-readline-portability.ps1",
+      "sha256": "15924ad90861e4d6f1d55045f57129199add4cb012c9fb3cf8cf454310120e47"
     }
   ],
   "review_scope": [
-    "Read the shared112 operation definitions and exact raw capture replay, including all19 native prompt operations and26 named AUnit linkage.",
+    "Read the shared112 operation definitions and exact raw capture replay, including all19 native prompt operations and29 named AUnit linkage.",
     "Verify exact Windows-only nativeT os.exit(37,false) zero-block assertion is observed as a nonpassing teardown diagnostic, with clean AdaT false, native default false and nativeT true siblings required.",
     "Verify source/setup/selected runtime library/native T configuration identities; independent context-image membership binds CLI/default native counterpart and all raw input/output files.",
     "Verify early broken input never becomes delivered input/EOF, and only the closed prompt-before-input terminal cases may observe it while generic pipe outcomes still fail.",
-    "Verify final source protocol review is separate from feature direction0570 and required by actual target image reconciliation."
+    "Verify final source protocol review is separate from feature direction0570 and required by actual target image reconciliation.",
+    "Review the current first-party readline backend, C prompt transport, Ada ownership/startup, CLI and test GPR roles, actual readline process script and compile-only int/void history signature portability guards. These source identities grant no platform runtime acceptance."
   ],
   "remaining_requirements": [
     "This file is pending author review input, never the accepted protocol review path.",
-    "Root must independently inspect current14-source hashes and issue a distinct exact protocol decision before final T image reconciliation.",
+    "Root must independently inspect current23-source hashes and issue a distinct exact protocol decision before final T image reconciliation.",
     "Linux/macOS no-close diagnostics require actual source-linked measurements and fresh applicability decisions; Windows handling cannot silently cover them.",
     "All original source/global ledgers and actual whole-target matrix remain pending."
   ]

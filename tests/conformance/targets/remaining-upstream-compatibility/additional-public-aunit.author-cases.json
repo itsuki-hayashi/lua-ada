@@ -6155,6 +6155,30 @@
       "runtime_acceptance": false,
       "coverage_authority": false,
       "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Empty_History",
+      "required_stdout_line": "OK CLI history: empty performs no allocation",
+      "registered_label": "CLI history: empty performs no allocation",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#History_C_String",
+      "required_stdout_line": "OK CLI history: actual C string borrow",
+      "registered_label": "CLI history: actual C string borrow",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-sessions-cli_prompt_tests.adb#History_Refusal",
+      "required_stdout_line": "OK CLI history: actual provider refusal retry",
+      "registered_label": "CLI history: actual provider refusal retry",
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "execution_evidence": []
     }
   ]
 }

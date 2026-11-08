@@ -565,7 +565,7 @@
       "bindings": [
         {
           "path": "tests/src/lua-sessions-cli_prompt_tests.adb",
-          "sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+          "sha256": "6ab0709c4560dedddead92f344a40b026f117876f46cd47df18ea095ff49f5af"
         },
         {
           "path": "tests/src/lua-sessions-cli_prompt_tests.ads",
@@ -578,6 +578,42 @@
         {
           "path": "scripts/check-cli.ps1",
           "sha256": "fb9a159f790d82509ec2a988b08ba900dd4baed1baf875aa65736b3c8897aacc"
+        },
+        {
+          "path": "cli/shared/lua_ada_cli_readline.c",
+          "sha256": "f30a269bfe1abf8a58bfd48cb761724114ea1040d68f999daabaeae6d2072aa1"
+        },
+        {
+          "path": "cli/shared/lua_ada_cli_prompt.c",
+          "sha256": "810db61e5b4c4e6dd478050428a46fd736ae1d47c5ac315734ad523f5ca6e26e"
+        },
+        {
+          "path": "cli/shared/lua-sessions-cli.adb",
+          "sha256": "b29b337b2762511aed1a3e9a2986350f895b33f7ea989f3f7be298f5eaf69c45"
+        },
+        {
+          "path": "cli/shared/lua-sessions-cli.ads",
+          "sha256": "4430feb9456b29ac279907f1b6efcda036b397fe58bd9c8b858ceb8626a45c91"
+        },
+        {
+          "path": "cli/shared/lua_cli.adb",
+          "sha256": "9ce48c447874496af313dbb8a702d1cd89d9e41fa57fa78aa9d2c5d9d9b25eb6"
+        },
+        {
+          "path": "cli/lua_ada_cli.gpr",
+          "sha256": "372a68f9466eab9da3e84be9102e57bf5fbbaee71eb064927fe3b57608bd751f"
+        },
+        {
+          "path": "tests/lua_ada_tests.gpr",
+          "sha256": "2d919063699469859d4ea10d619290ac81214d457ec7052d83bc6c327abdb6ce"
+        },
+        {
+          "path": "scripts/check-cli-readline.ps1",
+          "sha256": "1d1d6659d021fc7125ed2ca2f84443813c5c41c6ef5f995c034dca379fac7f49"
+        },
+        {
+          "path": "scripts/test-cli-readline-portability.ps1",
+          "sha256": "15924ad90861e4d6f1d55045f57129199add4cb012c9fb3cf8cf454310120e47"
         }
       ],
       "aunit_named_cases": [
@@ -684,6 +720,18 @@
         {
           "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Refusal_Recovery",
           "required_stdout_line": "OK CLI prompt: actual allocation refusal"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Empty_History",
+          "required_stdout_line": "OK CLI history: empty performs no allocation"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#History_C_String",
+          "required_stdout_line": "OK CLI history: actual C string borrow"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#History_Refusal",
+          "required_stdout_line": "OK CLI history: actual provider refusal retry"
         }
       ],
       "execution_evidence": []

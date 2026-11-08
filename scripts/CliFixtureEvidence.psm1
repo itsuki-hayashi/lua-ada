@@ -7,6 +7,10 @@ function Get-CliFixtureSources {
     return @('tests/lua/cli_prompt_controls.lua','scripts/check-cli.ps1',
         'scripts/CliFixtureCases.psm1','scripts/CliFixtureEvidence.psm1',
         'scripts/check-configured-cli.ps1','scripts/ConformanceRunner.psm1',
+        'cli/shared/lua_ada_cli_readline.c','cli/shared/lua_ada_cli_prompt.c',
+        'cli/shared/lua-sessions-cli.adb','cli/shared/lua-sessions-cli.ads','cli/shared/lua_cli.adb',
+        'cli/lua_ada_cli.gpr','tests/lua_ada_tests.gpr','scripts/check-cli-readline.ps1',
+        'scripts/test-cli-readline-portability.ps1',
         'tests/conformance/targets/configured-fixture-classification.json')
 }
 
@@ -33,7 +37,10 @@ function Assert-CliNativeTestExitDirection {
             'scripts/check-cli.ps1','scripts/check-configured-cli.ps1','scripts/ConfiguredFixtureEvidence.psm1',
             'scripts/compare.ps1','scripts/check.ps1','scripts/check-instrumented.ps1',
             'scripts/TargetWitnessPolicy.psm1','scripts/TargetObservationEnvelope.psm1','scripts/TargetContext.psm1',
-            'scripts/build-target-context.ps1','tests/conformance/targets/configured-fixture-classification.json')
+            'scripts/build-target-context.ps1','tests/conformance/targets/configured-fixture-classification.json',
+            'cli/shared/lua_ada_cli_readline.c','cli/shared/lua_ada_cli_prompt.c',
+            'cli/shared/lua-sessions-cli.adb','cli/shared/lua-sessions-cli.ads','cli/shared/lua_cli.adb',
+            'cli/lua_ada_cli.gpr','tests/lua_ada_tests.gpr','scripts/check-cli-readline.ps1','scripts/test-cli-readline-portability.ps1')
         if($approval.schema_version -ne 1 -or $approval.kind -cne 'native-t-exit-no-close-independent-protocol-review' -or
             $approval.decision -cne 'accepted-source-diagnostic-protocol' -or
             [string]::IsNullOrWhiteSpace($approval.author) -or [string]::IsNullOrWhiteSpace($approval.reviewer) -or
@@ -73,7 +80,10 @@ function Assert-CliHostClassification {
         throw 'Host CLI fixture requires its closed source setup and operation contract'
     }
     $required=@('tests/src/lua-sessions-cli_prompt_tests.adb','tests/src/lua-sessions-cli_prompt_tests.ads',
-        'scripts/CliFixtureCases.psm1','scripts/check-cli.ps1')
+        'scripts/CliFixtureCases.psm1','scripts/check-cli.ps1',
+        'cli/shared/lua_ada_cli_readline.c','cli/shared/lua_ada_cli_prompt.c',
+        'cli/shared/lua-sessions-cli.adb','cli/shared/lua-sessions-cli.ads','cli/shared/lua_cli.adb',
+        'cli/lua_ada_cli.gpr','tests/lua_ada_tests.gpr','scripts/check-cli-readline.ps1','scripts/test-cli-readline-portability.ps1')
     if($row.bindings -isnot [Array] -or $row.bindings.Count -ne $required.Count -or
         (($row.bindings.path|Sort-Object)-join '|') -cne (($required|Sort-Object)-join '|')){throw 'Host CLI fixture linkage is incomplete'}
     foreach($binding in $row.bindings){
@@ -83,10 +93,10 @@ function Assert-CliHostClassification {
     $actual=@([regex]::Matches((Get-Content (Join-Path $Root $source) -Raw),
         "(?s)Test_Support\.Add\s*\(Suite,\s*`"([^`"]+)`"\s*,\s*([A-Za-z0-9_]+)'Access")|
         ForEach-Object{$source+'#'+$_.Groups[2].Value+'|OK '+$_.Groups[1].Value}|Sort-Object)
-    if($row.aunit_named_cases -isnot [Array] -or $row.aunit_named_cases.Count -ne 26 -or
-        $actual.Count -ne 26 -or ($actual -join "`n") -cne
+    if($row.aunit_named_cases -isnot [Array] -or $row.aunit_named_cases.Count -ne 29 -or
+        $actual.Count -ne 29 -or ($actual -join "`n") -cne
         (($row.aunit_named_cases|ForEach-Object{$_.case+'|'+$_.required_stdout_line}|Sort-Object)-join "`n")){
-        throw 'Host CLI setup requires all26 actual named source registrations'
+        throw 'Host CLI setup requires all29 actual named source registrations'
     }
     $argumentPath='tests/lua/cli_argument_controls.lua'
     $argument=$Classification.host_entries[1]

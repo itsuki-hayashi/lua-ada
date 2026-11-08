@@ -105,7 +105,7 @@ evidence. Its C rows and all 473 global classifications remain pending until
 review and fresh paired observations in the required immutable contexts.
 
 The successor author inputs preserve the historical 100 C and 94 AUnit
-identities and currently regenerate 605 C and 867 AUnit witnesses. The checked-in
+identities and currently regenerate 605 C and 870 AUnit witnesses. The checked-in
 catalogue records its own dated source snapshot and needs regeneration before
 reviewing new inputs. Additional return/closing, reader, self-value and diagnostic
 cases are named source candidates with empty execution evidence. All 473 global
@@ -145,7 +145,7 @@ four-case public companion remains ordinary. All four fixed external-string
 operations require the actual instrumented C wrapper and reject a case filter
 or T-absent return. Ordinary scalar mutation, table-error and locale fixtures
 remain in generic comparison. The newly registered source candidates, including
-the twenty-six prompt unit cases, have empty execution evidence. The host CLI
+the twenty-nine prompt/history unit cases, have empty execution evidence. The host CLI
 prompt setup chunk requires its separate invocation contract and cannot serve
 as a standalone ordinary script.
 
@@ -170,7 +170,7 @@ the setup chunk cannot acquire a standalone or T-absent pass.
 
 The closed host CLI route
 requires all112 actual Ada CLI operations, the nineteen native prompt operations
-and twenty-six source-linked named AUnit controls. `check-cli.ps1` records raw
+and twenty-nine source-linked named AUnit controls. `check-cli.ps1` records raw
 input/output/error captures, exact argument order, selected runtime libraries
 and native T-presence measurements. Execution and replay share the original
 case contracts in `CliFixtureCases.psm1`; default comparison delegates the setup
