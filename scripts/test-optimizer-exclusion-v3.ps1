@@ -86,6 +86,7 @@ foreach($index in 0..7){Case "exact pinned private structure $index retains orig
 Case 'labelled synthetic reviews cannot authorize the actual target' {$f=Fixture;Reject {Validate $f -Actual} 'synthetic review'}
 foreach($flag in @('public_api','mixed_obligation','module_compatibility_obligation')){Case "$flag cannot be waived" {$f=Fixture;$f.exclusion[$flag]=$true;Reject {Validate $f} 'without public or mixed'}}
 Case 'observable structures cannot masquerade as invisible v1 metadata' {$f=Fixture;$f.exclusion.module_observable=$false;Reject {Validate $f} 'without public or mixed'}
+Case 'a legacy false-visibility label cannot bypass the closed code registry' {$f=Fixture;[void]$f.exclusion.Remove('eligibility_schema_version');$f.exclusion.module_observable=$false;Reject {Validate $f} 'require observable V3'}
 Case 'string false is not a compatibility boolean' {$f=Fixture;$f.exclusion.module_compatibility_obligation='false';Reject {Validate $f} 'without public or mixed'}
 Case 'a ninth candidate cannot enter the registry' {$f=Fixture;$f.exclusion.id='LUA-CODE-REVIEWED-BLOCK-9009';$f.record.id=$f.exclusion.id;Reject {Validate $f} 'without public or mixed'}
 Case 'one-byte widening cannot remove a public neighbour' {$f=Fixture;$f.exclusion.byte_length++;$f.record.byte_length++;$span=$bytes[$f.record.byte_offset..($f.record.byte_offset+$f.record.byte_length-1)];$f.record.anchor_sha256=Get-ConformanceHash $span;$f.exclusion.anchor_sha256=$f.record.anchor_sha256;Reject {Validate $f} 'without public or mixed'}

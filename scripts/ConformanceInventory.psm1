@@ -671,6 +671,11 @@ function Test-ConformanceTargetExclusion {
         throw 'Exclusion must identify a T-only private invariant without public or mixed behavior'
     }
     $eligibilityVersion=Get-ConformanceExclusionEligibilityVersion $Exclusion
+    # This pinned file's private compiler structures are known observable.
+    # A policy cannot evade the closed V3 shape by relabelling an old V1
+    # proposal as invisible. No accepted historical Code partition exists;
+    # V1/V2 behavior for their original source domains remains unchanged.
+    if($Source -ceq 'code.lua' -and $eligibilityVersion -ne 3){throw 'Pinned code optimizer exclusions require observable V3 eligibility'}
     if($eligibilityVersion -eq 2){Assert-ConformancePrivateBoundSource -Source $Source -Bytes $SourceBytes -Record $Record -Exclusion $Exclusion}
     if($eligibilityVersion -eq 3){
         if($Record.kind -cne 'reviewed-block'){throw 'V3 optimizer must use an exact derived reviewed block'}

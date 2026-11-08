@@ -482,10 +482,10 @@ Case 'installed API feature approval excludes only its derived child and grants 
         $parent[0].status -ceq 'pending' -and @($parent[0].evidence).Count -eq 0) 'Exact transform review became runtime evidence'
 }
 
-Case 'target overlay resolves one cited obligation without rewriting its ledger' {
-    # Copy the complete ledger, append a private-opcode inspection obligation,
-    # and approve it only in disposable fixture metadata. This tests the real
-    # inventory path without installing an exclusion in the production ledger.
+Case 'legacy false-visibility code overlay cannot bypass the closed optimizer registry' {
+    # Preserve the former synthetic overlay fixture as a negative regression.
+    # Public dumps make these Code inspections observable; a V1 false flag or
+    # made-up child9999 must not bypass the separately reviewed V3 shape.
     $sourceBytes = [IO.File]::ReadAllBytes((Join-Path $root 'references/lua/testes/code.lua'))
     $sourceText = [Text.Encoding]::Latin1.GetString($sourceBytes)
     $start = $sourceText.IndexOf('if T==nil then')
@@ -519,13 +519,11 @@ Case 'target overlay resolves one cited obligation without rewriting its ledger'
         protected_scopes=$protectedScopes;exclusions=@($f.exclusion)}
     Write-Json $policyPath $policy
     $strict = Test-ConformanceInventory -Root $root -InventoryDirectory $inventory
-    $target = Test-ConformanceInventory -Root $root -InventoryDirectory $inventory `
-        -TargetPolicy remaining-upstream-compatibility
-    Assert-True ($target.SourceAnchors -eq $strict.SourceAnchors -and
-        $target.PendingSourceAnchors -eq $strict.PendingSourceAnchors -and
-        $target.ExcludedSourceObligations -eq 1 -and
-        $target.RequiredPendingSourceAnchors -eq $strict.PendingSourceAnchors - 1 -and
-        -not $target.Complete -and -not $target.TargetComplete) 'Target resolution rewrote history or claimed completion'
+    Assert-Rejected {Test-ConformanceInventory -Root $root -InventoryDirectory $inventory `
+        -TargetPolicy remaining-upstream-compatibility} 'require observable V3'
+    $after=Test-ConformanceInventory -Root $root -InventoryDirectory $inventory
+    Assert-True ($after.SourceAnchors -eq $strict.SourceAnchors -and
+        $after.PendingSourceAnchors -eq $strict.PendingSourceAnchors -and -not $after.Complete) 'Rejected overlay rewrote original inventory'
     $stillPending = @(Read-ConformanceJsonLines $path | Where-Object { $_.id -ceq $entry.id })[0]
     Assert-True ($stillPending.status -ceq 'pending' -and @($stillPending.evidence).Count -eq 0) 'Overlay wrote to ledger'
     $policy.exclusions = @($f.exclusion,$f.exclusion); Write-Json $policyPath $policy
