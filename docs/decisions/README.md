@@ -108,3 +108,6 @@ real pre-panic closing and shared refusal across independently owned states.
 
 ADR 0042 records [typed CLI arguments](0042-cli-typed-arguments.md), actual
 selected-closure/table roots and sequential guarded primitive callbacks.
+
+ADR 0044 records [native CLI readline](0044-cli-native-readline.md), platform
+selection, rooted prompt/input ownership and history refusal recovery.

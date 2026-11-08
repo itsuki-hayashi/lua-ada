@@ -11,11 +11,14 @@ with Lua.Engine.Machine;
 with Lua.Engine.Warnings;
 with Lua.Runtime_Configuration;
 with Lua.Storage;
+with Lua.Storage.Buffers;
 with System;
 
 package body Lua.Sessions.CLI is
    use type Ada.Containers.Count_Type;
    use type Integer_Value;
+   use type Interfaces.C.int;
+   use type System.Address;
 
    function Primary (Pointer : System.Address) return Interfaces.C.int
      with Import, Convention => C,
@@ -34,8 +37,37 @@ package body Lua.Sessions.CLI is
      with Import, Convention => C,
           External_Name => "lua_ada_cli_argument_length";
 
-   function Write_Prompt
-     (Self : in out Session; First_Line : Boolean) return Execution_Result
+   function Init_Readline (Pointer : System.Address) return Interfaces.C.int
+     with Import, Convention => C,
+          External_Name => "lua_ada_cli_initreadline";
+   function Native_Readline (Prompt : System.Address) return System.Address
+     with Import, Convention => C,
+          External_Name => "lua_ada_cli_readline";
+   function Line_Length (Line : System.Address) return Interfaces.C.size_t
+     with Import, Convention => C,
+          External_Name => "lua_ada_cli_line_length";
+   procedure Free_Line (Line : System.Address)
+     with Import, Convention => C,
+          External_Name => "lua_ada_cli_freeline";
+   procedure Save_Line (Line : System.Address)
+     with Import, Convention => C,
+          External_Name => "lua_ada_cli_saveline";
+   function Has_History return Interfaces.C.int
+     with Import, Convention => C,
+          External_Name => "lua_ada_cli_has_history";
+
+   type Prompt_Operation_Kind is (Write_Only, Read_Input, Initialize_Input);
+   function Prompt_Operation
+     (Self : in out Session; First_Line : Boolean;
+      Operation : Prompt_Operation_Kind;
+      Line : out Unbounded_String; Available : out Boolean)
+      return Execution_Result;
+
+   function Prompt_Operation
+     (Self : in out Session; First_Line : Boolean;
+      Operation : Prompt_Operation_Kind;
+      Line : out Unbounded_String; Available : out Boolean)
+      return Execution_Result
    is
       Result : Execution_Result;
 
@@ -77,6 +109,8 @@ package body Lua.Sessions.CLI is
          State.Current.Status := Suspended_Context;
       end Recover;
    begin
+      Line := Null_Unbounded_String;
+      Available := False;
       if Self.State = null then
          return Failure (Self, "");
       end if;
@@ -125,8 +159,8 @@ package body Lua.Sessions.CLI is
                raise;
          end Drive;
 
-         procedure Emit (Bytes : String);
-         procedure Emit (Bytes : String) is
+         procedure Emit (Bytes : String; Pointer : System.Address);
+         procedure Emit (Bytes : String; Pointer : System.Address) is
             Last : Natural := Bytes'Last;
          begin
             --  Lua stores all bytes, while native readline/fputs consumes
@@ -145,8 +179,40 @@ package body Lua.Sessions.CLI is
                   exit;
                end if;
             end loop;
-            Emit_Output (State, Bytes (Bytes'First .. Last));
-            Flush_Output (State);
+            if Operation = Read_Input then
+               declare
+                  Input : constant System.Address := Native_Readline
+                    (Pointer);
+               begin
+                  if Input /= System.Null_Address then
+                     begin
+                        declare
+                           Size : constant Natural :=
+                             Natural (Line_Length (Input));
+                           Text : String (1 .. Size)
+                             with Import, Address => Input;
+                        begin
+                           --  Native pushline removes one final LF after
+                           --  strlen, so embedded NUL truncation takes place
+                           --  before that decision. Keep CR/high bytes.
+                           if Size > 0 and then Text (Size) = ASCII.LF then
+                              Line := To_Unbounded_String
+                                (Text (1 .. Size - 1));
+                           else
+                              Line := To_Unbounded_String (Text);
+                           end if;
+                           Available := True;
+                        end;
+                     exception
+                        when others => Free_Line (Input); raise;
+                     end;
+                     Free_Line (Input);
+                  end if;
+               end;
+            else
+               Emit_Output (State, Bytes (Bytes'First .. Last));
+               Flush_Output (State);
+            end if;
          end Emit;
       begin
          --  This host operation has one policy epoch across lookup,
@@ -167,17 +233,34 @@ package body Lua.Sessions.CLI is
          State.Output_Used := 0;
          State.Steps := 0;
 
-         Drive (if First_Line then Primary'Address else Secondary'Address);
+         if Operation = Initialize_Input then
+            --  This operation's flag is Ignore_Environment, rather than the
+            --  primary/secondary selector used by the two prompt operations.
+            Append_Root (State, State.Current.Arguments,
+                         (Boolean_Kind, First_Line));
+            Drive (Init_Readline'Address);
+         else
+            Drive (if First_Line then Primary'Address else Secondary'Address);
+         end if;
          if State.Exit_Phase = Exit_Complete then
             Result.Output := State.Output;
             Apply_Exit (Self, Result);
             return Result;
          end if;
-         if State.Current.Arguments.Length /= 1 then
+         if Operation = Initialize_Input then
+            State.Current.Status := Suspended_Context;
+            Result.Output := State.Output;
+            return Result;
+         elsif State.Current.Arguments.Length /= 1 then
             raise Program_Error with "invalid prompt lookup result";
          end if;
          if State.Current.Arguments.First_Element.Kind = Nil_Kind then
-            Emit (if First_Line then "> " else ">> ");
+            declare
+               Default : aliased constant String :=
+                 (if First_Line then "> " else ">> ") & ASCII.NUL;
+            begin
+               Emit (Default (1 .. Default'Last - 1), Default'Address);
+            end;
          else
             Drive (String_Prompt'Address);
             if State.Exit_Phase = Exit_Complete then
@@ -201,7 +284,7 @@ package body Lua.Sessions.CLI is
                   View : String (1 .. Bytes.Size)
                     with Import, Address => Bytes.Address;
                begin
-                  Emit (View);
+                  Emit (View, Item.Reference.C_Bytes);
                end;
             end;
          end if;
@@ -235,7 +318,65 @@ package body Lua.Sessions.CLI is
          end if;
          Recover;
          return Failure (Self, "");
+   end Prompt_Operation;
+
+   function Write_Prompt
+     (Self : in out Session; First_Line : Boolean) return Execution_Result
+   is
+      Line : Unbounded_String;
+      Available : Boolean;
+   begin
+      return Prompt_Operation
+        (Self, First_Line, Write_Only, Line, Available);
    end Write_Prompt;
+
+   function Initialize_Readline
+     (Self : in out Session; Ignore_Environment : Boolean)
+      return Execution_Result
+   is
+      Line : Unbounded_String;
+      Available : Boolean;
+   begin
+      return Prompt_Operation
+        (Self, Ignore_Environment, Initialize_Input, Line, Available);
+   end Initialize_Readline;
+
+   function Read_REPL_Line
+     (Self : in out Session; First_Line : Boolean;
+      Line : out Unbounded_String; Available : out Boolean)
+      return Execution_Result is
+   begin
+      return Prompt_Operation
+        (Self, First_Line, Read_Input, Line, Available);
+   end Read_REPL_Line;
+
+   function Save_REPL_Line
+     (Self : in out Session; Line : String) return Execution_Result
+   is
+      Buffer : Lua.Storage.Buffers.Buffer;
+      Result : Execution_Result;
+   begin
+      if Self.State = null then return Failure (Self, ""); end if;
+      if Has_History = 0 or else Line'Length = 0 or else
+        Line (Line'First) = ASCII.NUL
+      then
+         return Result;
+      end if;
+      Buffer.Set_Owner (Lua.Storage.Reference (Self.State.Memory));
+      Buffer.Append (Line);
+      Save_Line (Buffer.C_Address);
+      return Result;
+   exception
+      when Lua.Storage.Allocation_Error =>
+         Record_Memory_Error (Self.State.all);
+         return Failure (Self, "");
+      when Storage_Error =>
+         Self.State.Current.Failure_Class := Host_Abort;
+         Result.Status := Resource_Error;
+         Result.Error.Message := To_Unbounded_String
+           ("host storage exhausted");
+         return Result;
+   end Save_REPL_Line;
 
    function Execute_Selected_Script
      (Self : in out Session; Source, Name : String) return Execution_Result

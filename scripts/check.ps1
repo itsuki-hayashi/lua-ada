@@ -113,6 +113,12 @@ try {
         '-ReferenceLibraryDirectory',(Join-Path $projectRoot 'build/conformance/default/lib'),
         '-RuntimeDirectory',$runtimePath,'-Configuration','default',
         '-OutputDirectory',(Join-Path $consoleDirectory 'lua'))
+    Invoke-Alire -Arguments @('exec','--','pwsh','-NoProfile','-File',
+        (Join-Path $PSScriptRoot 'check-cli-readline.ps1'),'-Interpreter',$absoluteCli,
+        '-ReferenceInterpreter',(Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
+        '-ReferenceLibraryDirectory',(Join-Path $projectRoot 'build/conformance/default/lib'),
+        '-RuntimeDirectory',$runtimePath,'-Configuration','default',
+        '-OutputDirectory',(Join-Path $projectRoot ('reports/core-image/readline-'+[guid]::NewGuid().ToString('N'))))
     $consoleCompilerOutput=& alr exec -- pwsh -NoProfile -Command '(Get-Command gcc -ErrorAction Stop).Source'
     if($LASTEXITCODE -ne 0){throw 'Cannot identify selected console C compiler'}
     $consoleCompiler=($consoleCompilerOutput -join '').Trim()
