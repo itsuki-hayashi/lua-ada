@@ -153,6 +153,11 @@ try {
         'experiments/conformance/oracle.gpr', '-XLUA_CONFORMANCE_CONFIGURATION=upstream-test')
     Invoke-CheckedAlire @('exec', '--', 'gprbuild', '-P',
         'experiments/conformance/oracle.gpr', '-XLUA_CONFORMANCE_CONFIGURATION=default')
+    $consoleDirectory=Join-Path $root ('reports/core-image/'+[guid]::NewGuid().ToString('N'))
+    & "$PSScriptRoot/check-debug-console.ps1" -Interpreter "$root/cli/bin/upstream-test/$LibraryType/lua_ada$suffix" `
+        -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
+        -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib" `
+        -RuntimeDirectory $library -Configuration upstream-test -OutputDirectory (Join-Path $consoleDirectory 'lua')
     $cliPairReport=Join-Path $root ('reports/core-image/cli-'+[guid]::NewGuid().ToString('N')+'/pair.json')
     & "$PSScriptRoot/check-configured-cli.ps1" -Interpreter "$root/cli/bin/upstream-test/$LibraryType/lua_ada$suffix" `
         -RuntimeDirectory $library `
@@ -200,6 +205,14 @@ try {
     & "$PSScriptRoot/test-prebuilt-runtime-profile.ps1" -Profile validation `
         -LibraryType $LibraryType -Configuration upstream-test -TargetPolicy $TargetPolicy
     if ($LASTEXITCODE -ne 0) { throw 'Instrumented C consumer checks failed' }
+    # The four console modes are separate invocations of the actual newly
+    # linked consumer. They cannot borrow its no-argument case count or its
+    # custom allocator counts: these modes use their public state constructor.
+    $consoleCompiler=(Get-Command gcc -ErrorAction Stop).Source
+    & "$PSScriptRoot/check-debug-console-c.ps1" -Interpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
+        -AdaConsumer "$root/build/c-api/bin/upstream-test/validation/$LibraryType/builtin_api_contract$suffix" `
+        -Compiler $consoleCompiler -ReferenceLibrary "$root/build/conformance/upstream-test/lib" `
+        -AdaRuntimeDirectory $library -Configuration upstream-test -OutputDirectory (Join-Path $consoleDirectory 'c')
     if ($TargetPolicy -ne '') {
         $platform = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
         $link = if ($LibraryType -ceq 'relocatable') { 'shared' } else { $LibraryType }

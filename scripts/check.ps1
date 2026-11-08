@@ -106,6 +106,23 @@ try {
     Invoke-Alire -Arguments @('exec', '--', 'gprbuild', '-P',
         'experiments/conformance/oracle.gpr',
         '-XLUA_CONFORMANCE_CONFIGURATION=default')
+    $consoleDirectory=Join-Path $projectRoot ('reports/core-image/'+[guid]::NewGuid().ToString('N'))
+    Invoke-Alire -Arguments @('exec','--','pwsh','-NoProfile','-File',
+        (Join-Path $PSScriptRoot 'check-debug-console.ps1'),'-Interpreter',$absoluteCli,
+        '-ReferenceInterpreter',(Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
+        '-ReferenceLibraryDirectory',(Join-Path $projectRoot 'build/conformance/default/lib'),
+        '-RuntimeDirectory',$runtimePath,'-Configuration','default',
+        '-OutputDirectory',(Join-Path $consoleDirectory 'lua'))
+    $consoleCompilerOutput=& alr exec -- pwsh -NoProfile -Command '(Get-Command gcc -ErrorAction Stop).Source'
+    if($LASTEXITCODE -ne 0){throw 'Cannot identify selected console C compiler'}
+    $consoleCompiler=($consoleCompilerOutput -join '').Trim()
+    Invoke-Alire -Arguments @('exec','--','pwsh','-NoProfile','-File',
+        (Join-Path $PSScriptRoot 'check-debug-console-c.ps1'),
+        '-Interpreter',(Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
+        '-AdaConsumer',(Join-Path $projectRoot "build/c-api/bin/$Profile/$LibraryType/builtin_api_contract$suffix"),
+        '-Compiler',$consoleCompiler,'-ReferenceLibrary',(Join-Path $projectRoot 'build/conformance/default/lib'),
+        '-AdaRuntimeDirectory',$runtimePath,'-Configuration','default',
+        '-OutputDirectory',(Join-Path $consoleDirectory 'c'))
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-binary-cli.ps1'),
         '-Interpreter', $absoluteCli,
