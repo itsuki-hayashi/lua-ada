@@ -117,9 +117,13 @@ by an additional exact-span `reviewed-block`, with an exclusion targeting only
 that child. The original assertion still requires actual evidence as a reviewed
 equivalent; the child decision cannot supply that evidence or complete the
 parent. An exact empty replacement may remove the private conjunct while the
-public assertion and surrounding calls remain byte-identical. Author proposals
-such as the API fixed-buffer allocation-bound packet install no ledger records,
-exclusions, approvals or passing results.
+public assertion and surrounding calls remain byte-identical. Author proposal
+files supply no authority. The separate API fixed-buffer feature decision now
+authorizes only the exact 18-byte private upper-bound child: a pending derived
+record and source-only exclusion preserve the pending original mixed assertion.
+Its exact-byte transform manifest binds the installed policy hash but remains
+blocked pending independent transformation review. Feature approval supplies no
+original-parent execution, whole-file result or final matrix acceptance.
 
 Exclusion eligibility version 1 retains its original interpretation and rejects
 module-observable decisions. An explicit `eligibility_schema_version: 2`

@@ -432,14 +432,49 @@ Case 'strict source-link completion never consumes target exclusions' {
 }
 
 Case 'empty authorized policy preserves every pending anchor' {
-    $strict = Test-ConformanceInventory -Root $root
-    $target = Test-ConformanceInventory -Root $root -TargetPolicy remaining-upstream-compatibility
+    # Keep testing the empty-policy contract after a real independently
+    # reviewed source-only exclusion exists. Never clear production authority
+    # or rewrite original records merely to satisfy a unit-test baseline.
+    $inventory=Join-Path $temporary 'empty-policy-inventory'
+    [void][IO.Directory]::CreateDirectory((Join-Path $inventory 'targets'))
+    foreach($name in @('suite.json','c-api.jsonl','coverage')) {
+        Copy-Item -LiteralPath (Join-Path $root "tests/conformance/$name") -Destination $inventory -Recurse
+    }
+    $policy=Get-Content (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility.exclusions.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+    $policy.exclusions=@()
+    Write-Json (Join-Path $inventory 'targets/remaining-upstream-compatibility.exclusions.json') $policy
+    $strict = Test-ConformanceInventory -Root $root -InventoryDirectory $inventory
+    $target = Test-ConformanceInventory -Root $root -InventoryDirectory $inventory -TargetPolicy remaining-upstream-compatibility
     Assert-True ($target.SourceAnchors -eq $strict.SourceAnchors -and
         $target.PendingSourceAnchors -eq $strict.PendingSourceAnchors -and
         $target.ExcludedSourceObligations -eq 0) 'Target overlay changed original inventory'
     Assert-True (-not $target.Complete -and -not $target.TargetComplete) 'Foundation claimed completion'
-    Assert-Rejected { Test-ConformanceInventory -Root $root -RequireComplete `
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $inventory -RequireComplete `
         -TargetPolicy remaining-upstream-compatibility } 'Unresolved coverage'
+}
+
+Case 'installed API feature approval excludes only its derived child and grants no parent or transform pass' {
+    # This checks actual committed source metadata and reconstructs bytes in
+    # memory only. It neither invokes Lua nor writes an adapted upstream file.
+    $strict=Test-ConformanceInventory -Root $root
+    $target=Test-ConformanceInventory -Root $root -TargetPolicy remaining-upstream-compatibility
+    $parent=@(Read-ConformanceJsonLines (Join-Path $root 'tests/conformance/coverage/api.jsonl')|
+        Where-Object id -CEQ 'LUA-API-ASSERT-CALL-0125')
+    Assert-True ($parent.Count -eq 1 -and $parent[0].status -ceq 'pending' -and $parent[0].disposition -ceq 'pending' -and
+        @($parent[0].evidence).Count -eq 0 -and $target.ExcludedSourceObligations -eq 1 -and
+        $target.Exclusions[0].id -ceq 'LUA-API-REVIEWED-BLOCK-9001' -and
+        $target.PendingSourceAnchors -eq $strict.PendingSourceAnchors -and
+        $target.RequiredPendingSourceAnchors -eq $strict.PendingSourceAnchors-1 -and
+        -not $target.TargetComplete -and -not $target.Complete) 'Feature approval discharged an original runtime obligation'
+    $base='tests/conformance/targets/remaining-upstream-compatibility'
+    $spec=Get-Content (Join-Path $root "$base/api-fixed-buffer-private-bound.transform.json") -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+    $hash=(Get-FileHash (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility.exclusions.json')).Hash.ToLowerInvariant()
+    $resolved=@{};$resolved[$target.Exclusions[0].id]=$target.Exclusions[0]
+    Assert-Rejected {Get-ConformanceTReplay -Root $root -Specification $spec -PolicySha256 $hash -ResolvedExclusions $resolved} 'lacks independent semantic approval'
+    $replay=Get-ConformanceTReplay -Root $root -Specification $spec -PolicySha256 $hash -ResolvedExclusions $resolved -AllowUnreviewedDiagnostics
+    $text=[Text.Encoding]::UTF8.GetString($replay.bytes)
+    Assert-True ($replay.diagnostic_only -and $replay.sha256 -ceq '51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc' -and
+        $text.Contains('assert(m2 > m1)') -and $text.Contains('checkerr(":301:", code)')) 'Pending transform changed retained behavior or acquired acceptance'
 }
 
 Case 'target overlay resolves one cited obligation without rewriting its ledger' {
