@@ -809,6 +809,17 @@ static int external_string(lua_State *L) {
     return 1;
 }
 
+static int fixed_external_string(lua_State *L) {
+    size_t length;
+    const char *source = luaL_checklstring(L, 1, &length);
+    /* Exactly the pinned public-API wrapper: the caller retains the source
+     * bytes for the returned string's lifetime. NULL supplies no deallocator
+     * and transfers no ownership. Tests keep that original Lua value rooted;
+     * this helper neither copies the payload nor invents fixed C storage. */
+    lua_pushexternalstring(L, source, length, NULL, NULL);
+    return 1;
+}
+
 static int open_api(lua_State *L) {
     static const char *const names[] = {"testC", "makeCfunc", "sethook",
         "resume", "newstate", "loadlib", "doremote", "closestate",
@@ -820,6 +831,8 @@ static int open_api(lua_State *L) {
         lua_pushcfunction(L, lua_ada_test_api_callback(17 + (int)i));
         lua_setfield(L, -2, names[i]);
     }
+    lua_pushcfunction(L, fixed_external_string);
+    lua_setfield(L, -2, "externKstr");
     return 1;
 }
 
@@ -867,6 +880,7 @@ lua_CFunction lua_ada_test_api_callback(int operation) {
         close_state, double_to_string, string_to_double, push_userdata_address,
         userdata_address, create_reference, get_reference, release_reference,
         inspect_upvalue, run_new_stack, external_string, check_panic};
+    if (operation == 39) return fixed_external_string;
     if (operation < 17 || operation > 35) return NULL;
     return callbacks[operation - 17];
 }

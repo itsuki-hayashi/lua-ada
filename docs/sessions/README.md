@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [fixed external-string T driver](2026-11-08-fixed-external-string-driver.md).
+
 Correction: [native string locales](2026-11-08-native-string-locales.md).
 
 Correction: [table errors and missing iteration arguments](2026-11-08-table-error-arguments.md).

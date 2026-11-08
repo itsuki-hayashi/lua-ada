@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+Retain the [complete original strings observations](sessions/2026-11-08-fixed-external-string-driver.md)
+for fresh final-image replay. Its new C-backed fixed-string wrapper changes
+the adapter source hash: existing exact verifier/API/locals bindings must be
+reviewed again rather than silently rehashed. No upstream source was adapted
+or private obligation excluded by this driver checkpoint.
+
 Complete the retained external-string T driver reached by the
 [original strings replay](sessions/2026-11-08-native-string-locales.md).
 Keep borrowed external payload lifetimes and explicit deallocation behavior

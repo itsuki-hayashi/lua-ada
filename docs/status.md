@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [fixed external-string T driver](sessions/2026-11-08-fixed-external-string-driver.md)
+uses the exported external-string API in main and separately created states.
+Both local AUnit runs pass2,574 cases. Original strings now completes in
+default and instrumented C/Ada with matching stdout per configuration. These
+component observations retain their separate final matrix and ledger gates.
+
 The [native locale correction](sessions/2026-11-08-native-string-locales.md)
 connects string ordering, default sorting, recognized pattern classes and case
 conversion to the existing native locale boundary. Both full local AUnit runs

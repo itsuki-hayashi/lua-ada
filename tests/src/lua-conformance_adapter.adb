@@ -778,6 +778,7 @@ package body Lua.Conformance_Adapter is
       Add ("upvalue", 32);
       Add ("doonnewstack", 33);
       Add ("externstr", 34);
+      Add ("externKstr", 39);
       Add ("checkpanic", 35);
       Add ("stacklevel", 37);
       Add ("ada_check_table_storage", 38);

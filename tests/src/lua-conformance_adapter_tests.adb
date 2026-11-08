@@ -496,8 +496,55 @@ package body Lua.Conformance_Adapter_Tests is
         "assert(f:read('a')=='ok'); assert(f:close())", Platform => True);
    end Native_Pipe_Validation;
 
+   procedure Fixed_External (Name : String);
+   procedure Fixed_External (Name : String) is
+   begin
+      Check ("_FIXED_EXTERNAL_CASE='" & Name &
+             "';dofile('tests/lua/fixed_external_strings.lua')");
+   end Fixed_External;
+
+   procedure Fixed_Short_Binary;
+   procedure Fixed_Short_Binary is
+   begin
+      --  A short external payload retains its complete NUL-containing bytes
+      --  while its original caller-owned Lua value remains rooted.
+      Fixed_External ("Short_Binary");
+   end Fixed_Short_Binary;
+
+   procedure Fixed_Long_Borrow;
+   procedure Fixed_Long_Borrow is
+   begin
+      --  A dynamic long payload stays borrowed through collection and table
+      --  key lookup. The caller uses the original again after the collection.
+      Fixed_External ("Long_Borrow");
+   end Fixed_Long_Borrow;
+
+   procedure Fixed_Child_State;
+   procedure Fixed_Child_State is
+   begin
+      --  The real separately created state's T module exposes the same C
+      --  driver. Remote publication copies the result before child closure.
+      Fixed_External ("Child_State");
+   end Fixed_Child_State;
+
+   procedure Fixed_Invalid_Type;
+   procedure Fixed_Invalid_Type is
+   begin
+      --  The actual auxiliary string check rejects a table and permits a
+      --  healthy next call; this must not become a Lua-only T facade.
+      Fixed_External ("Invalid_Type");
+   end Fixed_Invalid_Type;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
+      Test_Support.Add (Suite, "fixed external: Short_Binary",
+                        Fixed_Short_Binary'Access);
+      Test_Support.Add (Suite, "fixed external: Long_Borrow",
+                        Fixed_Long_Borrow'Access);
+      Test_Support.Add (Suite, "fixed external: Child_State",
+                        Fixed_Child_State'Access);
+      Test_Support.Add (Suite, "fixed external: Invalid_Type",
+                        Fixed_Invalid_Type'Access);
       Test_Support.Add (Suite, "adapter: real C userdata export",
                         Userdata'Access);
       Test_Support.Add (Suite, "adapter: actual collector color",
