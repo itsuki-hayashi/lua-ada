@@ -35,6 +35,7 @@ with IO_Write_Error_Tests;
 with Collector_Error_Tests;
 with Argument_Registry_Tests;
 with String_Argument_Tests;
+with Sort_Argument_Tests;
 with Lua.String_Result_Tests;
 with Lua.Line_Baseline_Tests;
 with Metamethod_Root_Tests;
@@ -145,6 +146,7 @@ procedure Test_Runner is
       Collector_Error_Tests.Register (Result);
       Argument_Registry_Tests.Register (Result);
       String_Argument_Tests.Register (Result);
+      Sort_Argument_Tests.Register (Result);
       Lua.String_Result_Tests.Register (Result);
       Lua.Line_Baseline_Tests.Register (Result);
       Metamethod_Root_Tests.Register (Result);

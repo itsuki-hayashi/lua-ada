@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [sort argument checkpoint](sessions/2026-11-08-sort-argument-phases.md)
+preserves actual receiver/comparator argument names, validation order and
+failed-capture retirement. Fifteen native-paired cases match four-way
+compiler/VM campaigns in both configurations; each local configuration passes
+2,176 AUnit cases. Unchanged errors.lua progresses to setmetatable used as a
+gsub callback. Full source/T and final platform acceptance remain open.
+
 The [counted binary-source correction](sessions/2026-11-08-binary-source-nul.md)
 preserves full source metadata while matching native C-prefix display, after
 file-tail selection. Four cases match native/Ada default/T; the combined

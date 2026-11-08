@@ -2,6 +2,13 @@
 
 ## Active remaining-suite delivery
 
+Table.sort's argument phases have [local evidence](sessions/2026-11-08-sort-argument-phases.md):
+fifteen native-paired behaviors, four-way compiler/VM checks in both matching
+configurations and 2,176 passing AUnit cases per configuration. Continue
+unchanged errors.lua from setmetatable used as the gsub callback, and the
+separately measured cold string.find output refusal in unchanged T memerr.lua.
+Borrowed Lua CI and all remaining full-target obligations stay open.
+
 Counted source metadata and printable NUL behavior have
 [fresh native-paired evidence](sessions/2026-11-08-binary-source-nul.md), with
 2,161 passing AUnit cases per local configuration after integrating the
