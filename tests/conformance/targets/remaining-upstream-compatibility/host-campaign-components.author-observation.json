@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "kind": "host-campaign-component-author-observation",
+  "author": "Codex /root/validation_delivery",
+  "date": "2026-11-08",
+  "independent_review": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_build_provenance_verified": false,
+  "frozen_context_verified": false,
+  "synthetic_fixture": false,
+  "source_snapshot": {
+    "revision": "c55fba4d513ffeac8be2766545c33079ff5578aa",
+    "repository_dirty": true
+  },
+  "observations": [
+    {
+      "configuration": "default",
+      "index_path": "reports/target-builds/default-windows-validation-static/host-components-58b7512668cb468da97bb5546298e384/index.json",
+      "index_sha256": "347966583ab35cd9727415207f956311f6dcaa6fd741949054a9aed450dae513",
+      "input_snapshot": {
+        "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\target-builds\\host-external-copies-cff372aea24a47ce8734fb0afd198353\\inputs.json",
+        "sha256": "a1eea4bc4d14f7a89fde97dafcadc367021c6de61153af229ee38195f58a6924"
+      },
+      "reports": [
+        {
+          "kind": "console-lua",
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\target-builds\\default-windows-validation-static\\host-components-58b7512668cb468da97bb5546298e384\\console-lua\\result.json",
+          "sha256": "143a3e8a18dda243444ab3f4d9f03ac5d6d8df11e1c5b38f355764d80814a991",
+          "operations": 32,
+          "frozen_image_verified": false,
+          "final_rejection": "Host campaign final report requires actual clean observations"
+        },
+        {
+          "kind": "console-c",
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\target-builds\\default-windows-validation-static\\host-components-58b7512668cb468da97bb5546298e384\\console-c\\result.json",
+          "sha256": "84a164131084741c6003e726ba825164d69b3d7679b5f2b8ccfe142db8364f05",
+          "operations": 8,
+          "frozen_image_verified": false,
+          "final_rejection": "Host campaign final report requires actual clean observations"
+        },
+        {
+          "kind": "readline",
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\target-builds\\default-windows-validation-static\\host-components-58b7512668cb468da97bb5546298e384\\readline\\result.json",
+          "sha256": "2b16a282c063b04ce594e356605b51ebb9fe044521b11d180120bbdde1ce1e52",
+          "operations": 28,
+          "frozen_image_verified": false,
+          "final_rejection": "Host campaign final report requires actual clean observations"
+        }
+      ]
+    },
+    {
+      "configuration": "upstream-test",
+      "index_path": "reports/target-builds/upstream-test-windows-validation-static/host-components-7950c9f9aa4a4d7393fae9185af5f534/index.json",
+      "index_sha256": "84ea367dc09fdd50e3374c65b57cb8731be1a87eeacd02c79cb3620a6a7ed946",
+      "input_snapshot": {
+        "sha256": "a1eea4bc4d14f7a89fde97dafcadc367021c6de61153af229ee38195f58a6924",
+        "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\target-builds\\host-external-copies-cff372aea24a47ce8734fb0afd198353\\inputs.json"
+      },
+      "reports": [
+        {
+          "kind": "console-lua",
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\target-builds\\upstream-test-windows-validation-static\\host-components-7950c9f9aa4a4d7393fae9185af5f534\\console-lua\\result.json",
+          "sha256": "1c38866b283e208d86f340f5d0a664e61028a92c0a533b3d633d1b2b9f877789",
+          "operations": 32,
+          "frozen_image_verified": false,
+          "final_rejection": "Host campaign final report requires actual clean observations"
+        },
+        {
+          "kind": "console-c",
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\target-builds\\upstream-test-windows-validation-static\\host-components-7950c9f9aa4a4d7393fae9185af5f534\\console-c\\result.json",
+          "sha256": "41acb67fcb24dfe0e0083635afc9b26a9d374becbb58102de63853f2187bf474",
+          "operations": 8,
+          "frozen_image_verified": false,
+          "final_rejection": "Host campaign final report requires actual clean observations"
+        },
+        {
+          "kind": "readline",
+          "path": "C:\\Users\\Itsuki\\.codex\\worktrees\\remaining-policy\\lua-ada\\reports\\target-builds\\upstream-test-windows-validation-static\\host-components-7950c9f9aa4a4d7393fae9185af5f534\\readline\\result.json",
+          "sha256": "9c06795748cf664b3108cc0853e92f8e00674cef8644ca11881bddb5c083bb6b",
+          "operations": 28,
+          "frozen_image_verified": false,
+          "final_rejection": "Host campaign final report requires actual clean observations"
+        }
+      ]
+    }
+  ],
+  "reader_source": {
+    "path": "scripts/TargetHostCampaignEvidence.psm1",
+    "sha256": "dd21d6b4f56a017ee7efb7967e8b522f2e63524154aebc71f3e0d6795805c496"
+  },
+  "scope": "Fresh Windows component processes and dirty-source observation replay only. Product copies were hash-verified before/copy/after; their actual source/compile revision is not certified. All strict final replays reject these component reports. No existing report, ledger, review authority or source exception is promoted."
+}

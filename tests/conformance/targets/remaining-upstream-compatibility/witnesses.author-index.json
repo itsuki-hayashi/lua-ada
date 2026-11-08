@@ -109,7 +109,7 @@
   "pending_conditional_campaigns": [
     {
       "path": "tests/conformance/targets/remaining-upstream-compatibility/debug-console-consumer.author-proposal.json",
-      "sha256": "385e684fafb317872142070b0fbfbe37f1f0d10525e0d449a3666da9c3b26cae",
+      "sha256": "8b70cd4d6733b9baa4467828a5d9f9eeeb03f7b59ac682bc50b22b0d24bb8cdf",
       "case_count": 4,
       "coverage_authority": false,
       "runtime_acceptance": false

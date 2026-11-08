@@ -1,0 +1,1335 @@
+{
+  "runtime_acceptance": false,
+  "source_bindings": [
+    {
+      "sha256": "bec1aa0c8fd57b43cb40028eec80490539e06f0d31c7e913303a8ef2d2003a81",
+      "path": "scripts/TargetHostCampaignContracts.psm1"
+    },
+    {
+      "sha256": "e5ce485a0a2766b9f60171d046feae9a725d4125aa2ca0c86a0732f53f17d997",
+      "path": "scripts/check-debug-console.ps1"
+    },
+    {
+      "sha256": "072e9b8c3eb0147325b035a29ee54a7d30a7d5322ac654dd4ad1ae4c83b4cd9a",
+      "path": "scripts/check-debug-console-c.ps1"
+    },
+    {
+      "sha256": "be87fb0b831179f9965c509c1c6dfd3f9a239f3b5daa2a62da179ec797fe4b8d",
+      "path": "scripts/check-cli-readline.ps1"
+    }
+  ],
+  "author": "Codex /root/validation_delivery",
+  "reports": [
+    {
+      "compile_comparison": null,
+      "cases": 16,
+      "old_raw_report": "C:\\Users\\Itsuki\\workspace\\lua-ada\\reports\\debug-console\\36b407e939ec405fa624fd5e36b1634a\\result.json",
+      "old_report_replayed_as_current_source_evidence": false,
+      "configuration": "default",
+      "kind": "console-lua",
+      "old_raw_sha256": "e2687546d4abcbe8d05dcc8890968d361ede8222ed04fc597b7eef337ae6f415",
+      "operations": [
+        {
+          "stdin_bytes": 27,
+          "argv_unchanged": true,
+          "stdin_sha256": "a2d56af75ca48aa8bd56a8b595afecfb05fae35d232a1d22f408ab6bfea88fbe",
+          "role": "native",
+          "case": "write-and-continue",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 26,
+          "argv_unchanged": true,
+          "stdin_sha256": "eb6f839e0fbc3797601947658ae04af20c313a385d3055d7cb8465149edfe2e2",
+          "role": "native",
+          "case": "discard-results",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 42,
+          "argv_unchanged": true,
+          "stdin_sha256": "cb0fa0e929dfaec7d33d648595ff7ec4dad312f45b88382f59cebb7ac7a47b2a",
+          "role": "native",
+          "case": "syntax-error-recovery",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 106,
+          "argv_unchanged": true,
+          "stdin_sha256": "f7fe664358c03f777886600c8dabec5ca965fd32585218c9392c7e9c32bfa8d2",
+          "role": "native",
+          "case": "error-object-conversion",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 64,
+          "argv_unchanged": true,
+          "stdin_sha256": "7c5479daabd3e946ab7ce210a5a56d05b1f9ebf617935a9fc5fe82981db47548",
+          "role": "native",
+          "case": "command-environment",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 0,
+          "argv_unchanged": true,
+          "stdin_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "role": "native",
+          "case": "eof",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 20,
+          "argv_unchanged": true,
+          "stdin_sha256": "274912e9a9be729853fa404836303951c46607b32a569fa70e9969fb3304df00",
+          "role": "native",
+          "case": "partial-final-command",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 34,
+          "argv_unchanged": true,
+          "stdin_sha256": "17c3f50ebc2e4f9e12a0e718a67ab4e1518ddd0183ca7df0bd2e09a5861a9ab6",
+          "role": "native",
+          "case": "embedded-nul",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 774,
+          "argv_unchanged": true,
+          "stdin_sha256": "2fa02f98e03f55257403f8048ed95ebd0bce1e3a9d0dd3c3d46a9a17a630f2a7",
+          "role": "native",
+          "case": "fixed-buffer-boundary",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 66,
+          "argv_unchanged": true,
+          "stdin_sha256": "dfbe686e5f9fa9780663df62b705f0b312fb7e67d6068248947e4ff30d3e4df4",
+          "role": "native",
+          "case": "numeric-error-conversion",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 69,
+          "argv_unchanged": true,
+          "stdin_sha256": "3425c849eba15f5416c6e2b19a2f61bc66d07e3fe3fe82bf695c19195b2254fd",
+          "role": "native",
+          "case": "conversion-error-escapes",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 31,
+          "argv_unchanged": true,
+          "stdin_sha256": "f40e37fd96e941f7ea5780c192e6aa7b338388c0e04ec0029b7710ed2eb60978",
+          "role": "native",
+          "case": "command-cannot-yield",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "native",
+          "case": "initial-argument-release",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 35,
+          "argv_unchanged": true,
+          "stdin_sha256": "ed0aa736be4c7d563a9784a5c7809063956bd115ea39bf015c7a7e45b97d61a6",
+          "role": "native",
+          "case": "binary-error-bytes",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 28,
+          "argv_unchanged": true,
+          "stdin_sha256": "a2f2db0d1dee563bd9dccd22b4029cb71d7004bcd77c2ac2040b8e458e1cd883",
+          "role": "native",
+          "case": "native-text-crlf",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 9,
+          "argv_unchanged": true,
+          "stdin_sha256": "2d78c88b79ba1b33782fc99ad221e8b931527bcb1d66cab916503d5c447c7040",
+          "role": "native",
+          "case": "native-text-ctrl-z",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 27,
+          "argv_unchanged": true,
+          "stdin_sha256": "a2d56af75ca48aa8bd56a8b595afecfb05fae35d232a1d22f408ab6bfea88fbe",
+          "role": "ada",
+          "case": "write-and-continue",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 26,
+          "argv_unchanged": true,
+          "stdin_sha256": "eb6f839e0fbc3797601947658ae04af20c313a385d3055d7cb8465149edfe2e2",
+          "role": "ada",
+          "case": "discard-results",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 42,
+          "argv_unchanged": true,
+          "stdin_sha256": "cb0fa0e929dfaec7d33d648595ff7ec4dad312f45b88382f59cebb7ac7a47b2a",
+          "role": "ada",
+          "case": "syntax-error-recovery",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 106,
+          "argv_unchanged": true,
+          "stdin_sha256": "f7fe664358c03f777886600c8dabec5ca965fd32585218c9392c7e9c32bfa8d2",
+          "role": "ada",
+          "case": "error-object-conversion",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 64,
+          "argv_unchanged": true,
+          "stdin_sha256": "7c5479daabd3e946ab7ce210a5a56d05b1f9ebf617935a9fc5fe82981db47548",
+          "role": "ada",
+          "case": "command-environment",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 0,
+          "argv_unchanged": true,
+          "stdin_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "role": "ada",
+          "case": "eof",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 20,
+          "argv_unchanged": true,
+          "stdin_sha256": "274912e9a9be729853fa404836303951c46607b32a569fa70e9969fb3304df00",
+          "role": "ada",
+          "case": "partial-final-command",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 34,
+          "argv_unchanged": true,
+          "stdin_sha256": "17c3f50ebc2e4f9e12a0e718a67ab4e1518ddd0183ca7df0bd2e09a5861a9ab6",
+          "role": "ada",
+          "case": "embedded-nul",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 774,
+          "argv_unchanged": true,
+          "stdin_sha256": "2fa02f98e03f55257403f8048ed95ebd0bce1e3a9d0dd3c3d46a9a17a630f2a7",
+          "role": "ada",
+          "case": "fixed-buffer-boundary",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 66,
+          "argv_unchanged": true,
+          "stdin_sha256": "dfbe686e5f9fa9780663df62b705f0b312fb7e67d6068248947e4ff30d3e4df4",
+          "role": "ada",
+          "case": "numeric-error-conversion",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 69,
+          "argv_unchanged": true,
+          "stdin_sha256": "3425c849eba15f5416c6e2b19a2f61bc66d07e3fe3fe82bf695c19195b2254fd",
+          "role": "ada",
+          "case": "conversion-error-escapes",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 31,
+          "argv_unchanged": true,
+          "stdin_sha256": "f40e37fd96e941f7ea5780c192e6aa7b338388c0e04ec0029b7710ed2eb60978",
+          "role": "ada",
+          "case": "command-cannot-yield",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "ada",
+          "case": "initial-argument-release",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 35,
+          "argv_unchanged": true,
+          "stdin_sha256": "ed0aa736be4c7d563a9784a5c7809063956bd115ea39bf015c7a7e45b97d61a6",
+          "role": "ada",
+          "case": "binary-error-bytes",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 28,
+          "argv_unchanged": true,
+          "stdin_sha256": "a2f2db0d1dee563bd9dccd22b4029cb71d7004bcd77c2ac2040b8e458e1cd883",
+          "role": "ada",
+          "case": "native-text-crlf",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 9,
+          "argv_unchanged": true,
+          "stdin_sha256": "2d78c88b79ba1b33782fc99ad221e8b931527bcb1d66cab916503d5c447c7040",
+          "role": "ada",
+          "case": "native-text-ctrl-z",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        }
+      ],
+      "processes": 32
+    },
+    {
+      "compile_comparison": null,
+      "cases": 16,
+      "old_raw_report": "C:\\Users\\Itsuki\\workspace\\lua-ada\\reports\\debug-console\\97bdfa034b85405f9ef1121269085790\\result.json",
+      "old_report_replayed_as_current_source_evidence": false,
+      "configuration": "upstream-test",
+      "kind": "console-lua",
+      "old_raw_sha256": "9a5eab2ec850d79e50c4601c41da91f6e64566ba70129929bf9fcd875528f428",
+      "operations": [
+        {
+          "stdin_bytes": 27,
+          "argv_unchanged": true,
+          "stdin_sha256": "a2d56af75ca48aa8bd56a8b595afecfb05fae35d232a1d22f408ab6bfea88fbe",
+          "role": "native",
+          "case": "write-and-continue",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 26,
+          "argv_unchanged": true,
+          "stdin_sha256": "eb6f839e0fbc3797601947658ae04af20c313a385d3055d7cb8465149edfe2e2",
+          "role": "native",
+          "case": "discard-results",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 42,
+          "argv_unchanged": true,
+          "stdin_sha256": "cb0fa0e929dfaec7d33d648595ff7ec4dad312f45b88382f59cebb7ac7a47b2a",
+          "role": "native",
+          "case": "syntax-error-recovery",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 106,
+          "argv_unchanged": true,
+          "stdin_sha256": "f7fe664358c03f777886600c8dabec5ca965fd32585218c9392c7e9c32bfa8d2",
+          "role": "native",
+          "case": "error-object-conversion",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 64,
+          "argv_unchanged": true,
+          "stdin_sha256": "7c5479daabd3e946ab7ce210a5a56d05b1f9ebf617935a9fc5fe82981db47548",
+          "role": "native",
+          "case": "command-environment",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 0,
+          "argv_unchanged": true,
+          "stdin_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "role": "native",
+          "case": "eof",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 20,
+          "argv_unchanged": true,
+          "stdin_sha256": "274912e9a9be729853fa404836303951c46607b32a569fa70e9969fb3304df00",
+          "role": "native",
+          "case": "partial-final-command",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 34,
+          "argv_unchanged": true,
+          "stdin_sha256": "17c3f50ebc2e4f9e12a0e718a67ab4e1518ddd0183ca7df0bd2e09a5861a9ab6",
+          "role": "native",
+          "case": "embedded-nul",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 774,
+          "argv_unchanged": true,
+          "stdin_sha256": "2fa02f98e03f55257403f8048ed95ebd0bce1e3a9d0dd3c3d46a9a17a630f2a7",
+          "role": "native",
+          "case": "fixed-buffer-boundary",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 66,
+          "argv_unchanged": true,
+          "stdin_sha256": "dfbe686e5f9fa9780663df62b705f0b312fb7e67d6068248947e4ff30d3e4df4",
+          "role": "native",
+          "case": "numeric-error-conversion",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 69,
+          "argv_unchanged": true,
+          "stdin_sha256": "3425c849eba15f5416c6e2b19a2f61bc66d07e3fe3fe82bf695c19195b2254fd",
+          "role": "native",
+          "case": "conversion-error-escapes",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 31,
+          "argv_unchanged": true,
+          "stdin_sha256": "f40e37fd96e941f7ea5780c192e6aa7b338388c0e04ec0029b7710ed2eb60978",
+          "role": "native",
+          "case": "command-cannot-yield",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "native",
+          "case": "initial-argument-release",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 35,
+          "argv_unchanged": true,
+          "stdin_sha256": "ed0aa736be4c7d563a9784a5c7809063956bd115ea39bf015c7a7e45b97d61a6",
+          "role": "native",
+          "case": "binary-error-bytes",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 28,
+          "argv_unchanged": true,
+          "stdin_sha256": "a2f2db0d1dee563bd9dccd22b4029cb71d7004bcd77c2ac2040b8e458e1cd883",
+          "role": "native",
+          "case": "native-text-crlf",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 9,
+          "argv_unchanged": true,
+          "stdin_sha256": "2d78c88b79ba1b33782fc99ad221e8b931527bcb1d66cab916503d5c447c7040",
+          "role": "native",
+          "case": "native-text-ctrl-z",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 27,
+          "argv_unchanged": true,
+          "stdin_sha256": "a2d56af75ca48aa8bd56a8b595afecfb05fae35d232a1d22f408ab6bfea88fbe",
+          "role": "ada",
+          "case": "write-and-continue",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 26,
+          "argv_unchanged": true,
+          "stdin_sha256": "eb6f839e0fbc3797601947658ae04af20c313a385d3055d7cb8465149edfe2e2",
+          "role": "ada",
+          "case": "discard-results",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 42,
+          "argv_unchanged": true,
+          "stdin_sha256": "cb0fa0e929dfaec7d33d648595ff7ec4dad312f45b88382f59cebb7ac7a47b2a",
+          "role": "ada",
+          "case": "syntax-error-recovery",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 106,
+          "argv_unchanged": true,
+          "stdin_sha256": "f7fe664358c03f777886600c8dabec5ca965fd32585218c9392c7e9c32bfa8d2",
+          "role": "ada",
+          "case": "error-object-conversion",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 64,
+          "argv_unchanged": true,
+          "stdin_sha256": "7c5479daabd3e946ab7ce210a5a56d05b1f9ebf617935a9fc5fe82981db47548",
+          "role": "ada",
+          "case": "command-environment",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 0,
+          "argv_unchanged": true,
+          "stdin_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "role": "ada",
+          "case": "eof",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 20,
+          "argv_unchanged": true,
+          "stdin_sha256": "274912e9a9be729853fa404836303951c46607b32a569fa70e9969fb3304df00",
+          "role": "ada",
+          "case": "partial-final-command",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 34,
+          "argv_unchanged": true,
+          "stdin_sha256": "17c3f50ebc2e4f9e12a0e718a67ab4e1518ddd0183ca7df0bd2e09a5861a9ab6",
+          "role": "ada",
+          "case": "embedded-nul",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 774,
+          "argv_unchanged": true,
+          "stdin_sha256": "2fa02f98e03f55257403f8048ed95ebd0bce1e3a9d0dd3c3d46a9a17a630f2a7",
+          "role": "ada",
+          "case": "fixed-buffer-boundary",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 66,
+          "argv_unchanged": true,
+          "stdin_sha256": "dfbe686e5f9fa9780663df62b705f0b312fb7e67d6068248947e4ff30d3e4df4",
+          "role": "ada",
+          "case": "numeric-error-conversion",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 69,
+          "argv_unchanged": true,
+          "stdin_sha256": "3425c849eba15f5416c6e2b19a2f61bc66d07e3fe3fe82bf695c19195b2254fd",
+          "role": "ada",
+          "case": "conversion-error-escapes",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 31,
+          "argv_unchanged": true,
+          "stdin_sha256": "f40e37fd96e941f7ea5780c192e6aa7b338388c0e04ec0029b7710ed2eb60978",
+          "role": "ada",
+          "case": "command-cannot-yield",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "ada",
+          "case": "initial-argument-release",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 35,
+          "argv_unchanged": true,
+          "stdin_sha256": "ed0aa736be4c7d563a9784a5c7809063956bd115ea39bf015c7a7e45b97d61a6",
+          "role": "ada",
+          "case": "binary-error-bytes",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 28,
+          "argv_unchanged": true,
+          "stdin_sha256": "a2f2db0d1dee563bd9dccd22b4029cb71d7004bcd77c2ac2040b8e458e1cd883",
+          "role": "ada",
+          "case": "native-text-crlf",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 9,
+          "argv_unchanged": true,
+          "stdin_sha256": "2d78c88b79ba1b33782fc99ad221e8b931527bcb1d66cab916503d5c447c7040",
+          "role": "ada",
+          "case": "native-text-ctrl-z",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        }
+      ],
+      "processes": 32
+    },
+    {
+      "compile_comparison": {
+        "ordered_arguments_unchanged_after_explicit_path_separator_comparison": true,
+        "note": "The new producer spells compiler path arguments with forward slashes for portable replay; flags and referenced input/output files are unchanged."
+      },
+      "cases": 4,
+      "old_raw_report": "C:\\Users\\Itsuki\\workspace\\lua-ada\\reports\\debug-console-c\\25fb951433304f7c978be10231ea77ed\\result.json",
+      "old_report_replayed_as_current_source_evidence": false,
+      "configuration": "default",
+      "kind": "console-c",
+      "old_raw_sha256": "8fe9fdf9aaba531e899bace5e861396cfb534073cbd61b3bff3e7ad7883b0b75",
+      "operations": [
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "native",
+          "case": "host",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "ada",
+          "case": "host",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "native",
+          "case": "host-close",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "ada",
+          "case": "host-close",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "native",
+          "case": "callback-close",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "ada",
+          "case": "callback-close",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "native",
+          "case": "callback-error",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "ada",
+          "case": "callback-error",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        }
+      ],
+      "processes": 8
+    },
+    {
+      "compile_comparison": {
+        "ordered_arguments_unchanged_after_explicit_path_separator_comparison": true,
+        "note": "The new producer spells compiler path arguments with forward slashes for portable replay; flags and referenced input/output files are unchanged."
+      },
+      "cases": 4,
+      "old_raw_report": "C:\\Users\\Itsuki\\workspace\\lua-ada\\reports\\debug-console-c\\f9c4ba8726f8426795c0ff7daceebd70\\result.json",
+      "old_report_replayed_as_current_source_evidence": false,
+      "configuration": "upstream-test",
+      "kind": "console-c",
+      "old_raw_sha256": "ef066a2fdb651fa4619bec4ebf3b5f1d3fea231b2eeda11e7818890cd0fa2fe2",
+      "operations": [
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "native",
+          "case": "host",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "ada",
+          "case": "host",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "native",
+          "case": "host-close",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "ada",
+          "case": "host-close",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "native",
+          "case": "callback-close",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "ada",
+          "case": "callback-close",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "native",
+          "case": "callback-error",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 83,
+          "argv_unchanged": true,
+          "stdin_sha256": "fc14e24cace2b6cc4c22e5c114f8f697cd6ca0bdb58762da723e4d2fc582b74d",
+          "role": "ada",
+          "case": "callback-error",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        }
+      ],
+      "processes": 8
+    },
+    {
+      "compile_comparison": null,
+      "cases": 14,
+      "old_raw_report": "C:\\Users\\Itsuki\\workspace\\lua-ada\\reports\\cli-readline\\b1b194eba3944536b78d20a571ca378f\\result.json",
+      "old_report_replayed_as_current_source_evidence": false,
+      "configuration": "default",
+      "kind": "readline",
+      "old_raw_sha256": "2344e7ba494aff08f5d51314a403637f33d3645ef1d0d1c5b4494956081348d2",
+      "operations": [
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "4c5bd8418cdf2e378d9ae8dd9b8d53eae0d757216a720c0f5fccff79d24e4a82",
+          "role": "native",
+          "case": "basic",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 0,
+          "argv_unchanged": true,
+          "stdin_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "role": "native",
+          "case": "empty-eof",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 9,
+          "argv_unchanged": true,
+          "stdin_sha256": "ce4646420ebcb179feeacc37c59d1ad6aa91cae50e494c03d2a7b284694b446d",
+          "role": "native",
+          "case": "unterminated-final-line",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 11,
+          "argv_unchanged": true,
+          "stdin_sha256": "75a2044b178511b9a02c6ee41f57c7956f55d7c0a872d61aaf1f093b93abde52",
+          "role": "native",
+          "case": "empty-line",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 1113,
+          "argv_unchanged": true,
+          "stdin_sha256": "4ff5c6029961b12b1ce804b4b208fd2184bb18b20c6d4547728193cc4a8e68d0",
+          "role": "native",
+          "case": "fixed-buffer-boundary",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 30,
+          "argv_unchanged": true,
+          "stdin_sha256": "a9dc7a9646ae531831141afbe9a394a73608c81104bae1b65cf50cc2f8008fa8",
+          "role": "native",
+          "case": "embedded-nul",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 38,
+          "argv_unchanged": true,
+          "stdin_sha256": "f84a6beee0dda34ec94bf6a973e1ffc5b42fbd9f84840496376d4488e74163a1",
+          "role": "native",
+          "case": "multiline",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 22,
+          "argv_unchanged": true,
+          "stdin_sha256": "448ecc24be01df1ddf8eaac725f1c747da7c8dad5833de5047b2fab974132d65",
+          "role": "native",
+          "case": "dynamic-prompt",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 22,
+          "argv_unchanged": true,
+          "stdin_sha256": "3580b877bbe005ee86aa0d8be23e67e234625e98b9a5ed3189fbdd33c7bf99f8",
+          "role": "native",
+          "case": "crlf",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 15,
+          "argv_unchanged": true,
+          "stdin_sha256": "4be41727218a510a34de1a1aad87e675824fe733026e9db5385ccb3cd2d1974a",
+          "role": "native",
+          "case": "invalid-utf8-comment",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "a707eee2c2bc3e627ed0b6006c6d0b4a5c053ed4c58c7b483dba122f74836071",
+          "role": "native",
+          "case": "missing-library-warnings-off",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "5095abf72b4590ed9ef93dee0563911d0502abd727818d031ee9154518362344",
+          "role": "native",
+          "case": "missing-library-warnings-on",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "6cfce8d600764a14c3fff394e7603bd0aaca5ec3b96dbd6a9799c570c2d4daad",
+          "role": "native",
+          "case": "ignored-library-override",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 11,
+          "argv_unchanged": true,
+          "stdin_sha256": "cc4a485c6784ee87b08ddecefbdd9d6378dac87209f27218423f9863992f609f",
+          "role": "native",
+          "case": "native-text-ctrl-z",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "4c5bd8418cdf2e378d9ae8dd9b8d53eae0d757216a720c0f5fccff79d24e4a82",
+          "role": "ada",
+          "case": "basic",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 0,
+          "argv_unchanged": true,
+          "stdin_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "role": "ada",
+          "case": "empty-eof",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 9,
+          "argv_unchanged": true,
+          "stdin_sha256": "ce4646420ebcb179feeacc37c59d1ad6aa91cae50e494c03d2a7b284694b446d",
+          "role": "ada",
+          "case": "unterminated-final-line",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 11,
+          "argv_unchanged": true,
+          "stdin_sha256": "75a2044b178511b9a02c6ee41f57c7956f55d7c0a872d61aaf1f093b93abde52",
+          "role": "ada",
+          "case": "empty-line",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 1113,
+          "argv_unchanged": true,
+          "stdin_sha256": "4ff5c6029961b12b1ce804b4b208fd2184bb18b20c6d4547728193cc4a8e68d0",
+          "role": "ada",
+          "case": "fixed-buffer-boundary",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 30,
+          "argv_unchanged": true,
+          "stdin_sha256": "a9dc7a9646ae531831141afbe9a394a73608c81104bae1b65cf50cc2f8008fa8",
+          "role": "ada",
+          "case": "embedded-nul",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 38,
+          "argv_unchanged": true,
+          "stdin_sha256": "f84a6beee0dda34ec94bf6a973e1ffc5b42fbd9f84840496376d4488e74163a1",
+          "role": "ada",
+          "case": "multiline",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 22,
+          "argv_unchanged": true,
+          "stdin_sha256": "448ecc24be01df1ddf8eaac725f1c747da7c8dad5833de5047b2fab974132d65",
+          "role": "ada",
+          "case": "dynamic-prompt",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 22,
+          "argv_unchanged": true,
+          "stdin_sha256": "3580b877bbe005ee86aa0d8be23e67e234625e98b9a5ed3189fbdd33c7bf99f8",
+          "role": "ada",
+          "case": "crlf",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 15,
+          "argv_unchanged": true,
+          "stdin_sha256": "4be41727218a510a34de1a1aad87e675824fe733026e9db5385ccb3cd2d1974a",
+          "role": "ada",
+          "case": "invalid-utf8-comment",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "a707eee2c2bc3e627ed0b6006c6d0b4a5c053ed4c58c7b483dba122f74836071",
+          "role": "ada",
+          "case": "missing-library-warnings-off",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "5095abf72b4590ed9ef93dee0563911d0502abd727818d031ee9154518362344",
+          "role": "ada",
+          "case": "missing-library-warnings-on",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "6cfce8d600764a14c3fff394e7603bd0aaca5ec3b96dbd6a9799c570c2d4daad",
+          "role": "ada",
+          "case": "ignored-library-override",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 11,
+          "argv_unchanged": true,
+          "stdin_sha256": "cc4a485c6784ee87b08ddecefbdd9d6378dac87209f27218423f9863992f609f",
+          "role": "ada",
+          "case": "native-text-ctrl-z",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        }
+      ],
+      "processes": 28
+    },
+    {
+      "compile_comparison": null,
+      "cases": 14,
+      "old_raw_report": "C:\\Users\\Itsuki\\workspace\\lua-ada\\reports\\cli-readline\\1dd35caf8ab8446499a3851b99333b79\\result.json",
+      "old_report_replayed_as_current_source_evidence": false,
+      "configuration": "upstream-test",
+      "kind": "readline",
+      "old_raw_sha256": "104b75b9ba115966afeb7023189bca521150cda67105d77989b1efdc8dd91bc3",
+      "operations": [
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "4c5bd8418cdf2e378d9ae8dd9b8d53eae0d757216a720c0f5fccff79d24e4a82",
+          "role": "native",
+          "case": "basic",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 0,
+          "argv_unchanged": true,
+          "stdin_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "role": "native",
+          "case": "empty-eof",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 9,
+          "argv_unchanged": true,
+          "stdin_sha256": "ce4646420ebcb179feeacc37c59d1ad6aa91cae50e494c03d2a7b284694b446d",
+          "role": "native",
+          "case": "unterminated-final-line",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 11,
+          "argv_unchanged": true,
+          "stdin_sha256": "75a2044b178511b9a02c6ee41f57c7956f55d7c0a872d61aaf1f093b93abde52",
+          "role": "native",
+          "case": "empty-line",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 1113,
+          "argv_unchanged": true,
+          "stdin_sha256": "4ff5c6029961b12b1ce804b4b208fd2184bb18b20c6d4547728193cc4a8e68d0",
+          "role": "native",
+          "case": "fixed-buffer-boundary",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 30,
+          "argv_unchanged": true,
+          "stdin_sha256": "a9dc7a9646ae531831141afbe9a394a73608c81104bae1b65cf50cc2f8008fa8",
+          "role": "native",
+          "case": "embedded-nul",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 38,
+          "argv_unchanged": true,
+          "stdin_sha256": "f84a6beee0dda34ec94bf6a973e1ffc5b42fbd9f84840496376d4488e74163a1",
+          "role": "native",
+          "case": "multiline",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 22,
+          "argv_unchanged": true,
+          "stdin_sha256": "448ecc24be01df1ddf8eaac725f1c747da7c8dad5833de5047b2fab974132d65",
+          "role": "native",
+          "case": "dynamic-prompt",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 22,
+          "argv_unchanged": true,
+          "stdin_sha256": "3580b877bbe005ee86aa0d8be23e67e234625e98b9a5ed3189fbdd33c7bf99f8",
+          "role": "native",
+          "case": "crlf",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 15,
+          "argv_unchanged": true,
+          "stdin_sha256": "4be41727218a510a34de1a1aad87e675824fe733026e9db5385ccb3cd2d1974a",
+          "role": "native",
+          "case": "invalid-utf8-comment",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "a707eee2c2bc3e627ed0b6006c6d0b4a5c053ed4c58c7b483dba122f74836071",
+          "role": "native",
+          "case": "missing-library-warnings-off",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "5095abf72b4590ed9ef93dee0563911d0502abd727818d031ee9154518362344",
+          "role": "native",
+          "case": "missing-library-warnings-on",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "6cfce8d600764a14c3fff394e7603bd0aaca5ec3b96dbd6a9799c570c2d4daad",
+          "role": "native",
+          "case": "ignored-library-override",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 11,
+          "argv_unchanged": true,
+          "stdin_sha256": "cc4a485c6784ee87b08ddecefbdd9d6378dac87209f27218423f9863992f609f",
+          "role": "native",
+          "case": "native-text-ctrl-z",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "4c5bd8418cdf2e378d9ae8dd9b8d53eae0d757216a720c0f5fccff79d24e4a82",
+          "role": "ada",
+          "case": "basic",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 0,
+          "argv_unchanged": true,
+          "stdin_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "role": "ada",
+          "case": "empty-eof",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 9,
+          "argv_unchanged": true,
+          "stdin_sha256": "ce4646420ebcb179feeacc37c59d1ad6aa91cae50e494c03d2a7b284694b446d",
+          "role": "ada",
+          "case": "unterminated-final-line",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 11,
+          "argv_unchanged": true,
+          "stdin_sha256": "75a2044b178511b9a02c6ee41f57c7956f55d7c0a872d61aaf1f093b93abde52",
+          "role": "ada",
+          "case": "empty-line",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 1113,
+          "argv_unchanged": true,
+          "stdin_sha256": "4ff5c6029961b12b1ce804b4b208fd2184bb18b20c6d4547728193cc4a8e68d0",
+          "role": "ada",
+          "case": "fixed-buffer-boundary",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 30,
+          "argv_unchanged": true,
+          "stdin_sha256": "a9dc7a9646ae531831141afbe9a394a73608c81104bae1b65cf50cc2f8008fa8",
+          "role": "ada",
+          "case": "embedded-nul",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 38,
+          "argv_unchanged": true,
+          "stdin_sha256": "f84a6beee0dda34ec94bf6a973e1ffc5b42fbd9f84840496376d4488e74163a1",
+          "role": "ada",
+          "case": "multiline",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 22,
+          "argv_unchanged": true,
+          "stdin_sha256": "448ecc24be01df1ddf8eaac725f1c747da7c8dad5833de5047b2fab974132d65",
+          "role": "ada",
+          "case": "dynamic-prompt",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 22,
+          "argv_unchanged": true,
+          "stdin_sha256": "3580b877bbe005ee86aa0d8be23e67e234625e98b9a5ed3189fbdd33c7bf99f8",
+          "role": "ada",
+          "case": "crlf",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 15,
+          "argv_unchanged": true,
+          "stdin_sha256": "4be41727218a510a34de1a1aad87e675824fe733026e9db5385ccb3cd2d1974a",
+          "role": "ada",
+          "case": "invalid-utf8-comment",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "a707eee2c2bc3e627ed0b6006c6d0b4a5c053ed4c58c7b483dba122f74836071",
+          "role": "ada",
+          "case": "missing-library-warnings-off",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "5095abf72b4590ed9ef93dee0563911d0502abd727818d031ee9154518362344",
+          "role": "ada",
+          "case": "missing-library-warnings-on",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 10,
+          "argv_unchanged": true,
+          "stdin_sha256": "6cfce8d600764a14c3fff394e7603bd0aaca5ec3b96dbd6a9799c570c2d4daad",
+          "role": "ada",
+          "case": "ignored-library-override",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        },
+        {
+          "stdin_bytes": 11,
+          "argv_unchanged": true,
+          "stdin_sha256": "cc4a485c6784ee87b08ddecefbdd9d6378dac87209f27218423f9863992f609f",
+          "role": "ada",
+          "case": "native-text-ctrl-z",
+          "setup_unchanged": true,
+          "old_capture_hash_verified": true
+        }
+      ],
+      "processes": 28
+    }
+  ],
+  "scope": "Read-only exact operation retention audit against dated component reports. Does not execute, reapprove, modify or promote them; new schema/current-source observations remain required.",
+  "date": "2026-11-08",
+  "independent_review": "pending",
+  "schema_version": 1,
+  "kind": "host-campaign-contract-extraction-author-audit",
+  "process_inputs_compared": 136,
+  "coverage_authority": false,
+  "source_build_provenance_verified": false,
+  "old_reports_replayed_by_new_receiver": false
+}

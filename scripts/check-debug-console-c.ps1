@@ -11,6 +11,8 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
+Import-Module (Join-Path $PSScriptRoot 'TargetHostCampaignContracts.psm1')
+$platform=if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'}
 $referenceRevision=(& git -C (Join-Path $root 'references/lua') rev-parse HEAD).Trim()
 if($LASTEXITCODE -ne 0 -or $referenceRevision -cne '7579fc9d7ed90240487251dfb69168f8e64e9294'){
     throw 'Debug console C campaign requires the pinned native source tree'
@@ -47,7 +49,7 @@ $sources=@(foreach($relative in $sourceNames){
 if(@($sources|Where-Object { $_.sha256 -cne $_.snapshot_sha256 }).Count){
     throw 'Debug console C source changed during its byte snapshot'
 }
-$modes=@('host','host-close','callback-close','callback-error')
+$modes=@(Get-TargetHostCampaignCases -Kind console-c -Platform $platform|ForEach-Object name)
 $sourceText=[IO.File]::ReadAllText((Join-Path $sourceRoot 'c_api/tests/builtin_api_contract.c'))
 foreach($mode in $modes){
     if(-not $sourceText.Contains('"--debug-console-'+$mode+'"',[StringComparison]::Ordinal)){
@@ -93,25 +95,8 @@ foreach($directory in @($nativeImage,$adaImage)){
 }
 $suffix=if($IsWindows){'.exe'}else{''}
 $nativeExecutable=Join-Path $nativeImage ('builtin_api_contract'+$suffix)
-$compileArguments=@('-std=c99','-Wall','-Wextra','-Werror','-pedantic')
-if($Configuration -ceq 'upstream-test'){
-    # Use the real pinned test header's luaL_newstate macro so native T gets
-    # debug_realloc/l_memcontrol, rather than the ordinary SDK constructor.
-    # Ada remains its separately built public SDK consumer; no C private
-    # interpreter header or debug allocator is linked into the Ada runtime.
-    $compileArguments+='-DLUA_USER_H=<ltests.h>'
-}
-if($IsWindows){$compileArguments+='-DLUA_BUILD_AS_DLL'}
-elseif($IsMacOS){$compileArguments+='-DLUA_USE_MACOSX'}
-else{$compileArguments+='-DLUA_USE_LINUX'}
-if(-not $IsWindows){
-    # The actual T constructor takes &l_memcontrol from the shared oracle.
-    # Resolve data through the GOT, avoiding an executable copy relocation.
-    $compileArguments+='-fPIC'
-}
-$compileArguments+=@(('-I'+(Join-Path $sourceRoot 'references/lua')),
-    (Join-Path $sourceRoot 'c_api/tests/builtin_api_contract.c'),
-    ('-L'+$nativeImage),'-lconformance_lua','-lm','-o',$nativeExecutable)
+$compileArguments=@(Get-TargetHostConsoleCompileArguments -Configuration $Configuration -Platform $platform `
+    -SourceRoot $sourceRoot -NativeImage $nativeImage -NativeExecutable $nativeExecutable)
 $loader=if($IsWindows){'PATH'}elseif($IsMacOS){'DYLD_LIBRARY_PATH'}else{'LD_LIBRARY_PATH'}
 function Environment-For([string]$Directory){
     $environment=@{}
@@ -149,8 +134,7 @@ try{
     # actual lua_settop(L,0) after that command closes/removes its final root;
     # the second collection must reclaim it. A throwing closer exits after
     # the first command and is caught by the real outer C lua_pcall instead.
-    $inputBytes=[Text.UTF8Encoding]::new($false).GetBytes(
-        "collectgarbage();assert(watch[1]~=nil)`ncollectgarbage();assert(watch[1]==nil)`ncont`n")
+    $inputBytes=Get-TargetHostCampaignInputBytes -Kind console-c -Case @{name='host'}
     foreach($mode in $modes){
         foreach($role in @('native','ada')){
             $directory=Join-Path $OutputDirectory ($role+'/'+$mode)
@@ -197,10 +181,14 @@ try{
     # both sides, including native T's required debug allocator. The consumer
     # intentionally does not report its otherwise unused custom counts as a
     # console allocator/cleanup witness, and this report invents none.
-    $result=@{schema_version=1;kind='debug-console-c-process-regressions';configuration=$Configuration;
-        repository_revision=$revision;repository_dirty=($changes.Count -ne 0);reference_revision=$referenceRevision;
+    $result=@{schema_version=2;kind='debug-console-c-process-regressions';configuration=$Configuration;
+        output_directory=$OutputDirectory;
+        repository_revision=$revision;repository_dirty=($changes.Count -ne 0);
+        platform=$platform;source_repository_root=$root;
+        reference_revision=(&git -C (Join-Path $root 'references/lua') rev-parse HEAD).Trim();
+        source_bindings=@(Get-TargetHostCampaignSourcePaths -Kind console-c|ForEach-Object{@{path=$_;sha256=(Get-FileHash (Join-Path $root $_)).Hash.ToLowerInvariant()}});
         synthetic_fixture=$false;runtime_acceptance=$false;coverage_authority=$false;
-        comparison_complete=$comparisonComplete;source_repository_root=$root;sources=$sources;
+        comparison_complete=$comparisonComplete;sources=$sources;
         harness_sources=@(foreach($file in @('scripts/check-debug-console-c.ps1','scripts/ConformanceRunner.psm1')){
             @{path=$file;sha256=(Get-FileHash (Join-Path $root $file)).Hash.ToLowerInvariant()}});
         compiler=@{path=$compilerPath;sha256=(Get-FileHash $compilerPath).Hash.ToLowerInvariant()};

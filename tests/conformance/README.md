@@ -204,13 +204,33 @@ explicitly rejects a context until those receivers exist. The four C console mod
 separate actual invocations; the ordinary 605 C source candidates cannot borrow
 their evidence or count them as no-argument consumer operations.
 
+The schema-2 console Lua, four-mode C console and readline reports now share
+their closed input/argument contracts with `TargetHostCampaignContracts.psm1`.
+`TargetHostCampaignEvidence.psm1` checks every ordered role/case, exact delivered
+input, status, unmodified same-host output/error bytes, actual compiler and
+native configuration probe, source snapshots, copied program/runtime identities
+and supplied frozen-image membership. It binds each C console invocation to
+the separately built Ada consumer receipt. It does not claim product CLI
+allocator telemetry. These readers still need connection to the complete
+context receipt graph alongside the portable typed-argument consumer; the
+existing final missing-campaign gate remains active.
+
+The [contract extraction audit](targets/remaining-upstream-compatibility/host-campaign-contract-extraction.author-audit.json)
+compares all 136 inputs/argv/setup/modes in six dated full Windows reports.
+Those old reports remain dated observations and were not replayed as evidence
+for the new source. Fresh schema-2 Windows component captures independently
+exercise 32 Lua-console, eight C-console and 28 readline processes in each
+configuration. Their copied-product build provenance is explicitly unverified,
+the harness checkout is dirty, and strict final replay rejects them. They
+establish no frozen context, original-source or global API acceptance.
+
 The Windows native T no-close event is separately labelled
 `observed-native-test-teardown-diagnostic`, with passing execution evidence
 false. Its private `atexit(checkfinalmem)` assertion cannot replace the clean
 native-default no-close, Ada T no-close or native T close-true counterparts.
 Only the independently reviewed original-source direction permits collecting
 this diagnostic; final image reconciliation requires an additional independent
-review of all twenty-three current protocol sources. The pending author packet
+review of all twenty-four current protocol sources. The pending author packet
 grants none. Other hosts require fresh diagnostic applicability review. Raw
 failed input writes remain failed pipe observations, with separate write,
 close and output-drain fields; the closed prompt-before-input terminal cases

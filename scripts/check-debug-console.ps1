@@ -10,33 +10,13 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
+Import-Module (Join-Path $PSScriptRoot 'TargetHostCampaignContracts.psm1')
+$platform=if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'}
 if($OutputDirectory -eq ''){
     $OutputDirectory=Join-Path $root ('reports/debug-console/'+[guid]::NewGuid().ToString('N'))
 }
 [void][IO.Directory]::CreateDirectory($OutputDirectory)
-$ordinary="require('debug').debug();print('AFTER')"
-$cases=@(
-    @{name='write-and-continue';setup=$ordinary;input="io.stderr:write(1000)`ncont`n"},
-    @{name='discard-results';setup=$ordinary;input="return 123,'discard'`ncont`n"},
-    @{name='syntax-error-recovery';setup=$ordinary;input="local =`nio.stderr:write('RECOVERED')`ncont`n"},
-    @{name='error-object-conversion';setup=$ordinary;input="error(setmetatable({},{__tostring=function()return 'OBJECT ERROR'end}))`nio.stderr:write('RECOVERED')`ncont`n"},
-    @{name='command-environment';setup="local console_local=99;_G.console_global=17;require('debug').debug();assert(console_global==18);print('AFTER')";input="assert(console_local==nil);console_global=console_global+1`ncont`n"},
-    @{name='eof';setup=$ordinary;input=''},
-    @{name='partial-final-command';setup=$ordinary;input="io.stderr:write('E')"},
-    @{name='embedded-nul';setup=$ordinary;input="io.stderr:write('N')`0ignored`ncont`n"},
-    @{name='fixed-buffer-boundary';setup=$ordinary;input=(('--'+('x'*247))*3)+"`nio.stderr:write('B')`ncont`n"},
-    @{name='numeric-error-conversion';setup=$ordinary;input="error(setmetatable({},{__tostring=function()return 17 end}))`ncont`n"},
-    @{name='conversion-error-escapes';setup="local ok,e=pcall(require('debug').debug);assert(not ok and e=='CONVERT');print('AFTER')";input="error(setmetatable({},{__tostring=function()error('CONVERT',0)end}))`n"},
-    @{name='command-cannot-yield';setup="local c=coroutine.create(require('debug').debug);assert(coroutine.resume(c));assert(coroutine.status(c)=='dead');print('AFTER')";input="coroutine.yield('escape')`ncont`n"},
-    @{name='initial-argument-release';setup="_G.watch=setmetatable({},{__mode='v'});require('debug').debug((function()local t={}watch[1]=t;return t end)());assert(watch[1]==nil);print('AFTER')";input="collectgarbage();assert(watch[1]~=nil)`ncollectgarbage();assert(watch[1]==nil)`ncont`n"},
-    @{name='binary-error-bytes';setup=$ordinary;input="error(string.char(255,254),0)`ncont`n"}
-)
-if($IsWindows){
-    $cases+=@(
-        @{name='native-text-crlf';setup=$ordinary;input="io.stderr:write('R')`r`ncont`r`n"},
-        @{name='native-text-ctrl-z';setup=$ordinary;input="`u{001a}ignored`n"}
-    )
-}
+$cases=@(Get-TargetHostCampaignCases -Kind console-lua -Platform $platform)
 $rows=@()
 foreach($role in @('native','ada')){
     $source=if($role -ceq 'native'){$ReferenceInterpreter}else{$Interpreter}
@@ -55,11 +35,11 @@ foreach($role in @('native','ada')){
         $directory=Join-Path $OutputDirectory ($role+'/'+$case.name)
         [void][IO.Directory]::CreateDirectory($directory)
         $inputPath=Join-Path $directory 'stdin'
-        [IO.File]::WriteAllText($inputPath,$case.input,[Text.UTF8Encoding]::new($false))
+        [IO.File]::WriteAllBytes($inputPath,(Get-TargetHostCampaignInputBytes -Kind console-lua -Case $case))
         $loader=if($IsWindows){'PATH'}elseif($IsMacOS){'DYLD_LIBRARY_PATH'}else{'LD_LIBRARY_PATH'}
         $environment=@{}
         $environment[$loader]=$image+[IO.Path]::PathSeparator+[Environment]::GetEnvironmentVariable($loader)
-        $process=Invoke-ConformanceProcess -Executable $exe -Arguments @('-e',$case.setup) `
+        $process=Invoke-ConformanceProcess -Executable $exe -Arguments (Get-TargetHostCampaignArguments -Kind console-lua -Case $case) `
             -Directory $directory -OutputPrefix (Join-Path $directory 'process') `
             -TimeoutSeconds 30 -StandardInputPath $inputPath -Environment $environment
         $rows+=@{role=$role;name=$case.name;setup=$case.setup;environment=$environment;
@@ -67,9 +47,14 @@ foreach($role in @('native','ada')){
                 @{name=$_.Name;sha256=(Get-FileHash $_.FullName).Hash.ToLowerInvariant()}})}
     }
 }
-$report=@{schema_version=1;kind='debug-console-process-regressions';configuration=$Configuration;
-    synthetic_fixture=$false;runtime_acceptance=$false;coverage_authority=$false;
+$report=@{schema_version=2;kind='debug-console-process-regressions';configuration=$Configuration;
+    output_directory=$OutputDirectory;
+    platform=$platform;source_repository_root=$root;
+        reference_revision=(&git -C (Join-Path $root 'references/lua') rev-parse HEAD).Trim();
+        source_bindings=@(Get-TargetHostCampaignSourcePaths -Kind console-lua|ForEach-Object{@{path=$_;sha256=(Get-FileHash (Join-Path $root $_)).Hash.ToLowerInvariant()}});
+        synthetic_fixture=$false;runtime_acceptance=$false;coverage_authority=$false;
     repository_revision=(& git -C $root rev-parse HEAD).Trim();
+    repository_dirty=(@(&git -C $root -c core.fsmonitor=false status --porcelain=v1 --untracked-files=normal).Count -ne 0);
     source=@{path='scripts/check-debug-console.ps1';sha256=(Get-FileHash $PSCommandPath).Hash.ToLowerInvariant()};
     processes=$rows}
 # Preserve failures as observations too. Product CLI runs have no measured

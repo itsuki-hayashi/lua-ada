@@ -10,7 +10,7 @@ function Get-CliFixtureSources {
         'cli/shared/lua_ada_cli_readline.c','cli/shared/lua_ada_cli_prompt.c',
         'cli/shared/lua-sessions-cli.adb','cli/shared/lua-sessions-cli.ads','cli/shared/lua_cli.adb',
         'cli/lua_ada_cli.gpr','tests/lua_ada_tests.gpr','scripts/check-cli-readline.ps1',
-        'scripts/test-cli-readline-portability.ps1',
+        'scripts/test-cli-readline-portability.ps1','scripts/TargetHostCampaignContracts.psm1',
         'tests/conformance/targets/configured-fixture-classification.json')
 }
 
@@ -40,7 +40,8 @@ function Assert-CliNativeTestExitDirection {
             'scripts/build-target-context.ps1','tests/conformance/targets/configured-fixture-classification.json',
             'cli/shared/lua_ada_cli_readline.c','cli/shared/lua_ada_cli_prompt.c',
             'cli/shared/lua-sessions-cli.adb','cli/shared/lua-sessions-cli.ads','cli/shared/lua_cli.adb',
-            'cli/lua_ada_cli.gpr','tests/lua_ada_tests.gpr','scripts/check-cli-readline.ps1','scripts/test-cli-readline-portability.ps1')
+            'cli/lua_ada_cli.gpr','tests/lua_ada_tests.gpr','scripts/check-cli-readline.ps1','scripts/test-cli-readline-portability.ps1',
+            'scripts/TargetHostCampaignContracts.psm1')
         if($approval.schema_version -ne 1 -or $approval.kind -cne 'native-t-exit-no-close-independent-protocol-review' -or
             $approval.decision -cne 'accepted-source-diagnostic-protocol' -or
             [string]::IsNullOrWhiteSpace($approval.author) -or [string]::IsNullOrWhiteSpace($approval.reviewer) -or
@@ -83,7 +84,8 @@ function Assert-CliHostClassification {
         'scripts/CliFixtureCases.psm1','scripts/check-cli.ps1',
         'cli/shared/lua_ada_cli_readline.c','cli/shared/lua_ada_cli_prompt.c',
         'cli/shared/lua-sessions-cli.adb','cli/shared/lua-sessions-cli.ads','cli/shared/lua_cli.adb',
-        'cli/lua_ada_cli.gpr','tests/lua_ada_tests.gpr','scripts/check-cli-readline.ps1','scripts/test-cli-readline-portability.ps1')
+        'cli/lua_ada_cli.gpr','tests/lua_ada_tests.gpr','scripts/check-cli-readline.ps1','scripts/test-cli-readline-portability.ps1',
+        'scripts/TargetHostCampaignContracts.psm1')
     if($row.bindings -isnot [Array] -or $row.bindings.Count -ne $required.Count -or
         (($row.bindings.path|Sort-Object)-join '|') -cne (($required|Sort-Object)-join '|')){throw 'Host CLI fixture linkage is incomplete'}
     foreach($binding in $row.bindings){

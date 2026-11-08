@@ -205,6 +205,7 @@ function Get-ConfiguredFixtureSources {
         'cli/shared/lua_ada_cli_readline.c','cli/shared/lua_ada_cli_prompt.c',
         'cli/shared/lua-sessions-cli.adb','cli/shared/lua-sessions-cli.ads','cli/shared/lua_cli.adb',
         'cli/lua_ada_cli.gpr','tests/lua_ada_tests.gpr','scripts/check-cli-readline.ps1','scripts/test-cli-readline-portability.ps1',
+        'scripts/TargetHostCampaignContracts.psm1',
         'tests/src/lua-sessions-cli_prompt_tests.adb','tests/src/lua-sessions-cli_prompt_tests.ads',
         'tests/src/code_public_semantic_tests.adb','tests/src/code_public_semantic_tests.ads',
         'tests/src/lua-table_storage_inspection_tests.ads','tests/src/lua-table_storage_inspection_tests.adb',

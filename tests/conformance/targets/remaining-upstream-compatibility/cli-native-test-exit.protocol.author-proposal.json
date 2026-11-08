@@ -13,7 +13,7 @@
   "source_snapshot": {
     "repository_revision": "0db6e82182c19bad876e1d40632f490b1e409d71",
     "repository_dirty": true,
-    "revision": "c71319349f19bcc03a471fac7f913c1f103237ca"
+    "revision": "c55fba4d513ffeac8be2766545c33079ff5578aa"
   },
   "feature_review": {
     "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/cli-native-t-exit-no-close.independent-feature-review.json",
@@ -26,7 +26,7 @@
     },
     {
       "path": "scripts/CliFixtureEvidence.psm1",
-      "sha256": "5a7eb52b404b1b9b1b2408949cc8d87047b07970bc42237fe30424980dd86934"
+      "sha256": "c2b0f80b5eb99fcf1a043eab6fc1616416f2c7c6f315ed60f6bf74cf73d279cb"
     },
     {
       "path": "scripts/ConformanceRunner.psm1",
@@ -42,7 +42,7 @@
     },
     {
       "path": "scripts/ConfiguredFixtureEvidence.psm1",
-      "sha256": "2e64cdb6465a8599c1304cb41c18467cb461185130f73827179fa46640df2aec"
+      "sha256": "59dacfe6e8f49234ae1151f36586dfe61360235c620f29018549eb7bdcfa36e7"
     },
     {
       "path": "scripts/compare.ps1",
@@ -58,7 +58,7 @@
     },
     {
       "path": "scripts/TargetWitnessPolicy.psm1",
-      "sha256": "0d48ad880351060579050a2f12bf0b00c2ce2007313ca7e3e38cf6eed3b87855"
+      "sha256": "fa67ea7c0976e95c8c6618fcc2831bef1f8c3f825574a0c3b46c8c449151da73"
     },
     {
       "path": "scripts/TargetObservationEnvelope.psm1",
@@ -74,7 +74,7 @@
     },
     {
       "path": "tests/conformance/targets/configured-fixture-classification.json",
-      "sha256": "490f3437f0de9aff2d2aed8f13defa8c129b23d931a760086126ff166703def9"
+      "sha256": "6867b5318ea8c6018ccb86d1c4787133acdee00becd3979200ec51c81e0921a1"
     },
     {
       "path": "cli/shared/lua_ada_cli_readline.c",
@@ -106,11 +106,15 @@
     },
     {
       "path": "scripts/check-cli-readline.ps1",
-      "sha256": "2e770912883ee046a63e52bcf02e117c639dcec24dd280f035be83793bcdaf8c"
+      "sha256": "be87fb0b831179f9965c509c1c6dfd3f9a239f3b5daa2a62da179ec797fe4b8d"
     },
     {
       "path": "scripts/test-cli-readline-portability.ps1",
       "sha256": "15924ad90861e4d6f1d55045f57129199add4cb012c9fb3cf8cf454310120e47"
+    },
+    {
+      "path": "scripts/TargetHostCampaignContracts.psm1",
+      "sha256": "bec1aa0c8fd57b43cb40028eec80490539e06f0d31c7e913303a8ef2d2003a81"
     }
   ],
   "review_scope": [
@@ -123,7 +127,7 @@
   ],
   "remaining_requirements": [
     "This file is pending author review input, never the accepted protocol review path.",
-    "Root must independently inspect current23-source hashes and issue a distinct exact protocol decision before final T image reconciliation.",
+    "Root must independently inspect current24-source hashes and issue a distinct exact protocol decision before final T image reconciliation.",
     "Linux/macOS no-close diagnostics require actual source-linked measurements and fresh applicability decisions; Windows handling cannot silently cover them.",
     "All original source/global ledgers and actual whole-target matrix remain pending."
   ]

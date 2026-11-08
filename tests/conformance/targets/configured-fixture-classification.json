@@ -609,11 +609,15 @@
         },
         {
           "path": "scripts/check-cli-readline.ps1",
-          "sha256": "2e770912883ee046a63e52bcf02e117c639dcec24dd280f035be83793bcdaf8c"
+          "sha256": "be87fb0b831179f9965c509c1c6dfd3f9a239f3b5daa2a62da179ec797fe4b8d"
         },
         {
           "path": "scripts/test-cli-readline-portability.ps1",
           "sha256": "15924ad90861e4d6f1d55045f57129199add4cb012c9fb3cf8cf454310120e47"
+        },
+        {
+          "path": "scripts/TargetHostCampaignContracts.psm1",
+          "sha256": "bec1aa0c8fd57b43cb40028eec80490539e06f0d31c7e913303a8ef2d2003a81"
         }
       ],
       "aunit_named_cases": [

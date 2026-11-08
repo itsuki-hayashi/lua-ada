@@ -448,7 +448,8 @@ function Write-TargetBuildWitnesses {
         # this named collector must not borrow them as ordinary consumer or
         # no-argument AUnit evidence.
         if($value.Contains('kind') -and $value.kind -cin @(
-            'debug-console-process-regressions','debug-console-c-process-regressions')){continue}
+            'debug-console-process-regressions','debug-console-c-process-regressions',
+            'cli-readline-process-regressions')){continue}
         if ($value.repository_revision -cne $revision -or $value.configuration -cne $parts[0] -or
             $value.platform -cne $parts[1] -or $value.profile -cne $parts[2] -or $value.library_type -cne $library) { continue }
         if ($value.Contains('consumers')) { $consumerPaths += $file.FullName }

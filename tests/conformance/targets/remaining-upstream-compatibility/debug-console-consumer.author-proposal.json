@@ -9,7 +9,7 @@
   "coverage_authority": false,
   "execution_evidence": [],
   "source_snapshot": {
-    "repository_revision": "0db6e82182c19bad876e1d40632f490b1e409d71",
+    "repository_revision": "c55fba4d513ffeac8be2766545c33079ff5578aa",
     "repository_dirty": true
   },
   "ordinary_no_argument_catalog": {
@@ -32,11 +32,11 @@
     },
     {
       "path": "scripts/check-debug-console-c.ps1",
-      "sha256": "f87187a8be65d2a11e9dc869c2eb84bb0ba9a25974341a1e3ce7daffe4410d80"
+      "sha256": "072e9b8c3eb0147325b035a29ee54a7d30a7d5322ac654dd4ad1ae4c83b4cd9a"
     },
     {
       "path": "scripts/check-debug-console.ps1",
-      "sha256": "952be56d9dbdd688bf13ea196ff85e9f2fe47425470cad54924ecffd321d1b31"
+      "sha256": "e5ce485a0a2766b9f60171d046feae9a725d4125aa2ca0c86a0732f53f17d997"
     },
     {
       "path": "scripts/check.ps1",
@@ -45,6 +45,10 @@
     {
       "path": "scripts/check-instrumented.ps1",
       "sha256": "12f82a3b8509412462191edf016502d5365dfc11aa9e6f26df0fbb9f0b4b3833"
+    },
+    {
+      "path": "scripts/TargetHostCampaignContracts.psm1",
+      "sha256": "bec1aa0c8fd57b43cb40028eec80490539e06f0d31c7e913303a8ef2d2003a81"
     }
   ],
   "cases": [
